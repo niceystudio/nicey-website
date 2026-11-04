@@ -1,0 +1,51 @@
+---
+/** The Zero Drift opener: caption, h2, intro. The static variant adds the step rail. */
+import { markerBg, steps } from '../../data/zero-drift';
+
+interface Props {
+  rail?: boolean;
+}
+const { rail = false } = Astro.props;
+---
+
+<div class:list={['zd-intro', { 'zd-intro--rail': rail }]}>
+  <span class="caption text-ink-2">Zero Drift · how we work</span>
+  <h2 id="how-head" class="m-0 text-h2">From drift to a system that holds.</h2>
+  <p class="m-0 max-w-[36ch] text-cta text-pretty text-ink-2">
+    Five steps. Each one starts with a problem you can see in your product and ends with something you
+    can hold.
+  </p>
+  {
+    rail && (
+      <ol class="mt-2 mb-0 flex list-none flex-col border-t border-line-strong p-0">
+        {steps.map((s) => (
+          <li class="border-b border-line">
+            <a href={`#step-${s.id}`} class="flex min-h-11 items-center gap-3 text-body text-ink no-underline">
+              <i aria-hidden="true" class:list={['marker', markerBg[s.marker]]} />
+              <span class="font-mono text-caption text-ink-2">{s.num}</span>
+              {s.name}
+            </a>
+          </li>
+        ))}
+      </ol>
+    )
+  }
+</div>
+
+<style>
+  .zd-intro {
+    flex: 1 1 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .zd-intro--rail {
+    position: sticky;
+    top: 24px;
+  }
+  @media (max-width: 860px) {
+    .zd-intro--rail {
+      position: static;
+    }
+  }
+</style>

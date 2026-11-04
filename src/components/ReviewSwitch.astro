@@ -1,0 +1,57 @@
+---
+/**
+ * Review-only switch between the two Zero Drift variants.
+ * Shown in dev, or on any build when the URL carries ?review.
+ */
+interface Props {
+  current: 'static' | 'story';
+}
+const { current } = Astro.props;
+const dev = import.meta.env.DEV;
+---
+
+<nav aria-label="Review" class="review" data-review hidden={!dev} data-dev={dev ? 'true' : 'false'}>
+  <span class="caption-sm text-muted">Review</span>
+  <a href="/?review#how" aria-current={current === 'static' ? 'page' : undefined}>static</a>
+  <span aria-hidden="true" class="text-muted">|</span>
+  <a href="/story?review#how" aria-current={current === 'story' ? 'page' : undefined}>story</a>
+</nav>
+
+<style>
+  .review {
+    position: fixed;
+    right: 12px;
+    bottom: 12px;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 6px 0 14px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-pill);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+  }
+  .review[hidden] {
+    display: none;
+  }
+  .review a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 10px;
+    color: var(--color-ink-2);
+    text-decoration: none;
+  }
+  .review a[aria-current='page'] {
+    color: var(--color-ink);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+</style>
+
+<script>
+  const el = document.querySelector<HTMLElement>('[data-review]');
+  if (el && new URLSearchParams(location.search).has('review')) el.hidden = false;
+</script>

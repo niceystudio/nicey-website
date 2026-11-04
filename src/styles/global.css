@@ -1,0 +1,449 @@
+@import 'tailwindcss';
+
+/* ------------------------------------------------------------------ *
+ * Tokens. Every value lives here once; components use only these.
+ * Day values come from the v3 canvas. Night values are overridden
+ * below under [data-theme='dark'].
+ * ------------------------------------------------------------------ */
+@theme static {
+  --color-*: initial;
+  --font-*: initial;
+  --text-*: initial;
+
+  /* colour, day */
+  --color-page: #f3f0e9;
+  --color-surface: #fbfaf6;
+  --color-surface-hover: #f6f3ec;
+  --color-ink: #26251f;
+  --color-ink-2: #4d4a40;
+  --color-muted: #716e63;
+  --color-on-ink: #ffffff;
+  --color-line: rgba(38, 37, 31, 0.1);
+  --color-line-strong: rgba(38, 37, 31, 0.2);
+  --color-dashed: rgba(38, 37, 31, 0.3);
+  --color-cell-quiet: rgba(38, 37, 31, 0.18);
+  --color-accent: #6b5fbe;
+  /* canvas #C4471F nudged to #BF441E so 11px captions clear 4.5:1 on page and surface-hover */
+  --color-hot: #bf441e;
+  --color-focus: var(--color-accent);
+
+  /* pastel markers */
+  --color-sage: #cbdac4;
+  --color-lavender: #d9d2ef;
+  --color-peach: #f6d9c4;
+  --color-butter: #f2e6bc;
+  --color-mauve: #d8c6e0;
+
+  /* closing band */
+  --color-band: #26251f;
+  --color-on-band: #f3f0e9;
+  --color-on-band-2: #b6b1a3;
+
+  /* the purples found in step 01: content, identical in both themes */
+  --color-found-1: #6b5fbe;
+  --color-found-2: #7266c4;
+  --color-found-3: #665ab8;
+  --color-found-4: #5f53b0;
+  --color-found-5: #7a6ecc;
+
+  /* type */
+  --font-sans: 'Geist Variable', 'Geist Fallback', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono Variable', 'Geist Mono Fallback', ui-monospace, monospace;
+
+  --text-display-figure: clamp(104px, 13vw, 196px);
+  --text-display-figure--line-height: 0.84;
+  --text-display-figure--letter-spacing: -0.06em;
+  --text-display-figure--font-weight: 500;
+
+  --text-h1: clamp(48px, 7.4vw, 108px);
+  --text-h1--line-height: 0.95;
+  --text-h1--letter-spacing: -0.05em;
+  --text-h1--font-weight: 500;
+
+  --text-h2: clamp(36px, 4.2vw, 60px);
+  --text-h2--line-height: 1.02;
+  --text-h2--letter-spacing: -0.04em;
+  --text-h2--font-weight: 500;
+
+  --text-h3-practice: clamp(40px, 4.4vw, 64px);
+  --text-h3-practice--line-height: 0.98;
+  --text-h3-practice--letter-spacing: -0.05em;
+  --text-h3-practice--font-weight: 500;
+
+  --text-h3-alongside: clamp(28px, 2.8vw, 38px);
+  --text-h3-alongside--line-height: 1.04;
+  --text-h3-alongside--letter-spacing: -0.035em;
+  --text-h3-alongside--font-weight: 500;
+
+  --text-h3-step: clamp(26px, 2.6vw, 36px);
+  --text-h3-step--line-height: 1.1;
+  --text-h3-step--letter-spacing: -0.03em;
+  --text-h3-step--font-weight: 500;
+
+  --text-h3-card: 22px;
+  --text-h3-card--line-height: 1.2;
+  --text-h3-card--letter-spacing: -0.02em;
+  --text-h3-card--font-weight: 500;
+
+  --text-figure-step: clamp(56px, 6vw, 88px);
+  --text-figure-step--line-height: 0.86;
+  --text-figure-step--letter-spacing: -0.055em;
+  --text-figure-step--font-weight: 500;
+
+  --text-stat: clamp(48px, 5vw, 72px);
+  --text-stat--line-height: 0.9;
+  --text-stat--letter-spacing: -0.05em;
+  --text-stat--font-weight: 500;
+
+  --text-work: clamp(32px, 3.6vw, 48px);
+  --text-work--line-height: 1;
+  --text-work--letter-spacing: -0.045em;
+  --text-work--font-weight: 500;
+
+  --text-title: clamp(22px, 2.1vw, 30px);
+  --text-title--line-height: 1.15;
+  --text-title--letter-spacing: -0.02em;
+  --text-title--font-weight: 500;
+
+  --text-quote: clamp(20px, 2vw, 28px);
+  --text-quote--line-height: 1.3;
+  --text-quote--letter-spacing: -0.02em;
+
+  --text-sub: clamp(18px, 2vw, 26px);
+  --text-sub--line-height: 1.35;
+  --text-sub--letter-spacing: -0.02em;
+
+  --text-faq: 19px;
+  --text-faq--line-height: 1.55;
+  --text-faq--letter-spacing: -0.015em;
+  --text-faq--font-weight: 500;
+
+  --text-body-lg: clamp(17px, 1.5vw, 20px);
+  --text-body-lg--line-height: 1.5;
+  --text-lede: 18px;
+  --text-lede--line-height: 1.5;
+  --text-cta: 17px;
+  --text-cta--line-height: 1.5;
+  --text-body: 16px;
+  --text-body--line-height: 1.55;
+  --text-body-sm: 15px;
+  --text-body-sm--line-height: 1.55;
+  --text-label: 14px;
+  --text-label--line-height: 1.45;
+  --text-code: 13px;
+  --text-code--line-height: 1.6;
+  --text-caption: 12px;
+  --text-caption--line-height: 1.4;
+  --text-caption-sm: 11px;
+  --text-caption-sm--line-height: 1.4;
+  --text-arrow: 24px;
+  --text-arrow--line-height: 1;
+
+  /* shape */
+  --radius-panel: 16px;
+  --radius-code: 8px;
+  --radius-chip: 6px;
+  --radius-swatch: 2px;
+  --radius-pill: 999px;
+
+  /* space */
+  --spacing-section: 128px;
+  --spacing-gutter: 24px;
+  --spacing-cell: 40px;
+  --spacing-cell-lg: 44px;
+  --container-page: 1200px;
+
+  /* motion */
+  --ease-resolve: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* ------------------------------------------------------------------ *
+ * Night. Every colour token has a value here.
+ * ------------------------------------------------------------------ */
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+  :root[data-theme='dark'] {
+    color-scheme: dark;
+    --color-page: #141410;
+    --color-surface: #1d1c16;
+    --color-surface-hover: #24231c;
+    --color-ink: #ece7db;
+    --color-ink-2: #b6b1a3;
+    --color-muted: #8f8c81;
+    --color-on-ink: #141410;
+    --color-line: rgba(236, 231, 219, 0.13);
+    --color-line-strong: rgba(236, 231, 219, 0.26);
+    --color-dashed: rgba(236, 231, 219, 0.34);
+    --color-cell-quiet: rgba(236, 231, 219, 0.16);
+    --color-accent: #a79bea;
+    --color-hot: #ff8a66;
+    --color-sage: #3d4a37;
+    --color-lavender: #3a3556;
+    --color-peach: #4a3a2c;
+    --color-butter: #4a4229;
+    --color-mauve: #463a4c;
+    /* a step darker than the page, so the closing band still reads */
+    --color-band: #0c0c09;
+    --color-on-band: #ece7db;
+    --color-on-band-2: #b6b1a3;
+  }
+
+  /* metric-matched fallbacks so the swap to Geist doesn't shift layout */
+  @font-face {
+    font-family: 'Geist Fallback';
+    src: local('Arial');
+    ascent-override: 95.94%;
+    descent-override: 28.16%;
+    line-gap-override: 0%;
+    size-adjust: 104.76%;
+  }
+  @font-face {
+    font-family: 'Geist Mono Fallback';
+    src: local('Arial');
+    ascent-override: 74.67%;
+    descent-override: 21.92%;
+    line-gap-override: 0%;
+    size-adjust: 134.59%;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    scroll-padding-top: 24px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+  body {
+    margin: 0;
+    background: var(--color-page);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-synthesis: none;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-surface);
+  }
+  a {
+    color: inherit;
+  }
+  button {
+    font: inherit;
+    color: inherit;
+  }
+  summary {
+    cursor: pointer;
+    list-style: none;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  /* focus: one ring, everywhere interactive */
+  :where(a, button, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+  :where(a, button, summary, [tabindex]):focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* one frame with no transitions while the theme swaps */
+  .theme-switching,
+  .theme-switching *,
+  .theme-switching *::before,
+  .theme-switching *::after {
+    transition: none !important;
+  }
+
+  @media (max-width: 767px) {
+    :root {
+      --spacing-section: 96px;
+      --spacing-cell: 28px;
+      --spacing-cell-lg: 28px;
+    }
+  }
+  @media (max-width: 479px) {
+    :root {
+      --spacing-section: 72px;
+      --spacing-gutter: 20px;
+      --spacing-cell: 24px;
+      --spacing-cell-lg: 24px;
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * House patterns
+ * ------------------------------------------------------------------ */
+@layer components {
+  .container-page {
+    max-width: var(--container-page);
+    margin-inline: auto;
+    padding-inline: var(--spacing-gutter);
+  }
+
+  /* The panel: 1px line-coloured gaps between surface cells. */
+  .panel {
+    gap: 1px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background: var(--color-line);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-panel);
+    overflow: hidden;
+  }
+  .panel > * {
+    background: var(--color-surface);
+    min-width: 0;
+  }
+  /* a nested run of cells that shares the panel's gaps */
+  .panel > .panel-sub {
+    background: transparent;
+    gap: 1px;
+  }
+  .panel-sub > * {
+    background: var(--color-surface);
+    min-width: 0;
+  }
+  /* inside a clipped panel, rings draw inward */
+  .panel :where(a, button, summary):focus-visible {
+    outline-offset: -4px;
+  }
+
+  /* four cells → two → one, by the panel's own width */
+  .grid-4 {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  @container panel (min-width: 520px) {
+    .grid-4 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @container panel (min-width: 960px) {
+    .grid-4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  .panel-wrap {
+    container: panel / inline-size;
+  }
+
+  .caption {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    line-height: var(--text-caption--line-height);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .caption-sm {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption-sm);
+    line-height: var(--text-caption-sm--line-height);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .marker {
+    display: block;
+    flex: none;
+    width: 8px;
+    height: 8px;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    border-radius: var(--radius-pill);
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .pill-ink {
+    background: var(--color-ink);
+    color: var(--color-on-ink);
+  }
+  .pill-outline {
+    border: 1px solid var(--color-ink);
+    color: var(--color-ink);
+  }
+  .pill-lg {
+    padding: 16px 24px;
+    font-size: var(--text-cta);
+    line-height: 1.5;
+  }
+  .pill-lg.pill-outline {
+    padding: 15px 23px;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    background: var(--color-page);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-chip);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--color-ink);
+  }
+
+  .placeholder {
+    border: 1px dashed var(--color-dashed);
+    border-radius: var(--radius-chip);
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+    color: var(--color-ink-2);
+  }
+
+  /* unit charts: one cell per real item */
+  .units {
+    display: grid;
+    gap: 2px;
+    grid-template-columns: repeat(auto-fill, var(--u));
+    max-width: calc(var(--n) * var(--u) + (var(--n) - 1) * 2px);
+  }
+  .units > i {
+    display: block;
+    width: var(--u);
+    height: var(--u);
+    background: var(--color-cell-quiet);
+  }
+  .units > i.is-hot {
+    background: var(--color-hot);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+}

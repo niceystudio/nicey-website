@@ -1,0 +1,84 @@
+---
+import SectionHead from './SectionHead.astro';
+import UnitChart from './UnitChart.astro';
+import { markerBg } from '../data/zero-drift';
+---
+
+<section aria-labelledby="when-head" class="container-page flex flex-col gap-12 pb-section">
+  <SectionHead id="when-head" caption="When to bring us in" headingClass="max-w-[18ch]">
+    If one of these sounds like your team, talk to us.
+  </SectionHead>
+  <div class="panel-wrap">
+    <ul class="panel grid-4">
+      <li class="when-cell">
+        <span class="when-num"><i aria-hidden="true" class:list={['marker', markerBg.sage]}></i>01</span>
+        <h3 class="m-0 text-h3-card">Your design file and your repo have drifted apart</h3>
+        <p class="m-0 text-body-sm text-pretty text-ink-2">
+          At Everbreed, 53 variables had drifted between Figma and code, and nobody could tell a rename
+          from a delete.
+        </p>
+        <div class="mt-auto flex flex-col gap-2.5">
+          <UnitChart count={53} hot={53} columns={18} cell={8} label="53 cells, one per drifted variable" />
+          <span class="caption-sm text-muted">53 drifted variables</span>
+        </div>
+      </li>
+      <li class="when-cell">
+        <span class="when-num"><i aria-hidden="true" class:list={['marker', markerBg.lavender]}></i>02</span>
+        <h3 class="m-0 text-h3-card">The product was built for years without a designer</h3>
+        <p class="m-0 text-body-sm text-pretty text-ink-2">
+          At QBench, every screen was a developer’s best guess, and each new feature meant relearning
+          decisions nobody wrote down.
+        </p>
+      </li>
+      <li class="when-cell">
+        <span class="when-num"><i aria-hidden="true" class:list={['marker', markerBg.peach]}></i>03</span>
+        <h3 class="m-0 text-h3-card">The library looks healthy, but a machine can’t use it</h3>
+        <p class="m-0 text-body-sm text-pretty text-ink-2">
+          At Everbreed, all 302 variables had no scope and no code name. Fine for people, unreadable for a
+          pipeline.
+        </p>
+        <div class="mt-auto flex flex-col gap-2.5">
+          <UnitChart
+            count={302}
+            columns={22}
+            cell={6}
+            label="302 cells, one per variable, none with a scope"
+          />
+          <span class="caption-sm text-muted">302 variables · 0 scoped</span>
+        </div>
+      </li>
+      <li class="when-cell">
+        <span class="when-num"><i aria-hidden="true" class:list={['marker', markerBg.butter]}></i>04</span>
+        <h3 class="m-0 text-h3-card">Your team is handing design to AI agents</h3>
+        <p class="m-0 text-body-sm text-pretty text-ink-2">
+          A developer fills the gaps in a Figma file. An agent guesses, and every guess becomes a
+          correction pass.
+        </p>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<style>
+  .when-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 360px;
+    padding: 32px 28px;
+  }
+  .when-num {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--color-ink-2);
+  }
+  @container panel (max-width: 519.98px) {
+    .when-cell {
+      min-height: 0;
+      padding: var(--spacing-cell);
+    }
+  }
+</style>

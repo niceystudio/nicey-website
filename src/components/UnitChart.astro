@@ -1,0 +1,20 @@
+---
+/**
+ * A unit chart: one DOM cell per real item, never invented data.
+ * `hot` cells come first. `columns` is the canvas's row width; narrower
+ * containers wrap to fewer columns instead of overflowing.
+ */
+interface Props {
+  count: number;
+  hot?: number;
+  columns: number;
+  cell: number;
+  label: string;
+}
+const { count, hot = 0, columns, cell, label } = Astro.props;
+const cells = Array.from({ length: count }, (_, i) => i < hot);
+---
+
+<div role="img" aria-label={label} class="units" style={`--u: ${cell}px; --n: ${columns}`}>
+  {cells.map((isHot) => <i class:list={{ 'is-hot': isHot }} />)}
+</div>

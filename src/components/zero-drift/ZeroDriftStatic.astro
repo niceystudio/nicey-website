@@ -1,0 +1,17 @@
+---
+/** Zero Drift, static: sticky rail + all five steps in one panel. */
+import ZeroDriftIntro from './ZeroDriftIntro.astro';
+import ZeroDriftStep from './ZeroDriftStep.astro';
+import { steps } from '../../data/zero-drift';
+---
+
+<section
+  id="how"
+  aria-labelledby="how-head"
+  class="container-page flex flex-wrap items-start gap-x-[72px] gap-y-12 pb-section"
+>
+  <ZeroDriftIntro rail />
+  <ol class="panel flex min-w-0 flex-[999_1_560px] flex-col">
+    {steps.map((s) => <ZeroDriftStep step={s} id={`step-${s.id}`} />)}
+  </ol>
+</section>

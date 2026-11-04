@@ -1,0 +1,44 @@
+---
+/**
+ * The whole homepage. `/` and `/story` both render this; only the
+ * Zero Drift variant differs.
+ */
+import Base from '../layouts/Base.astro';
+import Header from './Header.astro';
+import Hero from './Hero.astro';
+import ProofPanel from './ProofPanel.astro';
+import WhenToBring from './WhenToBring.astro';
+import ZeroDriftStatic from './zero-drift/ZeroDriftStatic.astro';
+import ZeroDriftStory from './zero-drift/ZeroDriftStory.astro';
+import Services from './Services.astro';
+import Process from './Process.astro';
+import Work from './Work.astro';
+import Faq from './Faq.astro';
+import Footer from './Footer.astro';
+import ReviewSwitch from './ReviewSwitch.astro';
+
+interface Props {
+  zeroDrift: 'static' | 'story';
+}
+const { zeroDrift } = Astro.props;
+---
+
+<Base
+  title="Nicey · Design systems people and agents read the same way"
+  description="We turn years of drifted UI into one system: tokens, components and documentation that a designer, an engineer and a coding agent understand the same way. Product design when you need the screens too."
+  noindex={zeroDrift === 'story'}
+>
+  <Header />
+  <main id="main" tabindex="-1">
+    <Hero />
+    <ProofPanel />
+    <WhenToBring />
+    {zeroDrift === 'static' ? <ZeroDriftStatic /> : <ZeroDriftStory />}
+    <Services />
+    <Process />
+    <Work />
+    <Faq />
+  </main>
+  <Footer />
+  <ReviewSwitch current={zeroDrift} />
+</Base>

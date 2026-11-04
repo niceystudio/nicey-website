@@ -1,0 +1,64 @@
+---
+import SectionHead from './SectionHead.astro';
+import { links } from '../data/links';
+import { markerBg } from '../data/zero-drift';
+
+const steps = [
+  {
+    n: '01',
+    free: true,
+    title: 'Share your Figma file',
+    body: 'The repo is optional. With it, we can also check Figma against code.',
+  },
+  {
+    n: '02',
+    free: true,
+    title: 'Get the audit report',
+    body: 'A score per pillar, the top findings, and what to fix first.',
+  },
+  {
+    n: '03',
+    free: false,
+    title: 'Talk it through',
+    body: 'A call with the people who will do the work, then a scoped proposal.',
+  },
+  {
+    n: '04',
+    free: false,
+    title: 'Build, pilot, roll out',
+    body: 'Architecture agreed with your engineers, a gated pilot, then migration in slices. For product work, scope is locked in week one: built, documented, or parked with a reason.',
+  },
+];
+---
+
+<section id="audit" aria-labelledby="start-head" class="container-page flex flex-col gap-12 pb-section">
+  <div class="flex flex-wrap items-end justify-between gap-6">
+    <SectionHead id="start-head" caption="What working with us looks like" headingClass="max-w-[16ch]">
+      It starts with a free audit.
+    </SectionHead>
+    <a href={links.startAudit} class="pill pill-ink pill-lg">Get a free audit</a>
+  </div>
+  <div class="panel-wrap">
+    <ol class="panel grid-4">
+      {
+        steps.map((s) => (
+          <li class="flex min-h-[260px] flex-col justify-between gap-10 px-8 pt-7 pb-8 max-sm:min-h-0 max-sm:px-6">
+            <span class="caption flex items-center justify-between gap-3 text-ink-2">
+              <span>Step {s.n}</span>
+              {s.free && (
+                <span class="inline-flex items-center gap-1.5">
+                  <i aria-hidden="true" class:list={['marker', markerBg.sage]} />
+                  Free
+                </span>
+              )}
+            </span>
+            <div class="flex flex-col gap-2.5">
+              <h3 class="m-0 text-h3-card">{s.title}</h3>
+              <p class="m-0 text-body-sm text-pretty text-ink-2">{s.body}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>

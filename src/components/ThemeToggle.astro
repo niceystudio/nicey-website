@@ -1,0 +1,91 @@
+---
+/* Day/night switch. The theme itself is applied before paint by Base.astro. */
+---
+
+<button type="button" class="theme-toggle" aria-pressed="false" data-theme-toggle>
+  <span class="sr-only">Night theme</span>
+  <svg aria-hidden="true" viewBox="0 0 20 20" width="18" height="18">
+    <circle cx="10" cy="10" r="7.25" fill="none" stroke="currentColor" stroke-width="1.5"></circle>
+    <path d="M10 2.75a7.25 7.25 0 0 1 0 14.5z" fill="currentColor"></path>
+  </svg>
+</button>
+
+<style>
+  .theme-toggle {
+    display: inline-grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--color-ink);
+    cursor: pointer;
+  }
+  .theme-toggle svg {
+    display: block;
+  }
+  :global([data-theme='dark']) .theme-toggle svg {
+    transform: scaleX(-1);
+  }
+  @media (hover: hover) {
+    .theme-toggle:hover {
+      background: var(--color-surface-hover);
+    }
+  }
+</style>
+
+<script>
+  const KEY = 'nicey-theme';
+  const root = document.documentElement;
+  const media = window.matchMedia('(prefers-color-scheme: dark)');
+
+  type Theme = 'light' | 'dark';
+
+  function stored(): Theme | null {
+    try {
+      const v = localStorage.getItem(KEY);
+      return v === 'light' || v === 'dark' ? v : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function sync() {
+    const dark = root.dataset.theme === 'dark';
+    document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((b) => {
+      b.setAttribute('aria-pressed', String(dark));
+    });
+  }
+
+  function apply(theme: Theme) {
+    // suppress transitions for one frame so the page doesn't crossfade
+    root.classList.add('theme-switching');
+    root.dataset.theme = theme;
+    void getComputedStyle(root).getPropertyValue('color');
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => root.classList.remove('theme-switching'));
+    });
+    sync();
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((b) => {
+    b.addEventListener('click', () => {
+      const next: Theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      try {
+        localStorage.setItem(KEY, next);
+      } catch {
+        /* storage blocked: the choice lasts for this page view */
+      }
+      apply(next);
+    });
+  });
+
+  // follow the system until the visitor picks one
+  media.addEventListener('change', (e) => {
+    if (!stored()) apply(e.matches ? 'dark' : 'light');
+  });
+
+  sync();
+</script>

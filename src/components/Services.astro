@@ -1,0 +1,87 @@
+---
+import SectionHead from './SectionHead.astro';
+import { links } from '../data/links';
+import { markerBg } from '../data/zero-drift';
+
+const primary = [
+  'Audit and consolidation',
+  'Token architecture and theming',
+  'Component library, Figma to code',
+  'AI-ready documentation',
+  'Systems partner, monthly',
+  'Free audit to start',
+];
+const alongside = ['Product and UX design', 'Design engineering', 'AI workflows in delivery'];
+---
+
+<section id="services" aria-labelledby="services-head" class="container-page flex flex-col gap-12 pb-section">
+  <SectionHead id="services-head" caption="What we help with" headingClass="max-w-[16ch]">
+    Design systems first. Product design alongside.
+  </SectionHead>
+  <div class="panel flex flex-wrap">
+    <article class="svc flex-[999_1_560px] gap-6">
+      <span class="caption flex items-center gap-2 text-ink-2"
+        ><i aria-hidden="true" class:list={['marker', markerBg.lavender]}></i>01 · Primary practice</span
+      >
+      <h3 class="m-0 text-h3-practice">Design systems</h3>
+      <p class="m-0 max-w-[44ch] text-lede text-pretty text-ink-2">
+        For products with years of drift, and teams that want their coding agents to build on-system.
+      </p>
+      <ul class="svc-list svc-list--grid">
+        {primary.map((item) => <li>{item}</li>)}
+      </ul>
+      <div class="placeholder flex aspect-[16/7] items-center justify-center rounded-code p-4 text-center">
+        [Video intro, 60–90 s]
+      </div>
+      <a href={links.exploreDesignSystems} class="svc-link">Explore design systems →</a>
+    </article>
+    <article class="svc flex-[1_1_320px] gap-5">
+      <span class="caption flex items-center gap-2 text-ink-2"
+        ><i aria-hidden="true" class:list={['marker', markerBg.peach]}></i>02 · Alongside</span
+      >
+      <h3 class="m-0 text-h3-alongside">Product design</h3>
+      <p class="m-0 text-cta text-pretty text-ink-2">
+        Complex workflows designed on the system we build, so new screens ship consistent from day one.
+      </p>
+      <ul class="svc-list">
+        {alongside.map((item) => <li>{item}</li>)}
+      </ul>
+      <a href={links.exploreProductDesign} class="svc-link mt-auto">Explore product design →</a>
+    </article>
+  </div>
+</section>
+
+<style>
+  .svc {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    padding: var(--spacing-cell-lg);
+  }
+  .svc-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--color-line);
+  }
+  .svc-list--grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    column-gap: 28px;
+  }
+  .svc-list li {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--color-line);
+    font-size: var(--text-body);
+  }
+  .svc-link {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-size: var(--text-cta);
+    font-weight: 500;
+    color: var(--color-ink);
+    text-underline-offset: 4px;
+  }
+</style>

@@ -1,0 +1,136 @@
+---
+import SectionHead from './SectionHead.astro';
+import { links } from '../data/links';
+
+interface Row {
+  name: string;
+  meta: string;
+  href: string;
+  /** null keeps the dashed placeholder: the figure isn't collected yet */
+  figure: { value: string; arrow?: boolean } | null;
+  caption: string;
+  description: string;
+}
+
+const rows: Row[] = [
+  {
+    name: 'QBench',
+    meta: 'Design system + product · LIMS',
+    href: links.work.qbench,
+    figure: { value: '1,071', arrow: true },
+    caption: 'Outside-library references',
+    description:
+      'Years without a designer, consolidated into one semantic token system. Plus one status model for eight entry points, compliance steps included, shipped as an MVP.',
+  },
+  {
+    name: 'Everbreed',
+    meta: 'Design system · Agtech',
+    href: links.work.everbreed,
+    figure: { value: '302' },
+    caption: 'Variables made machine-readable',
+    description:
+      'A mature Figma library made machine-readable: IDs, scopes and code names on 302 variables, so the code config can come from Figma. In progress.',
+  },
+  {
+    name: 'Clerky',
+    meta: 'Design system · Legal tech',
+    href: links.work.clerky,
+    figure: { value: '0 T1' },
+    caption: 'Defects at the pilot gate',
+    description:
+      'Three-tier tokens, AI-context docs on every component and token, and a zero-T1 defect gate. Validated at pilot scale on the Documents App.',
+  },
+  {
+    name: 'Omnisafe',
+    meta: 'Product design · Insurance',
+    href: links.work.omnisafe,
+    figure: { value: '16' },
+    caption: 'Modules tested before build',
+    description: 'Sixteen modules, tested end to end with real employees before engineering began.',
+  },
+  {
+    name: 'FLYR',
+    meta: 'Product design · Hospitality',
+    href: links.work.flyr,
+    figure: null,
+    caption: 'One business result',
+    description: 'Group Quotation MVP shipped, so hotels can see whether a group booking makes money.',
+  },
+];
+---
+
+<section id="work" aria-labelledby="work-head" class="container-page flex flex-col gap-12 pb-section">
+  <SectionHead id="work-head" caption="Work">Systems and products we have built</SectionHead>
+  <ul class="panel flex flex-col">
+    {
+      rows.map((r) => (
+        <li>
+          <a href={r.href} class="work-row">
+            <span class="flex flex-[1_1_220px] flex-col gap-2.5">
+              <span class="text-work">{r.name}</span>
+              <span class="caption-sm text-ink-2">{r.meta}</span>
+            </span>
+            <span class="flex flex-[0_1_220px] flex-col gap-2">
+              {r.figure ? (
+                <span class="text-work whitespace-nowrap tabular-nums">
+                  {r.figure.value}
+                  {r.figure.arrow && (
+                    <>
+                      {' '}
+                      <span class="text-muted">→</span> 0
+                    </>
+                  )}
+                </span>
+              ) : (
+                <span class="placeholder self-start px-3 py-2">[result to collect]</span>
+              )}
+              <span class:list={['caption-sm', r.figure ? 'text-hot' : 'text-muted']}>{r.caption}</span>
+            </span>
+            <span class="max-w-[44ch] flex-[1_1_300px] text-body text-pretty text-ink-2">{r.description}</span>
+            <span class="work-arr" aria-hidden="true">→</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .work-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 16px 40px;
+    padding: 36px var(--spacing-cell);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+  .work-arr {
+    flex: 0 0 auto;
+    font-size: var(--text-arrow);
+    line-height: 1;
+    color: var(--color-ink);
+  }
+  @media (hover: hover) {
+    .work-row:hover {
+      background: var(--color-surface-hover);
+    }
+  }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .work-row {
+      transition: background-color 0.15s ease;
+    }
+    .work-arr {
+      transition: transform 0.15s ease;
+    }
+    .work-row:hover .work-arr {
+      transform: translateX(4px);
+    }
+  }
+  @media (max-width: 479px) {
+    .work-row {
+      padding-block: 28px;
+    }
+  }
+</style>

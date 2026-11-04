@@ -1,0 +1,15 @@
+---
+/** Caption + h2, the opener every section shares. */
+interface Props {
+  id: string;
+  caption: string;
+  class?: string;
+  headingClass?: string;
+}
+const { id, caption, class: className, headingClass } = Astro.props;
+---
+
+<div class:list={['flex flex-col gap-3.5', className]}>
+  <span class="caption text-ink-2">{caption}</span>
+  <h2 id={id} class:list={['m-0 text-h2', headingClass]}><slot /></h2>
+</div>
