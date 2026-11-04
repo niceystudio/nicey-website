@@ -322,8 +322,8 @@
     background: var(--color-surface);
     min-width: 0;
   }
-  /* inside a clipped panel, rings draw inward */
-  .panel :where(a, button, summary):focus-visible {
+  /* rows that touch a clipped panel's edge draw their ring inward */
+  .panel :where(.work-row, summary, [role='tab'], [role='tabpanel']):focus-visible {
     outline-offset: -4px;
   }
 

@@ -325,7 +325,8 @@ export function mountProofField(root: HTMLElement): void {
     const moving = p !== target;
     const interval = 1000 / (moving || hover ? FPS_ACTIVE : FPS_IDLE);
     if (ms - lastDraw >= interval - 1) {
-      const dt = Math.min(0.1, (ms - lastDraw) / 1000);
+      // time-based, so a throttled tab still finishes in DURATION; capped to avoid a jump
+      const dt = Math.min(0.25, (ms - lastDraw) / 1000);
       lastDraw = ms;
       if (moving) {
         const step = dt / DURATION;

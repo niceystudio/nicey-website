@@ -202,6 +202,10 @@ const pillars = [
   .zd-fig-row--units {
     row-gap: 16px;
   }
+  /* here the note sits in a column under the chart, so no flex basis */
+  .zd-fig-row--units .zd-fig-note {
+    flex: none;
+  }
   .zd-fig {
     margin: 0 0 0 -0.04em;
     /* stays inside the cell at 320px: "1,071 → 0" never wraps */

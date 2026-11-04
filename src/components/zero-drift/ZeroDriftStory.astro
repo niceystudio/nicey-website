@@ -182,7 +182,8 @@ import { markerBg, steps } from '../../data/zero-drift';
         if (panel && !reduced.matches) {
           // short opacity crossfade in; none under reduced motion
           panel.classList.add('is-entering');
-          requestAnimationFrame(() => requestAnimationFrame(() => panel.classList.remove('is-entering')));
+          void panel.offsetWidth; // commit opacity 0 so the transition runs
+          panel.classList.remove('is-entering');
         }
         current = n;
       }
