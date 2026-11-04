@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Nicey homepage concept v3</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..600&amp;family=Geist+Mono:wght@400..500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+a{color:#6B5FBE}a:hover{color:#574BAA}
+a:focus-visible,summary:focus-visible,button:focus-visible{outline:2px solid #6B5FBE;outline-offset:3px;border-radius:4px}
+summary{cursor:pointer;list-style:none}summary::-webkit-details-marker{display:none}
+.pf-slot>i{transition:transform .2s ease}
+.pf-slot:hover>i{transform:scale(1.6)}
+@media (prefers-reduced-motion: reduce){.pf-slot,.pf-slot>i,.pf-anim{transition-duration:0.01ms !important;transition-delay:0s !important}.pf-sweep{display:none}}
+@media (max-width: 860px){.story-rail{position:static !important}}
+</style>
+</helmet>
+<div style="background: #F3F0E9; color: #26251F; font-family: 'Geist', system-ui, sans-serif; font-size: 16px; line-height: 1.55; min-height: 100vh">
+<header style="border-bottom: 1px solid #26251F1A">
+<nav aria-label="Main" style="max-width: 1200px; margin: 0 auto; padding: 16px 24px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 24px">
+<a href="#" style="font-size: 22px; font-weight: 600; letter-spacing: -0.04em; color: #26251F; text-decoration: none">nicey<span style="color: #6B5FBE">.</span></a>
+<div style="display: flex; flex-wrap: wrap; gap: 4px 24px; align-items: center; font-size: 15px">
+<a href="#services" style="color: #26251F; text-decoration: none; padding: 12px 0">Design systems</a>
+<a href="#services" style="color: #26251F; text-decoration: none; padding: 12px 0">Product design</a>
+<a href="#work" style="color: #26251F; text-decoration: none; padding: 12px 0">Work</a>
+<a href="#how" style="color: #26251F; text-decoration: none; padding: 12px 0">How we work</a>
+<a href="#audit" style="padding: 12px 18px; border-radius: 999px; background: #26251F; color: #FFFFFF; text-decoration: none; font-weight: 500">Free audit</a>
+</div>
+</nav>
+</header>
+<main>
+
+<section style="max-width: 1200px; margin: 0 auto; padding: 120px 24px 80px; display: flex; flex-direction: column; gap: 32px">
+<span style="font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #4D4A40">A design systems studio · for legacy products and teams scaling with agents</span>
+<h1 style="margin: 0; font-size: clamp(48px, 7.4vw, 108px); line-height: 0.95; font-weight: 500; letter-spacing: -0.05em; max-width: 11ch; text-wrap: balance">Design systems people and agents read the same way.</h1>
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 28px 64px">
+<p style="margin: 0; font-size: clamp(17px, 1.5vw, 20px); line-height: 1.5; color: #4D4A40; max-width: 52ch; text-wrap: pretty">We turn years of drifted UI into one system: tokens, components and documentation that a designer, an engineer and a coding agent understand the same way. Product design when you need the screens too.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 10px">
+<a href="#audit" style="padding: 16px 24px; border-radius: 999px; background: #26251F; color: #FFFFFF; text-decoration: none; font-size: 17px; font-weight: 500">Get a free audit</a>
+<a href="#" style="padding: 15px 23px; border-radius: 999px; border: 1px solid #26251F; color: #26251F; text-decoration: none; font-size: 17px; font-weight: 500">Book a call</a>
+</div>
+</div>
+<p style="margin: 0; font-family: 'Geist Mono', monospace; font-size: 13px; color: #4D4A40">We audit before we quote. The first look at your system is free and read-only.</p>
+</section>
+
+<section aria-labelledby="proof-label" style="max-width: 1200px; margin: 0 auto; padding: 0 24px 128px">
+<div style="background: #FBFAF6; border: 1px solid #26251F1A; border-radius: 16px; overflow: hidden">
+<div style="display: flex; flex-wrap: wrap; align-items: stretch; gap: 0">
+<div style="flex: 1 1 380px; min-width: 0; padding: 44px 44px 40px; display: flex; flex-direction: column">
+<span style="display: flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #C4471F"><i aria-hidden="true" style="width: 7px; height: 7px; border-radius: 50%; background: #C4471F"></i>QBench · Design system</span>
+<p aria-live="polite" style="margin: 32px 0 0 -0.05em; font-size: clamp(104px, 13vw, 196px); line-height: 0.84; font-weight: 500; letter-spacing: -0.06em; font-variant-numeric: tabular-nums">{{figure}}</p>
+<h2 id="proof-label" style="margin: 24px 0 0; font-size: clamp(22px, 2.1vw, 30px); line-height: 1.15; font-weight: 500; letter-spacing: -0.02em; text-wrap: balance">references to outside libraries</h2>
+<div style="margin-top: 12px; min-height: 3.2em; max-width: 34ch; color: #4D4A40; text-wrap: pretty">
+<sc-if value="{{before}}" hint-placeholder-val="{{ true }}"><p style="margin: 0">Years without a designer. Every screen was a developer’s best guess, built on eleven libraries.</p></sc-if>
+<sc-if value="{{after}}" hint-placeholder-val="{{ false }}"><p style="margin: 0">One semantic token system, and zero outside references left across 141 components.</p></sc-if>
+</div>
+<div style="margin-top: auto; padding-top: 36px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px">
+<div role="group" aria-label="Show state" style="display: inline-flex; border: 1px solid #26251F33; border-radius: 999px; padding: 3px">
+<button type="button" onClick="{{showBefore}}" aria-pressed="{{pressedBefore}}" style="font: inherit; font-size: 14px; font-weight: 500; min-height: 38px; padding: 0 18px; border: 0; border-radius: 999px; cursor: pointer; background: {{btnBefore.bg}}; color: {{btnBefore.fg}}">Before</button>
+<button type="button" onClick="{{showAfter}}" aria-pressed="{{pressedAfter}}" style="font: inherit; font-size: 14px; font-weight: 500; min-height: 38px; padding: 0 18px; border: 0; border-radius: 999px; cursor: pointer; background: {{btnAfter.bg}}; color: {{btnAfter.fg}}">After</button>
+</div>
+<span style="font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #716E63; font-variant-numeric: tabular-nums">
+<sc-if value="{{before}}" hint-placeholder-val="{{ true }}">11 libraries · 141 components</sc-if>
+<sc-if value="{{after}}" hint-placeholder-val="{{ false }}">0 outside libraries · 141 components</sc-if>
+</span>
+</div>
+</div>
+<div role="img" aria-label="1,071 cells, one per outside-library reference, resolving into a block of 141 components on one token system" style="flex: 999 1 520px; min-width: 0; padding: 72px 40px 0 0; display: flex; align-items: flex-end">
+<div style="position: relative; width: 100%; container-type: inline-size">
+<div style="display: flex; align-items: flex-end; width: 100%">
+<sc-for list="{{columns}}" as="col" hint-placeholder-count="64">
+<div style="flex: 1 1 0; min-width: 0; display: flex; flex-direction: column-reverse">
+<sc-for list="{{col.cells}}" as="c" hint-placeholder-count="16">
+<span class="pf-slot" style="display: block; aspect-ratio: 1; position: relative; opacity: {{c.o}}; transform: {{c.t}}; transition: transform 950ms cubic-bezier(0.65, 0, 0.35, 1) {{c.d}}, opacity 450ms ease {{c.d}}"><i style="position: absolute; inset: 10%; background: {{c.bg}}; transition: background-color 700ms ease {{c.d}}"></i></span>
+</sc-for>
+</div>
+</sc-for>
+</div>
+<span class="pf-sweep" aria-hidden="true" style="position: absolute; top: -40px; bottom: 0; left: {{sweep.left}}; width: 1px; background: #C4471F; opacity: {{sweep.o}}; transition: left 1950ms linear, opacity 300ms ease"></span>
+<span class="pf-anim" aria-hidden="true" style="position: absolute; left: {{blockLabel.left}}; bottom: calc(12 * 100cqw / 64 + 12px); font-family: 'Geist Mono', monospace; font-size: 11px; line-height: 1.5; white-space: nowrap; color: #4D4A40; opacity: {{blockLabel.o}}; transition: opacity 400ms ease {{blockLabel.d}}">141 components<br><span style="color: #716E63">one semantic token system</span></span>
+</div>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1px; background: #26251F1A; border-top: 1px solid #26251F1A">
+<div style="background: #FBFAF6; padding: 28px 32px 32px; min-height: 230px; display: flex; flex-direction: column; justify-content: space-between; gap: 40px">
+<p style="margin: 0; font-size: 14px; line-height: 1.45; color: #4D4A40; max-width: 24ch; text-wrap: pretty"><span style="display: block; margin-bottom: 8px; font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #716E63">Everbreed</span>Variables given IDs, scopes and code names, so code config comes from Figma</p>
+<p style="margin: 0 0 0 -0.04em; font-size: clamp(48px, 5vw, 72px); line-height: 0.9; font-weight: 500; letter-spacing: -0.05em; font-variant-numeric: tabular-nums">302</p>
+</div>
+<div style="background: #FBFAF6; padding: 28px 32px 32px; min-height: 230px; display: flex; flex-direction: column; justify-content: space-between; gap: 40px">
+<p style="margin: 0; font-size: 14px; line-height: 1.45; color: #4D4A40; max-width: 24ch; text-wrap: pretty"><span style="display: block; margin-bottom: 8px; font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #716E63">QBench</span>Entry points brought under one status model, compliance steps included</p>
+<p style="margin: 0 0 0 -0.04em; font-size: clamp(48px, 5vw, 72px); line-height: 0.9; font-weight: 500; letter-spacing: -0.05em; font-variant-numeric: tabular-nums">8</p>
+</div>
+<div style="background: #FBFAF6; padding: 28px 32px 32px; min-height: 230px; display: flex; flex-direction: column; justify-content: space-between; gap: 40px">
+<p style="margin: 0; font-size: 14px; line-height: 1.45; color: #4D4A40; max-width: 24ch; text-wrap: pretty"><span style="display: block; margin-bottom: 8px; font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #716E63">Omnisafe</span>Modules tested end to end with real employees before engineering began</p>
+<p style="margin: 0 0 0 -0.04em; font-size: clamp(48px, 5vw, 72px); line-height: 0.9; font-weight: 500; letter-spacing: -0.05em; font-variant-numeric: tabular-nums">16</p>
+</div>
+<div style="background: #FBFAF6; padding: 28px 32px 32px; min-height: 230px; display: flex; flex-direction: column; justify-content: space-between; gap: 40px">
+<p style="margin: 0; font-size: 14px; line-height: 1.45; color: #4D4A40; max-width: 24ch; text-wrap: pretty"><span style="display: block; margin-bottom: 8px; font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #716E63">Clerky</span>T1 defects at the pilot gate on the Documents App</p>
+<p style="margin: 0 0 0 -0.04em; font-size: clamp(48px, 5vw, 72px); line-height: 0.9; font-weight: 500; letter-spacing: -0.05em; font-variant-numeric: tabular-nums">0</p>
+</div>
+</div>
+</div>
+</section>
+
+<section aria-labelledby="when-head" style="max-width: 1200px; margin: 0 auto; padding: 0 24px 128px; display: flex; flex-direction: column; gap: 48px">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<span style="font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #4D4A40">When to bring us in</span>
+<h2 id="when-head" style="margin: 0; font-size: clamp(36px, 4.2vw, 60px); line-height: 1.02; font-weight: 500; letter-spacing: -0.04em; max-width: 18ch; text-wrap: balance">If one of these sounds like your team, talk to us.</h2>
+</div>
+<ul style="margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1px; background: #26251F1A; border: 1px solid #26251F1A; border-radius: 16px; overflow: hidden">
+<li style="background: #FBFAF6; padding: 32px 28px; display: flex; flex-direction: column; gap: 14px; min-height: 360px">
+<span style="display: flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 12px; color: #4D4A40"><i aria-hidden="true" style="width: 8px; height: 8px; background: #CBDAC4"></i>01</span>
+<h3 style="margin: 0; font-size: 22px; line-height: 1.2; font-weight: 500; letter-spacing: -0.02em; text-wrap: balance">Your design file and your repo have drifted apart</h3>
+<p style="margin: 0; font-size: 15px; line-height: 1.55; color: #4D4A40; text-wrap: pretty">At Everbreed, 53 variables had drifted between Figma and code, and nobody could tell a rename from a delete.</p>
+<div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px">
+<div role="img" aria-label="53 cells, one per drifted variable" style="display: grid; grid-template-columns: repeat(18, 8px); gap: 2px">
+<sc-for list="{{u53}}" as="u" hint-placeholder-count="53"><i style="width: 8px; height: 8px; background: #C4471F"></i></sc-for>
+</div>
+<span style="font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #716E63">53 drifted variables</span>
+</div>
+</li>
+<li style="background: #FBFAF6; padding: 32px 28px; display: flex; flex-direction: column; gap: 14px; min-height: 360px">
+<span style="display: flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 12px; color: #4D4A40"><i aria-hidden="true" style="width: 8px; height: 8px; background: #D9D2EF"></i>02</span>
+<h3 style="margin: 0; font-size: 22px; line-height: 1.2; font-weight: 500; letter-spacing: -0.02em; text-wrap: balance">The product was built for years without a designer</h3>
+<p style="margin: 0; font-size: 15px; line-height: 1.55; color: #4D4A40; text-wrap: pretty">At QBench, every screen was a developer’s best guess, and each new feature meant relearning decisions nobody wrote down.</p>
+</li>
+<li style="background: #FBFAF6; padding: 32px 28px; display: flex; flex-direction: column; gap: 14px; min-height: 360px">
+<span style="display: flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 12px; color: #4D4A40"><i aria-hidden="true" style="width: 8px; height: 8px; background: #F6D9C4"></i>03</span>
+<h3 style="margin: 0; font-size: 22px; line-height: 1.2; font-weight: 500; letter-spacing: -0.02em; text-wrap: balance">The library looks healthy, but a machine can’t use it</h3>
+<p style="margin: 0; font-size: 15px; line-height: 1.55; color: #4D4A40; text-wrap: pretty">At Everbreed, all 302 variables had no scope and no code name. Fine for people, unreadable for a pipeline.</p>
+<div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px">
+<div role="img" aria-label="302 cells, one per variable, none with a scope" style="display: grid; grid-template-columns: repeat(22, 6px); gap: 2px">
+<sc-for list="{{u302}}" as="u" hint-placeholder-count="302"><i style="width: 6px; height: 6px; background: #26251F2E"></i></sc-for>
+</div>
+<span style="font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #716E63">302 variables · 0 scoped</span>
+</div>
+</li>
+<li style="background: #FBFAF6; padding: 32px 28px; display: flex; flex-direction: column; gap: 14px; min-height: 360px">
+<span style="display: flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 12px; color: #4D4A40"><i aria-hidden="true" style="width: 8px; height: 8px; background: #F2E6BC"></i>04</span>
+<h3 style="margin: 0; font-size: 22px; line-height: 1.2; font-weight: 500; letter-spacing: -0.02em; text-wrap: balance">Your team is handing design to AI agents</h3>
+<p style="margin: 0; font-size: 15px; line-height: 1.55; color: #4D4A40; text-wrap: pretty">A developer fills the gaps in a Figma file. An agent guesses, and every guess becomes a correction pass.</p>
+</li>
+</ul>
+</section>
+
+<section id="how" aria-labelledby="how-head" style="max-width: 1200px; margin: 0 auto; padding: 0 24px 128px; display: flex; flex-wrap: wrap; gap: 48px 72px; align-items: flex-start">
+<div class="story-rail" style="flex: 1 1 300px; position: sticky; top: 24px; display: flex; flex-direction: column; gap: 20px">
+<span style="font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #4D4A40">Zero Drift · how we work</span>
+<h2 id="how-head" style="margin: 0; font-size: clamp(36px, 4.2vw, 60px); line-height: 1.02; font-weight: 500; letter-spacing: -0.04em; text-wrap: balance">From drift to a system that holds.</h2>
+<p style="margin: 0; font-size: 17px; line-height: 1.55; color: #4D4A40; max-width: 36ch; text-wrap: pretty">Five steps. Each one starts with a problem you can see in your product and ends with something you can hold.</p>
+<ol style="margin: 8px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; border-top: 1px solid #26251F33">
+<li style="border-bottom: 1px solid #26251F1A"><a href="#step-drift" style="display: flex; align-items: center; gap: 12px; min-height: 44px; color: #26251F; text-decoration: none; font-size: 16px"><i aria-hidden="true" style="width: 8px; height: 8px; background: #CBDAC4"></i><span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: #4D4A40">01</span>Drift</a></li>
+<li style="border-bottom: 1px solid #26251F1A"><a href="#step-audit" style="display: flex; align-items: center; gap: 12px; min-height: 44px; color: #26251F; text-decoration: none; font-size: 16px"><i aria-hidden="true" style="width: 8px; height: 8px; background: #D9D2EF"></i><span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: #4D4A40">02</span>Audit</a></li>
+<li style="border-bottom: 1px solid #26251F1A"><a href="#step-system" style="display: flex; align-items: center; gap: 12px; min-height: 44px; color: #26251F; text-decoration: none; font-size: 16px"><i aria-hidden="true" style="width: 8px; height: 8px; background: #F6D9C4"></i><span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: #4D4A40">03</span>System</a></li>
+<li style="border-bottom: 1px solid #26251F1A"><a href="#step-context" style="display: flex; align-items: center; gap: 12px; min-height: 44px; color: #26251F; text-decoration: none; font-size: 16px"><i aria-hidden="true" style="width: 8px; height: 8px; background: #F2E6BC"></i><span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: #4D4A40">04</span>Context</a></li>
+<li style="border-bottom: 1px solid #26251F1A"><a href="#step-proof" style="display: flex; align-items: center; gap: 12px; min-height: 44px; color: #26251F; text-decoration: none; font-size: 16px"><i aria-hidden="true" style="width: 8px; height: 8px; background: #D8C6E0"></i><span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: #4D4A40">05</span>Proof</a></li>
+</ol>
+</div>
+<ol style="flex: 999 1 560px; min-width: 0; margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 1px; background: #26251F1A; border: 1px solid #26251F1A; border-radius: 16px; overflow: hidden">
+
+<li id="step-drift" style="background: #FBFAF6; padding: 40px; display: flex; flex-direction: column; gap: 24px; scroll-margin-top: 24px">
+<span style="display: flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #4D4A40"><i aria-hidden="true" style="width: 8px; height: 8px; background: #CBDAC4"></i>01 · Drift</span>
+<h3 style="margin: 0; font-size: clamp(26px, 2.6vw, 36px); line-height: 1.1; font-weight: 500; letter-spacing: -0.03em; text-wrap: balance">Nobody owns the colours, so every screen guesses.</h3>
+<div aria-hidden="true" style="display: flex; flex-wrap: wrap; gap: 8px">
+<span style="display: inline-flex; gap: 8px; align-items: center; padding: 7px 10px; background: #F3F0E9; border: 1px solid #26251F1A; border-radius: 6px; font-family: 'Geist Mono', monospace; font-size: 12px; transform: rotate(-2deg)"><i style="width: 10px; height: 10px; border-radius: 2px; background: #6B5FBE"></i>purple-2</span>
+<span style="display: inline-flex; gap: 8px; align-items: center; padding: 7px 10px; background: #F3F0E9; border: 1px solid #26251F1A; border-radius: 6px; font-family: 'Geist Mono', monospace; font-size: 12px; transform: rotate(1.5deg)"><i style="width: 10px; height: 10px; border-radius: 2px; background: #7266C4"></i>purpleLight2</span>
+<span style="display: inline-flex; gap: 8px; align-items: center; padding: 7px 10px; background: #F3F0E9; border: 1px solid #26251F1A; border-radius: 6px; font-family: 'Geist Mono', monospace; font-size: 12px"><i style="width: 10px; height: 10px; border-radius: 2px; background: #665AB8"></i>brand/purple/30</span>
+<span style="display: inline-flex; gap: 8px; align-items: center; padding: 7px 10px; background: #F3F0E9; border: 1px solid #26251F1A; border-radius: 6px; font-family: 'Geist Mono', monospace; font-size: 12px; transform: rotate(-1deg)"><i style="width: 10px; height: 10px; border-radius: 2px; background: #5F53B0"></i>col-7</span>
+<span style="display: inline-flex; gap: 8px; align-items: center; padding: 7px 10px; background: #F3F0E9; border: 1px solid #26251F1A; border-radius: 6px; font-family: 'Geist Mono', monospace; font-size: 12px; transform: rotate(2deg)"><i style="width: 10px; height: 10px; border-radius: 2px; background: #7A6ECC"></i>violet-final</span>
+<span style="display: inline-flex; gap: 8px; align-items: center; padding: 7px 10px; font-family: 'Geist Mono', monospace; font-size: 12px; color: #4D4A40">+ 6 more</span>
+</div>
+<dl style="margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px 28px; border-top: 1px solid #26251F1A; padding-top: 20px">
+<div style="display: flex; flex-direction: column; gap: 6px"><dt style="font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: #4D4A40">You’re seeing</dt><dd style="margin: 0; font-size: 16px; line-height: 1.5">A colour class with no token behind it renders nothing, and the page still passes review. One purple ends up under eleven names.</dd></div>
+<div style="display: flex; flex-direction: column; gap: 6px"><dt style="font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: #4D4A40">We do</dt><dd style="margin: 0; font-size: 16px; line-height: 1.5">Read the Figma file, the compiled CSS and the source, and list every value the product uses.</dd></div>
+<div style="display: flex; flex-direction: column; gap: 6px"><dt style="font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: #4D4A40">You get</dt><dd style="margin: 0; font-size: 16px; line-height: 1.5; font-weight: 500">A drift map: what exists, what it should be, where design and code disagree.</dd></div>
+</dl>
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 28px; padding-top: 24px; border-top: 1px solid #26251F1A">
+<p style="margin: 0 0 0 -0.04em; font-size: clamp(56px, 6vw, 88px); line-height: 0.86; font-weight: 500; letter-spacing: -0.055em; font-variant-numeric: tabular-nums">53</p>
+<p style="flex: 1 1 260px; margin: 0; font-size: 15px; line-height: 1.5; color: #4D4A40; max-width: 40ch; text-wrap: pretty"><span style="display: block; margin-bottom: 4px; font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #C4471F">Seen at Everbreed</span>variables had drifted between the Figma file and the repo, with no IDs to tell a rename from a delete.</p>
+</div>
+</li>
+
+<li id="step-audit" style="background: #FBFAF6; padding: 40px; display: flex; flex-direction: column; gap: 24px; scroll-margin-top: 24px">
+<span style="display: flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #4D4A40"><i aria-hidden="true" style="width: 8px; height: 8px; background: #D9D2EF"></i>02 · Audit</span>
+<h3 style="margin: 0; font-size: clamp(26px, 2.6vw, 36px); line-height: 1.1; font-weight: 500; letter-spacing: -0.03em; text-wrap: balance">A free audit across five pillars.</h3>
+<ul aria-label="Audit pillars" style="margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 10px 24px; font-size: 15px">
+<li style="display: flex; align-items: center; gap: 8px"><i aria-hidden="true" style="width: 8px; height: 8px; background: #CBDAC4"></i>Figma inspect</li>
+<li style="display: flex; align-items: center; gap: 8px"><i aria-hidden="true" style="width: 8px; height: 8px; background: #D9D2EF"></i>Agentic readiness</li>
+<li style="display: flex; align-items: center; gap: 8px"><i aria-hidden="true" style="width: 8px; height: 8px; background: #F6D9C4"></i>Conventions</li>
+<li style="display: flex; align-items: center; gap: 8px"><i aria-hidden="true" style="width: 8px; height: 8px; background: #F2E6BC"></i>Component API</li>
+<li style="display: flex; align-items: center; gap: 8px"><i aria-hidden="true" style="width: 8px; height: 8px; background: #D8C6E0"></i>Zero drift</li>
+</ul>
+<dl style="margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px 28px; border-top: 1px solid #26251F1A; padding-top: 20px">
+<div style="display: flex; flex-direction: column; gap: 6px"><dt style="font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: #4D4A40">You’re seeing</dt><dd style="margin: 0; font-size: 16px; line-height: 1.5">Something is off, but not where, or what to fix first.</dd></div>
+<div style="display: flex; flex-direction: column; gap: 6px"><dt style="font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: #4D4A40">We do</dt><dd style="margin: 0; font-size: 16px; line-height: 1.5">Check what an agent needs: descriptions on components and tokens, bindings to semantic tokens, slots declared instead of inferred. With repo access, Figma tokens against compiled CSS and source.</dd></div>
+<div style="display: flex; flex-direction: column; gap: 6px"><dt style="font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: #4D4A40">You get</dt><dd style="margin: 0; font-size: 16px; line-height: 1.5; font-weight: 500">A score per pillar, the findings, and a roadmap in days.</dd></div>
+</dl>
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 16px 28px; padding-top: 24px; border-top: 1px solid #26251F1A">
+<p style="margin: 0 0 0 -0.04em; display: flex; align-items: baseline; gap: 0.16em; font-size: clamp(56px, 6vw, 88px); line-height: 0.86; font-weight: 500; letter-spacing: -0.055em; font-variant-numeric: tabular-nums">12<span style="font-size: 0.3em; letter-spacing: -0.02em; color: #716E63">of 52</span></p>
+<div style="flex: 1 1 260px; display: flex; flex-direction: column; gap: 12px">
+<div role="img" aria-label="52 cells, 12 marked: components without a description" style="display: grid; grid-template-columns: repeat(26, 8px); gap: 2px">
+<sc-for list="{{u52}}" as="u" hint-placeholder-count="52"><i style="width: 8px; height: 8px; background: {{u.bg}}"></i></sc-for>
+</div>
+<p style="margin: 0; font-size: 15px; line-height: 1.5; color: #4D4A40; max-width: 40ch; text-wrap: pretty"><span style="display: block; margin-bottom: 4px; font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #C4471F">Seen at Clerky</span>components had no description an agent could read. All 315 semantic and component tokens already did.</p>
+</div>
+</div>
+</li>
+
+<li id="step-system" style="background: #FBFAF6; padding: 40px; display: flex; flex-direction: column; gap: 24px; scroll-margin-top: 24px">
+<span style="display: flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #4D4A40"><i aria-hidden="true" style="width: 8px; height: 8px; background: #F6D9C4"></i>03 · System</span>
+<h3 style="margin: 0; font-size: clamp(26px, 2.6vw, 36px); line-height: 1.1; font-weight: 500; letter-spacing: -0.03em; text-wrap: balance">Everything reduced to a name, then bound to it.</h3>
+<p aria-hidden="true" style="margin: 0; font-family: 'Geist Mono', monospace; font-size: 13px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; color: #716E63"><span style="padding: 7px 10px; background: #F3F0E9; border: 1px solid #26251F1A; border-radius: 6px; color: #26251F">violet.500</span>→<span style="padding: 7px 10px; background: #F3F0E9; border: 1px solid #26251F1A; border-radius: 6px; color: #26251F">color.accent</span>→<span style="padding: 7px 10px; background: #F3F0E9; border: 1px solid #26251F1A; border-radius: 6px; color: #26251F">Button/primary/bg</span></p>
+<dl style="margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px 28px; border-top: 1px solid #26251F1A; padding-top: 20px">
+<div style="display: flex; flex-direction: column; gap: 6px"><dt style="font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: #4D4A40">You’re seeing</dt><dd style="margin: 0; font-size: 16px; line-height: 1.5">Teams rebuild the same button, and Figma properties drift from code props.</dd></div>
+<div style="display: flex; flex-direction: column; gap: 6px"><dt style="font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: #4D4A40">We do</dt><dd style="margin: 0; font-size: 16px; line-height: 1.5">One token model, components built in Figma and code against it, IDs that survive renames, and code config generated from Figma instead of written by hand.</dd></div>
+<div style="display: flex; flex-direction: column; gap: 6px"><dt style="font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: #4D4A40">You get</dt><dd style="margin: 0; font-size: 16px; line-height: 1.5; font-weight: 500">One source of truth, in light, dark and brand modes.</dd></div>
+</dl>
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 28px; padding-top: 24px; border-top: 1px solid #26251F1A">
+<p style="margin: 0 0 0 -0.04em; font-size: clamp(56px, 6vw, 88px); line-height: 0.86; font-weight: 500; letter-spacing: -0.055em; font-variant-numeric: tabular-nums; white-space: nowrap">1,071 <span style="color: #716E63">→</span> 0</p>
+<p style="flex: 1 1 260px; margin: 0; font-size: 15px; line-height: 1.5; color: #4D4A40; max-width: 40ch; text-wrap: pretty"><span style="display: block; margin-bottom: 4px; font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #C4471F">Seen at QBench</span>references to 11 outside libraries, brought down to zero across 141 components.</p>
+</div>
+</li>
+
+<li id="step-context" style="background: #FBFAF6; padding: 40px; display: flex; flex-direction: column; gap: 24px; scroll-margin-top: 24px">
+<span style="display: flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #4D4A40"><i aria-hidden="true" style="width: 8px; height: 8px; background: #F2E6BC"></i>04 · Context</span>
+<h3 style="margin: 0; font-size: clamp(26px, 2.6vw, 36px); line-height: 1.1; font-weight: 500; letter-spacing: -0.03em; text-wrap: balance">Written for the reader that never asks.</h3>
+<pre aria-hidden="true" style="margin: 0; padding: 16px 18px; background: #F3F0E9; border: 1px solid #26251F1A; border-radius: 8px; font-family: 'Geist Mono', monospace; font-size: 13px; line-height: 1.6; color: #4D4A40; white-space: pre-wrap">## For agents
+If a state is missing here, it does not exist. Ask, do not add.</pre>
+<dl style="margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px 28px; border-top: 1px solid #26251F1A; padding-top: 20px">
+<div style="display: flex; flex-direction: column; gap: 6px"><dt style="font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: #4D4A40">You’re seeing</dt><dd style="margin: 0; font-size: 16px; line-height: 1.5">Agents ship screens that are almost on-brand, because the rules live in people’s heads.</dd></div>
+<div style="display: flex; flex-direction: column; gap: 6px"><dt style="font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: #4D4A40">We do</dt><dd style="margin: 0; font-size: 16px; line-height: 1.5">A context file for every token and component: what it is, when to use it, what it must never do.</dd></div>
+<div style="display: flex; flex-direction: column; gap: 6px"><dt style="font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: #4D4A40">You get</dt><dd style="margin: 0; font-size: 16px; line-height: 1.5; font-weight: 500">Documentation people and coding agents read the same way.</dd></div>
+</dl>
+<div style="padding-top: 24px; border-top: 1px solid #26251F1A; display: flex; flex-direction: column; gap: 8px">
+<span style="font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #C4471F">Seen at Everbreed · the one rule in every agent file</span>
+<p style="margin: 0; font-family: 'Geist Mono', monospace; font-size: clamp(20px, 2vw, 28px); line-height: 1.3; letter-spacing: -0.02em; text-wrap: balance">Report the gap. Don’t invent the value.</p>
+</div>
+</li>
+
+<li id="step-proof" style="background: #FBFAF6; padding: 40px; display: flex; flex-direction: column; gap: 24px; scroll-margin-top: 24px">
+<span style="display: flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #4D4A40"><i aria-hidden="true" style="width: 8px; height: 8px; background: #D8C6E0"></i>05 · Proof</span>
+<h3 style="margin: 0; font-size: clamp(26px, 2.6vw, 36px); line-height: 1.1; font-weight: 500; letter-spacing: -0.03em; text-wrap: balance">Done means it holds in production.</h3>
+<p style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 500"><i aria-hidden="true" style="width: 8px; height: 8px; background: #26251F"></i>Pilot surface passed the defect gate</p>
+<dl style="margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px 28px; border-top: 1px solid #26251F1A; padding-top: 20px">
+<div style="display: flex; flex-direction: column; gap: 6px"><dt style="font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: #4D4A40">You’re seeing</dt><dd style="margin: 0; font-size: 16px; line-height: 1.5">Systems that look finished in Figma and fall apart on the first real feature.</dd></div>
+<div style="display: flex; flex-direction: column; gap: 6px"><dt style="font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: #4D4A40">We do</dt><dd style="margin: 0; font-size: 16px; line-height: 1.5">One real surface built through the system, gated on T1 blocking, T2 architectural and T3 minor defects. When a bug appears, we fix the model, not the screen.</dd></div>
+<div style="display: flex; flex-direction: column; gap: 6px"><dt style="font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: #4D4A40">You get</dt><dd style="margin: 0; font-size: 16px; line-height: 1.5; font-weight: 500">A before and after report as the delivery document.</dd></div>
+</dl>
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 28px; padding-top: 24px; border-top: 1px solid #26251F1A">
+<p style="margin: 0 0 0 -0.04em; font-size: clamp(56px, 6vw, 88px); line-height: 0.86; font-weight: 500; letter-spacing: -0.055em; font-variant-numeric: tabular-nums">0</p>
+<p style="flex: 1 1 260px; margin: 0; font-size: 15px; line-height: 1.5; color: #4D4A40; max-width: 40ch; text-wrap: pretty"><span style="display: block; margin-bottom: 4px; font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #C4471F">Seen at Clerky</span>T1 defects: the gate for the pilot on the Documents App, and the model held at pilot scale.</p>
+</div>
+</li>
+</ol>
+</section>
+
+<section id="services" aria-labelledby="services-head" style="max-width: 1200px; margin: 0 auto; padding: 0 24px 128px; display: flex; flex-direction: column; gap: 48px">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<span style="font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #4D4A40">What we help with</span>
+<h2 id="services-head" style="margin: 0; font-size: clamp(36px, 4.2vw, 60px); line-height: 1.02; font-weight: 500; letter-spacing: -0.04em; max-width: 16ch; text-wrap: balance">Design systems first. Product design alongside.</h2>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 1px; background: #26251F1A; border: 1px solid #26251F1A; border-radius: 16px; overflow: hidden">
+<article style="flex: 999 1 560px; min-width: 0; background: #FBFAF6; padding: 44px; display: flex; flex-direction: column; gap: 24px">
+<span style="display: flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #4D4A40"><i aria-hidden="true" style="width: 8px; height: 8px; background: #D9D2EF"></i>01 · Primary practice</span>
+<h3 style="margin: 0; font-size: clamp(40px, 4.4vw, 64px); line-height: 0.98; font-weight: 500; letter-spacing: -0.05em">Design systems</h3>
+<p style="margin: 0; font-size: 18px; line-height: 1.5; color: #4D4A40; max-width: 44ch; text-wrap: pretty">For products with years of drift, and teams that want their coding agents to build on-system.</p>
+<ul style="margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0 28px; border-top: 1px solid #26251F1A">
+<li style="padding: 14px 0; border-bottom: 1px solid #26251F1A; font-size: 16px">Audit and consolidation</li>
+<li style="padding: 14px 0; border-bottom: 1px solid #26251F1A; font-size: 16px">Token architecture and theming</li>
+<li style="padding: 14px 0; border-bottom: 1px solid #26251F1A; font-size: 16px">Component library, Figma to code</li>
+<li style="padding: 14px 0; border-bottom: 1px solid #26251F1A; font-size: 16px">AI-ready documentation</li>
+<li style="padding: 14px 0; border-bottom: 1px solid #26251F1A; font-size: 16px">Systems partner, monthly</li>
+<li style="padding: 14px 0; border-bottom: 1px solid #26251F1A; font-size: 16px">Free audit to start</li>
+</ul>
+<div style="aspect-ratio: 16 / 7; border: 1px dashed #26251F4D; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: 'Geist Mono', monospace; font-size: 13px; color: #4D4A40">[Video intro, 60–90 s]</div>
+<a href="#" style="align-self: flex-start; display: inline-flex; align-items: center; min-height: 44px; font-size: 17px; font-weight: 500; color: #26251F; text-underline-offset: 4px">Explore design systems →</a>
+</article>
+<article style="flex: 1 1 320px; min-width: 0; background: #FBFAF6; padding: 44px; display: flex; flex-direction: column; gap: 20px">
+<span style="display: flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #4D4A40"><i aria-hidden="true" style="width: 8px; height: 8px; background: #F6D9C4"></i>02 · Alongside</span>
+<h3 style="margin: 0; font-size: clamp(28px, 2.8vw, 38px); line-height: 1.04; font-weight: 500; letter-spacing: -0.035em">Product design</h3>
+<p style="margin: 0; font-size: 17px; line-height: 1.5; color: #4D4A40; text-wrap: pretty">Complex workflows designed on the system we build, so new screens ship consistent from day one.</p>
+<ul style="margin: 0; padding: 0; list-style: none; border-top: 1px solid #26251F1A">
+<li style="padding: 14px 0; border-bottom: 1px solid #26251F1A; font-size: 16px">Product and UX design</li>
+<li style="padding: 14px 0; border-bottom: 1px solid #26251F1A; font-size: 16px">Design engineering</li>
+<li style="padding: 14px 0; border-bottom: 1px solid #26251F1A; font-size: 16px">AI workflows in delivery</li>
+</ul>
+<a href="#" style="margin-top: auto; align-self: flex-start; display: inline-flex; align-items: center; min-height: 44px; font-size: 17px; font-weight: 500; color: #26251F; text-underline-offset: 4px">Explore product design →</a>
+</article>
+</div>
+</section>
+
+<section id="audit" aria-labelledby="start-head" style="max-width: 1200px; margin: 0 auto; padding: 0 24px 128px; display: flex; flex-direction: column; gap: 48px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 24px">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<span style="font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #4D4A40">What working with us looks like</span>
+<h2 id="start-head" style="margin: 0; font-size: clamp(36px, 4.2vw, 60px); line-height: 1.02; font-weight: 500; letter-spacing: -0.04em; max-width: 16ch; text-wrap: balance">It starts with a free audit.</h2>
+</div>
+<a href="#" style="padding: 16px 24px; border-radius: 999px; background: #26251F; color: #FFFFFF; text-decoration: none; font-size: 17px; font-weight: 500">Get a free audit</a>
+</div>
+<ol style="margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1px; background: #26251F1A; border: 1px solid #26251F1A; border-radius: 16px; overflow: hidden">
+<li style="background: #FBFAF6; padding: 28px 32px 32px; min-height: 260px; display: flex; flex-direction: column; justify-content: space-between; gap: 40px">
+<span style="display: flex; justify-content: space-between; align-items: center; gap: 12px; font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #4D4A40"><span>Step 01</span><span style="display: inline-flex; align-items: center; gap: 6px"><i aria-hidden="true" style="width: 8px; height: 8px; background: #CBDAC4"></i>Free</span></span>
+<div style="display: flex; flex-direction: column; gap: 10px"><h3 style="margin: 0; font-size: 22px; line-height: 1.2; font-weight: 500; letter-spacing: -0.02em">Share your Figma file</h3><p style="margin: 0; font-size: 15px; line-height: 1.55; color: #4D4A40; text-wrap: pretty">The repo is optional. With it, we can also check Figma against code.</p></div>
+</li>
+<li style="background: #FBFAF6; padding: 28px 32px 32px; min-height: 260px; display: flex; flex-direction: column; justify-content: space-between; gap: 40px">
+<span style="display: flex; justify-content: space-between; align-items: center; gap: 12px; font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #4D4A40"><span>Step 02</span><span style="display: inline-flex; align-items: center; gap: 6px"><i aria-hidden="true" style="width: 8px; height: 8px; background: #CBDAC4"></i>Free</span></span>
+<div style="display: flex; flex-direction: column; gap: 10px"><h3 style="margin: 0; font-size: 22px; line-height: 1.2; font-weight: 500; letter-spacing: -0.02em">Get the audit report</h3><p style="margin: 0; font-size: 15px; line-height: 1.55; color: #4D4A40; text-wrap: pretty">A score per pillar, the top findings, and what to fix first.</p></div>
+</li>
+<li style="background: #FBFAF6; padding: 28px 32px 32px; min-height: 260px; display: flex; flex-direction: column; justify-content: space-between; gap: 40px">
+<span style="font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #4D4A40">Step 03</span>
+<div style="display: flex; flex-direction: column; gap: 10px"><h3 style="margin: 0; font-size: 22px; line-height: 1.2; font-weight: 500; letter-spacing: -0.02em">Talk it through</h3><p style="margin: 0; font-size: 15px; line-height: 1.55; color: #4D4A40; text-wrap: pretty">A call with the people who will do the work, then a scoped proposal.</p></div>
+</li>
+<li style="background: #FBFAF6; padding: 28px 32px 32px; min-height: 260px; display: flex; flex-direction: column; justify-content: space-between; gap: 40px">
+<span style="font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #4D4A40">Step 04</span>
+<div style="display: flex; flex-direction: column; gap: 10px"><h3 style="margin: 0; font-size: 22px; line-height: 1.2; font-weight: 500; letter-spacing: -0.02em">Build, pilot, roll out</h3><p style="margin: 0; font-size: 15px; line-height: 1.55; color: #4D4A40; text-wrap: pretty">Architecture agreed with your engineers, a gated pilot, then migration in slices. For product work, scope is locked in week one: built, documented, or parked with a reason.</p></div>
+</li>
+</ol>
+</section>
+
+</main>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":9600}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { after: false, shown: 1071, sweeping: false };
+    this.field = this.buildField();
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.tick);
+  }
+
+  // 1,071 cells under an envelope, one per QBench outside-library reference.
+  // 141 of them, spread through the sweep, become the component block.
+  buildField() {
+    const TOTAL = 1071, KEEP = 141, COLS = 64, BW = 12;
+    const smooth = (t) => t * t * (3 - 2 * t);
+    const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+    let seed = 0x2a;
+    const rnd = () => {
+      seed = (seed + 0x6d2b79f5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+    // the pixel field's value noise, frozen at t = 0
+    const LC = 10, LR = 5, node = [];
+    for (let i = 0; i < LC * LR; i++) {
+      const phase = rnd() * Math.PI * 2;
+      rnd();
+      const bias = rnd() * 0.5;
+      node.push(bias + 0.5 * (0.5 + 0.5 * Math.sin(phase)));
+    }
+    const sample = (x, y) => {
+      const gx = clamp(x, 0, 1) * (LC - 1), gy = clamp(y, 0, 1) * (LR - 1);
+      const x0 = Math.floor(gx), y0 = Math.floor(gy);
+      const x1 = Math.min(x0 + 1, LC - 1), y1 = Math.min(y0 + 1, LR - 1);
+      const tx = smooth(gx - x0), ty = smooth(gy - y0);
+      const n = (cx, cy) => node[cy * LC + cx];
+      const top = n(x0, y0) + (n(x1, y0) - n(x0, y0)) * tx;
+      const bot = n(x0, y1) + (n(x1, y1) - n(x0, y1)) * tx;
+      return top + (bot - top) * ty;
+    };
+    const envelope = (t) => {
+      const rise = Math.pow(smooth(clamp(t / 0.8, 0, 1)), 1.5);
+      const fall = 1 - 0.9 * smooth(clamp((t - 0.84) / 0.16, 0, 1));
+      const bump = 0.14 * Math.exp(-(((t - 0.46) / 0.08) ** 2));
+      const wob = 0.035 * Math.sin(t * 23 + 1.3) + 0.02 * Math.sin(t * 47);
+      return clamp((0.05 + 0.95 * rise + bump + wob * rise) * fall, 0.02, 1);
+    };
+    const env = Array.from({ length: COLS }, (_, c) => envelope(c / (COLS - 1)));
+    const sum = (k) => env.reduce((s, e) => s + Math.round(e * k), 0);
+    let lo = 0, hi = 200;
+    for (let i = 0; i < 40; i++) { const m = (lo + hi) / 2; if (sum(m) < TOTAL) lo = m; else hi = m; }
+    const heights = env.map((e) => Math.round(e * hi));
+    let over = heights.reduce((s, h) => s + h, 0) - TOTAL;
+    while (over !== 0) {
+      const i = heights.indexOf(Math.max(...heights));
+      heights[i] += over > 0 ? -1 : 1;
+      over += over > 0 ? -1 : 1;
+    }
+    const maxH = Math.max(...heights);
+    const peak = heights.indexOf(maxH);
+    const bc0 = clamp(peak - BW / 2, 0, COLS - BW);
+
+    const stops = [[203, 218, 196], [217, 210, 239], [246, 217, 196], [242, 230, 188], [216, 198, 224]];
+    const keepAt = new Set();
+    for (let i = 0; i < KEEP; i++) keepAt.add(Math.round((i + 0.5) * TOTAL / KEEP));
+
+    const columns = [], times = [];
+    let idx = 0, k = 0;
+    for (let c = 0; c < COLS; c++) {
+      const cells = [];
+      for (let r = 0; r < heights[c]; r++) {
+        const pos = clamp(sample(c / (COLS - 1), r / maxH), 0, 0.9999) * (stops.length - 1);
+        const i = Math.floor(pos), t = pos - i, a = stops[i], b = stops[Math.min(i + 1, stops.length - 1)];
+        const rgb = [0, 1, 2].map((j) => Math.round(a[j] + (b[j] - a[j]) * t));
+        const alpha = (0.55 + 0.45 * clamp(heights[c] / 22, 0, 1)) * smooth(clamp(Math.min(c, COLS - 1 - c) / 4, 0.2, 1));
+        const delay = Math.round(c * 28 + rnd() * 160);
+        const cell = { bg: `rgba(${rgb.join(',')},${alpha.toFixed(2)})`, delay };
+        if (keepAt.has(idx)) {
+          cell.keep = true;
+          cell.dx = bc0 + (k % BW) - c;
+          cell.dy = r - Math.floor(k / BW);
+          k++;
+        }
+        cells.push(cell);
+        times.push(delay + 250);
+        idx++;
+      }
+      columns.push(cells);
+    }
+    times.sort((x, y) => x - y);
+    return { columns, times, labelLeft: `calc(${bc0} * 100% / ${COLS})`, total: TOTAL };
+  }
+
+  go(after) {
+    if (after === this.state.after) return;
+    clearInterval(this.tick);
+    const start = Date.now(), times = this.field.times, total = this.field.total;
+    this.setState({ after, sweeping: after });
+    this.tick = setInterval(() => {
+      const elapsed = Date.now() - start;
+      let n = 0;
+      while (n < times.length && times[n] <= elapsed) n++;
+      if (elapsed > 2800) {
+        clearInterval(this.tick);
+        this.setState({ shown: after ? 0 : total, sweeping: false });
+        return;
+      }
+      this.setState({ shown: after ? total - n : n });
+    }, 60);
+  }
+
+  renderVals() {
+    const after = this.state.after;
+    const on = { bg: '#26251F', fg: '#FFFFFF' }, off = { bg: 'transparent', fg: '#4D4A40' };
+    const columns = this.field.columns.map((cells) => ({
+      cells: cells.map((cell) => ({
+        o: after && !cell.keep ? 0 : 1,
+        t: !after ? 'none' : cell.keep ? `translate(${cell.dx * 100}%, ${cell.dy * 100}%)` : 'scale(0.4)',
+        bg: after && cell.keep ? '#6B5FBE' : cell.bg,
+        d: `${cell.delay}ms`,
+      })),
+    }));
+    const unit = (n, hot) => Array.from({ length: n }, (_, i) => ({ bg: i < hot ? '#C4471F' : '#26251F2E' }));
+    return {
+      figure: this.state.shown.toLocaleString('en-US'),
+      before: !after,
+      after,
+      pressedBefore: after ? 'false' : 'true',
+      pressedAfter: after ? 'true' : 'false',
+      btnBefore: after ? off : on,
+      btnAfter: after ? on : off,
+      showBefore: () => this.go(false),
+      showAfter: () => this.go(true),
+      columns,
+      sweep: { left: after ? '100%' : '0%', o: this.state.sweeping ? 1 : 0 },
+      blockLabel: { left: this.field.labelLeft, o: after ? 1 : 0, d: after ? '2300ms' : '0ms' },
+      u53: unit(53, 53),
+      u302: unit(302, 0),
+      u52: unit(52, 12),
+    };
+  }
+}
+</script>
+</body>
+</html>

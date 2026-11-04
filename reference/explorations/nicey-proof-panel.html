@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nicey Proof Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..600&family=Geist+Mono:wght@400..500&display=swap" rel="stylesheet">
+<!--
+  Exploration: the pixel field as a unit chart. Every cell is one real
+  item from the case studies (Home-v2 copy), never an invented series.
+  Field palette and noise from src/lib/pixel-field.ts.
+-->
+<style>
+  :root {
+    color-scheme: light;
+    --desk: #f3f0e9;
+    --card: #fbfaf6;
+    --ink: #26251f;
+    --ink-2: #4d4a40;
+    --muted: #716e63;
+    --line: rgba(38, 37, 31, 0.1);
+    --line-strong: rgba(38, 37, 31, 0.2);
+    --accent: #6b5fbe;
+    --hot: #c4471f;           /* 5.3:1 on --card: safe for the small tag text */
+    --cell-quiet: rgba(38, 37, 31, 0.12);
+
+    /* type scale, named by use */
+    --fs-display: clamp(104px, 15vw, 216px);
+    --fs-stat: clamp(48px, 5.2vw, 76px);
+    --fs-figure: clamp(64px, 8vw, 120px);
+    --fs-title: clamp(22px, 2.1vw, 30px);
+    --fs-body: 16px;
+    --fs-label: 14px;
+    --fs-caption: 11px;
+
+    --pad: clamp(24px, 3.4vw, 48px);
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --desk: #0f0f0c;
+    --card: #161612;
+    --ink: #ece7db;
+    --ink-2: #b6b1a3;
+    --muted: #8f8c81;
+    --line: rgba(236, 231, 219, 0.12);
+    --line-strong: rgba(236, 231, 219, 0.24);
+    --accent: #a79bea;
+    --hot: #ff8a66;
+    --cell-quiet: rgba(236, 231, 219, 0.14);
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--desk);
+    color: var(--ink);
+    font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+    font-size: var(--fs-body);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color .4s ease, color .4s ease;
+  }
+  button { font: inherit; color: inherit; }
+  ::selection { background: var(--accent); color: var(--card); }
+
+  .caption {
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: var(--fs-caption);
+    line-height: 1.4;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ------------------------------------------------------------ header */
+  .top {
+    max-width: 1320px; margin: 0 auto;
+    display: flex; align-items: center; gap: 32px;
+    padding: 28px var(--pad);
+  }
+  .wordmark { font-weight: 600; font-size: 18px; letter-spacing: -0.03em; }
+  .nav { display: flex; gap: 24px; font-size: var(--fs-label); color: var(--ink-2); }
+  .nav a { color: inherit; text-decoration: none; }
+  .nav a:hover { color: var(--ink); }
+  .theme { margin-left: auto; display: inline-flex; border: 1px solid var(--line-strong); border-radius: 99px; padding: 2px; }
+  .theme button { border: 0; background: none; padding: 4px 12px; border-radius: 99px; cursor: pointer; font-size: 12px; color: var(--muted); }
+  .theme button[aria-pressed="true"] { background: var(--ink); color: var(--card); }
+  @media (max-width: 860px) { .nav { display: none; } }
+
+  .wrap { max-width: 1320px; margin: 0 auto; padding: 24px var(--pad) 96px; display: grid; gap: 24px; }
+
+  .intro { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px 48px; padding: 48px 0 24px; }
+  .intro h1 {
+    margin: 0;
+    font-size: clamp(32px, 3.6vw, 52px);
+    line-height: 1.05;
+    font-weight: 500;
+    letter-spacing: -0.035em;
+    max-width: 16ch;
+    text-wrap: balance;
+  }
+  .intro p { margin: 0; max-width: 40ch; color: var(--ink-2); text-wrap: pretty; }
+
+  /* ------------------------------------------------------------ panel */
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .hero { position: relative; min-height: 600px; }
+  .hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .copy {
+    position: relative; z-index: 1;
+    padding: var(--pad);
+    max-width: 560px;
+    display: flex; flex-direction: column;
+    pointer-events: none;
+  }
+  .copy > * { pointer-events: auto; }
+  .tag { display: flex; align-items: center; gap: 8px; color: var(--hot); }
+  .tag::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .figure {
+    margin: 28px 0 0;
+    font-size: var(--fs-display);
+    line-height: 0.84;
+    font-weight: 500;
+    letter-spacing: -0.06em;
+    font-variant-numeric: tabular-nums;
+    margin-left: -0.05em; /* optical: pull the first digit's side bearing to the text edge */
+  }
+  .figure-label {
+    margin: 22px 0 0;
+    font-size: var(--fs-title);
+    line-height: 1.15;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .figure-note {
+    margin: 12px 0 0;
+    max-width: 34ch;
+    color: var(--ink-2);
+    text-wrap: pretty;
+    min-height: 3.1em; /* holds two lines so the swap doesn't move the controls */
+    transition: opacity .25s ease;
+  }
+  .controls { margin-top: 32px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+  .seg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 99px; padding: 3px; }
+  .seg button {
+    border: 0; background: none; cursor: pointer;
+    min-height: 36px; padding: 0 16px; border-radius: 99px;
+    font-size: var(--fs-label); font-weight: 500; color: var(--ink-2);
+  }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: var(--card); }
+  .seg button:focus-visible, .theme button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .readout { font-variant-numeric: tabular-nums; }
+
+  @media (max-width: 760px) {
+    .hero { min-height: 0; }
+    .copy { padding-bottom: 300px; }
+  }
+
+  /* ------------------------------------------------------------ stats */
+  .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--line); }
+  .stat {
+    display: flex; flex-direction: column; justify-content: space-between; gap: 48px;
+    min-height: 240px;
+    padding: 28px var(--pad) 32px;
+    border-left: 1px solid var(--line);
+  }
+  .stat:first-child { border-left: 0; }
+  .stat-label { margin: 0; font-size: var(--fs-label); line-height: 1.45; color: var(--ink-2); max-width: 24ch; text-wrap: pretty; }
+  .stat-label .caption { display: block; margin-bottom: 8px; }
+  .stat-num {
+    margin: 0;
+    font-size: var(--fs-stat);
+    line-height: 0.9;
+    font-weight: 500;
+    letter-spacing: -0.05em;
+    font-variant-numeric: tabular-nums;
+    margin-left: -0.04em;
+  }
+  @media (max-width: 1000px) {
+    .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .stat:nth-child(3) { border-left: 0; }
+    .stat:nth-child(n + 3) { border-top: 1px solid var(--line); }
+  }
+  @media (max-width: 520px) {
+    .stats { grid-template-columns: 1fr; }
+    .stat { border-left: 0; border-top: 1px solid var(--line); min-height: 0; gap: 28px; }
+    .stat:first-child { border-top: 0; }
+  }
+
+  /* ------------------------------------------------------------ unit panel */
+  .units { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .unit { padding: var(--pad); display: flex; flex-direction: column; gap: 28px; }
+  .unit + .unit { border-left: 1px solid var(--line); }
+  .unit-figure {
+    margin: 0;
+    display: flex; align-items: baseline; gap: 0.18em;
+    font-size: var(--fs-figure);
+    line-height: 0.9;
+    font-weight: 500;
+    letter-spacing: -0.055em;
+    font-variant-numeric: tabular-nums;
+    margin-left: -0.04em;
+  }
+  .unit-figure small { font-size: 0.32em; letter-spacing: -0.02em; color: var(--muted); font-weight: 500; }
+  .unit-text { margin: 0; max-width: 32ch; font-size: 18px; line-height: 1.4; letter-spacing: -0.01em; text-wrap: pretty; }
+  .grid { display: grid; gap: 2px; justify-content: start; }
+  .grid span { width: 10px; height: 10px; background: var(--cell-quiet); transition: transform .2s ease; }
+  .grid span.hot { background: var(--hot); }
+  .grid span.ok { background: var(--accent); opacity: .72; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 20px; }
+  .legend span { display: inline-flex; align-items: center; gap: 8px; }
+  .legend i { width: 10px; height: 10px; display: block; }
+  @media (max-width: 860px) {
+    .units { grid-template-columns: 1fr; }
+    .unit + .unit { border-left: 0; border-top: 1px solid var(--line); }
+  }
+
+  .source { padding: 16px var(--pad); border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; }
+  .foot { max-width: 1320px; margin: 0 auto; padding: 0 var(--pad) 40px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <span class="wordmark">nicey.</span>
+  <nav class="nav" aria-label="Main">
+    <a href="#">Design systems</a><a href="#">Product design</a><a href="#">Work</a><a href="#">How we work</a><a href="#">Free audit</a>
+  </nav>
+  <div class="theme" role="group" aria-label="Theme">
+    <button type="button" data-theme-btn="light" aria-pressed="true">Day</button>
+    <button type="button" data-theme-btn="dark" aria-pressed="false">Night</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="intro">
+    <h1>What the drift looked like, and what was left.</h1>
+    <p>Every cell below is one real item from a client system: a reference, a component, a token. Nothing is drawn for effect.</p>
+  </div>
+
+  <section class="panel" aria-labelledby="qb-label">
+    <div class="hero" id="hero">
+      <canvas id="field" role="img" aria-label="1,071 cells, one per outside-library reference, resolving into a block of 141 components on one token system"></canvas>
+      <div class="copy">
+        <span class="caption tag">QBench · Design system</span>
+        <p class="figure" id="figure" aria-live="polite">1,071</p>
+        <h2 class="figure-label" id="qb-label">references to outside libraries</h2>
+        <p class="figure-note" id="note">Years without a designer. Every screen was a developer’s best guess, built on eleven libraries.</p>
+        <div class="controls">
+          <div class="seg" role="group" aria-label="Show state">
+            <button type="button" data-state="0" aria-pressed="true">Before</button>
+            <button type="button" data-state="1" aria-pressed="false">After</button>
+          </div>
+          <span class="caption readout" id="readout">11 libraries · 141 components</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <p class="stat-label"><span class="caption">Everbreed</span>Variables given IDs, scopes and code names, so code config comes from Figma</p>
+        <p class="stat-num">302</p>
+      </div>
+      <div class="stat">
+        <p class="stat-label"><span class="caption">QBench</span>Entry points brought under one status model, compliance steps included</p>
+        <p class="stat-num">8</p>
+      </div>
+      <div class="stat">
+        <p class="stat-label"><span class="caption">Omnisafe</span>Modules tested end to end with real employees before engineering began</p>
+        <p class="stat-num">16</p>
+      </div>
+      <div class="stat">
+        <p class="stat-label"><span class="caption">Clerky</span>T1 defects at the pilot gate on the Documents App</p>
+        <p class="stat-num">0</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="ck-title">
+    <div class="units">
+      <div class="unit">
+        <span class="caption tag" id="ck-title">Clerky · Agentic readiness audit</span>
+        <p class="unit-figure">12<small>of 52</small></p>
+        <p class="unit-text">components had no description an agent could read.</p>
+        <div class="grid" id="grid-components" style="grid-template-columns: repeat(13, 10px)" role="img" aria-label="52 cells, 12 marked: components without a description"></div>
+        <div class="legend caption"><span><i style="background:var(--hot)"></i>No description</span><span><i style="background:var(--cell-quiet)"></i>Described</span></div>
+      </div>
+      <div class="unit">
+        <span class="caption" aria-hidden="true">&nbsp;</span>
+        <p class="unit-figure">315<small>of 315</small></p>
+        <p class="unit-text">semantic and component tokens already did.</p>
+        <div class="grid" id="grid-tokens" style="grid-template-columns: repeat(21, 10px)" role="img" aria-label="315 cells, all described"></div>
+        <div class="legend caption"><span><i style="background:var(--accent);opacity:.72"></i>Token with description</span></div>
+      </div>
+    </div>
+    <div class="source caption"><span>One cell = one component or token</span><span>Source: Clerky audit, agentic readiness pillar</span></div>
+  </section>
+</main>
+
+<footer class="foot caption">
+  <span>nicey · proof panel · exploration v0.1</span>
+  <span>figures from the Home-v2 copy · 2026-11-02</span>
+</footer>
+
+<script>
+(() => {
+  const root = document.documentElement;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (matchMedia('(prefers-color-scheme: dark)').matches) root.dataset.theme = 'dark';
+  const isDark = () => root.dataset.theme === 'dark';
+
+  /* ------------------------------------------------ data (Home-v2) */
+  const TOTAL = 1071;  // outside-library references, QBench
+  const KEEP = 141;    // components on the token system after
+  const NOTE = [
+    'Years without a designer. Every screen was a developer’s best guess, built on eleven libraries.',
+    'One semantic token system. Every one of the 141 components now resolves through it.',
+  ];
+
+  /* ------------------------------------------------ field (pixel-field.ts) */
+  const STOPS = {
+    light: [[243,240,233],[203,218,196],[217,210,239],[246,217,196],[242,230,188],[216,198,224]],
+    dark:  [[20,20,16],[78,101,71],[88,80,132],[126,88,64],[120,104,58],[104,74,110]],
+  };
+  const smooth = (t) => t * t * (3 - 2 * t);
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  function mulberry32(seed) {
+    let a = seed | 0;
+    return () => {
+      a = (a + 0x6d2b79f5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  const LC = 10, LR = 5, rnd = mulberry32(0x2a);
+  const phase = [], speed = [], bias = [];
+  for (let i = 0; i < LC * LR; i++) { phase.push(rnd() * Math.PI * 2); speed.push(0.15 + rnd() * 0.25); bias.push(rnd() * 0.5); }
+  const node = (cx, cy, t) => { const i = cy * LC + cx; return bias[i] + 0.5 * (0.5 + 0.5 * Math.sin(t * 2 * speed[i] + phase[i])); };
+  function sample(x, y, t) {
+    const gx = clamp(x, 0, 1) * (LC - 1), gy = clamp(y, 0, 1) * (LR - 1);
+    const x0 = Math.floor(gx), y0 = Math.floor(gy), x1 = Math.min(x0 + 1, LC - 1), y1 = Math.min(y0 + 1, LR - 1);
+    const tx = smooth(gx - x0), ty = smooth(gy - y0);
+    const top = node(x0, y0, t) + (node(x1, y0, t) - node(x0, y0, t)) * tx;
+    const bot = node(x0, y1, t) + (node(x1, y1, t) - node(x0, y1, t)) * tx;
+    return top + (bot - top) * ty;
+  }
+  function rgbAt(v) {
+    const S = isDark() ? STOPS.dark : STOPS.light;
+    // skip stop 0 (the page colour) so every reference stays visible
+    const pos = (0.2 + 0.8 * clamp(v, 0, 0.9999)) * (S.length - 1);
+    const i = Math.floor(pos), t = pos - i, a = S[i], b = S[Math.min(i + 1, S.length - 1)];
+    return [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)];
+  }
+
+  /* ------------------------------------------------ layout: 1,071 cells under an envelope */
+  const canvas = document.getElementById('field'), hero = document.getElementById('hero');
+  let ctx, W = 0, H = 0, dpr = 1, cells = [], pitch = 10, size = 8, F = {};
+  const envelope = (t) => {
+    const rise = Math.pow(smooth(clamp(t / 0.8, 0, 1)), 1.5);
+    const fall = 1 - 0.9 * smooth(clamp((t - 0.84) / 0.16, 0, 1));
+    const bump = 0.14 * Math.exp(-(((t - 0.46) / 0.08) ** 2));
+    const wob = 0.035 * Math.sin(t * 23 + 1.3) + 0.02 * Math.sin(t * 47);
+    return clamp((0.05 + 0.95 * rise + bump + wob * rise) * fall, 0.02, 1);
+  };
+
+  function build() {
+    const r = hero.getBoundingClientRect();
+    W = Math.round(r.width); H = Math.round(r.height);
+    dpr = Math.min(2, devicePixelRatio || 1);
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    ctx = canvas.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const narrow = W < 760;
+    F = narrow
+      ? { x0: 16, x1: W - 16, top: H - 280, bottom: H }
+      : { x0: Math.round(W * 0.36), x1: W - 40, top: 72, bottom: H };
+
+    // the largest cell that still fits all 1,071 under the envelope
+    let cols = 0, rows = 0, env = [];
+    for (pitch = 14; pitch >= 5; pitch--) {
+      cols = Math.floor((F.x1 - F.x0) / pitch); rows = Math.floor((F.bottom - F.top) / pitch);
+      env = Array.from({ length: cols }, (_, c) => envelope(c / (cols - 1)));
+      if (env.reduce((s, e) => s + Math.round(e * rows), 0) >= TOTAL) break;
+    }
+    size = pitch >= 8 ? pitch - 2 : pitch - 1;
+    // scale the envelope so the column heights sum to exactly TOTAL
+    let lo = 0, hi = 1;
+    const sum = (k) => env.reduce((s, e) => s + Math.round(e * rows * k), 0);
+    for (let i = 0; i < 40; i++) { const m = (lo + hi) / 2; sum(m) < TOTAL ? (lo = m) : (hi = m); }
+    const heights = env.map((e) => Math.round(e * rows * hi));
+    let over = heights.reduce((s, h) => s + h, 0) - TOTAL;
+    while (over > 0) { heights[heights.indexOf(Math.max(...heights))]--; over--; }
+    while (over < 0) { heights[heights.indexOf(Math.max(...heights))]++; over++; }
+
+    const peak = heights.indexOf(Math.max(...heights));
+    const bcols = 12, bw = bcols * pitch;
+    const bx0 = clamp(F.x0 + peak * pitch - bw / 2, F.x0, F.x1 - bw);
+    F.block = { x0: bx0, x1: bx0 + bw, rows: Math.ceil(KEEP / bcols) };
+
+    const jit = mulberry32(7);
+    cells = [];
+    for (let c = 0; c < cols; c++) {
+      for (let r = 0; r < heights[c]; r++) {
+        cells.push({ c, r, h: heights[c], x: F.x0 + c * pitch, y: F.bottom - (r + 1) * pitch, j: jit() * 70 });
+      }
+    }
+    // 141 cells, spread evenly through the sweep, become the components
+    let k = 0;
+    for (let i = 0; i < KEEP; i++) {
+      const cell = cells[Math.round((i + 0.5) * TOTAL / KEEP)];
+      cell.keep = true;
+      cell.tx = bx0 + (k % bcols) * pitch;
+      cell.ty = F.bottom - (Math.floor(k / bcols) + 1) * pitch;
+      k++;
+    }
+    F.cols = cols; F.rows = rows;
+    draw(now());
+  }
+
+  /* ------------------------------------------------ draw */
+  let p = 0, target = 0, hover = null;
+  const now = () => (reduced ? 4 : performance.now() / 1000);
+  const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
+  const css = (n) => getComputedStyle(root).getPropertyValue(n).trim();
+  let COL = {};
+  const readCols = () => { COL = { accent: css('--accent'), hot: css('--hot'), ink2: css('--ink-2'), muted: css('--muted'), line: css('--line-strong') }; };
+  const hexRgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+
+  function draw(t) {
+    ctx.clearRect(0, 0, W, H);
+    // runs far enough past the last column that every cell, jitter included, finishes
+    const span = F.x1 - F.x0 + 320;
+    const sweep = F.x0 - 120 + ease(p) * span;
+    const acc = hexRgb(COL.accent);
+    let resolved = 0;
+
+    for (const cell of cells) {
+      const local = clamp((sweep - cell.x - cell.j) / 110, 0, 1);
+      if (local >= 1) resolved++;
+      let x = cell.x, y = cell.y, s = size, a;
+      let rgb = rgbAt(sample(cell.c / F.cols, cell.r / F.rows, t));
+      // column edges and the thin left tail sit quieter, like a halftone
+      a = (0.55 + 0.45 * clamp(cell.h / 22, 0, 1)) * smooth(clamp(Math.min(cell.c, F.cols - cell.c) / 5, 0.15, 1));
+      if (cell.keep) {
+        const m = smooth(local);
+        x = lerp(cell.x, cell.tx, m); y = lerp(cell.y, cell.ty, m);
+        rgb = rgb.map((v, i) => lerp(v, acc[i], m));
+        a = lerp(a, 0.92, m);
+      } else if (local > 0) {
+        a *= 1 - local;
+        s = size * (1 - 0.6 * local);
+        if (a < 0.01) continue;
+      }
+      if (hover) {
+        const d = Math.hypot(x + size / 2 - hover.x, y + size / 2 - hover.y);
+        if (d < 64) { const g = (1 - d / 64) ** 2; s += 4 * g; a = Math.min(1, a + 0.4 * g); }
+      }
+      ctx.globalAlpha = a;
+      ctx.fillStyle = `rgb(${rgb[0] | 0},${rgb[1] | 0},${rgb[2] | 0})`;
+      const o = (size - s) / 2;
+      ctx.fillRect(x + o, y + o, s, s);
+    }
+    ctx.globalAlpha = 1;
+
+    // the sweep: one measurement line, one readout
+    if (p > 0.001 && p < 0.999) {
+      const x = Math.round(clamp(sweep, F.x0, F.x1)) + 0.5;
+      ctx.strokeStyle = COL.hot; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(x, F.top - 24); ctx.lineTo(x, F.bottom); ctx.stroke();
+      ctx.font = '500 11px "Geist Mono", monospace'; ctx.fillStyle = COL.hot; ctx.textBaseline = 'alphabetic';
+      const txt = `${resolved.toLocaleString('en-US')} / ${TOTAL.toLocaleString('en-US')} resolved`;
+      const tw = ctx.measureText(txt).width;
+      ctx.fillText(txt, x + 8 + tw > W - 16 ? x - 8 - tw : x + 8, F.top - 14);
+    }
+
+    // after: the block, named
+    if (p > 0.98) {
+      ctx.globalAlpha = smooth((p - 0.98) / 0.02);
+      const b = F.block, ty = F.bottom - b.rows * pitch - 14;
+      ctx.strokeStyle = COL.line; ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(b.x0 + 0.5, ty + 5); ctx.lineTo(b.x0 + 0.5, ty + 0.5); ctx.lineTo(b.x1 - 2 + 0.5, ty + 0.5); ctx.lineTo(b.x1 - 2 + 0.5, ty + 5);
+      ctx.stroke();
+      ctx.font = '500 11px "Geist Mono", monospace'; ctx.fillStyle = COL.ink2;
+      ctx.fillText('141 components', b.x0, ty - 26);
+      ctx.fillStyle = COL.muted;
+      ctx.fillText('one semantic token system', b.x0, ty - 10);
+      ctx.globalAlpha = 1;
+    }
+
+    const shown = TOTAL - resolved;
+    figure.textContent = shown.toLocaleString('en-US');
+  }
+
+  /* ------------------------------------------------ state + loop */
+  const figure = document.getElementById('figure');
+  const note = document.getElementById('note');
+  const readout = document.getElementById('readout');
+  const segBtns = document.querySelectorAll('[data-state]');
+  function setState(s, instant) {
+    target = s;
+    segBtns.forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset.state === s)));
+    note.style.opacity = 0;
+    setTimeout(() => { note.textContent = NOTE[s]; note.style.opacity = 1; }, instant ? 0 : 200);
+    readout.textContent = s ? '0 outside libraries · 141 components' : '11 libraries · 141 components';
+    if (instant || reduced) { p = s; if (ctx) draw(now()); }
+  }
+  segBtns.forEach((b) => b.addEventListener('click', () => setState(+b.dataset.state)));
+
+  let last = performance.now(), visible = true;
+  function loop(ms) {
+    requestAnimationFrame(loop);
+    if (!visible) return;
+    const dt = Math.min(0.05, (ms - last) / 1000);
+    const moving = p !== target;
+    if (moving) p = target > p ? Math.min(target, p + dt / 2.8) : Math.max(target, p - dt / 2.8);
+    // 30fps while resolving or hovered, 12fps idle drift
+    if (!moving && !hover && ms - last < 1000 / 12) return;
+    last = ms;
+    draw(ms / 1000);
+  }
+
+  hero.addEventListener('pointermove', (e) => {
+    const r = canvas.getBoundingClientRect();
+    hover = { x: e.clientX - r.left, y: e.clientY - r.top };
+    if (reduced) draw(now());
+  });
+  hero.addEventListener('pointerleave', () => { hover = null; if (reduced) draw(now()); });
+
+  // resolve once, the first time the panel is properly on screen
+  let played = false;
+  new IntersectionObserver((es) => {
+    visible = es[0].isIntersecting;
+    if (visible && es[0].intersectionRatio > 0.5 && !played && !reduced) {
+      played = true;
+      setTimeout(() => { if (target === 0) setState(1); }, 1200);
+    }
+  }, { threshold: [0, 0.5] }).observe(hero);
+
+  /* ------------------------------------------------ unit grids */
+  const fill = (id, n, hot, cls) => {
+    const g = document.getElementById(id);
+    g.innerHTML = Array.from({ length: n }, (_, i) => `<span class="${i < hot ? 'hot' : cls}"></span>`).join('');
+  };
+  fill('grid-components', 52, 12, '');
+  fill('grid-tokens', 315, 0, 'ok');
+
+  /* ------------------------------------------------ theme */
+  function setTheme(t) {
+    root.dataset.theme = t;
+    document.querySelectorAll('[data-theme-btn]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.themeBtn === t)));
+    readCols();
+    if (ctx) draw(now());
+  }
+  document.querySelectorAll('[data-theme-btn]').forEach((b) => b.addEventListener('click', () => setTheme(b.dataset.themeBtn)));
+
+  setTheme(isDark() ? 'dark' : 'light');
+  if (reduced) { setState(1, true); }
+  new ResizeObserver(build).observe(hero);
+  document.fonts.ready.then(build);
+  if (!reduced) requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

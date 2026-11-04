@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Nicey homepage concept v3, part 2</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..600&amp;family=Geist+Mono:wght@400..500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+a{color:#6B5FBE}a:hover{color:#574BAA}
+a:focus-visible,summary:focus-visible{outline:2px solid #6B5FBE;outline-offset:3px;border-radius:4px}
+summary{cursor:pointer;list-style:none}summary::-webkit-details-marker{display:none}
+/* rows sit inside a clipped panel, so their focus ring draws inward */
+summary:focus-visible,.work-row:focus-visible{outline-offset:-4px}
+.faq-ind::before{content:"+"}
+details[open] .faq-ind::before{content:"\2212"}
+.work-arr{transition:transform .15s ease}
+@media (hover: hover){
+.work-row{transition:background-color .15s ease}
+.work-row:hover{background:#F6F3EC}
+.work-row:hover .work-arr{transform:translateX(4px)}
+}
+@media (prefers-reduced-motion: reduce){.work-arr,.work-row{transition:none}}
+</style>
+</helmet>
+<div style="background: #F3F0E9; color: #26251F; font-family: 'Geist', system-ui, sans-serif; font-size: 16px; line-height: 1.55; min-height: 100vh">
+<main>
+
+<section id="work" aria-labelledby="work-head" style="max-width: 1200px; margin: 0 auto; padding: 128px 24px; display: flex; flex-direction: column; gap: 48px">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<span style="font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #4D4A40">Work</span>
+<h2 id="work-head" style="margin: 0; font-size: clamp(36px, 4.2vw, 60px); line-height: 1.02; font-weight: 500; letter-spacing: -0.04em; text-wrap: balance">Systems and products we have built</h2>
+</div>
+<ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 1px; background: #26251F1A; border: 1px solid #26251F1A; border-radius: 16px; overflow: hidden">
+
+<li><a href="#" class="work-row" style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 16px 40px; padding: 36px 40px; background: #FBFAF6; color: #26251F; text-decoration: none">
+<span style="flex: 1 1 220px; display: flex; flex-direction: column; gap: 10px"><span style="font-size: clamp(32px, 3.6vw, 48px); line-height: 1; font-weight: 500; letter-spacing: -0.045em">QBench</span><span style="font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #4D4A40">Design system + product · LIMS</span></span>
+<span style="flex: 0 1 220px; display: flex; flex-direction: column; gap: 8px"><span style="font-size: clamp(32px, 3.6vw, 48px); line-height: 1; font-weight: 500; letter-spacing: -0.045em; font-variant-numeric: tabular-nums; white-space: nowrap">1,071 <span style="color: #716E63">→</span> 0</span><span style="font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #C4471F">Outside-library references</span></span>
+<span style="flex: 1 1 300px; font-size: 16px; line-height: 1.55; color: #4D4A40; max-width: 44ch; text-wrap: pretty">Years without a designer, consolidated into one semantic token system. Plus one status model for eight entry points, compliance steps included, shipped as an MVP.</span>
+<span class="work-arr" aria-hidden="true" style="flex: 0 0 auto; font-size: 24px; line-height: 1; color: #26251F">→</span>
+</a></li>
+
+<li><a href="#" class="work-row" style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 16px 40px; padding: 36px 40px; background: #FBFAF6; color: #26251F; text-decoration: none">
+<span style="flex: 1 1 220px; display: flex; flex-direction: column; gap: 10px"><span style="font-size: clamp(32px, 3.6vw, 48px); line-height: 1; font-weight: 500; letter-spacing: -0.045em">Everbreed</span><span style="font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #4D4A40">Design system · Agtech</span></span>
+<span style="flex: 0 1 220px; display: flex; flex-direction: column; gap: 8px"><span style="font-size: clamp(32px, 3.6vw, 48px); line-height: 1; font-weight: 500; letter-spacing: -0.045em; font-variant-numeric: tabular-nums">302</span><span style="font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #C4471F">Variables made machine-readable</span></span>
+<span style="flex: 1 1 300px; font-size: 16px; line-height: 1.55; color: #4D4A40; max-width: 44ch; text-wrap: pretty">A mature Figma library made machine-readable: IDs, scopes and code names on 302 variables, so the code config can come from Figma. In progress.</span>
+<span class="work-arr" aria-hidden="true" style="flex: 0 0 auto; font-size: 24px; line-height: 1; color: #26251F">→</span>
+</a></li>
+
+<li><a href="#" class="work-row" style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 16px 40px; padding: 36px 40px; background: #FBFAF6; color: #26251F; text-decoration: none">
+<span style="flex: 1 1 220px; display: flex; flex-direction: column; gap: 10px"><span style="font-size: clamp(32px, 3.6vw, 48px); line-height: 1; font-weight: 500; letter-spacing: -0.045em">Clerky</span><span style="font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #4D4A40">Design system · Legal tech</span></span>
+<span style="flex: 0 1 220px; display: flex; flex-direction: column; gap: 8px"><span style="font-size: clamp(32px, 3.6vw, 48px); line-height: 1; font-weight: 500; letter-spacing: -0.045em; font-variant-numeric: tabular-nums">0 T1</span><span style="font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #C4471F">Defects at the pilot gate</span></span>
+<span style="flex: 1 1 300px; font-size: 16px; line-height: 1.55; color: #4D4A40; max-width: 44ch; text-wrap: pretty">Three-tier tokens, AI-context docs on every component and token, and a zero-T1 defect gate. Validated at pilot scale on the Documents App.</span>
+<span class="work-arr" aria-hidden="true" style="flex: 0 0 auto; font-size: 24px; line-height: 1; color: #26251F">→</span>
+</a></li>
+
+<li><a href="#" class="work-row" style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 16px 40px; padding: 36px 40px; background: #FBFAF6; color: #26251F; text-decoration: none">
+<span style="flex: 1 1 220px; display: flex; flex-direction: column; gap: 10px"><span style="font-size: clamp(32px, 3.6vw, 48px); line-height: 1; font-weight: 500; letter-spacing: -0.045em">Omnisafe</span><span style="font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #4D4A40">Product design · Insurance</span></span>
+<span style="flex: 0 1 220px; display: flex; flex-direction: column; gap: 8px"><span style="font-size: clamp(32px, 3.6vw, 48px); line-height: 1; font-weight: 500; letter-spacing: -0.045em; font-variant-numeric: tabular-nums">16</span><span style="font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #C4471F">Modules tested before build</span></span>
+<span style="flex: 1 1 300px; font-size: 16px; line-height: 1.55; color: #4D4A40; max-width: 44ch; text-wrap: pretty">Sixteen modules, tested end to end with real employees before engineering began.</span>
+<span class="work-arr" aria-hidden="true" style="flex: 0 0 auto; font-size: 24px; line-height: 1; color: #26251F">→</span>
+</a></li>
+
+<li><a href="#" class="work-row" style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 16px 40px; padding: 36px 40px; background: #FBFAF6; color: #26251F; text-decoration: none">
+<span style="flex: 1 1 220px; display: flex; flex-direction: column; gap: 10px"><span style="font-size: clamp(32px, 3.6vw, 48px); line-height: 1; font-weight: 500; letter-spacing: -0.045em">FLYR</span><span style="font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #4D4A40">Product design · Hospitality</span></span>
+<span style="flex: 0 1 220px; display: flex; flex-direction: column; gap: 8px"><span style="align-self: flex-start; padding: 8px 12px; border: 1px dashed #26251F4D; border-radius: 6px; font-family: 'Geist Mono', monospace; font-size: 13px; color: #4D4A40">[result to collect]</span><span style="font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #716E63">One business result</span></span>
+<span style="flex: 1 1 300px; font-size: 16px; line-height: 1.55; color: #4D4A40; max-width: 44ch; text-wrap: pretty">Group Quotation MVP shipped, so hotels can see whether a group booking makes money.</span>
+<span class="work-arr" aria-hidden="true" style="flex: 0 0 auto; font-size: 24px; line-height: 1; color: #26251F">→</span>
+</a></li>
+</ul>
+</section>
+
+<section aria-labelledby="faq-head" style="max-width: 1200px; margin: 0 auto; padding: 0 24px 128px; display: flex; flex-wrap: wrap; gap: 40px 72px; align-items: flex-start">
+<div style="flex: 1 1 300px; display: flex; flex-direction: column; gap: 14px">
+<span style="font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #4D4A40">Questions</span>
+<h2 id="faq-head" style="margin: 0; font-size: clamp(36px, 4.2vw, 60px); line-height: 1.02; font-weight: 500; letter-spacing: -0.04em; text-wrap: balance">Before you book a call</h2>
+</div>
+<div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 1px; background: #26251F1A; border: 1px solid #26251F1A; border-radius: 16px; overflow: hidden">
+<details open="" style="background: #FBFAF6; padding: 0 32px"><summary style="display: flex; align-items: center; gap: 16px; min-height: 76px; font-size: 19px; font-weight: 500; letter-spacing: -0.015em"><span style="font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; color: #716E63">01</span><span style="flex: 1">What does the free audit need from us?</span><span class="faq-ind" aria-hidden="true" style="font-family: 'Geist Mono', monospace; font-size: 18px; color: #4D4A40"></span></summary><p style="margin: 0; padding: 0 0 28px 36px; font-size: 16px; line-height: 1.6; color: #4D4A40; max-width: 60ch; text-wrap: pretty">Your Figma file. Read access to the repo is optional; with it, we also compare your Figma tokens against the compiled CSS and source code.</p></details>
+<details style="background: #FBFAF6; padding: 0 32px"><summary style="display: flex; align-items: center; gap: 16px; min-height: 76px; font-size: 19px; font-weight: 500; letter-spacing: -0.015em"><span style="font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; color: #716E63">02</span><span style="flex: 1">Do we need to rename everything first?</span><span class="faq-ind" aria-hidden="true" style="font-family: 'Geist Mono', monospace; font-size: 18px; color: #4D4A40"></span></summary><p style="margin: 0; padding: 0 0 28px 36px; font-size: 16px; line-height: 1.6; color: #4D4A40; max-width: 60ch; text-wrap: pretty">No. Renaming is risky and IDs are cheap. Each token gets an ID that survives renames, a scope and a code name, and Figma stays the source of truth.</p></details>
+<details style="background: #FBFAF6; padding: 0 32px"><summary style="display: flex; align-items: center; gap: 16px; min-height: 76px; font-size: 19px; font-weight: 500; letter-spacing: -0.015em"><span style="font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; color: #716E63">03</span><span style="flex: 1">What does “AI-ready” actually mean?</span><span class="faq-ind" aria-hidden="true" style="font-family: 'Geist Mono', monospace; font-size: 18px; color: #4D4A40"></span></summary><p style="margin: 0; padding: 0 0 28px 36px; font-size: 16px; line-height: 1.6; color: #4D4A40; max-width: 60ch; text-wrap: pretty">Four checks you can run today: components have descriptions, components bind to semantic tokens rather than primitives, inputs declare their icon and action slots, and tokens have descriptions.</p></details>
+<details style="background: #FBFAF6; padding: 0 32px"><summary style="display: flex; align-items: center; gap: 16px; min-height: 76px; font-size: 19px; font-weight: 500; letter-spacing: -0.015em"><span style="font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; color: #716E63">04</span><span style="flex: 1">We have a live product with legacy code. Can you still help?</span><span class="faq-ind" aria-hidden="true" style="font-family: 'Geist Mono', monospace; font-size: 18px; color: #4D4A40"></span></summary><p style="margin: 0; padding: 0 0 28px 36px; font-size: 16px; line-height: 1.6; color: #4D4A40; max-width: 60ch; text-wrap: pretty">That is most of our work. We migrate in slices, so the product keeps shipping while the system replaces what was there.</p></details>
+<details style="background: #FBFAF6; padding: 0 32px"><summary style="display: flex; align-items: center; gap: 16px; min-height: 76px; font-size: 19px; font-weight: 500; letter-spacing: -0.015em"><span style="font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; color: #716E63">05</span><span style="flex: 1">Won’t this slow our team down?</span><span class="faq-ind" aria-hidden="true" style="font-family: 'Geist Mono', monospace; font-size: 18px; color: #4D4A40"></span></summary><p style="margin: 0; padding: 0 0 28px 36px; font-size: 16px; line-height: 1.6; color: #4D4A40; max-width: 60ch; text-wrap: pretty">We start with one real surface from your roadmap as the pilot, so the first thing the system produces is something you were going to ship anyway.</p></details>
+<details style="background: #FBFAF6; padding: 0 32px"><summary style="display: flex; align-items: center; gap: 16px; min-height: 76px; font-size: 19px; font-weight: 500; letter-spacing: -0.015em"><span style="font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; color: #716E63">06</span><span style="flex: 1">How does this work with our coding agents?</span><span class="faq-ind" aria-hidden="true" style="font-family: 'Geist Mono', monospace; font-size: 18px; color: #4D4A40"></span></summary><p style="margin: 0; padding: 0 0 28px 36px; font-size: 16px; line-height: 1.6; color: #4D4A40; max-width: 60ch; text-wrap: pretty">Every token and component gets a context file your agents read. The pilot can be built by your team’s agent, and it has to pass the same defect gate.</p></details>
+<details style="background: #FBFAF6; padding: 0 32px"><summary style="display: flex; align-items: center; gap: 16px; min-height: 76px; font-size: 19px; font-weight: 500; letter-spacing: -0.015em"><span style="font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; color: #716E63">07</span><span style="flex: 1">Who maintains the system after you leave?</span><span class="faq-ind" aria-hidden="true" style="font-family: 'Geist Mono', monospace; font-size: 18px; color: #4D4A40"></span></summary><p style="margin: 0; padding: 0 0 28px 36px; font-size: 16px; line-height: 1.6; color: #4D4A40; max-width: 60ch; text-wrap: pretty">Your team, with the documentation and review cadence we set up. Or we stay on as your systems partner on a monthly retainer.</p></details>
+</div>
+</section>
+
+</main>
+<footer style="background: #26251F; color: #F3F0E9">
+<div style="max-width: 1200px; margin: 0 auto; padding: 128px 24px; display: flex; flex-direction: column; gap: 24px; align-items: flex-start">
+<span style="font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #B6B1A3">Free audit · read-only</span>
+<h2 style="margin: 0; font-size: clamp(48px, 7.4vw, 108px); line-height: 0.95; font-weight: 500; letter-spacing: -0.05em; max-width: 12ch; text-wrap: balance">Send us the system you have.</h2>
+<p style="margin: 0; font-size: clamp(18px, 2vw, 26px); line-height: 1.35; letter-spacing: -0.02em; color: #B6B1A3">We will show you the one you should.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px">
+<a href="#audit" style="padding: 16px 24px; border-radius: 999px; background: #F3F0E9; color: #26251F; text-decoration: none; font-size: 17px; font-weight: 500">Get a free audit</a>
+<a href="#" style="padding: 15px 23px; border-radius: 999px; border: 1px solid #F3F0E9; color: #F3F0E9; text-decoration: none; font-size: 17px; font-weight: 500">Book a call</a>
+</div>
+</div>
+</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2700}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

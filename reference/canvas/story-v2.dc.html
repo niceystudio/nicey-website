@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Zero Drift story v2</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button:focus-visible{outline:2px solid #6B5FBE;outline-offset:3px}
+</style>
+</helmet>
+<div style="width: 1440px; min-height: 925px; box-sizing: border-box; padding: 64px 80px; background: #F3F0E9; color: #26251F; font-family: 'Inter Tight', system-ui, sans-serif; display: grid; grid-template-columns: 560px minmax(0, 1fr); gap: 64px">
+<section aria-labelledby="story-head" style="display: flex; flex-direction: column; gap: 28px; min-width: 0">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #4D4A40">Zero Drift · how we work</span>
+<nav aria-label="Story steps" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px">
+<sc-for list="{{steps}}" as="s" hint-placeholder-count="5">
+<button type="button" onClick="{{s.pick}}" aria-current="{{s.current}}" style="font: inherit; cursor: pointer; text-align: left; border: 0; padding: 12px 0 0; background: transparent; color: #26251F; display: flex; flex-direction: column; gap: 6px; min-height: 44px; border-top: {{s.rule}}">
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #4D4A40">{{s.num}}</span>
+<span style="font-size: 15px; font-weight: {{s.weight}}">{{s.key}}</span>
+</button>
+</sc-for>
+</nav>
+</div>
+<div style="display: flex; flex-direction: column; gap: 22px; flex-grow: 1">
+<div style="display: flex; align-items: baseline; gap: 16px">
+<span aria-hidden="true" style="font-size: 120px; line-height: 0.8; font-weight: 600; letter-spacing: -0.06em; color: #6B5FBE">{{cur.num}}</span>
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #4D4A40">{{cur.key}}</span>
+</div>
+<h2 id="story-head" style="margin: 0; font-size: 44px; line-height: 1.04; font-weight: 600; letter-spacing: -0.035em; text-wrap: balance">{{cur.head}}</h2>
+<dl style="margin: 0; display: flex; flex-direction: column; gap: 0; border-top: 1px solid #26251F33">
+<div style="display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 16px; padding: 14px 0; border-bottom: 1px solid #26251F1A">
+<dt style="font-family: 'JetBrains Mono', monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #4D4A40; padding-top: 3px">You’re seeing</dt>
+<dd style="margin: 0; font-size: 17px; line-height: 1.5">{{cur.see}}</dd>
+</div>
+<div style="display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 16px; padding: 14px 0; border-bottom: 1px solid #26251F1A">
+<dt style="font-family: 'JetBrains Mono', monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #4D4A40; padding-top: 3px">We do</dt>
+<dd style="margin: 0; font-size: 17px; line-height: 1.5">{{cur.do}}</dd>
+</div>
+<div style="display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 16px; padding: 14px 0">
+<dt style="font-family: 'JetBrains Mono', monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #4D4A40; padding-top: 3px">You get</dt>
+<dd style="margin: 0; font-size: 17px; line-height: 1.5; font-weight: 600">{{cur.get}}</dd>
+</div>
+</dl>
+<p style="margin: 0; padding: 14px 16px; border-radius: 12px; background: #FFFFFF; font-size: 15px; line-height: 1.5"><span style="display: block; margin-bottom: 4px; font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4D4A40">{{cur.where}}</span>{{cur.proof}}</p>
+</div>
+<div style="display: flex; gap: 8px">
+<button type="button" onClick="{{prev}}" disabled="{{atStart}}" style="font: inherit; font-size: 15px; font-weight: 500; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid #26251F; background: transparent; color: #26251F; cursor: pointer">Previous</button>
+<button type="button" onClick="{{next}}" disabled="{{atEnd}}" style="font: inherit; font-size: 15px; font-weight: 600; min-height: 44px; padding: 0 22px; border-radius: 999px; border: 0; background: #26251F; color: #FFFFFF; cursor: pointer">Next step</button>
+</div>
+</section>
+<section aria-label="Stage" style="position: relative; background: #FFFFFF; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column">
+<div style="display: flex; justify-content: space-between; padding: 18px 24px; border-bottom: 1px solid #26251F1A; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #4D4A40">
+<span>stage</span>
+<span style="color: #26251F">{{cur.stage}}</span>
+</div>
+<div style="flex-grow: 1; padding: 32px; display: flex; flex-direction: column; justify-content: center">
+<sc-if value="{{show.drift}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 20px">
+<p style="margin: 0; font-size: 15px; color: #4D4A40">One purple, as found in a product nobody owned:</p>
+<ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 10px">
+<sc-for list="{{found}}" as="f" hint-placeholder-count="11">
+<li style="display: flex; align-items: center; gap: 8px; padding: 9px 12px; border: 1px solid #26251F1A; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 13px; transform: {{f.tilt}}"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 3px; background: {{f.hex}}"></span>{{f.name}}</li>
+</sc-for>
+</ul>
+<p style="margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #26251F">11 names · 1 intention</p>
+</div>
+</sc-if>
+<sc-if value="{{show.audit}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<sc-for list="{{pillars}}" as="p" hint-placeholder-count="5">
+<div style="display: grid; grid-template-columns: 36px minmax(0, 1fr) 120px; align-items: center; gap: 16px; padding: 16px 18px; border-radius: 12px; background: {{p.bg}}">
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #4D4A40">{{p.num}}</span>
+<span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 18px; font-weight: 600">{{p.name}}</span><span style="font-size: 14px; color: #4D4A40">{{p.what}}</span></span>
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; text-align: right">[score]</span>
+</div>
+</sc-for>
+<p style="margin: 6px 0 0; font-size: 14px; color: #4D4A40">Figma file is enough to start. The zero drift check also needs read access to the repo.</p>
+</div>
+</sc-if>
+<sc-if value="{{show.system}}" hint-placeholder-val="{{ false }}">
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: stretch">
+<div style="background: #F3F0E9; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 10px"><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #4D4A40">primitive</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 14px">violet.500</span><span aria-hidden="true" style="height: 40px; border-radius: 8px; background: #6B5FBE"></span></div>
+<div style="background: #D9D2EF; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 10px"><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #4D4A40">semantic</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 14px">color.accent</span><span style="font-size: 14px; color: #4D4A40">light, dark and brand modes from one source</span></div>
+<div style="background: #F3F0E9; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 10px"><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #4D4A40">component</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 14px">Button/primary/bg</span><span style="align-self: flex-start; padding: 10px 16px; border-radius: 999px; background: #6B5FBE; color: #FFFFFF; font-size: 14px; font-weight: 600">Send invoice</span></div>
+<div style="grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px">
+<div style="border: 1px solid #26251F1A; border-radius: 12px; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px"><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #4D4A40">Figma properties</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 14px">variant · size · icon · disabled</span></div>
+<div style="border: 1px solid #26251F1A; border-radius: 12px; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px"><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #4D4A40">Code props</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 14px">variant · size · icon · disabled</span></div>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{show.context}}" hint-placeholder-val="{{ false }}">
+<div style="border: 1px solid #26251F33; border-radius: 12px; overflow: hidden">
+<div style="padding: 10px 16px; border-bottom: 1px solid #26251F1A; font-family: 'JetBrains Mono', monospace; font-size: 12px">components/invoice-card.md</div>
+<pre style="margin: 0; padding: 18px; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.65; color: #4D4A40; white-space: pre-wrap"># InvoiceCard
+The one card a billing surface renders. One per invoice, never nested.
+
+## Tokens
+padding     <b style="color: #6B5FBE; font-weight: 500">space.5</b>
+badge.paid  <b style="color: #6B5FBE; font-weight: 500">color.sage</b> on <b style="color: #6B5FBE; font-weight: 500">color.ink</b>
+action      Button / primary
+
+## Rules
+- Paid, Due and Overdue are the only badge states.
+- Never truncate the amount.
+
+## For agents
+If a state is missing here, it does not exist. Ask, do not add.</pre>
+</div>
+</sc-if>
+<sc-if value="{{show.proof}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 16px">
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px">
+<div style="border-radius: 12px; background: #F3F0E9; padding: 18px; display: flex; flex-direction: column; gap: 10px"><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #4D4A40">re-audit · before</span><span style="font-size: 28px; font-weight: 600; letter-spacing: -0.02em">[score]</span><span style="font-size: 14px; color: #4D4A40">[findings at the first audit]</span></div>
+<div style="border-radius: 12px; background: #CBDAC4; padding: 18px; display: flex; flex-direction: column; gap: 10px"><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #4D4A40">re-audit · after</span><span style="font-size: 28px; font-weight: 600; letter-spacing: -0.02em">[score]</span><span style="font-size: 14px; color: #4D4A40">[findings after delivery]</span></div>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 12px; background: #26251F; color: #F3F0E9">
+<span aria-hidden="true" style="width: 10px; height: 10px; background: #CBDAC4"></span>
+<span style="font-size: 16px; font-weight: 600">Pilot surface passed the defect gate</span>
+<span style="margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #B6B1A3">0 blocking defects</span>
+</div>
+</div>
+</sc-if>
+</div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":925}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { step: 0 };
+  }
+  renderVals() {
+    const data = [
+      { key: 'Drift', where: 'Seen at Everbreed', proof: '53 variables had drifted between Figma and code, with no IDs to tell a rename from a delete.', stage: 'values, as found',
+        head: 'Nobody owns the colours, so every screen guesses.',
+        see: 'A colour class with no token behind it renders nothing, and the page still passes review. One purple ends up under eleven names.',
+        do: 'We read the Figma file, the compiled CSS and the source, and list every value the product actually uses.',
+        get: 'A drift map: what exists, what it should be, and where design and code disagree.' },
+      { key: 'Audit', where: 'Seen at Clerky', proof: '12 of 52 components had no description an agent could read.', stage: 'five pillars',
+        head: 'A free audit across five pillars.',
+        see: 'You know something is off, but not where, or what to fix first.',
+        do: 'We check what an agent needs: descriptions, bindings to semantic tokens, declared slots. With repo access, Figma tokens against compiled CSS and source.',
+        get: 'A report with a score per pillar, the findings, and a roadmap in days.' },
+      { key: 'System', where: 'Seen at QBench', proof: '1,071 references to 11 outside libraries, brought down to zero across 141 components.', stage: 'tokens → components',
+        head: 'Everything reduced to a name, then bound to it.',
+        see: 'Teams rebuild the same button, and Figma properties drift from code props.',
+        do: 'One token model, components built in Figma and code against it, IDs that survive renames, and code config generated from Figma.',
+        get: 'One source of truth for design and engineering, in light, dark and brand modes.' },
+      { key: 'Context', where: 'Seen at Everbreed', proof: 'One rule in every agent file: report the gap, don’t invent the value.', stage: 'context file',
+        head: 'Written for the reader that never asks.',
+        see: 'Agents ship screens that are almost on-brand, because the rules live in people’s heads.',
+        do: 'A context file for every token and component: what it is, when to use it, what it must never do.',
+        get: 'Documentation your designers, engineers and coding agents read the same way.' },
+      { key: 'Proof', where: 'Seen at Clerky', proof: 'Zero T1 defects was the gate for the pilot on the Documents App.', stage: 'pilot + re-audit',
+        head: 'Done means it holds in production.',
+        see: 'Systems that look finished in Figma and fall apart on the first real feature.',
+        do: 'One real surface built through the system, gated on T1 blocking, T2 architectural and T3 minor defects. We fix the model, not the screen.',
+        get: 'A before and after report as the delivery document.' },
+    ];
+    const step = this.state.step;
+    const keys = ['drift', 'audit', 'system', 'context', 'proof'];
+    const show = {};
+    keys.forEach((k, i) => { show[k] = i === step; });
+    const tints = ['#CBDAC4', '#D9D2EF', '#F6D9C4', '#F2E6BC', '#D8C6E0'];
+    const tilts = ['rotate(-2deg)', 'rotate(1.5deg)', 'none', 'rotate(-1deg)', 'rotate(2.5deg)', 'none', 'rotate(-3deg)', 'rotate(1deg)', 'none', 'rotate(-1.5deg)', 'rotate(2deg)'];
+    const names = ['purple-2', 'purple_light', 'purpleLight2', 'violet-copy', 'brand/purple/30', '--purple-ish', 'col-7', 'bg-violet-hover', 'purpleNEW', 'violet-final', '#6b5fbf'];
+    const hexes = ['#6B5FBE', '#7266C4', '#6A5DBB', '#7468C9', '#665AB8', '#6E62C0', '#6B5FBF', '#5F53B0', '#7A6ECC', '#6457B9', '#6B5FBF'];
+    return {
+      cur: { ...data[step], num: String(step + 1).padStart(2, '0') },
+      show,
+      steps: data.map((d, i) => ({
+        num: String(i + 1).padStart(2, '0'),
+        key: d.key,
+        current: i === step ? 'step' : 'false',
+        rule: i === step ? '3px solid #26251F' : (i < step ? '3px solid #6B5FBE' : '3px solid #26251F33'),
+        weight: i === step ? '600' : '400',
+        pick: () => this.setState({ step: i }),
+      })),
+      found: names.map((n, i) => ({ name: n, hex: hexes[i], tilt: tilts[i] })),
+      pillars: ['Figma inspect', 'Agentic readiness', 'Conventions', 'Component API', 'Zero drift'].map((n, i) => ({
+        num: String(i + 1).padStart(2, '0'), name: n, bg: tints[i],
+        what: ['Variables, bindings, styles, library hygiene', 'Can an agent pick the right component and token?', 'Naming and structure against a rule set', 'Variants, states and properties matched to code', 'Figma tokens against compiled CSS and source'][i],
+      })),
+      atStart: step === 0,
+      atEnd: step === data.length - 1,
+      prev: () => this.setState({ step: Math.max(0, step - 1) }),
+      next: () => this.setState({ step: Math.min(data.length - 1, step + 1) }),
+    };
+  }
+}
+</script>
+</body>
+</html>

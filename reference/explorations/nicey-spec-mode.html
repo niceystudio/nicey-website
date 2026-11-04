@@ -1,0 +1,1088 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nicey Spec Mode</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
+<!--
+  Exploration: the pixel field as an instrument, not wallpaper.
+  Same field math and palette as src/lib/pixel-field.ts; everything on top
+  of it (rulers, redlines, island detection, terminal, inspector) is the
+  "spec mode" layer being proposed for Nicey.
+-->
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f7f2;
+    --surface: #ece7db;
+    --surface-2: #e3dccd;
+    --ink: #26251f;
+    --ink-2: #4d4a40;
+    --muted: #716e63;
+    --line: rgba(38, 37, 31, 0.1);
+    --line-strong: rgba(38, 37, 31, 0.2);
+    --accent: #6b5fbe;
+    /* the one new colour: an instrument colour reserved for measurement,
+       never used for brand or content */
+    --measure: #d4512c;
+    --on-chip: #ffffff;
+    --sage: #cbdac4;
+    --lavender: #d9d2ef;
+    --peach: #f6d9c4;
+    --butter: #f2e6bc;
+    --mauve: #d8c6e0;
+    --term-bg: #1d1c16;
+    --term-ink: #ece7db;
+    --term-dim: #8f8c81;
+    --grid-fill: rgba(107, 95, 190, 0.03);
+    --label-col: 200px;
+    --pad: 48px;
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #141410;
+    --surface: #1d1c16;
+    --surface-2: #26251e;
+    --ink: #ece7db;
+    --ink-2: #b6b1a3;
+    --muted: #8f8c81;
+    --line: rgba(236, 231, 219, 0.13);
+    --line-strong: rgba(236, 231, 219, 0.26);
+    --accent: #a79bea;
+    --measure: #ff8a66;
+    --on-chip: #141410;
+    --sage: #3d4a37;
+    --lavender: #3a3556;
+    --peach: #4a3a2c;
+    --butter: #4a4229;
+    --mauve: #463a4c;
+    --term-bg: #0c0c09;
+    --term-ink: #ece7db;
+    --term-dim: #8f8c81;
+    --grid-fill: rgba(167, 155, 234, 0.05);
+  }
+  @media (max-width: 767px) {
+    :root { --pad: 20px; --label-col: 0px; }
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--page);
+    color: var(--ink);
+    font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color .4s ease, color .4s ease;
+  }
+  .mono { font-family: "Geist Mono", ui-monospace, monospace; }
+  button { font: inherit; color: inherit; }
+
+  /* ---------------------------------------------------------------- top bar */
+  .bar {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; align-items: center; gap: 16px;
+    height: 44px; padding: 0 16px;
+    background: color-mix(in srgb, var(--page) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+    font: 500 12px/1 "Geist Mono", monospace;
+    color: var(--ink-2);
+  }
+  .bar .mark { display: flex; align-items: center; gap: 8px; color: var(--ink); font-weight: 600; letter-spacing: -0.01em; }
+  .bar .mark i { display: grid; grid-template-columns: repeat(2, 6px); gap: 1px; }
+  .bar .mark i b { width: 6px; height: 6px; background: var(--accent); display: block; }
+  .bar .mark i b:nth-child(2) { background: var(--peach); }
+  .bar .mark i b:nth-child(3) { background: var(--sage); }
+  .bar .mark i b:nth-child(4) { background: var(--butter); }
+  .bar .crumb { color: var(--muted); }
+  .bar .readout { margin-left: auto; display: flex; gap: 14px; font-variant-numeric: tabular-nums; }
+  .bar .readout span b { color: var(--ink); font-weight: 500; }
+  .seg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 6px; overflow: hidden; }
+  .seg button { border: 0; background: none; padding: 5px 9px; cursor: pointer; font: inherit; color: var(--muted); }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: var(--page); }
+  @media (max-width: 767px) { .bar .crumb, .bar .readout .hide-sm { display: none; } }
+
+  /* ---------------------------------------------------------------- hero */
+  .hero {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    grid-template-rows: 24px auto;
+    border-bottom: 1px solid var(--line);
+  }
+  .corner {
+    display: grid; place-items: center;
+    border-right: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    font: 500 8px/1 "Geist Mono", monospace; color: var(--muted);
+  }
+  #ruler-x { border-bottom: 1px solid var(--line); display: block; }
+  #ruler-y { border-right: 1px solid var(--line); display: block; }
+  .stage {
+    position: relative;
+    height: clamp(460px, 68vh, 680px);
+    overflow: hidden;
+    cursor: crosshair;
+    touch-action: manipulation;
+  }
+  .stage canvas { position: absolute; inset: 0; display: block; }
+  .headline {
+    position: absolute; left: var(--pad); bottom: 64px;
+    pointer-events: none;
+    max-width: min(760px, calc(100% - 2 * var(--pad)));
+  }
+  .headline h1 {
+    margin: 0;
+    font-size: clamp(44px, 7.2vw, 92px);
+    line-height: 0.98;
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
+  }
+  .headline p {
+    margin: 22px 0 0;
+    max-width: 46ch;
+    font: 400 13px/1.6 "Geist Mono", monospace;
+    color: var(--ink-2);
+  }
+  .tag {
+    position: absolute;
+    font: 500 10px/1 "Geist Mono", monospace;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+    pointer-events: none;
+    font-variant-numeric: tabular-nums;
+  }
+  .tag.tl { top: 14px; left: 16px; }
+  .tag.tr { top: 14px; right: 16px; text-align: right; }
+  .tag.br { bottom: 14px; right: 16px; text-align: right; }
+  @media (max-width: 767px) { .tag.tr { display: none; } }
+  .tag .dot { display: inline-block; width: 7px; height: 7px; background: var(--accent); margin-right: 6px; vertical-align: -1px; }
+  .tip {
+    position: absolute; z-index: 3;
+    pointer-events: none;
+    padding: 8px 10px;
+    background: var(--ink); color: var(--page);
+    border-radius: 6px;
+    font: 500 10.5px/1.55 "Geist Mono", monospace;
+    font-variant-numeric: tabular-nums;
+    white-space: pre;
+    opacity: 0; transition: opacity .12s;
+    box-shadow: 0 8px 24px rgba(0,0,0,.18);
+  }
+  .tip.on { opacity: 1; }
+  .tip i { display: inline-block; width: 8px; height: 8px; border-radius: 1px; vertical-align: -1px; margin-right: 6px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.25); }
+
+  /* ---------------------------------------------------------------- sections */
+  .sec {
+    display: grid;
+    grid-template-columns: var(--label-col) 1fr;
+    gap: 0 56px;
+    padding: 72px var(--pad);
+    border-bottom: 1px solid var(--line);
+  }
+  @media (max-width: 767px) { .sec { grid-template-columns: 1fr; gap: 0; padding-block: 48px; } }
+  .sec-label {
+    font: 500 11px/1.5 "Geist Mono", monospace;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 20px;
+  }
+  .sec-label b { display: block; color: var(--ink); font-weight: 500; }
+  .sec h2 {
+    margin: 0 0 10px;
+    font-size: 28px; line-height: 1.15; letter-spacing: -0.025em; font-weight: 600;
+  }
+  .sec .lede { margin: 0 0 32px; color: var(--ink-2); max-width: 60ch; }
+
+  /* ---------------------------------------------------------------- console */
+  .console { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; }
+  @media (max-width: 1000px) { .console { grid-template-columns: 1fr; } }
+  .term {
+    background: var(--term-bg); color: var(--term-ink);
+    border-radius: 10px;
+    font: 400 12.5px/1.7 "Geist Mono", monospace;
+    font-variant-numeric: tabular-nums;
+    display: flex; flex-direction: column;
+    min-height: 360px; max-height: 420px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 16px 48px rgba(38,37,31,.1);
+  }
+  .term-head {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(236,231,219,.1);
+    color: var(--term-dim); font-size: 11px;
+  }
+  .term-head i { width: 9px; height: 9px; background: rgba(236,231,219,.18); display: block; }
+  .term-head span { margin-left: 6px; }
+  .log { flex: 1; overflow-y: auto; padding: 12px 14px 4px; scrollbar-width: thin; }
+  .ln { white-space: pre-wrap; word-break: break-word; }
+  .ln .k { color: #d9d2ef; }   /* lavender — keys */
+  .ln .n { color: #f2e6bc; }   /* butter — numbers */
+  .ln .s { color: #cbdac4; }   /* sage — ok / strings */
+  .ln .e { color: #f6d9c4; }   /* peach — events */
+  .ln .m { color: var(--term-dim); }
+  .ln .x { color: #ff9a80; }   /* errors */
+  .ln .sw { display: inline-block; width: 9px; height: 9px; vertical-align: -1px; margin-right: 4px; }
+  .prompt { display: flex; gap: 8px; padding: 6px 14px 12px; align-items: center; }
+  .prompt label { color: #cbdac4; white-space: nowrap; }
+  .prompt input {
+    flex: 1; min-width: 0;
+    background: none; border: 0; outline: 0;
+    color: var(--term-ink); font: inherit; caret-color: #f6d9c4;
+  }
+
+  .inspect {
+    border: 1px solid var(--line-strong);
+    border-radius: 10px;
+    padding: 16px 18px;
+    font: 400 12px/1 "Geist Mono", monospace;
+    font-variant-numeric: tabular-nums;
+  }
+  .inspect h3 { margin: 0 0 14px; font: 500 11px/1 "Geist Mono", monospace; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; display: flex; justify-content: space-between; }
+  .inspect dl { margin: 0; display: grid; grid-template-columns: 76px 1fr; gap: 10px 12px; }
+  .inspect dt { color: var(--muted); }
+  .inspect dd { margin: 0; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .vbar { display: inline-block; vertical-align: middle; width: 90px; height: 6px; background: var(--surface-2); margin-left: 8px; position: relative; }
+  .vbar b { position: absolute; inset: 0 auto 0 0; background: var(--accent); }
+  .vbar::after { content: ""; position: absolute; top: -3px; bottom: -3px; left: 32%; width: 1px; background: var(--measure); }
+  .ramp { margin-top: 20px; }
+  .ramp-cells { display: grid; grid-template-columns: repeat(30, 1fr); gap: 1px; height: 22px; position: relative; }
+  .ramp-cells span { display: block; }
+  .ramp-axis { display: flex; justify-content: space-between; margin-top: 6px; color: var(--muted); font-size: 10px; }
+  .ramp-mark { position: absolute; top: -5px; bottom: -5px; width: 2px; background: var(--ink); left: 0; transition: left .08s linear; }
+  .ramp-island { position: absolute; top: -9px; height: 4px; right: 0; background: var(--measure); }
+
+  /* ---------------------------------------------------------------- tokens */
+  .tokens { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+  .tok { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--page); }
+  .tok-sw { height: 96px; display: grid; grid-template-columns: repeat(12, 1fr); grid-template-rows: repeat(6, 1fr); gap: 1px; padding: 0; background: var(--page); }
+  .tok-sw span { display: block; }
+  .tok-body { padding: 12px 14px 14px; font: 400 11.5px/1.7 "Geist Mono", monospace; font-variant-numeric: tabular-nums; border-top: 1px solid var(--line); }
+  .tok-body .nm { font-weight: 500; color: var(--ink); font-size: 12.5px; display: flex; justify-content: space-between; gap: 8px; }
+  .tok-body .row { display: flex; justify-content: space-between; color: var(--muted); gap: 8px; }
+  .tok-body .row b { color: var(--ink-2); font-weight: 400; }
+  .pill { font-size: 10px; padding: 1px 6px; border-radius: 99px; border: 1px solid currentColor; line-height: 1.5; white-space: nowrap; }
+  .pill.ok { color: var(--muted); }
+  .pill.warn { color: var(--measure); }
+
+  /* ---------------------------------------------------------------- anatomy */
+  .anatomy { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+  @media (max-width: 1000px) { .anatomy { grid-template-columns: 1fr; } }
+  .board {
+    position: relative;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background:
+      linear-gradient(var(--line) 1px, transparent 1px) 0 0 / 16px 16px,
+      linear-gradient(90deg, var(--line) 1px, transparent 1px) 0 0 / 16px 16px;
+    background-color: var(--page);
+    min-height: 300px;
+    display: grid; place-items: center;
+    overflow: hidden;
+  }
+  .board-tag { position: absolute; top: 12px; left: 14px; font: 500 10px/1 "Geist Mono", monospace; color: var(--muted); }
+  .specimen { position: relative; padding: 72px 96px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    height: 44px; padding: 0 20px 0 16px;
+    border: 0; border-radius: 10px;
+    background: var(--ink); color: var(--page);
+    font: 500 15px/20px "Geist", sans-serif; letter-spacing: -0.005em;
+    cursor: pointer;
+    transition: background-color .15s;
+  }
+  .btn svg { width: 16px; height: 16px; flex: none; }
+  .btn:hover, .btn.is-hover { background: #000; }
+  :root[data-theme="dark"] .btn:hover, :root[data-theme="dark"] .btn.is-hover { background: #fff; }
+  .btn.is-focus { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .btn:disabled { opacity: .38; cursor: not-allowed; }
+  #redlines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+  #redlines text { font: 500 10px "Geist Mono", monospace; }
+  .states { display: flex; flex-wrap: wrap; gap: 20px 28px; margin-top: 20px; }
+  .state { display: grid; gap: 10px; justify-items: start; }
+  .state code { font: 400 10.5px/1 "Geist Mono", monospace; color: var(--muted); }
+  .callouts { list-style: none; margin: 0; padding: 0; counter-reset: c; display: grid; gap: 0; border-top: 1px solid var(--line); }
+  .callouts li {
+    counter-increment: c;
+    display: grid; grid-template-columns: 26px 1fr; gap: 12px;
+    padding: 14px 0; border-bottom: 1px solid var(--line);
+  }
+  .callouts li::before {
+    content: counter(c);
+    width: 20px; height: 20px; border-radius: 50%;
+    display: grid; place-items: center;
+    background: var(--accent); color: var(--on-chip);
+    font: 600 10px/1 "Geist Mono", monospace;
+  }
+  .callouts b { display: block; font-weight: 500; }
+  .callouts code { font: 400 11.5px/1.7 "Geist Mono", monospace; color: var(--ink-2); }
+
+  .foot {
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px;
+    padding: 20px var(--pad) 28px;
+    font: 400 11px/1.5 "Geist Mono", monospace; color: var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <span class="mark"><i><b></b><b></b><b></b><b></b></i>nicey</span>
+  <span class="crumb">/ spec / field.hero</span>
+  <span class="readout">
+    <span>x <b id="rx">----</b></span>
+    <span>y <b id="ry">----</b></span>
+    <span class="hide-sm">v <b id="rv">-.---</b></span>
+    <span class="hide-sm">fps <b id="rf">--</b></span>
+  </span>
+  <span class="seg" role="group" aria-label="Theme">
+    <button type="button" data-theme-btn="light" aria-pressed="true">day</button>
+    <button type="button" data-theme-btn="dark" aria-pressed="false">night</button>
+  </span>
+</header>
+
+<section class="hero" aria-label="Pixel field, annotated">
+  <div class="corner">PX</div>
+  <canvas id="ruler-x" aria-hidden="true"></canvas>
+  <canvas id="ruler-y" aria-hidden="true"></canvas>
+  <div class="stage" id="stage">
+    <canvas id="field" aria-hidden="true"></canvas>
+    <canvas id="overlay" aria-hidden="true"></canvas>
+    <div class="tag tl" id="tag-tl">FIELD / hero</div>
+    <div class="tag tr">click to emit a ripple<br>hover to inspect a cell</div>
+    <div class="tag br"><span class="dot"></span>island = cells ≥ 0.32, fused</div>
+    <div class="headline" id="headline">
+      <h1>Every pixel,<br>accounted for.</h1>
+      <p>Design systems for products that ship with agents. Tokens, components and context files: named, measured, versioned.</p>
+    </div>
+    <div class="tip" id="tip"></div>
+  </div>
+</section>
+
+<section class="sec" aria-labelledby="h-console">
+  <div class="sec-label">§01<b>Console</b></div>
+  <div>
+    <h2 id="h-console">The field reports on itself.</h2>
+    <p class="lede">Every ripple, island and cell is logged. The terminal takes commands; the field palette doubles as syntax colours. Try <span class="mono">help</span>, <span class="mono">ripple</span>, <span class="mono">cell 24</span>, <span class="mono">seed 7</span>, <span class="mono">theme night</span>.</p>
+    <div class="console">
+      <div class="term">
+        <div class="term-head"><i></i><i></i><i></i><span>nicey — spec — field.hero</span></div>
+        <div class="log" id="log" aria-live="polite"></div>
+        <form class="prompt" id="cmd" autocomplete="off">
+          <label for="cmd-in">nicey ~ %</label>
+          <input id="cmd-in" spellcheck="false" aria-label="Command">
+        </form>
+      </div>
+      <div class="inspect" aria-live="off">
+        <h3><span>Inspect · cell</span><span id="i-src">auto</span></h3>
+        <dl>
+          <dt>cell</dt><dd id="i-cell">—</dd>
+          <dt>origin</dt><dd id="i-px">—</dd>
+          <dt>value</dt><dd><span id="i-v">—</span><span class="vbar"><b id="i-vbar" style="width:0"></b></span></dd>
+          <dt>stop</dt><dd id="i-stop">—</dd>
+          <dt>fill</dt><dd id="i-fill">—</dd>
+          <dt>token</dt><dd id="i-tok">—</dd>
+          <dt>region</dt><dd id="i-isl">—</dd>
+        </dl>
+        <div class="ramp">
+          <div class="ramp-cells" id="ramp"><div class="ramp-island" id="ramp-isl"></div><div class="ramp-mark" id="ramp-mark"></div></div>
+          <div class="ramp-axis"><span>0.00</span><span>value → stop</span><span>1.00</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" aria-labelledby="h-tokens">
+  <div class="sec-label">§02<b>Tokens</b></div>
+  <div>
+    <h2 id="h-tokens">Six stops, read off the field.</h2>
+    <p class="lede">The palette the field paints with, as tokens. Each swatch is that stop's cells at the alphas the field actually uses. Contrast is the text colour that sits on the solid token, in the current mode.</p>
+    <div class="tokens" id="tokens"></div>
+  </div>
+</section>
+
+<section class="sec" aria-labelledby="h-anatomy">
+  <div class="sec-label">§03<b>Anatomy</b></div>
+  <div>
+    <h2 id="h-anatomy">Button / primary</h2>
+    <p class="lede">Redlines are measured from the live element, not typed in, so the spec can't drift from the build.</p>
+    <div class="anatomy">
+      <div>
+        <div class="board">
+          <span class="board-tag">FRAME / 16px grid</span>
+          <div class="specimen" id="specimen">
+            <button class="btn" id="btn" type="button">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3"/></svg>
+              <span>Book a call</span>
+            </button>
+            <svg id="redlines" aria-hidden="true"></svg>
+          </div>
+        </div>
+        <div class="states">
+          <div class="state"><button class="btn" type="button" tabindex="-1">Book a call</button><code>state=default</code></div>
+          <div class="state"><button class="btn is-hover" type="button" tabindex="-1">Book a call</button><code>state=hover</code></div>
+          <div class="state"><button class="btn is-focus" type="button" tabindex="-1">Book a call</button><code>state=focus</code></div>
+          <div class="state"><button class="btn" type="button" disabled>Book a call</button><code>state=disabled</code></div>
+        </div>
+      </div>
+      <ol class="callouts">
+        <li><div><b>Container</b><code>bg --color-ink · radius 10 · h 44<br>hover --color-ink-strong</code></div></li>
+        <li><div><b>Icon</b><code>16 × 16 · stroke 1.5 · currentColor</code></div></li>
+        <li><div><b>Label</b><code>Geist 500 · 15/20 · -0.005em<br>color --color-page</code></div></li>
+        <li><div><b>Spacing</b><code>pad-l 16 · gap 8 · pad-r 20<br>optical: icon side 4px tighter</code></div></li>
+        <li><div><b>Focus</b><code>outline 2 --color-accent · offset 2</code></div></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <span>nicey.studio · spec mode · exploration v0.1</span>
+  <span>field math: src/lib/pixel-field.ts · 2026-11-02</span>
+</footer>
+
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const root = document.documentElement;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (matchMedia('(prefers-color-scheme: dark)').matches) root.dataset.theme = 'dark';
+
+  /* ------------------------------------------------ field (pixel-field.ts) */
+  const STOPS = {
+    light: [[243,240,233,0],[203,218,196,.4],[217,210,239,.5],[246,217,196,.52],[242,230,188,.46],[216,198,224,.5]],
+    dark:  [[20,20,16,0],[78,101,71,.34],[88,80,132,.44],[126,88,64,.4],[120,104,58,.36],[104,74,110,.42]],
+  };
+  const NAMES = ['void', 'sage', 'lavender', 'peach', 'butter', 'mauve'];
+  const isDark = () => root.dataset.theme === 'dark';
+  const stops = () => (isDark() ? STOPS.dark : STOPS.light);
+
+  const P = { cell: 16, cols: 10, rows: 5, drift: 2, island: 0.32, offset: 0.18, edge: 80, seed: 0x2a, grid: true };
+  const RIP = { speed: 720, width: 115, life: 1.35, gain: 0.5, max: 6 };
+  const BOOST = { cycle: 14, radius: 0.28, gain: 0.42 };
+
+  const smooth = (t) => t * t * (3 - 2 * t);
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  const pad = (n, w = 4) => String(Math.round(n)).padStart(w, '0');
+  const hex = (n) => '0x' + n.toString(16);
+  function mulberry32(seed) {
+    let a = seed | 0;
+    return () => {
+      a = (a + 0x6d2b79f5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  let lat;
+  function buildLattice() {
+    const r = mulberry32(P.seed);
+    lat = { phase: [], speed: [], bias: [] };
+    for (let i = 0; i < P.cols * P.rows; i++) {
+      lat.phase.push(r() * Math.PI * 2);
+      lat.speed.push(0.15 + r() * 0.25);
+      lat.bias.push(r() * 0.5);
+    }
+  }
+  const node = (cx, cy, t) => {
+    const i = cy * P.cols + cx;
+    return lat.bias[i] + 0.5 * (0.5 + 0.5 * Math.sin(t * P.drift * lat.speed[i] + lat.phase[i]));
+  };
+  function sample(x, y, t) {
+    const gx = x * (P.cols - 1), gy = y * (P.rows - 1);
+    const x0 = Math.floor(gx), y0 = Math.floor(gy);
+    const x1 = Math.min(x0 + 1, P.cols - 1), y1 = Math.min(y0 + 1, P.rows - 1);
+    const tx = smooth(gx - x0), ty = smooth(gy - y0);
+    const top = node(x0, y0, t) + (node(x1, y0, t) - node(x0, y0, t)) * tx;
+    const bot = node(x0, y1, t) + (node(x1, y1, t) - node(x0, y1, t)) * tx;
+    return top + (bot - top) * ty;
+  }
+  function stopAt(v) {
+    const S = stops();
+    const pos = clamp(v, 0, 0.9999) * (S.length - 1);
+    const i = Math.floor(pos), t = pos - i;
+    const a = S[i], b = S[i + 1];
+    const mix = (x, y) => x + (y - x) * t;
+    const c = [mix(a[0], b[0]) | 0, mix(a[1], b[1]) | 0, mix(a[2], b[2]) | 0, mix(a[3], b[3])];
+    return { i, t, near: t < 0.5 ? i : i + 1, c, css: `rgba(${c[0]},${c[1]},${c[2]},${c[3].toFixed(3)})` };
+  }
+
+  const ripples = [];
+  function waveAt(px, py, t) {
+    let w = 0;
+    for (const r of ripples) {
+      const e = t - r.t0;
+      if (e < 0 || e > RIP.life) continue;
+      const band = Math.abs(Math.hypot(px - r.x, py - r.y) - e * RIP.speed);
+      if (band < RIP.width) w += Math.cos((band / RIP.width) * (Math.PI / 2)) * (1 - e / RIP.life);
+    }
+    return w;
+  }
+
+  /* ------------------------------------------------ canvases */
+  const stage = $('#stage'), fieldC = $('#field'), ovC = $('#overlay');
+  const rulerX = $('#ruler-x'), rulerY = $('#ruler-y');
+  let W = 0, H = 0, dpr = 1, cols = 0, rows = 0, vals = new Float32Array(0);
+  let fctx, octx, rxc, ryc;
+  const fit = (c, w, h) => {
+    c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);
+    c.style.width = w + 'px'; c.style.height = h + 'px';
+    const x = c.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0); return x;
+  };
+  const C = {};
+  function readColors() {
+    const cs = getComputedStyle(root);
+    for (const k of ['ink', 'ink-2', 'muted', 'line', 'line-strong', 'accent', 'measure', 'on-chip', 'page', 'grid-fill', 'surface'])
+      C[k] = cs.getPropertyValue('--' + k).trim();
+  }
+
+  function resize() {
+    const r = stage.getBoundingClientRect();
+    W = Math.round(r.width); H = Math.round(r.height);
+    dpr = Math.min(2, devicePixelRatio || 1);
+    fctx = fit(fieldC, W, H); octx = fit(ovC, W, H);
+    rxc = fit(rulerX, W, 24); ryc = fit(rulerY, 24, H);
+    cols = Math.ceil(W / P.cell); rows = Math.ceil(H / P.cell);
+    vals = new Float32Array(cols * rows);
+    $('#tag-tl').innerHTML = `FIELD / hero<br>${P.cols}×${P.rows} lattice · cell ${P.cell} · seed ${hex(P.seed)}<br>${W} × ${H} · ${cols} × ${rows} cells`;
+    frame(now(), true);
+  }
+
+  /* ------------------------------------------------ boost + islands */
+  let boostCycle = -1, boostX = 0, boostY = 0, swell = 0, island = null, islandLogged = -1;
+  function updateBoost(t) {
+    const c = Math.floor(t / BOOST.cycle);
+    if (c !== boostCycle) {
+      boostCycle = c;
+      const r = mulberry32((P.seed * 7919) ^ (c * 2654435761));
+      boostX = (0.12 + 0.76 * r()) * W;
+      boostY = (0.12 + 0.6 * r()) * H;
+    }
+    swell = Math.sin(Math.PI * ((t % BOOST.cycle) / BOOST.cycle)) ** 2;
+  }
+  // connected cells from `start` that satisfy `pred` (4-neighbour)
+  function flood(start, pred) {
+    if (start < 0 || !pred(vals[start])) return null;
+    const seen = new Uint8Array(cols * rows), q = [start];
+    seen[start] = 1;
+    let x0 = 1e9, y0 = 1e9, x1 = -1, y1 = -1, n = 0;
+    while (q.length) {
+      const i = q.pop(), x = i % cols, y = (i / cols) | 0;
+      n++; x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const nx = x + dx, ny = y + dy;
+        if (nx < 0 || ny < 0 || nx >= cols || ny >= rows) continue;
+        const j = ny * cols + nx;
+        if (!seen[j] && pred(vals[j])) { seen[j] = 1; q.push(j); }
+      }
+    }
+    return { x0, y0, x1, y1, n, seen };
+  }
+  function findIsland() {
+    const bx = Math.floor(boostX / P.cell), by = Math.floor(boostY / P.cell);
+    let best = -1, bv = P.island;
+    for (let dy = -5; dy <= 5; dy++) for (let dx = -5; dx <= 5; dx++) {
+      const x = bx + dx, y = by + dy;
+      if (x < 0 || y < 0 || x >= cols || y >= rows) continue;
+      const i = y * cols + x;
+      if (vals[i] > bv) { bv = vals[i]; best = i; }
+    }
+    // the fusion threshold joins most of the field into one mass, so the
+    // annotated island is the crest: everything within 0.16 of the local peak
+    const thr = Math.max(P.island, bv - 0.16);
+    const r = flood(best, (u) => u > thr);
+    if (r) r.thr = thr;
+    return r;
+  }
+  // hover selection: connected cells resolving to the same token
+  const region = (i) => { const near = stopAt(vals[i]).near; return { near, ...flood(i, (u) => stopAt(u).near === near) }; };
+
+  /* ------------------------------------------------ draw: field */
+  function drawField(t) {
+    const S = stops(), cell = P.cell, half = cell / 2;
+    fctx.clearRect(0, 0, W, H);
+    updateBoost(t);
+    const boostR = Math.hypot(W, H) * BOOST.radius;
+    const live = ripples.length > 0;
+    for (let cy = 0; cy < rows; cy++) {
+      for (let cx = 0; cx < cols; cx++) {
+        const px = cx * cell + half, py = cy * cell + half;
+        let v = sample(cx / cols, cy / rows, t);
+        const d = Math.hypot(px - boostX, py - boostY);
+        if (d < boostR) v += BOOST.gain * swell * smooth(1 - d / boostR);
+        if (live) v += waveAt(px, py, t) * RIP.gain;
+        v -= P.offset;
+        vals[cy * cols + cx] = v;
+        const f = Math.min(px / P.edge, (W - px) / P.edge, py / P.edge, (H - py) / P.edge, 1);
+        fctx.globalAlpha = f < 1 ? smooth(Math.max(0, f)) : 1;
+        fctx.fillStyle = stopAt(v).css;
+        const size = v > P.island ? cell : cell - 1;
+        fctx.fillRect(cx * cell, cy * cell, size, size);
+      }
+    }
+    fctx.globalAlpha = 1;
+    island = findIsland();
+    if (island && swell > 0.92 && islandLogged !== boostCycle) {
+      islandLogged = boostCycle;
+      const w = (island.x1 - island.x0 + 1) * cell, h = (island.y1 - island.y0 + 1) * cell;
+      out(`<span class="m">${clock()}</span> <span class="e">crest.${pad(boostCycle % 1000, 3)}</span> <span class="k">peak</span>   <span class="n">${island.n}</span> cells  <span class="n">${w}×${h}</span>  @ <span class="n">${island.x0 * cell},${island.y0 * cell}</span>`);
+    }
+  }
+
+  /* ------------------------------------------------ draw: overlay helpers */
+  const MONO = '500 10px "Geist Mono", ui-monospace, monospace';
+  function rrect(o, x, y, w, h, r) {
+    o.beginPath();
+    if (o.roundRect) o.roundRect(x, y, w, h, r); else o.rect(x, y, w, h);
+  }
+  function chip(o, x, y, text, bg, fg, align = 'left') {
+    o.font = MONO;
+    const w = Math.ceil(o.measureText(text).width) + 10, h = 16;
+    let bx = align === 'center' ? x - w / 2 : align === 'right' ? x - w : x;
+    bx = clamp(bx, 2, W - w - 2);
+    const by = clamp(y, 2, H - h - 2);
+    o.fillStyle = bg; rrect(o, bx, by, w, h, 3); o.fill();
+    o.fillStyle = fg; o.textBaseline = 'middle'; o.fillText(text, bx + 5, by + h / 2 + 0.5);
+  }
+  const crisp = (v) => Math.round(v) + 0.5;
+  function dim(o, x1, y1, x2, y2, label, color) {
+    const horiz = Math.abs(x2 - x1) >= Math.abs(y2 - y1), k = 4;
+    x1 = crisp(x1); y1 = crisp(y1); x2 = crisp(x2); y2 = crisp(y2);
+    o.strokeStyle = color; o.lineWidth = 1; o.setLineDash([]);
+    o.beginPath();
+    o.moveTo(x1, y1); o.lineTo(x2, y2);
+    if (horiz) { o.moveTo(x1, y1 - k); o.lineTo(x1, y1 + k); o.moveTo(x2, y2 - k); o.lineTo(x2, y2 + k); }
+    else { o.moveTo(x1 - k, y1); o.lineTo(x1 + k, y1); o.moveTo(x2 - k, y2); o.lineTo(x2 + k, y2); }
+    o.stroke();
+    if (label) chip(o, (x1 + x2) / 2, (y1 + y2) / 2 - 8, label, color, C['on-chip'], 'center');
+  }
+  function handles(o, x0, y0, x1, y1, color) {
+    o.fillStyle = C.page; o.strokeStyle = color; o.lineWidth = 1;
+    for (const [x, y] of [[x0, y0], [x1, y0], [x0, y1], [x1, y1]]) {
+      o.fillRect(x - 3, y - 3, 6, 6); o.strokeRect(crisp(x - 3), crisp(y - 3), 5, 5);
+    }
+  }
+
+  /* ------------------------------------------------ draw: overlay */
+  let hover = null; // {x, y} in stage px
+  const headline = $('#headline');
+  function drawOverlay(t) {
+    const o = octx, cell = P.cell;
+    o.clearRect(0, 0, W, H);
+
+    // layout grid: 12 columns inside the page gutter
+    if (P.grid) {
+      const m = W < 768 ? 20 : 48, g = W < 768 ? 12 : 24, n = W < 768 ? 4 : 12;
+      const cw = (W - 2 * m - g * (n - 1)) / n;
+      o.fillStyle = C['grid-fill'];
+      for (let i = 0; i < n; i++) o.fillRect(m + i * (cw + g), 0, cw, H);
+    }
+
+    // dominant island: selection box + dimensions
+    if (island && swell > 0.12) {
+      o.globalAlpha = Math.min(1, (swell - 0.12) / 0.3);
+      const x0 = island.x0 * cell, y0 = island.y0 * cell, x1 = (island.x1 + 1) * cell, y1 = (island.y1 + 1) * cell;
+      o.strokeStyle = C.accent; o.lineWidth = 1; o.setLineDash([4, 3]);
+      o.strokeRect(crisp(x0), crisp(y0), x1 - x0 - 1, y1 - y0 - 1);
+      o.setLineDash([]);
+      handles(o, x0, y0, x1, y1, C.accent);
+      chip(o, x0, y0 - 22, `crest.${pad(boostCycle % 1000, 3)} · ${island.n} cells · v>${island.thr.toFixed(2)}`, C.accent, C['on-chip']);
+      dim(o, x0, y1 + 10, x1, y1 + 10, `${x1 - x0}`, C.measure);
+      dim(o, x1 + 10, y0, x1 + 10, y1, `${y1 - y0}`, C.measure);
+      o.globalAlpha = 1;
+    }
+
+    // ripples: ring + radius readout
+    for (const r of ripples) {
+      const e = t - r.t0;
+      if (e < 0 || e > RIP.life) continue;
+      const rad = e * RIP.speed, a = 1 - e / RIP.life;
+      o.globalAlpha = a;
+      o.strokeStyle = C.accent; o.lineWidth = 1;
+      o.beginPath(); o.arc(r.x, r.y, rad, 0, Math.PI * 2); o.stroke();
+      o.setLineDash([2, 3]);
+      o.beginPath(); o.arc(r.x, r.y, Math.max(0, rad - RIP.width), 0, Math.PI * 2); o.stroke();
+      o.setLineDash([]);
+      const ang = -0.55, lx = r.x + Math.cos(ang) * rad, ly = r.y + Math.sin(ang) * rad;
+      o.beginPath(); o.moveTo(r.x - 6, r.y); o.lineTo(r.x + 6, r.y); o.moveTo(r.x, r.y - 6); o.lineTo(r.x, r.y + 6); o.stroke();
+      o.strokeStyle = C.measure; o.beginPath(); o.moveTo(r.x, r.y); o.lineTo(lx, ly); o.stroke();
+      chip(o, lx + 6, ly - 8, `r ${rad | 0}px · ${e.toFixed(2)}s`, C.measure, C['on-chip']);
+      o.globalAlpha = 1;
+    }
+
+    // headline: selection + distances to the frame
+    const sr = stage.getBoundingClientRect(), hr = headline.getBoundingClientRect();
+    const hx0 = hr.left - sr.left, hy0 = hr.top - sr.top, hx1 = hr.right - sr.left, hy1 = hr.bottom - sr.top;
+    o.strokeStyle = C.accent; o.lineWidth = 1;
+    o.strokeRect(crisp(hx0), crisp(hy0), hx1 - hx0 - 1, hy1 - hy0 - 1);
+    handles(o, hx0, hy0, hx1, hy1, C.accent);
+    chip(o, hx0, hy0 - 22, `text.block · Geist 600 · ${Math.round(parseFloat(getComputedStyle(headline.firstElementChild).fontSize))}/0.98 · -0.04em`, C.accent, C['on-chip']);
+    dim(o, 0, hy0 + 24, hx0, hy0 + 24, `${Math.round(hx0)}`, C.measure);
+    dim(o, hx0 + 32, hy1, hx0 + 32, H, `${Math.round(H - hy1)}`, C.measure);
+
+    // hover: crosshair, cell selection, distances to the frame
+    if (hover) {
+      const cx = Math.floor(hover.x / cell), cy = Math.floor(hover.y / cell);
+      const x = cx * cell, y = cy * cell, mx = x + cell / 2, my = y + cell / 2;
+      const i = cy * cols + cx;
+      const isl = region(i);
+      if (isl.near !== 0) {
+        o.fillStyle = C.accent; o.globalAlpha = 0.16;
+        for (let j = 0; j < isl.seen.length; j++) if (isl.seen[j]) o.fillRect((j % cols) * cell, ((j / cols) | 0) * cell, cell, cell);
+        o.globalAlpha = 1;
+      }
+      o.globalAlpha = 0.4; o.strokeStyle = C.measure; o.setLineDash([1, 3]);
+      o.beginPath(); o.moveTo(crisp(mx), 0); o.lineTo(crisp(mx), H); o.moveTo(0, crisp(my)); o.lineTo(W, crisp(my)); o.stroke();
+      o.setLineDash([]); o.globalAlpha = 1;
+      if (x > 48) dim(o, 0, my, x, my, `${x}`, C.measure);
+      if (y > 48) dim(o, mx, 0, mx, y, `${y}`, C.measure);
+      o.strokeStyle = C.ink; o.lineWidth = 2;
+      o.strokeRect(x + 1, y + 1, cell - 2, cell - 2);
+      o.lineWidth = 1;
+    }
+  }
+
+  /* ------------------------------------------------ rulers */
+  function drawRulers() {
+    const cell = P.cell;
+    for (const [c, len, horiz] of [[rxc, W, true], [ryc, H, false]]) {
+      const w = horiz ? len : 24, h = horiz ? 24 : len;
+      c.clearRect(0, 0, w, h);
+      if (hover) {
+        const p = horiz ? Math.floor(hover.x / cell) * cell : Math.floor(hover.y / cell) * cell;
+        c.fillStyle = C.accent; c.globalAlpha = 0.18;
+        horiz ? c.fillRect(p, 0, cell, 24) : c.fillRect(0, p, 24, cell);
+        c.globalAlpha = 1;
+      }
+      c.strokeStyle = C['line-strong']; c.lineWidth = 1; c.beginPath();
+      for (let p = 0; p <= len; p += 8) {
+        const k = p % 128 === 0 ? 12 : p % 64 === 0 ? 8 : p % 16 === 0 ? 5 : 2;
+        if (horiz) { c.moveTo(crisp(p), 24); c.lineTo(crisp(p), 24 - k); } else { c.moveTo(24, crisp(p)); c.lineTo(24 - k, crisp(p)); }
+      }
+      c.stroke();
+      c.fillStyle = C.muted; c.font = '500 8px "Geist Mono", monospace'; c.textBaseline = 'top';
+      for (let p = 128; p < len; p += 128) {
+        if (horiz) c.fillText(p, p + 3, 3);
+        else { c.save(); c.translate(3, p - 3); c.rotate(-Math.PI / 2); c.fillText(p, 0, 0); c.restore(); }
+      }
+      if (hover) {
+        const p = horiz ? hover.x : hover.y;
+        c.strokeStyle = C.measure; c.beginPath();
+        if (horiz) { c.moveTo(crisp(p), 0); c.lineTo(crisp(p), 24); } else { c.moveTo(0, crisp(p)); c.lineTo(24, crisp(p)); }
+        c.stroke();
+      }
+    }
+  }
+
+  /* ------------------------------------------------ inspector + tooltip */
+  const tip = $('#tip');
+  const el = (id) => document.getElementById(id);
+  function inspect(cx, cy, src) {
+    cx = clamp(cx, 0, cols - 1); cy = clamp(cy, 0, rows - 1);
+    const i = cy * cols + cx, v = vals[i], s = stopAt(v);
+    const isl = region(i);
+    const name = NAMES[s.near];
+    const tok = s.near === 0 ? '— (transparent)' : s.near === 5 ? '--color-mauve ⚠ untokenized' : `--color-${name}`;
+    el('i-src').textContent = src;
+    el('i-cell').textContent = `${cx}, ${cy}`;
+    el('i-px').textContent = `${cx * P.cell}, ${cy * P.cell}  (${P.cell}×${P.cell})`;
+    el('i-v').textContent = v.toFixed(3);
+    el('i-vbar').style.width = clamp(v, 0, 1) * 100 + '%';
+    el('i-stop').textContent = `${NAMES[s.i]} → ${NAMES[Math.min(s.i + 1, 5)]}  t ${s.t.toFixed(2)}`;
+    el('i-fill').textContent = s.css;
+    el('i-tok').textContent = tok;
+    el('i-isl').textContent = `${isl.n} connected · ${v > P.island ? 'fused' : 'loose'}`;
+    el('ramp-mark').style.left = `calc(${clamp(v, 0, 1) * 100}% - 1px)`;
+    $('#rx').textContent = pad(cx * P.cell); $('#ry').textContent = pad(cy * P.cell); $('#rv').textContent = v.toFixed(3);
+    return { v, s, isl, tok, name };
+  }
+  function updateTip() {
+    if (!hover) return;
+    const cx = Math.floor(hover.x / P.cell), cy = Math.floor(hover.y / P.cell);
+    const r = inspect(cx, cy, 'hover');
+    const sw = `rgb(${r.s.c[0]},${r.s.c[1]},${r.s.c[2]})`;
+    tip.innerHTML = `<i style="background:${sw}"></i>cell ${cx},${cy}  v ${r.v.toFixed(3)}\n  ${r.tok}\n  α ${r.s.c[3].toFixed(2)} · region ${r.isl.n} cells`;
+    const tw = tip.offsetWidth, th = tip.offsetHeight;
+    let tx = hover.x + 18, ty = hover.y + 18;
+    if (tx + tw > W - 8) tx = hover.x - tw - 14;
+    if (ty + th > H - 8) ty = hover.y - th - 14;
+    tip.style.transform = `translate(${tx}px, ${ty}px)`;
+  }
+  function buildRamp() {
+    const ramp = el('ramp');
+    ramp.querySelectorAll('span').forEach((s) => s.remove());
+    for (let i = 0; i < 30; i++) {
+      const s = document.createElement('span');
+      s.style.background = stopAt(i / 29).css;
+      ramp.insertBefore(s, ramp.firstChild && ramp.querySelector('.ramp-island'));
+    }
+    el('ramp-isl').style.left = P.island * 100 + '%';
+  }
+
+  /* ------------------------------------------------ loop */
+  const now = () => (reduced ? 7 : performance.now() / 1000);
+  let fpsCount = 0, fpsT = performance.now();
+  function frame(t, force) {
+    drawField(t);
+    drawOverlay(t);
+    drawRulers();
+    if (hover) updateTip();
+    else if (island && (force || Math.random() < 0.15)) {
+      const cx = ((island.x0 + island.x1) / 2) | 0, cy = ((island.y0 + island.y1) / 2) | 0;
+      inspect(cx, cy, 'auto · island');
+    }
+    fpsCount++;
+    const n = performance.now();
+    if (n - fpsT > 1000) { $('#rf').textContent = pad(fpsCount, 2); fpsCount = 0; fpsT = n; }
+  }
+  let last = 0, visible = true;
+  new IntersectionObserver((e) => (visible = e[0].isIntersecting)).observe(stage);
+  function loop(ms) {
+    requestAnimationFrame(loop);
+    if (!visible) return;
+    const t = ms / 1000;
+    while (ripples.length && t - ripples[0].t0 > RIP.life) ripples.shift();
+    const fps = ripples.length || hover ? 30 : 15;
+    if (ms - last < 1000 / fps) return;
+    last = ms;
+    frame(t);
+  }
+
+  /* ------------------------------------------------ input */
+  function emit(x, y, src) {
+    ripples.push({ x, y, t0: performance.now() / 1000 });
+    if (ripples.length > RIP.max) ripples.shift();
+    out(`<span class="m">${clock()}</span> <span class="e">ripple.emit</span>  <span class="k">x</span> <span class="n">${pad(x)}</span>  <span class="k">y</span> <span class="n">${pad(y)}</span>  <span class="m">src ${src}</span>`);
+    if (reduced) frame(now());
+  }
+  stage.addEventListener('pointermove', (e) => {
+    const r = stage.getBoundingClientRect();
+    hover = { x: clamp(e.clientX - r.left, 0, W - 1), y: clamp(e.clientY - r.top, 0, H - 1) };
+    tip.classList.add('on');
+    if (reduced) { drawOverlay(now()); drawRulers(); updateTip(); }
+  });
+  stage.addEventListener('pointerleave', () => {
+    hover = null; tip.classList.remove('on');
+    $('#rx').textContent = '----'; $('#ry').textContent = '----';
+    if (reduced) { drawOverlay(now()); drawRulers(); }
+  });
+  stage.addEventListener('pointerdown', (e) => {
+    if (!e.isPrimary || e.button !== 0) return;
+    const r = stage.getBoundingClientRect();
+    emit(e.clientX - r.left, e.clientY - r.top, 'pointer');
+  });
+
+  /* ------------------------------------------------ terminal */
+  const log = $('#log');
+  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const clock = () => new Date().toTimeString().slice(0, 8);
+  function out(html) {
+    const d = document.createElement('div');
+    d.className = 'ln'; d.innerHTML = html;
+    log.appendChild(d);
+    while (log.children.length > 240) log.firstChild.remove();
+    log.scrollTop = log.scrollHeight;
+  }
+  const kv = (k, v, note = '') => out(`  <span class="k">${k.padEnd(10)}</span> <span class="n">${v}</span>${note ? '  <span class="m">' + note + '</span>' : ''}`);
+
+  const COMMANDS = {
+    help() {
+      out('<span class="m">  commands</span>');
+      [['ripple [x y]', 'emit a wave (random point if omitted)'], ['cell <8-40>', 'cell size in px'], ['seed <n>', 'reseed the lattice'],
+       ['lattice <c> <r>', 'noise lattice size'], ['island <0-1>', 'fusion threshold'], ['grid on|off', 'layout grid overlay'],
+       ['theme day|night', 'switch mode'], ['inspect <cx> <cy>', 'read one cell'], ['tokens', 'print the palette'], ['spec', 'dump parameters'], ['clear', 'clear the log']]
+        .forEach(([c, d]) => out(`  <span class="s">${c.padEnd(18)}</span><span class="m">${d}</span>`));
+    },
+    ripple(a) {
+      const x = a[0] != null ? +a[0] : Math.random() * W, y = a[1] != null ? +a[1] : Math.random() * H;
+      if (!isFinite(x) || !isFinite(y)) return out('<span class="x">  usage: ripple [x y]</span>');
+      emit(clamp(x, 0, W), clamp(y, 0, H), 'console');
+    },
+    cell(a) {
+      const n = Math.round(+a[0]);
+      if (!(n >= 8 && n <= 40)) return out('<span class="x">  cell expects 8–40</span>');
+      P.cell = n; resize(); out(`  <span class="s">✓</span> cell <span class="n">${n}px</span> → <span class="n">${cols} × ${rows}</span> cells`);
+    },
+    seed(a) {
+      const n = parseInt(a[0]);
+      if (!isFinite(n)) return out('<span class="x">  seed expects a number</span>');
+      P.seed = n; buildLattice(); boostCycle = -1; resize(); out(`  <span class="s">✓</span> seed <span class="n">${hex(n)}</span> · field rebuilt`);
+    },
+    lattice(a) {
+      const c = Math.round(+a[0]), r = Math.round(+a[1]);
+      if (!(c >= 2 && c <= 40 && r >= 2 && r <= 40)) return out('<span class="x">  lattice expects two numbers 2–40</span>');
+      P.cols = c; P.rows = r; buildLattice(); resize(); out(`  <span class="s">✓</span> lattice <span class="n">${c} × ${r}</span>`);
+    },
+    island(a) {
+      const n = +a[0];
+      if (!(n >= 0 && n <= 1)) return out('<span class="x">  island expects 0–1</span>');
+      P.island = n; buildRamp(); frame(now(), true); out(`  <span class="s">✓</span> islands fuse above <span class="n">${n}</span>`);
+    },
+    grid(a) { P.grid = a[0] !== 'off'; frame(now(), true); out(`  <span class="s">✓</span> layout grid <span class="n">${P.grid ? 'on' : 'off'}</span>`); },
+    theme(a) {
+      const t = a[0] === 'night' || a[0] === 'dark' ? 'dark' : a[0] === 'day' || a[0] === 'light' ? 'light' : (isDark() ? 'light' : 'dark');
+      setTheme(t); out(`  <span class="s">✓</span> mode <span class="n">${t === 'dark' ? 'night' : 'day'}</span>`);
+    },
+    inspect(a) {
+      const cx = +a[0], cy = +a[1];
+      if (!isFinite(cx) || !isFinite(cy)) return out('<span class="x">  usage: inspect &lt;cx&gt; &lt;cy&gt;</span>');
+      const r = inspect(cx | 0, cy | 0, 'console');
+      kv('cell', `${clamp(cx | 0, 0, cols - 1)}, ${clamp(cy | 0, 0, rows - 1)}`);
+      kv('value', r.v.toFixed(3)); kv('fill', r.s.css); kv('token', r.tok); kv('region', r.isl.n + ' cells');
+    },
+    tokens() {
+      stops().forEach((s, i) => out(`  <span class="sw" style="background:rgb(${s[0]},${s[1]},${s[2]})"></span><span class="k">${NAMES[i].padEnd(9)}</span> <span class="n">rgba(${s.join(',')})</span>  <span class="m">v ${(i / 5).toFixed(2)}${i === 5 ? '  ⚠ no site token' : ''}</span>`));
+    },
+    spec() {
+      kv('mode', isDark() ? 'night' : 'day'); kv('cell', P.cell + 'px', 'gap 1px · islands fuse');
+      kv('lattice', `${P.cols} × ${P.rows}`, 'value noise, smoothstep'); kv('seed', hex(P.seed));
+      kv('island', P.island); kv('offset', P.offset); kv('edge', P.edge + 'px', 'feather');
+      kv('ripple', `${RIP.speed}px/s`, `band ${RIP.width} · life ${RIP.life}s · gain ${RIP.gain}`);
+      kv('boost', `${BOOST.cycle}s`, `r ${BOOST.radius} · gain ${BOOST.gain}`);
+    },
+    clear() { log.innerHTML = ''; },
+  };
+  const hist = []; let hi = 0;
+  const input = $('#cmd-in');
+  $('#cmd').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const line = input.value.trim(); input.value = '';
+    if (!line) return;
+    hist.push(line); hi = hist.length;
+    out(`<span class="s">nicey ~ %</span> ${esc(line)}`);
+    const [cmd, ...args] = line.split(/\s+/);
+    const fn = COMMANDS[cmd.toLowerCase()];
+    fn ? fn(args) : out(`<span class="x">  unknown: ${esc(cmd)}</span> <span class="m">· try help</span>`);
+  });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowUp' && hi > 0) { input.value = hist[--hi]; e.preventDefault(); }
+    if (e.key === 'ArrowDown') { hi = Math.min(hist.length, hi + 1); input.value = hist[hi] || ''; e.preventDefault(); }
+  });
+
+  /* ------------------------------------------------ tokens */
+  const TOKENS = [
+    { name: '--color-sage', key: 'sage', stop: 1 },
+    { name: '--color-lavender', key: 'lavender', stop: 2 },
+    { name: '--color-peach', key: 'peach', stop: 3 },
+    { name: '--color-butter', key: 'butter', stop: 4 },
+    { name: '--color-mauve', key: 'mauve', stop: 5, missing: true },
+    { name: '--color-accent', key: 'accent', stop: null, on: 'page' },
+  ];
+  const rgb = (h) => { h = h.replace('#', ''); return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16)); };
+  const lum = (c) => { const [r, g, b] = c.map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
+  const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05); };
+  function renderTokens() {
+    const cs = getComputedStyle(root);
+    const S = stops(), r = mulberry32(11);
+    el('tokens').innerHTML = TOKENS.map((t) => {
+      const val = cs.getPropertyValue('--' + t.key).trim();
+      const on = t.on || 'ink';
+      const cr = ratio(rgb(val), rgb(cs.getPropertyValue('--' + on).trim()));
+      const grade = cr >= 7 ? 'AAA' : cr >= 4.5 ? 'AA' : cr >= 3 ? 'AA large' : 'fail';
+      let cells = '';
+      for (let i = 0; i < 72; i++) {
+        const solid = i % 12 >= 8;
+        const s = t.stop != null ? S[t.stop] : null;
+        const bg = solid || !s ? val : `rgba(${s[0]},${s[1]},${s[2]},${(s[3] * (0.55 + 0.45 * r())).toFixed(2)})`;
+        cells += `<span style="background:${bg}"></span>`;
+      }
+      const stopTxt = t.stop != null ? `rgba(${S[t.stop].slice(0, 3).join(',')},${S[t.stop][3]})` : 'not in field';
+      return `<article class="tok">
+        <div class="tok-sw">${cells}</div>
+        <div class="tok-body">
+          <div class="nm"><span>${t.name}</span>${t.missing ? '<span class="pill warn">untokenized</span>' : `<span class="pill ok">${grade}</span>`}</div>
+          <div class="row"><span>value</span><b>${val}</b></div>
+          <div class="row"><span>field stop</span><b>${stopTxt}</b></div>
+          <div class="row"><span>ramp v</span><b>${t.stop != null ? (t.stop / 5).toFixed(2) : '—'}</b></div>
+          <div class="row"><span>${on} on fill</span><b>${cr.toFixed(1)}:1</b></div>
+        </div></article>`;
+    }).join('');
+  }
+
+  /* ------------------------------------------------ anatomy redlines */
+  function drawRedlines() {
+    const svg = el('redlines'), sp = el('specimen'), btn = el('btn');
+    const R = sp.getBoundingClientRect(), b = btn.getBoundingClientRect();
+    const ic = btn.querySelector('svg').getBoundingClientRect(), lb = btn.querySelector('span').getBoundingClientRect();
+    const rel = (r) => ({ x0: r.left - R.left, y0: r.top - R.top, x1: r.right - R.left, y1: r.bottom - R.top });
+    const B = rel(b), I = rel(ic), L = rel(lb);
+    const m = 'var(--measure)', a = 'var(--accent)';
+    const line = (x1, y1, x2, y2, c, dash) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${c}" stroke-width="1" ${dash ? 'stroke-dasharray="3 3"' : ''} shape-rendering="crispEdges"/>`;
+    const tag = (x, y, txt, c, anchor = 'middle') => {
+      const w = txt.length * 6.1 + 10;
+      const bx = anchor === 'middle' ? x - w / 2 : anchor === 'end' ? x - w : x;
+      return `<rect x="${bx}" y="${y - 8}" width="${w}" height="16" rx="3" fill="${c}"/><text x="${bx + 5}" y="${y + 3.5}" fill="var(--on-chip)">${txt}</text>`;
+    };
+    const hdim = (x1, x2, y, txt) => line(x1, y, x2, y, m) + line(x1, y - 4, x1, y + 4, m) + line(x2, y - 4, x2, y + 4, m) + tag((x1 + x2) / 2, y, txt, m);
+    const vdim = (x, y1, y2, txt) => line(x, y1, x, y2, m) + line(x - 4, y1, x + 4, y1, m) + line(x - 4, y2, x + 4, y2, m) + tag(x, (y1 + y2) / 2, txt, m, 'end');
+    const dot = (x, y, n) => `<circle cx="${x}" cy="${y}" r="9" fill="${a}"/><text x="${x}" y="${y + 3.5}" text-anchor="middle" fill="var(--on-chip)" font-weight="600">${n}</text>`;
+    let s = '';
+    // padding + gap zones
+    s += `<rect x="${B.x0}" y="${B.y0}" width="${I.x0 - B.x0}" height="${B.y1 - B.y0}" fill="${m}" fill-opacity=".22"/>`;
+    s += `<rect x="${L.x1}" y="${B.y0}" width="${B.x1 - L.x1}" height="${B.y1 - B.y0}" fill="${m}" fill-opacity=".22"/>`;
+    s += `<rect x="${I.x1}" y="${B.y0}" width="${L.x0 - I.x1}" height="${B.y1 - B.y0}" fill="${a}" fill-opacity=".35"/>`;
+    // element bounds
+    s += `<rect x="${I.x0}" y="${I.y0}" width="${I.x1 - I.x0}" height="${I.y1 - I.y0}" fill="none" stroke="${a}" stroke-dasharray="2 2"/>`;
+    s += `<rect x="${L.x0}" y="${L.y0}" width="${L.x1 - L.x0}" height="${L.y1 - L.y0}" fill="none" stroke="${a}" stroke-dasharray="2 2"/>`;
+    // dimensions
+    s += hdim(B.x0, B.x1, B.y0 - 22, `W ${Math.round(B.x1 - B.x0)}`);
+    s += vdim(B.x0 - 18, B.y0, B.y1, `H ${Math.round(B.y1 - B.y0)}`);
+    s += hdim(B.x0, I.x0, B.y1 + 18, `${Math.round(I.x0 - B.x0)}`);
+    s += hdim(I.x1, L.x0, B.y1 + 18, `${Math.round(L.x0 - I.x1)}`);
+    s += hdim(L.x1, B.x1, B.y1 + 18, `${Math.round(B.x1 - L.x1)}`);
+    // radius
+    s += `<path d="M ${B.x1 - 10} ${B.y0} A 10 10 0 0 1 ${B.x1} ${B.y0 + 10}" fill="none" stroke="${m}" stroke-width="1.5"/>`;
+    s += line(B.x1 - 2, B.y0 + 2, B.x1 + 26, B.y0 - 18, m) + tag(B.x1 + 28, B.y0 - 18, 'r 10', m, 'start');
+    // callout dots
+    s += dot(B.x0 + 4, B.y1 + 44, 1) + line(B.x0 + 4, B.y1 + 35, B.x0 + 4, B.y1 - 2, a, true);
+    s += dot(I.x0 + 8, B.y0 - 52, 2) + line(I.x0 + 8, B.y0 - 43, I.x0 + 8, I.y0, a, true);
+    s += dot(L.x0 + 30, B.y0 - 52, 3) + line(L.x0 + 30, B.y0 - 43, L.x0 + 30, L.y0, a, true);
+    s += dot(B.x1 + 34, B.y1 + 18, 4);
+    svg.innerHTML = s;
+  }
+
+  /* ------------------------------------------------ theme */
+  function setTheme(t) {
+    root.dataset.theme = t;
+    document.querySelectorAll('[data-theme-btn]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.themeBtn === t)));
+    readColors(); buildRamp(); renderTokens();
+    if (fctx) frame(now(), true);
+  }
+  document.querySelectorAll('[data-theme-btn]').forEach((b) => b.addEventListener('click', () => setTheme(b.dataset.themeBtn)));
+
+  /* ------------------------------------------------ boot */
+  buildLattice();
+  readColors();
+  setTheme(isDark() ? 'dark' : 'light');
+  new ResizeObserver(resize).observe(stage);
+  new ResizeObserver(drawRedlines).observe(el('specimen'));
+  document.fonts.ready.then(() => { resize(); drawRedlines(); });
+
+  const boot = [
+    `<span class="s">$</span> nicey spec --target hero.field`,
+    `  <span class="m">▸</span> <span class="k">tokens </span>   <span class="n">6</span> stops · <span class="n">2</span> modes <span class="m">(day, night)</span>`,
+    `  <span class="m">▸</span> <span class="k">lattice</span>   <span class="n">${P.cols} × ${P.rows}</span> · seed <span class="n">${hex(P.seed)}</span>`,
+    `  <span class="m">▸</span> <span class="k">cell   </span>   <span class="n">${P.cell}px</span> · gap <span class="n">1px</span> · island ≥ <span class="n">${P.island}</span>`,
+    `  <span class="m">▸</span> <span class="k">ripple </span>   <span class="n">${RIP.speed}px/s</span> · band <span class="n">${RIP.width}px</span> · life <span class="n">${RIP.life}s</span>`,
+    `  <span class="x">⚠</span> <span class="k">audit  </span>   stop 5 <span class="e">mauve</span> has no site token <span class="m">(field-only value)</span>`,
+    () => `  <span class="s">✓ field mounted</span>  <span class="n">${W} × ${H}</span> · <span class="n">${cols} × ${rows}</span> cells`,
+    `  <span class="m">type</span> <span class="s">help</span> <span class="m">for commands · click the field to emit a ripple</span>`,
+  ];
+  boot.forEach((l, i) => setTimeout(() => out(typeof l === 'function' ? l() : l), reduced ? 0 : 180 + i * 140));
+  if (!reduced) {
+    setTimeout(() => { emit(W * 0.72, H * 0.38, 'auto'); setInterval(() => emit(W * (0.2 + Math.random() * 0.7), H * (0.15 + Math.random() * 0.5), 'auto'), 10500); }, 4000);
+    requestAnimationFrame(loop);
+  }
+})();
+</script>
+</body>
+</html>
