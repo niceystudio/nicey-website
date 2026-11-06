@@ -1,0 +1,23 @@
+---
+/**
+ * Renders copy with its [bracketed gaps] as inline dashed placeholders,
+ * so a missing fact reads as missing, not as content.
+ */
+interface Props {
+  text: string;
+}
+const parts = Astro.props.text.split(/(\[[^\]]+\])/).filter(Boolean);
+---
+
+{parts.map((p) => (p.startsWith('[') && p.endsWith(']') ? <span class="copy-gap">{p}</span> : p))}
+
+<style>
+  .copy-gap {
+    padding: 0 4px;
+    border: 1px dashed var(--color-dashed);
+    border-radius: 4px;
+    color: var(--color-ink-2);
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+</style>

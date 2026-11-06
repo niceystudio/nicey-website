@@ -4,7 +4,7 @@ Static Astro build of the v3 canvas (frames 09 and 09b), using the copies in `re
 
 ```bash
 npm install
-npm run dev      # http://localhost:4321/ (static) and /story (interactive)
+npm run dev      # http://localhost:4321/ (static), /story (interactive), /work/<slug> (case studies)
 npm run build    # astro check + static build to dist/
 ```
 
@@ -67,18 +67,65 @@ The review switch ("Review: static | story", bottom right) shows in dev, or on a
   - The 302 quiet unit-chart cells are 1.43:1 against the card. The number is also in the caption and the `aria-label`, so no information is lost.
 - **The field area after the sweep is mostly empty:** just the 141 block bottom right. That matches the canvas, but it reads quieter at 768, where the field is 380px tall.
 
+## Case studies (added later)
+
+Six pages at `/work/<slug>`, built from the canvas's "Case studies v2" page (frames 08.1–08.6) in the v3 house style. You chose that style over the frames' v2 look (Inter Tight, JetBrains Mono, rounded white cards).
+
+| Page | Frame |
+|---|---|
+| `/work/qbench-design-system` | 08.1 QBench · design system |
+| `/work/qbench-status-workflows` | 08.2 QBench · status workflows |
+| `/work/everbreed` | 08.3 Everbreed |
+| `/work/clerky` | 08.4 Clerky |
+| `/work/omnisafe` | 08.5 Omnisafe |
+| `/work/flyr` | 08.6 FLYR |
+
+**Verified:** build and `astro check` are clean. A script found every text string from each canvas frame in its built page. No horizontal scroll on any page at 320 or 768. One `<h1>` and one `<main>` per page. A contrast scan over every text element on all six pages passes 4.5:1 in both themes, after the sage fix below. Keyboard order is skip link → header → CTAs → next case study, with the ring on every stop. Lighthouse on `/work/qbench-design-system` (production build, mobile) scores 100 for performance, accessibility, best practices and SEO, with CLS 0 and LCP 1.4 s. I checked night theme visually on Everbreed and Clerky.
+
+**Differences from the frames:**
+- **Type and shapes:**
+  - Geist and Geist Mono at weight 500 instead of Inter Tight 600, with the frames' font sizes kept as new `text-case-*` tokens.
+  - The "in numbers" cards are a v3 panel (hairline gaps) instead of separate white cards: 3 → 1 columns for three figures and 4 → 2 → 1 for four, so there's never an empty cell.
+  - The number figures shrink to stay on one line in narrow cells, like the homepage figures.
+- **Placeholders:**
+  - Missing screenshots and images are dashed `[placeholder]` boxes instead of the frames' filled grey boxes.
+  - Bracketed gaps inside sentences, such as `[Team size]` and `[confirm stack]`, are inline dashed marks.
+  - "To collect" boxes stay dashed as a whole.
+- **Header:** it keeps the frames' short nav (wordmark, ← All work, Free audit) and adds the theme toggle and skip link.
+- **Links:**
+  - ← All work → `/#work`.
+  - Free audit and the "Get a free audit" / "Get yours free" CTAs → `/#audit`.
+  - "Book a call" → `links.bookCall`, still `#`.
+  - The wordmark → `/` on every page. `links.home` was `#` and is now `/`.
+- **Night values I chose:**
+  - `stone` (FLYR's band) is `#33312A`.
+  - The agentic layer's lavender labels stay `#D9D2EF` in both themes (new token `on-band-accent`).
+  - Night `sage` went from `#3D4A37` to `#3A4634`, because secondary text on the QBench status band was 4.39:1. It's now 4.66:1, and the homepage sage markers move by the same step.
+- **Page titles and meta:** titles are "<name> case study · Nicey", and the meta description is each page's lede. The frames have neither.
+
+**Worth a look:**
+- **QBench link:** the homepage QBench row links to the design system case study. Status workflows is reached from its "Next case study" link, and the homepage doesn't link to it directly. A second row or a split link is your call.
+- **Name size:** the case studies use the 08.x sizes (name up to 128px), so their hero is larger than the homepage h1 (108px).
+
 ## Open placeholders
 
 - **Links:** every `#` lives in `src/data/links.ts`:
-  - `home` (wordmark)
-  - `bookCall` (hero and footer)
+  - `bookCall` (hero, footer, and the "Book a call" CTAs on the QBench status workflows, Omnisafe and FLYR case studies)
   - `startAudit` ("Get a free audit" in the process section)
   - `exploreDesignSystems`, `exploreProductDesign`
-  - `work.qbench`, `work.everbreed`, `work.clerky`, `work.omnisafe`, `work.flyr`
 
   The in-page anchors `#audit`, `#services`, `#work` and `#how` are real.
 - **Video:** `[Video intro, 60–90 s]` is a dashed slot in Services.
 - **FLYR:** `[result to collect]` stays dashed in Work.
+- **Case studies:** each page's dashed boxes are the canvas's "to collect" list:
+  - team size and stack
+  - one business result
+  - one client quote
+  - the screenshots
+  - Everbreed's permission to publish its figures by name
+  - the Clerky engineer's name and role
+
+  All of it is in `src/data/case-studies.ts`.
 
 ## Where things are
 
@@ -86,3 +133,4 @@ The review switch ("Review: static | story", bottom right) shows in dev, or on a
 - Proof field engine: `src/lib/proof-field.ts`, using `src/lib/pixel-field.ts`, a verbatim copy of `reference/pixel-field.ts`.
 - Zero Drift: `src/data/zero-drift.ts` holds the copy, and `src/components/zero-drift/` holds the shared `ZeroDriftStep` plus the `Static` and `Story` variants.
 - Both pages render `src/components/HomePage.astro` and differ only in `zeroDrift`.
+- Case studies: copy in `src/data/case-studies.ts`, the template in `src/components/case-study/CaseStudy.astro`, the route in `src/pages/work/[slug].astro`.

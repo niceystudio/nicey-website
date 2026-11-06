@@ -33,11 +33,15 @@
   --color-peach: #f6d9c4;
   --color-butter: #f2e6bc;
   --color-mauve: #d8c6e0;
+  /* FLYR's case study band */
+  --color-stone: #ece7db;
 
   /* closing band */
   --color-band: #26251f;
   --color-on-band: #f3f0e9;
   --color-on-band-2: #b6b1a3;
+  /* labels on the band (case study agentic layer): canvas lavender, both themes */
+  --color-on-band-accent: #d9d2ef;
 
   /* the purples found in step 01: content, identical in both themes */
   --color-found-1: #6b5fbe;
@@ -99,6 +103,32 @@
   --text-work--line-height: 1;
   --text-work--letter-spacing: -0.045em;
   --text-work--font-weight: 500;
+
+  /* case study pages (canvas 08.x sizes, v3 weights) */
+  --text-case-name: clamp(56px, 9vw, 128px);
+  --text-case-name--line-height: 0.9;
+  --text-case-name--letter-spacing: -0.05em;
+  --text-case-name--font-weight: 500;
+
+  --text-case-h1: clamp(28px, 3.4vw, 46px);
+  --text-case-h1--line-height: 1.08;
+  --text-case-h1--letter-spacing: -0.03em;
+  --text-case-h1--font-weight: 500;
+
+  --text-case-h2: clamp(28px, 3vw, 40px);
+  --text-case-h2--line-height: 1.05;
+  --text-case-h2--letter-spacing: -0.03em;
+  --text-case-h2--font-weight: 500;
+
+  --text-case-cta: clamp(24px, 2.6vw, 34px);
+  --text-case-cta--line-height: 1.1;
+  --text-case-cta--letter-spacing: -0.03em;
+  --text-case-cta--font-weight: 500;
+
+  --text-case-figure: 52px;
+  --text-case-figure--line-height: 1;
+  --text-case-figure--letter-spacing: -0.04em;
+  --text-case-figure--font-weight: 500;
 
   --text-title: clamp(22px, 2.1vw, 30px);
   --text-title--line-height: 1.15;
@@ -179,11 +209,12 @@
     --color-cell-quiet: rgba(236, 231, 219, 0.16);
     --color-accent: #a79bea;
     --color-hot: #ff8a66;
-    --color-sage: #3d4a37;
+    --color-sage: #3a4634;
     --color-lavender: #3a3556;
     --color-peach: #4a3a2c;
     --color-butter: #4a4229;
     --color-mauve: #463a4c;
+    --color-stone: #33312a;
     /* a step darker than the page, so the closing band still reads */
     --color-band: #0c0c09;
     --color-on-band: #ece7db;
@@ -344,6 +375,16 @@
   }
   .panel-wrap {
     container: panel / inline-size;
+  }
+  /* three cells → one: never a 2 + 1 with an empty cell */
+  .grid-3 {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  @container panel (min-width: 720px) {
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
   }
 
   .caption {

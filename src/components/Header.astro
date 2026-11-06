@@ -2,12 +2,22 @@
 import { links } from '../data/links';
 import ThemeToggle from './ThemeToggle.astro';
 
-const nav = [
-  { href: '#services', label: 'Design systems' },
-  { href: '#services', label: 'Product design' },
-  { href: '#work', label: 'Work' },
-  { href: '#how', label: 'How we work' },
-];
+interface Props {
+  /** 'case': the case study nav from canvas 08.x (← All work, Free audit) */
+  variant?: 'home' | 'case';
+}
+const { variant = 'home' } = Astro.props;
+
+const nav =
+  variant === 'case'
+    ? [{ href: '/#work', label: '← All work' }]
+    : [
+        { href: '#services', label: 'Design systems' },
+        { href: '#services', label: 'Product design' },
+        { href: '#work', label: 'Work' },
+        { href: '#how', label: 'How we work' },
+      ];
+const audit = variant === 'case' ? '/#audit' : '#audit';
 ---
 
 <a href="#main" class="skip-link pill pill-ink px-[18px] text-label">Skip to content</a>
@@ -30,7 +40,7 @@ const nav = [
         ))
       }
       <div class="flex items-center gap-2">
-        <a href="#audit" class="pill pill-ink px-[18px] py-3">Free audit</a>
+        <a href={audit} class="pill pill-ink px-[18px] py-3">Free audit</a>
         <ThemeToggle />
       </div>
     </div>

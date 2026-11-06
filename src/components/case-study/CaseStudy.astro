@@ -1,0 +1,457 @@
+---
+/**
+ * One case study page: the "Case studies v2" canvas layout (08.x) in v3 house style.
+ * Hero band → lead image or audit callout → numbers → Zero Drift steps or a note
+ * → what we did → (agentic layer) → working together → what changed → from the work
+ * → CTA card and the next case study.
+ */
+import Base from '../../layouts/Base.astro';
+import Header from '../Header.astro';
+import Gaps from './Gaps.astro';
+import { links } from '../../data/links';
+import { caseHref, getCaseStudy, type Band, type CaseStudy } from '../../data/case-studies';
+
+interface Props {
+  study: CaseStudy;
+}
+const { study: s } = Astro.props;
+const next = getCaseStudy(s.next);
+
+// literal class names so Tailwind sees them
+const bandBg: Record<Band, string> = {
+  lavender: 'bg-lavender',
+  sage: 'bg-sage',
+  peach: 'bg-peach',
+  butter: 'bg-butter',
+  mauve: 'bg-mauve',
+  stone: 'bg-stone',
+};
+const band = bandBg[s.band];
+const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
+---
+
+<Base title={`${s.linkName} case study · Nicey`} description={s.lede}>
+  <Header variant="case" />
+  <main id="main" tabindex="-1" class="cs">
+    <section aria-labelledby="cs-title" class={band}>
+      <div class="container-page cs-hero">
+        <span class="caption text-ink-2">{s.kicker}</span>
+        <p class="m-0 text-case-name">{s.name}</p>
+        <h1 id="cs-title" class="m-0 max-w-[24ch] text-case-h1">{s.statement}</h1>
+        <p class="m-0 max-w-[62ch] text-body-lg text-pretty text-ink-2"><Gaps text={s.lede} /></p>
+        <dl class="cs-facts">
+          {
+            s.facts.map((f) => (
+              <div>
+                <dt class="caption-sm text-ink-2">{f.term}</dt>
+                <dd class="m-0 text-body">
+                  <Gaps text={f.detail} />
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+        <p class="m-0 text-body-sm text-ink-2"><Gaps text={s.who} /></p>
+      </div>
+    </section>
+
+    {
+      s.lead.kind === 'image' ? (
+        <section aria-label="Project image" class="container-page cs-lead">
+          <div class="placeholder cs-shot cs-shot--wide">{s.lead.placeholder}</div>
+        </section>
+      ) : (
+        <section aria-labelledby="audit-head" class="container-page cs-lead">
+          <div class="cs-audit bg-band text-on-band">
+            <div class="flex max-w-[60ch] flex-col gap-1.5">
+              <h2 id="audit-head" class="m-0 text-h3-card">
+                {s.lead.heading}
+              </h2>
+              <p class="m-0 text-body text-on-band-2">{s.lead.text}</p>
+            </div>
+            <a href="/#audit" class="pill bg-on-band px-[22px] text-body text-band">
+              {s.lead.cta}
+            </a>
+          </div>
+        </section>
+      )
+    }
+
+    <section aria-labelledby="numbers-head" class="container-page cs-block cs-block--md">
+      <h2 id="numbers-head" class="caption m-0 mb-5 text-ink-2">{s.numbersHeading}</h2>
+      <div class="panel-wrap">
+        <ul class:list={['panel', s.numbers.length === 4 ? 'grid-4' : 'grid-3']}>
+          {
+            s.numbers.map((n) => (
+              <li class="cs-num">
+                <span class="cs-num-fig">{n.value}</span>
+                <span class="text-body-sm text-ink-2">{n.label}</span>
+                <span class="cs-num-meaning">{n.meaning}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    {
+      s.steps && (
+        <section aria-labelledby="steps-head" class="container-page cs-block cs-block--md cs-steps">
+          <h2 id="steps-head" class="caption m-0 text-ink-2">
+            Zero Drift steps in this project
+          </h2>
+          <ul class="m-0 flex list-none flex-wrap gap-2 p-0">
+            {s.steps.map((st) => (
+              <li class:list={['cs-step', st.inProgress && 'cs-step--open']}>{st.label}</li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    {
+      s.note && (
+        <section aria-labelledby="note-head" class="container-page cs-block cs-block--md">
+          <div class="panel">
+            <div class="cs-note">
+              <h2 id="note-head" class="caption m-0 text-ink-2">
+                {s.note.heading}
+              </h2>
+              <p class="m-0 flex-[1_1_420px] text-cta">{s.note.text}</p>
+            </div>
+          </div>
+        </section>
+      )
+    }
+
+    <section aria-labelledby="did-head" class="container-page cs-block cs-split">
+      <h2 id="did-head" class="cs-split-head m-0 text-case-h2">What we did</h2>
+      <ol class="cs-split-body cs-did">
+        {
+          s.did.map((d, i) => (
+            <li>
+              <span class="caption-sm pt-[5px] text-ink-2">{String(i + 1).padStart(2, '0')}</span>
+              <span class="text-lede">{d}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    {
+      s.agentic && (
+        <section aria-labelledby="agentic-head" class="container-page cs-block">
+          <div class="cs-agentic bg-band text-on-band">
+            <div class="flex flex-col gap-2.5">
+              <span class="caption text-on-band-2">{s.agentic.kicker}</span>
+              <h2 id="agentic-head" class="m-0 max-w-[26ch] text-case-h2">
+                {s.agentic.heading}
+              </h2>
+            </div>
+            <ol class="cs-agentic-list">
+              {s.agentic.items.map((it) => (
+                <li>
+                  <span class="font-mono text-caption text-on-band-accent">{it.label}</span>
+                  <span class="text-cta">{it.text}</span>
+                </li>
+              ))}
+            </ol>
+            <p class="m-0 max-w-[64ch] text-cta text-on-band-2">{s.agentic.footnote}</p>
+          </div>
+        </section>
+      )
+    }
+
+    {
+      [
+        { id: 'together-head', heading: 'Working together', ...s.together },
+        { id: 'changed-head', heading: 'What changed for the team', ...s.changed },
+      ].map((b) => (
+        <section aria-labelledby={b.id} class="container-page cs-block cs-split">
+          <h2 id={b.id} class="cs-split-head m-0 text-case-h2">
+            {b.heading}
+          </h2>
+          <div class="cs-split-body flex flex-col gap-4">
+            <p class="m-0 text-lede text-pretty">
+              <Gaps text={b.text} />
+            </p>
+            <p class="cs-collect">
+              <span class="caption-sm mb-1.5 block text-ink-2">{b.collect.label}</span>
+              {b.collect.text}
+            </p>
+          </div>
+        </section>
+      ))
+    }
+
+    <section aria-labelledby="work-head" class="container-page cs-block flex flex-col gap-5">
+      <h2 id="work-head" class="m-0 text-case-h2">From the work</h2>
+      <div class="cs-figs">
+        {
+          s.work.map((w) => (
+            <figure class="m-0 flex flex-col gap-3">
+              <div class="placeholder cs-shot">{w.placeholder}</div>
+              <figcaption class="text-body-sm text-ink-2">{w.caption}</figcaption>
+            </figure>
+          ))
+        }
+      </div>
+    </section>
+  </main>
+
+  <footer class="container-page cs-foot">
+    <div class:list={['cs-cta', band]}>
+      <div class="flex max-w-[46ch] flex-col gap-2">
+        <p class="m-0 text-case-cta">{s.cta.heading}</p>
+        <p class="m-0 text-cta text-ink-2">{s.cta.text}</p>
+      </div>
+      <a href={ctaHref} class="pill pill-ink pill-lg">{s.cta.label}</a>
+    </div>
+    <a href={caseHref(next.slug)} class="cs-next">
+      <span class="caption-sm text-ink-2">Next case study</span>
+      <span class="text-case-cta">{next.linkName} →</span>
+    </a>
+  </footer>
+</Base>
+
+<style>
+  .cs,
+  .cs-foot {
+    --cs-lg: 72px;
+    --cs-md: 64px;
+    --cs-sm: 48px;
+  }
+  @media (max-width: 767px) {
+    .cs,
+    .cs-foot {
+      --cs-lg: 56px;
+      --cs-md: 48px;
+      --cs-sm: 40px;
+    }
+  }
+  @media (max-width: 479px) {
+    .cs,
+    .cs-foot {
+      --cs-lg: 48px;
+      --cs-md: 40px;
+      --cs-sm: 32px;
+    }
+  }
+
+  .cs-hero {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-block: var(--cs-lg) 56px;
+  }
+  .cs-facts {
+    margin: 8px 0 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--color-line-strong);
+  }
+  .cs-facts > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .cs-lead {
+    padding-top: var(--cs-sm);
+  }
+  .cs-block {
+    padding-top: var(--cs-lg);
+  }
+  .cs-block--md {
+    padding-top: var(--cs-md);
+  }
+
+  /* dashed = not collected yet */
+  .cs-shot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 4 / 3;
+    padding: 16px;
+    border-radius: var(--radius-panel);
+    text-align: center;
+  }
+  .cs-shot--wide {
+    aspect-ratio: 16 / 8;
+  }
+
+  .cs-audit {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 32px;
+    padding: 28px 32px;
+    border-radius: var(--radius-panel);
+    /* the accent ring is under 3:1 on the band */
+    --color-focus: var(--color-on-band);
+  }
+
+  .cs-num {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 28px;
+    container-type: inline-size;
+  }
+  .cs-num-fig {
+    /* stays on one line in the narrowest cell: "1,071 → 0", "302 / 302" */
+    font-size: min(var(--text-case-figure), 19cqi);
+    line-height: var(--text-case-figure--line-height);
+    letter-spacing: var(--text-case-figure--letter-spacing);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .cs-num-meaning {
+    padding-top: 10px;
+    border-top: 1px solid var(--color-line);
+    font-size: var(--text-body);
+    line-height: 1.45;
+    font-weight: 500;
+  }
+
+  .cs-steps {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 24px;
+  }
+  .cs-step {
+    padding: 8px 14px;
+    border-radius: var(--radius-pill);
+    background: var(--color-ink);
+    color: var(--color-on-ink);
+    font-size: var(--text-label);
+    line-height: var(--text-label--line-height);
+  }
+  .cs-step--open {
+    padding: 7px 13px;
+    background: transparent;
+    border: 1px dashed var(--color-ink);
+    color: var(--color-ink);
+  }
+
+  .cs-note {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px 24px;
+    padding: 24px 28px;
+  }
+
+  .cs-split {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px 64px;
+  }
+  .cs-split-head {
+    flex: 1 1 260px;
+  }
+  .cs-split-body {
+    flex: 999 1 560px;
+    min-width: 0;
+  }
+  .cs-did {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--color-line-strong);
+  }
+  .cs-did > li {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 16px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .cs-agentic {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 40px;
+    border-radius: var(--radius-panel);
+  }
+  .cs-agentic-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+    gap: 12px;
+  }
+  .cs-agentic-list > li {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 22px;
+    border-radius: var(--radius-code);
+    background: color-mix(in srgb, var(--color-on-band) 8%, transparent);
+  }
+
+  .cs-collect {
+    margin: 0;
+    padding: 18px 20px;
+    border: 1px dashed var(--color-dashed);
+    border-radius: var(--radius-panel);
+    font-size: var(--text-body);
+    line-height: 1.5;
+  }
+
+  .cs-figs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+    gap: 16px;
+  }
+
+  .cs-foot {
+    padding-block: var(--cs-lg);
+  }
+  .cs-cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 40px;
+    border-radius: var(--radius-panel);
+  }
+  .cs-next {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 40px;
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+  @media (hover: hover) {
+    .cs-next:hover .text-case-cta {
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 6px;
+    }
+  }
+
+  @media (max-width: 479px) {
+    .cs-audit,
+    .cs-agentic,
+    .cs-cta {
+      padding: 24px;
+    }
+    .cs-num {
+      padding: 24px;
+    }
+    .cs-did > li {
+      grid-template-columns: 32px minmax(0, 1fr);
+      gap: 12px;
+    }
+  }
+</style>
