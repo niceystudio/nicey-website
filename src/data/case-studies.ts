@@ -64,8 +64,7 @@ export interface CaseStudy {
     | { kind: 'image'; placeholder: string; src?: Shot; alt?: string }
     | { kind: 'audit'; heading: string; text: string; cta: string };
   numbersHeading: string;
-  /** `before` turns a number into a before → after pair */
-  numbers: { value: string; label: string; meaning: string; before?: string }[];
+  numbers: { value: string; label: string; meaning: string }[];
   /** a custom visual on the right of the hero */
   heroVisual?: 'qbench-build';
   /** an animated before/after above the numbers */
@@ -112,20 +111,17 @@ export const caseStudies: CaseStudy[] = [
     numbersHeading: 'Before and after',
     numbers: [
       {
-        before: '1,071',
-        value: '0',
+        value: '1,071 → 0',
         label: 'references to libraries outside the Foundation',
         meaning: 'So design and code pull from one source, and nothing breaks when an outside file changes.',
       },
       {
-        before: '11',
-        value: '0',
+        value: '11 → 0',
         label: 'external libraries the components depended on',
         meaning: 'So the library no longer leans on files nobody maintains.',
       },
       {
-        before: '2 files',
-        value: '1 file',
+        value: '2 files → 1',
         label: 'for tokens and components',
         meaning: 'So a change to a token reaches every component on its own.',
       },
