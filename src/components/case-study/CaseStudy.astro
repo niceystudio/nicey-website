@@ -197,14 +197,17 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
       <h2 id="work-head" class="m-0 text-case-h2">From the work</h2>
       <div class="cs-figs">
         {
-          s.work.map((w) => (
+          s.work.map((w, i) => (
             <figure class="m-0 flex flex-col gap-3">
               {w.src ? (
                 <Shot shot={w.src} alt={w.alt ?? ''} />
               ) : (
                 <div class="placeholder cs-shot">{w.placeholder}</div>
               )}
-              <figcaption class="text-body-sm text-ink-2">{w.caption}</figcaption>
+              <figcaption class="flex flex-col gap-1 text-body-sm text-ink-2">
+                <span class="caption-sm text-muted">Fig 0.{i + 1}</span>
+                {w.caption}
+              </figcaption>
             </figure>
           ))
         }
