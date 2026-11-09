@@ -68,6 +68,8 @@ export interface CaseStudy {
   numbers: { value: string; label: string; meaning: string; before?: string }[];
   /** a custom visual on the right of the hero */
   heroVisual?: 'qbench-build';
+  /** an animated before/after above the numbers */
+  proofViz?: 'names';
   steps?: { label: string; inProgress?: boolean }[];
   /** the slides of the Figma case study, one section each */
   chapters?: Chapter[];
@@ -106,6 +108,7 @@ export const caseStudies: CaseStudy[] = [
     ],
     who: 'Who did the work: Goran Babarogić, as product designer and design system engineer at QBench, June 2025 to now.',
     heroVisual: 'qbench-build',
+    proofViz: 'names',
     numbersHeading: 'Before and after',
     numbers: [
       {
@@ -119,12 +122,6 @@ export const caseStudies: CaseStudy[] = [
         value: '0',
         label: 'external libraries the components depended on',
         meaning: 'So the library no longer leans on files nobody maintains.',
-      },
-      {
-        before: '13 / 553',
-        value: '554 / 554',
-        label: 'variables with a name developers can type in CSS',
-        meaning: 'So the value a designer picks is the variable a developer or an agent writes.',
       },
       {
         before: '2 files',

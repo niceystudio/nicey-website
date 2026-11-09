@@ -9,6 +9,7 @@ import Base from '../../layouts/Base.astro';
 import Header from '../Header.astro';
 import Gaps from './Gaps.astro';
 import Shot from './Shot.astro';
+import NamesField from './NamesField.astro';
 import Chapters from './Chapters.astro';
 import SiteFooter from '../SiteFooter.astro';
 import { links } from '../../data/links';
@@ -86,8 +87,9 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
 
     <section aria-labelledby="numbers-head" class="container-page cs-block cs-block--md">
       <h2 id="numbers-head" class="caption m-0 mb-5 text-ink-2">{s.numbersHeading}</h2>
-      <div class="panel-wrap">
-        <ul class:list={['panel', s.numbers.length === 4 ? (s.numbers[0].before ? 'grid-2' : 'grid-4') : 'grid-3']}>
+      <div class:list={['panel-wrap', s.proofViz && 'panel flex flex-col']}>
+        {s.proofViz === 'names' && <NamesField />}
+        <ul class:list={[s.proofViz ? 'panel-sub' : 'panel', s.numbers.length === 4 ? (s.numbers[0].before ? 'grid-2' : 'grid-4') : 'grid-3']}>
           {
             s.numbers.map((n) => (
               <li class="cs-num">
