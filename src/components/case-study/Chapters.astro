@@ -22,12 +22,44 @@ const slug = (k: string) =>
 
 <section aria-labelledby="chapters-head" class="container-page ch-wrap">
   <h2 id="chapters-head" class="caption m-0 text-ink-2">The work, step by step</h2>
+  <div class="panel chs" data-chapters>
+    <div class="chs-tabs" role="tablist" aria-label="Steps of the work">
+      {
+        chapters.map((c, i) => {
+          const [num, ...rest] = c.kicker.split(' · ');
+          return (
+            <button
+              type="button"
+              role="tab"
+              id={`tab-${slug(c.kicker)}`}
+              aria-controls={`panel-${slug(c.kicker)}`}
+              aria-selected={i === 0 ? 'true' : 'false'}
+              tabindex={i === 0 ? 0 : -1}
+              class="chs-tab"
+            >
+              <span class="flex items-center gap-2 font-mono text-caption text-ink-2">
+                <i aria-hidden="true" class:list={['marker', marker]} />
+                {num}
+              </span>
+              <span class="chs-tab-name">{rest.join(' · ')}</span>
+            </button>
+          );
+        })
+      }
+    </div>
   {
-    chapters.map((c) => {
+    chapters.map((c, i) => {
       const id = slug(c.kicker);
       const twoCol = c.blocks.length === 2;
       return (
-        <article aria-labelledby={id} class="panel ch">
+        <div
+          id={`panel-${id}`}
+          role="tabpanel"
+          aria-labelledby={`tab-${id}`}
+          tabindex="0"
+          hidden={i !== 0}
+          class="ch"
+        >
           <header class="ch-head">
             <span class="caption flex items-center gap-2 text-ink-2">
               <i aria-hidden="true" class:list={['marker', marker]} />
@@ -289,11 +321,73 @@ const slug = (k: string) =>
               ))}
             </ul>
           )}
-        </article>
+        </div>
       );
     })
   }
+    <div class="chs-controls">
+      <button type="button" class="pill pill-outline chs-btn" data-prev aria-disabled="true">Previous</button>
+      <button type="button" class="pill pill-ink chs-btn chs-btn--next" data-next>Next step</button>
+    </div>
+  </div>
 </section>
+
+<script>
+  function mountChapters(root: HTMLElement) {
+    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
+    const panels = tabs.map((t) => document.getElementById(t.getAttribute('aria-controls') ?? ''));
+    const prev = root.querySelector<HTMLButtonElement>('[data-prev]');
+    const next = root.querySelector<HTMLButtonElement>('[data-next]');
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let current = 0;
+
+    function select(i: number, focus: boolean) {
+      const n = Math.max(0, Math.min(tabs.length - 1, i));
+      if (n !== current) {
+        tabs.forEach((t, k) => {
+          t.setAttribute('aria-selected', String(k === n));
+          t.tabIndex = k === n ? 0 : -1;
+        });
+        panels.forEach((p, k) => {
+          if (p) p.hidden = k !== n;
+        });
+        const panel = panels[n];
+        if (panel && !reduced.matches) {
+          panel.classList.add('is-entering');
+          void panel.offsetWidth;
+          panel.classList.remove('is-entering');
+        }
+        current = n;
+      }
+      tabs[n].scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: reduced.matches ? 'auto' : 'smooth' });
+      if (focus) tabs[n].focus();
+      prev?.setAttribute('aria-disabled', String(n === 0));
+      next?.setAttribute('aria-disabled', String(n === tabs.length - 1));
+    }
+
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => select(i, false));
+      t.addEventListener('keydown', (e) => {
+        let to = -1;
+        if (e.key === 'ArrowRight') to = (i + 1) % tabs.length;
+        else if (e.key === 'ArrowLeft') to = (i - 1 + tabs.length) % tabs.length;
+        else if (e.key === 'Home') to = 0;
+        else if (e.key === 'End') to = tabs.length - 1;
+        if (to < 0) return;
+        e.preventDefault();
+        select(to, true);
+      });
+    });
+    prev?.addEventListener('click', () => {
+      if (prev.getAttribute('aria-disabled') !== 'true') select(current - 1, false);
+    });
+    next?.addEventListener('click', () => {
+      if (next.getAttribute('aria-disabled') !== 'true') select(current + 1, false);
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-chapters]').forEach(mountChapters);
+</script>
 
 <style>
   .ch-wrap {
@@ -312,9 +406,112 @@ const slug = (k: string) =>
       padding-top: 48px;
     }
   }
+  .chs {
+    display: flex;
+    flex-direction: column;
+  }
+  .chs-tabs {
+    display: flex;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
+  .chs-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .chs-tab {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    min-height: 44px;
+    padding: 18px 20px 16px;
+    border: 0;
+    background: transparent;
+    color: var(--color-ink);
+    text-align: left;
+    cursor: pointer;
+    scroll-snap-align: start;
+  }
+  .chs-tab-name {
+    font-size: var(--text-body-sm);
+    line-height: 1.3;
+  }
+  .chs-tab::after {
+    content: '';
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    bottom: 0;
+    height: 2px;
+    background: transparent;
+  }
+  .chs-tab[aria-selected='true'] .chs-tab-name {
+    font-weight: 500;
+  }
+  .chs-tab[aria-selected='true']::after {
+    background: var(--color-ink);
+  }
+  @media (hover: hover) {
+    .chs-tab[aria-selected='false']:hover {
+      background: var(--color-surface-hover);
+    }
+  }
+  @media (max-width: 899px) {
+    .chs-tab {
+      flex: 0 0 auto;
+      min-width: 128px;
+    }
+  }
+  .chs-tab:focus-visible,
+  .ch:focus-visible {
+    outline-offset: -4px;
+  }
   .ch {
     display: flex;
     flex-direction: column;
+    gap: 1px;
+    background: var(--color-line);
+  }
+  .ch[hidden] {
+    display: none;
+  }
+  .ch > * {
+    background: var(--color-surface);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .ch {
+      transition: opacity 220ms ease;
+    }
+  }
+  .ch.is-entering {
+    opacity: 0;
+  }
+  .chs-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 20px 44px;
+  }
+  .chs-btn {
+    padding: 0 18px;
+    font-size: var(--text-body-sm);
+    cursor: pointer;
+  }
+  .chs-btn--next {
+    padding: 0 22px;
+    border: 0;
+  }
+  .chs-btn.pill-outline {
+    background: transparent;
+  }
+  .chs-btn[aria-disabled='true'] {
+    opacity: 0.4;
+    cursor: default;
   }
   .ch-head {
     display: flex;
@@ -624,6 +821,9 @@ const slug = (k: string) =>
   }
 
   @media (max-width: 767px) {
+    .chs-controls {
+      padding-inline: 28px;
+    }
     .ch-head {
       padding: 28px 28px 24px;
     }

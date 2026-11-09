@@ -1,0 +1,73 @@
+---
+/**
+ * A case-study image. If there is a night version, the day and night images
+ * swap with the site theme (data-theme on <html>, or the system setting).
+ */
+import type { Shot } from '../../data/case-studies';
+
+interface Props {
+  shot: Shot;
+  alt: string;
+  wide?: boolean;
+  eager?: boolean;
+}
+
+const { shot, alt, wide = false, eager = false } = Astro.props;
+const loading = eager ? 'eager' : 'lazy';
+---
+
+<div class:list={['shot', { 'shot--wide': wide, 'shot--themed': !!shot.dark }]}>
+  <img
+    class="shot-light"
+    src={shot.light}
+    alt={alt}
+    width={shot.width}
+    height={shot.height}
+    loading={loading}
+    decoding="async"
+  />
+  {
+    shot.dark && (
+      <img
+        class="shot-dark"
+        src={shot.dark}
+        alt={alt}
+        width={shot.width}
+        height={shot.height}
+        loading={loading}
+        decoding="async"
+      />
+    )
+  }
+</div>
+
+<style>
+  .shot {
+    overflow: hidden;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-panel);
+    background: var(--color-surface);
+  }
+  .shot img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .shot--themed .shot-dark {
+    display: none;
+  }
+  :global([data-theme='dark']) .shot--themed .shot-light {
+    display: none;
+  }
+  :global([data-theme='dark']) .shot--themed .shot-dark {
+    display: block;
+  }
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .shot--themed .shot-light {
+      display: none;
+    }
+    :global(:root:not([data-theme='light'])) .shot--themed .shot-dark {
+      display: block;
+    }
+  }
+</style>
