@@ -67,6 +67,8 @@ export interface CaseStudy {
   numbers: { value: string; label: string; meaning: string }[];
   /** a custom visual on the right of the hero */
   heroVisual?: 'qbench-build';
+  /** custom "From the work" visuals instead of image figures */
+  workVisual?: 'qbench';
   /** an animated before/after above the numbers */
   proofViz?: 'names';
   steps?: { label: string; inProgress?: boolean }[];
@@ -108,6 +110,7 @@ export const caseStudies: CaseStudy[] = [
     who: 'Who did the work: Goran Babarogić, as product designer and design system engineer at QBench, June 2025 to now.',
     heroVisual: 'qbench-build',
     proofViz: 'names',
+    workVisual: 'qbench',
     numbersHeading: 'Before and after',
     numbers: [
       {
