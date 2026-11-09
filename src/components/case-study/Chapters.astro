@@ -1,0 +1,642 @@
+---
+/**
+ * The case study told slide by slide: each slide of the Figma
+ * "Case Study Documentation" file becomes one panel here, as real text
+ * (readable by search engines and screen readers, themed day and night).
+ */
+import type { Chapter } from '../../data/case-studies';
+
+interface Props {
+  chapters: Chapter[];
+  /** marker colour class, e.g. 'bg-lavender' */
+  marker: string;
+}
+const { chapters, marker } = Astro.props;
+const slug = (k: string) =>
+  'ch-' +
+  k
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+---
+
+<section aria-labelledby="chapters-head" class="container-page ch-wrap">
+  <h2 id="chapters-head" class="caption m-0 text-ink-2">The work, step by step</h2>
+  {
+    chapters.map((c) => {
+      const id = slug(c.kicker);
+      const twoCol = c.blocks.length === 2;
+      return (
+        <article aria-labelledby={id} class="panel ch">
+          <header class="ch-head">
+            <span class="caption flex items-center gap-2 text-ink-2">
+              <i aria-hidden="true" class:list={['marker', marker]} />
+              {c.kicker}
+            </span>
+            <h3 id={id} class="m-0 max-w-[30ch] text-case-h2 text-balance">
+              {c.heading}
+            </h3>
+            <p class="m-0 max-w-[64ch] text-lede text-pretty text-ink-2">{c.lede}</p>
+          </header>
+
+          <div class:list={['ch-body', twoCol && 'ch-body--two']}>
+            {c.blocks.map((b) => (
+              <div class="ch-block">
+                {b.kind === 'stats' && (
+                  <ul class="ch-stats">
+                    {b.items.map((it) => (
+                      <li>
+                        <span class="caption-sm text-ink-2">{it.label}</span>
+                        <span class="ch-fig">{it.value}</span>
+                        {it.seenAt && <span class="caption-sm text-hot">{it.seenAt}</span>}
+                        <span class="text-body text-pretty">{it.caption}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                {b.kind === 'rows' && (
+                  <>
+                    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                    <dl class="ch-rows">
+                      {b.rows.map((r) => (
+                        <div>
+                          <dt class="text-body-lg">{r.label}</dt>
+                          <dd class="m-0 text-body tabular-nums text-ink-2">{r.value}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </>
+                )}
+
+                {b.kind === 'map' && (
+                  <>
+                    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                    <ul class="ch-map">
+                      {b.rows.map((r) => (
+                        <li>
+                          <code class="ch-code">{r.from}</code>
+                          <span aria-hidden="true" class="text-ink-2">
+                            →
+                          </span>
+                          <span class="sr-only">maps to</span>
+                          <code class="ch-code ch-code--accent">{r.to}</code>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+
+                {b.kind === 'ramp' && (
+                  <>
+                    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                    <ol class="ch-ramp">
+                      {b.swatches.map((w) => (
+                        <li class:list={[w.feeds && 'ch-ramp--feeds']}>
+                          <span aria-hidden="true" class="ch-swatch" style={`background:#${w.hex}`} />
+                          <span class="text-body-sm tabular-nums">{w.step}</span>
+                          <span class="caption-sm text-ink-2">{w.hex}</span>
+                        </li>
+                      ))}
+                    </ol>
+                    <p class="m-0 text-body text-ink-2">{b.note}</p>
+                  </>
+                )}
+
+                {b.kind === 'chain' && (
+                  <>
+                    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                    <ul class="ch-chain">
+                      {b.links.map((l) => (
+                        <li>
+                          <code class="ch-code">{l.from}</code>
+                          <span class="flex items-baseline gap-2">
+                            <span aria-hidden="true" class="text-ink-2">
+                              ↳
+                            </span>
+                            <code class="ch-code ch-code--accent">{l.token}</code>
+                          </span>
+                          <span class="caption-sm text-ink-2">{l.state}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+
+                {b.kind === 'docs' && (
+                  <>
+                    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                    <ul class="ch-docs">
+                      {b.items.map((d) => (
+                        <li>
+                          <span class="text-h3-card">{d.name}</span>
+                          <div class="flex flex-col gap-1.5">
+                            <span class="text-body">{d.purpose}</span>
+                            <span class="text-body-sm">
+                              <span class="caption-sm text-ink-2">Use for</span> {d.useFor}
+                            </span>
+                            <span class="text-body-sm">
+                              <span class="caption-sm text-ink-2">Not for</span> {d.notFor}{' '}
+                              <code class="ch-code ch-code--hot">{d.instead}</code>
+                            </span>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+
+                {b.kind === 'flow' && (
+                  <>
+                    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                    <ol class="ch-flow">
+                      {b.steps.map((st) => (
+                        <li>
+                          <span class="caption-sm text-ink-2">{st.n}</span>
+                          <span class="text-body-lg">{st.name}</span>
+                          <span class="text-body text-ink-2">{st.text}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </>
+                )}
+
+                {b.kind === 'checks' && (
+                  <>
+                    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                    <div class="ch-checks">
+                      <p class="m-0 flex flex-wrap items-center justify-between gap-2">
+                        <span class="text-body-lg">{b.subject}</span>
+                        <span class="ch-pass caption-sm">{b.status}</span>
+                      </p>
+                      <ul>
+                        {b.items.map((it) => (
+                          <li>
+                            <span class="ch-fig-sm">{it.value}</span>
+                            <span class="text-body">{it.label}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </>
+                )}
+
+                {b.kind === 'meters' && (
+                  <>
+                    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                    <dl class="ch-meters">
+                      {b.items.map((m) => (
+                        <div>
+                          <dt class="text-body">{m.label}</dt>
+                          <dd class="m-0 text-body tabular-nums">{m.value}</dd>
+                          <span aria-hidden="true" class="ch-meter">
+                            <span style={`width:${parseFloat(m.value)}%`} />
+                          </span>
+                        </div>
+                      ))}
+                    </dl>
+                  </>
+                )}
+
+                {b.kind === 'states' && (
+                  <>
+                    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                    <table class="ch-table ch-states">
+                      <thead>
+                        <tr>
+                          <th scope="col" class="caption-sm">
+                            State
+                          </th>
+                          <th scope="col" class="caption-sm">
+                            Token
+                          </th>
+                          <th scope="col" class="caption-sm">
+                            Example
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {b.rows.map((r) => (
+                          <tr>
+                            <th scope="row" class="text-body-lg font-normal">
+                              {r.state}
+                            </th>
+                            <td>
+                              <code class="ch-code">{r.token}</code>
+                            </td>
+                            <td class="text-body text-ink-2">{r.example}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </>
+                )}
+
+                {b.kind === 'compare' && (
+                  <table class="ch-table ch-compare">
+                    <thead>
+                      <tr>
+                        <th scope="col" class="caption-sm">
+                          <span class="sr-only">Measure</span>
+                        </th>
+                        <th scope="col" class="caption-sm">
+                          Before
+                        </th>
+                        <th scope="col" class="caption-sm">
+                          After
+                        </th>
+                        <th scope="col" class="caption-sm">
+                          <span class="sr-only">What it counts</span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {b.rows.map((r) => (
+                        <tr>
+                          <th scope="row" class="text-body-lg font-normal">
+                            {r.label}
+                          </th>
+                          <td class="ch-before tabular-nums">{r.before}</td>
+                          <td class="ch-after tabular-nums">{r.after}</td>
+                          <td class="text-body text-ink-2">{r.note}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+
+                {b.kind === 'images' && (
+                  <div class="ch-images">
+                    {b.images.map((im) => (
+                      <img src={im.src} alt={im.alt} width={im.width} height={im.height} loading="lazy" decoding="async" />
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {c.proof && (
+            <ul class="ch-proof">
+              {c.proof.map((p) => (
+                <li>
+                  <span class="ch-fig">{p.value}</span>
+                  <span class="flex flex-col gap-1">
+                    {p.seenAt && <span class="caption-sm text-hot">{p.seenAt}</span>}
+                    <span class="text-body text-pretty">{p.caption}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </article>
+      );
+    })
+  }
+</section>
+
+<style>
+  .ch-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-top: 72px;
+  }
+  @media (max-width: 767px) {
+    .ch-wrap {
+      padding-top: 56px;
+    }
+  }
+  @media (max-width: 479px) {
+    .ch-wrap {
+      padding-top: 48px;
+    }
+  }
+  .ch {
+    display: flex;
+    flex-direction: column;
+  }
+  .ch-head {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 40px 44px 32px;
+  }
+  .ch-body {
+    display: grid;
+    gap: 1px;
+    background: var(--color-line);
+  }
+  .ch-body--two {
+    grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr));
+  }
+  .ch-block {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+    padding: 28px 44px 36px;
+    background: var(--color-surface);
+  }
+
+  .ch-fig {
+    font-size: min(var(--text-case-figure), 14cqi);
+    line-height: var(--text-case-figure--line-height);
+    letter-spacing: var(--text-case-figure--letter-spacing);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .ch-fig-sm {
+    font-size: var(--text-h3-card);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .ch-stats {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+    gap: 28px 40px;
+  }
+  .ch-stats > li {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    container-type: inline-size;
+  }
+
+  .ch-rows {
+    margin: 0;
+  }
+  .ch-rows > div,
+  .ch-meters > div {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .ch-map,
+  .ch-chain,
+  .ch-docs,
+  .ch-flow,
+  .ch-checks ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ch-map > li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .ch-code {
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+    line-height: var(--text-code--line-height);
+    overflow-wrap: anywhere;
+  }
+  .ch-code--accent {
+    color: var(--color-accent);
+  }
+  .ch-code--hot {
+    color: var(--color-hot);
+  }
+
+  .ch-ramp {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+    gap: 8px;
+  }
+  .ch-ramp > li {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .ch-swatch {
+    display: block;
+    aspect-ratio: 1;
+    border-radius: var(--radius-swatch);
+    border: 1px solid var(--color-line);
+  }
+  .ch-ramp--feeds .ch-swatch {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  .ch-chain > li {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .ch-docs > li {
+    display: grid;
+    grid-template-columns: minmax(120px, 0.6fr) minmax(0, 2fr);
+    gap: 8px 24px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--color-line);
+  }
+  @media (max-width: 560px) {
+    .ch-docs > li {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .ch-flow > li {
+    display: grid;
+    grid-template-columns: 32px minmax(110px, 0.7fr) minmax(0, 2fr);
+    align-items: baseline;
+    gap: 6px 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--color-line);
+  }
+  @media (max-width: 560px) {
+    .ch-flow > li {
+      grid-template-columns: 32px 1fr;
+    }
+    .ch-flow > li > :last-child {
+      grid-column: 2;
+    }
+  }
+
+  .ch-checks {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-code);
+  }
+  .ch-checks li {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    padding: 8px 0;
+    border-top: 1px solid var(--color-line);
+  }
+  .ch-pass {
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    background: var(--color-sage);
+    color: var(--color-ink);
+  }
+
+  .ch-meters {
+    margin: 0;
+  }
+  .ch-meters > div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 8px;
+  }
+  .ch-meter {
+    grid-column: 1 / -1;
+    display: block;
+    height: 4px;
+    border-radius: var(--radius-pill);
+    background: var(--color-cell-quiet);
+    overflow: hidden;
+  }
+  .ch-meter > span {
+    display: block;
+    height: 100%;
+    background: var(--color-accent);
+  }
+
+  .ch-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .ch-table th,
+  .ch-table td {
+    padding: 12px 16px 12px 0;
+    text-align: left;
+    vertical-align: baseline;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .ch-table thead th {
+    color: var(--color-ink-2);
+    font-weight: 400;
+  }
+  .ch-before,
+  .ch-after {
+    white-space: nowrap;
+  }
+  .ch-before {
+    font-size: var(--text-h3-card);
+    color: var(--color-ink-2);
+  }
+  .ch-after {
+    font-size: var(--text-h3-card);
+    font-weight: 500;
+  }
+  @media (max-width: 560px) {
+    .ch-states thead {
+      display: none;
+    }
+    .ch-states tr {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--color-line);
+    }
+    .ch-states th,
+    .ch-states td {
+      border: 0;
+      padding: 0;
+    }
+  }
+  @media (max-width: 640px) {
+    .ch-compare thead {
+      display: none;
+    }
+    .ch-compare tr {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px 16px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--color-line);
+    }
+    .ch-compare th,
+    .ch-compare td {
+      border: 0;
+      padding: 0;
+    }
+    .ch-compare th,
+    .ch-compare td:last-child {
+      grid-column: 1 / -1;
+    }
+    .ch-before::before {
+      content: 'Before ';
+      font-family: var(--font-mono);
+      font-size: var(--text-caption-sm);
+      color: var(--color-ink-2);
+    }
+    .ch-after::before {
+      content: 'After ';
+      font-family: var(--font-mono);
+      font-size: var(--text-caption-sm);
+      color: var(--color-ink-2);
+    }
+  }
+
+  .ch-images {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+    gap: 16px;
+  }
+  .ch-images img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-code);
+    border: 1px solid var(--color-line);
+  }
+
+  .ch-proof {
+    margin: 0;
+    padding: 28px 44px 36px;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+    gap: 24px 48px;
+  }
+  .ch-proof > li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 8px 24px;
+    container-type: inline-size;
+  }
+
+  @media (max-width: 767px) {
+    .ch-head {
+      padding: 28px 28px 24px;
+    }
+    .ch-block,
+    .ch-proof {
+      padding: 24px 28px 28px;
+    }
+  }
+  @media (max-width: 479px) {
+    .ch-head,
+    .ch-block,
+    .ch-proof {
+      padding-inline: 20px;
+    }
+  }
+</style>

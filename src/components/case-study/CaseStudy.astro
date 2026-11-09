@@ -8,6 +8,7 @@
 import Base from '../../layouts/Base.astro';
 import Header from '../Header.astro';
 import Gaps from './Gaps.astro';
+import Chapters from './Chapters.astro';
 import { links } from '../../data/links';
 import { caseHref, getCaseStudy, type Band, type CaseStudy } from '../../data/case-studies';
 
@@ -123,6 +124,8 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
         </section>
       )
     }
+
+    {s.chapters && <Chapters chapters={s.chapters} marker={band} />}
 
     <section aria-labelledby="did-head" class="container-page cs-block cs-split">
       <h2 id="did-head" class="cs-split-head m-0 text-case-h2">What we did</h2>

@@ -11,6 +11,35 @@ export interface Collect {
   text: string;
 }
 
+/** One slide of the "Case Study Documentation" Figma file, rebuilt as a page section. */
+export type ChapterBlock =
+  | { kind: 'stats'; items: { value: string; label: string; caption: string; seenAt?: string }[] }
+  | { kind: 'rows'; title: string; rows: { label: string; value: string }[] }
+  | { kind: 'map'; title: string; rows: { from: string; to: string }[] }
+  | { kind: 'ramp'; title: string; swatches: { step: string; hex: string; feeds?: boolean }[]; note: string }
+  | { kind: 'chain'; title: string; root: string; links: { token: string; from: string; state: string }[] }
+  | {
+      kind: 'docs';
+      title: string;
+      items: { name: string; purpose: string; useFor: string; notFor: string; instead: string }[];
+    }
+  | { kind: 'flow'; title: string; steps: { n: string; name: string; text: string }[] }
+  | { kind: 'checks'; title: string; subject: string; status: string; items: { value: string; label: string }[] }
+  | { kind: 'meters'; title: string; items: { label: string; value: string }[] }
+  | { kind: 'states'; title: string; rows: { state: string; token: string; example: string }[] }
+  | { kind: 'compare'; rows: { label: string; before: string; after: string; note: string }[] }
+  | { kind: 'images'; images: { src: string; alt: string; width: number; height: number }[] };
+
+export interface Chapter {
+  /** e.g. "02 · Before" */
+  kicker: string;
+  heading: string;
+  lede: string;
+  blocks: ChapterBlock[];
+  /** the big figure with its "Seen at …" line */
+  proof?: { value: string; caption: string; seenAt?: string }[];
+}
+
 export interface CaseStudy {
   slug: string;
   /** used in the "Next case study" link and the page title */
@@ -29,6 +58,8 @@ export interface CaseStudy {
   numbersHeading: string;
   numbers: { value: string; label: string; meaning: string }[];
   steps?: { label: string; inProgress?: boolean }[];
+  /** the slides of the Figma case study, one section each */
+  chapters?: Chapter[];
   note?: { heading: string; text: string };
   did: string[];
   agentic?: {
@@ -88,6 +119,282 @@ export const caseStudies: CaseStudy[] = [
       { label: '03 System' },
       { label: '04 Context' },
       { label: '05 Proof · pilot' },
+    ],
+    chapters: [
+      {
+        kicker: '02 · Before',
+        heading: 'Tokens and components lived in separate files, and the links between them drifted.',
+        lede: 'QBench V1 kept its variables in a separate Foundation library. Components pointed at copies of those variables, many of them outdated. Developers saw colour values but almost no names they could type in code.',
+        blocks: [
+          {
+            kind: 'stats',
+            items: [
+              {
+                value: '1,071',
+                label: '1,071 references · 11 libraries',
+                caption: 'references to outside libraries. Components looked right, but their values came from eleven libraries.',
+                seenAt: 'Seen at QBench',
+              },
+              {
+                value: '13 / 553',
+                label: '13 named · 553 variables',
+                caption: 'variables had a code name. The rest showed developers a raw value and nothing to match it to in CSS.',
+                seenAt: 'Foundation, V1',
+              },
+              {
+                value: '2 files',
+                label: 'Foundation ⇢ Components',
+                caption: 'held one design system: Foundation for tokens, Components for parts. A change in one did not reach the other on its own.',
+                seenAt: 'V1',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        kicker: '03 · One file',
+        heading: 'One library, and every variable carries the name developers use in code.',
+        lede: 'V2 brings tokens and components into a single file. Each variable has a web code name, so the value a designer picks in Figma is the same CSS variable a developer or an agent writes.',
+        blocks: [
+          {
+            kind: 'rows',
+            title: 'Variable collections · V2',
+            rows: [
+              { label: 'Primitives', value: '256' },
+              { label: 'Semantic Tokens', value: '178' },
+              { label: 'Dimensions', value: '84' },
+              { label: 'Typography', value: '28' },
+              { label: 'Elevation', value: '6' },
+              { label: 'Component Tokens', value: '2' },
+            ],
+          },
+          {
+            kind: 'map',
+            title: 'Figma variable → web code name',
+            rows: [
+              { from: 'text/default', to: 'var(--text-default)' },
+              { from: 'surface/default', to: 'var(--surface-default)' },
+              { from: 'primitives/primary/600', to: 'var(--primary-600)' },
+              { from: 'spacing/4', to: 'var(--spacing-4)' },
+              { from: 'radius/md', to: 'var(--radius-md)' },
+            ],
+          },
+        ],
+        proof: [
+          {
+            value: '554 / 554',
+            caption: 'variables with a web code name, up from 13 of 553 in V1.',
+            seenAt: 'Seen at QBench',
+          },
+        ],
+      },
+      {
+        kicker: '04 · Token system',
+        heading: 'One ramp, aliased down to the button.',
+        lede: 'Components never point at a hex. A button reads its component token, the token aliases a primitive, so one change to the ramp reaches every screen that uses it.',
+        blocks: [
+          {
+            kind: 'ramp',
+            title: 'primitives / primary · 11 steps',
+            swatches: [
+              { step: '50', hex: 'F1F6FD' },
+              { step: '100', hex: 'E4EFFC' },
+              { step: '200', hex: 'D2E6FB' },
+              { step: '300', hex: 'ACD1F4' },
+              { step: '400', hex: '8FBEF0' },
+              { step: '500', hex: '5B8ED7' },
+              { step: '600', hex: '4074C7' },
+              { step: '700', hex: '275FBE' },
+              { step: '800', hex: '244D9E', feeds: true },
+              { step: '900', hex: '23437B', feeds: true },
+              { step: '950', hex: '182749' },
+            ],
+            note: '800 and 900 feed the primary button.',
+          },
+          {
+            kind: 'chain',
+            title: 'Alias chain · primary button',
+            root: 'primary button',
+            links: [
+              { from: 'primitives/primary/800', token: 'button/surface/solid/primary/default', state: 'Default · 800' },
+              { from: 'primitives/primary/900', token: 'button/surface/solid/primary/hover', state: 'Hover · 900' },
+            ],
+          },
+        ],
+        proof: [
+          {
+            value: '256 → 178 → 2',
+            caption: 'primitives, semantic tokens and component tokens in the V2 library.',
+            seenAt: 'Three layers',
+          },
+        ],
+      },
+      {
+        kicker: '05 · Docs agents can read',
+        heading: 'Each component says when to use it, and what to use instead.',
+        lede: 'Designers read it in the panel. Agents read the same text through the API.',
+        blocks: [
+          {
+            kind: 'rows',
+            title: 'Component descriptions · V2',
+            rows: [
+              { label: 'Start with a one-line purpose', value: '126' },
+              { label: 'Include Use for', value: '62' },
+              { label: 'Include Not for', value: '68' },
+            ],
+          },
+          {
+            kind: 'docs',
+            title: 'What the panel and the API both return',
+            items: [
+              {
+                name: 'Switch',
+                purpose: 'Toggles a setting with label and description.',
+                useFor: 'immediate settings.',
+                notFor: 'single-choice lists. Use',
+                instead: 'RadioButton',
+              },
+              {
+                name: 'Input',
+                purpose: 'Single-line field for entering short text or values.',
+                useFor: 'text and numbers.',
+                notFor: 'selecting options. Use',
+                instead: 'Select',
+              },
+              {
+                name: 'ToggleButton',
+                purpose: 'Icon-only button that switches an option on or off and stays selected while on.',
+                useFor: 'toggling a view or setting in place.',
+                notFor: 'one-off actions like save, delete or open. Use',
+                instead: 'Button',
+              },
+            ],
+          },
+        ],
+        proof: [
+          {
+            value: '126 / 126',
+            caption: 'component sets with a description, up from 119 of 124 in V1.',
+            seenAt: 'Seen at QBench',
+          },
+        ],
+      },
+      {
+        kicker: '06 · Screen Generator',
+        heading: 'A developer hands over a PRD, and an agent builds the screen from the library.',
+        lede: 'One skill builds the screen in Figma with published components. A second checks every layer against the library. Designers then refine the result.',
+        blocks: [
+          {
+            kind: 'flow',
+            title: 'From PRD to screen',
+            steps: [
+              { n: '01', name: 'PRD', text: 'Issue list: filters, table, pagination.' },
+              { n: '02', name: 'generate-screen', text: 'Reads design-conventions.md and library.json, then builds in Figma.' },
+              { n: '03', name: 'check-screen', text: 'Walks every layer against the library and the allowed list.' },
+              { n: '04', name: 'Designer', text: 'Refines the screen and hands it to development.' },
+            ],
+          },
+          {
+            kind: 'checks',
+            title: 'Test run · check-screen',
+            subject: 'Issue list · 239 layers',
+            status: 'Pass · 0 issues',
+            items: [
+              { value: '0', label: 'Tokens from outside the library' },
+              { value: '0', label: 'Raw colour or spacing values' },
+              { value: '0', label: 'Components outside the allowed list' },
+            ],
+          },
+        ],
+        proof: [
+          {
+            value: '243',
+            caption: 'components the agent is allowed to use, all from the published library.',
+            seenAt: 'Seen at QBench',
+          },
+        ],
+      },
+      {
+        kicker: '07 · Audited, not assumed',
+        heading: 'Scripts read the files and report what is really bound to a token.',
+        lede: 'Instead of trusting how a component looks, we scan every layer.',
+        blocks: [
+          {
+            kind: 'stats',
+            items: [
+              {
+                value: '1,071 → 0',
+                label: 'Library scan · V2',
+                caption: 'references to outside libraries, across 141 components, repointed to the system.',
+                seenAt: 'Seen at QBench',
+              },
+              {
+                value: '121 / 121',
+                label: 'Library scan · V2',
+                caption: 'V1 components matched to their V2 version.',
+              },
+            ],
+          },
+          {
+            kind: 'meters',
+            title: 'Token coverage · V2 · values bound to a token',
+            items: [
+              { label: 'Fill', value: '97%' },
+              { label: 'Stroke', value: '99.7%' },
+              { label: 'Text', value: '99.8%' },
+              { label: 'Corner radius', value: '100%' },
+              { label: 'Gap', value: '99.8%' },
+              { label: 'Padding', value: '100%' },
+              { label: 'Effects', value: '99%' },
+            ],
+          },
+        ],
+        proof: [
+          {
+            value: '99.5%',
+            caption: 'Across 1,610 components. V1 measured 99.1% with the same script.',
+          },
+        ],
+      },
+      {
+        kicker: '08 · State rules',
+        heading: 'Every state comes from a shared style or a token, not a one-off colour.',
+        lede: 'One ring for focus, one border token for fields, one opacity for disabled.',
+        blocks: [
+          {
+            kind: 'states',
+            title: 'Shared across the library',
+            rows: [
+              { state: 'Focus · button', token: 'ring/ring-selected', example: 'Create CAPA' },
+              { state: 'Focus · text field', token: 'border/primary/default', example: 'Batch ID' },
+              { state: 'Error · text field', token: 'border/critical/default', example: 'Batch ID' },
+              { state: 'Disabled', token: 'opacity/disabled · 50%', example: 'Create CAPA' },
+            ],
+          },
+        ],
+        proof: [
+          { value: '28', caption: 'components focus with the same ring style.', seenAt: 'Seen at QBench' },
+          { value: '716', caption: 'layers fade with one opacity token when disabled.' },
+        ],
+      },
+      {
+        kicker: '09 · Results',
+        heading: 'One system that designers, developers and agents read the same way.',
+        lede: 'Numbers come from the live Figma files, our migration log and the Screen Generator test run.',
+        blocks: [
+          {
+            kind: 'compare',
+            rows: [
+              { label: 'Code names', before: '13 / 553', after: '554 / 554', note: 'variables a developer can use in CSS' },
+              { label: 'Library files', before: '2', after: '1', note: 'tokens and components in one place' },
+              { label: 'Component docs', before: '119 / 124', after: '126 / 126', note: 'component sets with a description' },
+              { label: 'Token coverage', before: '99.1%', after: '99.5%', note: 'values bound to a token' },
+              { label: 'Outside-library references', before: '1,071', after: '0', note: 'across 141 components' },
+              { label: 'Agent-built screen', before: '—', after: '0', note: 'off-library values in 239 layers' },
+            ],
+          },
+        ],
+      },
     ],
     did: [
       'Audited and consolidated the legacy system: colours, tokens and components that had drifted apart.',
