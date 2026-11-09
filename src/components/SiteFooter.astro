@@ -1,0 +1,108 @@
+---
+/**
+ * The site footer on every page: studio line, navigation, every case study,
+ * contact, and the copyright line. Sits below the closing band.
+ */
+import { links } from '../data/links';
+import { caseStudies, caseHref } from '../data/case-studies';
+
+const year = new Date().getFullYear();
+const cols = [
+  {
+    head: 'Services',
+    items: [
+      { href: '/#services', label: 'Design systems' },
+      { href: '/#services', label: 'Product design' },
+      { href: '/#audit', label: 'Free audit' },
+    ],
+  },
+  {
+    head: 'Work',
+    items: caseStudies.map((c) => ({ href: caseHref(c.slug), label: c.linkName })),
+  },
+  {
+    head: 'Studio',
+    items: [
+      { href: '/#how', label: 'How we work' },
+      { href: '/#faq', label: 'FAQ' },
+      { href: links.bookCall, label: 'Book a call' },
+    ],
+  },
+  {
+    head: 'Contact',
+    items: [
+      { href: links.email, label: 'Email' },
+      { href: links.linkedin, label: 'LinkedIn' },
+      { href: links.github, label: 'GitHub' },
+    ],
+  },
+];
+---
+
+<footer class="site-foot border-t border-line">
+  <div class="container-page site-foot-grid">
+    <div class="flex max-w-[34ch] flex-col gap-3">
+      <a
+        href={links.home}
+        class="text-[22px] leading-none font-semibold tracking-[-0.04em] text-ink no-underline"
+        >nicey<span class="text-accent">.</span></a
+      >
+      <p class="m-0 text-body-sm text-pretty text-ink-2">
+        A design systems studio. Design systems people and agents read the same way.
+      </p>
+    </div>
+    <nav aria-label="Footer" class="site-foot-cols">
+      {
+        cols.map((c) => (
+          <div class="flex flex-col gap-3">
+            <h2 class="caption-sm m-0 text-ink-2">{c.head}</h2>
+            <ul class="m-0 flex list-none flex-col gap-2 p-0">
+              {c.items.map((it) => (
+                <li>
+                  <a href={it.href} class="text-body-sm text-ink no-underline hover:underline">
+                    {it.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </nav>
+  </div>
+  <div class="container-page site-foot-base">
+    <p class="caption-sm m-0 text-ink-2">© {year} Nicey Studio</p>
+    <a href="#main" class="caption-sm text-ink-2 no-underline hover:underline">Back to top ↑</a>
+  </div>
+</footer>
+
+<style>
+  .site-foot {
+    padding-block: 64px 32px;
+  }
+  .site-foot-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 40px 64px;
+  }
+  .site-foot-cols {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(120px, auto));
+    gap: 32px 48px;
+  }
+  @media (max-width: 767px) {
+    .site-foot-cols {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .site-foot-base {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 48px;
+    padding-top: 20px;
+    border-top: 1px solid var(--color-line);
+  }
+</style>
