@@ -1,0 +1,475 @@
+---
+/**
+ * Three "From the work" treatments for the QBench case study, for review (?review&w=1|2|3).
+ * 1: token table. Semantic token → primitive → web code name, rows reveal in order.
+ * 2: component states. Input on the case-study band, an "agent" cursor visits each state.
+ * 3: before / after. Drifted buttons behind, the one library button in front, drag to compare.
+ * Token names and aliases are from the QBench V2 variables panel.
+ */
+const tokens = [
+  { token: 'surface/default', alias: 'Primitives/White', swatch: '#ffffff', code: 'var(--surface-default)' },
+  { token: 'surface/hover', alias: 'Primitives/Slate/50', swatch: '#f8fafc', code: 'var(--surface-hover)' },
+  { token: 'surface/primary', alias: 'Primitives/Primary/950', swatch: '#14294f', code: 'var(--surface-primary)' },
+  { token: 'surface/select', alias: 'Primitives/Primary/100', swatch: '#dbe7fb', code: 'var(--surface-select)' },
+  { token: 'surface/highlight', alias: 'Primitives/Yellow/300', swatch: '#fde047', code: 'var(--surface-highlight)' },
+  { token: 'surface/selected/hover', alias: 'Primitives/Primary/200', swatch: '#c3d5f7', code: 'var(--surface-selected-hover)' },
+];
+const states = [
+  { n: '01', name: 'Default', cls: '' },
+  { n: '02', name: 'Hover', cls: 'is-hover' },
+  { n: '03', name: 'Focus', cls: 'is-focus' },
+  { n: '04', name: 'Disabled', cls: 'is-disabled' },
+  { n: '05', name: 'Error', cls: 'is-error' },
+];
+const drifted = [
+  { label: 'Save', style: 'background:#244d9e;border-radius:4px;padding:10px 18px;font-size:15px' },
+  { label: 'SAVE', style: 'background:#3a63b8;border-radius:22px;padding:12px 26px;font-size:13px;letter-spacing:.08em' },
+  { label: 'Save changes', style: 'background:#1f4796;border-radius:2px;padding:8px 14px;font-size:14px;box-shadow:0 3px 0 #13306a' },
+  { label: 'Submit', style: 'background:transparent;color:#244d9e;border:2px solid #244d9e;border-radius:8px;padding:9px 20px;font-size:16px' },
+  { label: 'Save', style: 'background:linear-gradient(#3b66bd,#1f4796);border-radius:6px;padding:13px 30px;font-size:17px' },
+  { label: 'OK', style: 'background:#5b7fc7;border-radius:0;padding:9px 24px;font-size:14px;font-weight:500' },
+];
+---
+
+<div class="qw" data-qw>
+  <!-- 1 · token table -->
+  <figure class="qw-v m-0" data-variant="1" hidden>
+    <div class="qw-panel">
+      <div class="qw-t-head qw-mono">
+        <span>Semantic token</span><span>Points at</span><span>Web code name</span>
+      </div>
+      <ol class="qw-t">
+        {
+          tokens.map((t, i) => (
+            <li style={`--i:${i}`}>
+              <span class="qw-t-token">
+                <i style={`background:${t.swatch}`} aria-hidden="true" />
+                {t.token}
+              </span>
+              <span class="qw-t-alias">{t.alias}</span>
+              <span class="qw-t-code">{t.code}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+    <figcaption class="qw-cap">
+      <span class="caption-sm text-muted">Fig 0.1</span> Every semantic token points at one primitive and carries the
+      name developers type.
+    </figcaption>
+  </figure>
+
+  <!-- 2 · component states -->
+  <figure class="qw-v m-0" data-variant="2" hidden>
+    <div class="qw-stage bg-lavender">
+      <div class="qw-states">
+        {
+          states.map((s) => (
+            <div class:list={['qw-state', s.cls]} data-state>
+              <span class="qw-mono qw-state-n">
+                {s.n} · {s.name}
+              </span>
+              <span class="qw-field">
+                <span class="qw-label">Sample ID *</span>
+                <span class="qw-input">{s.cls === 'is-disabled' ? 'Not editable' : 'S-2026-0142'}</span>
+                <span class="qw-help">{s.cls === 'is-error' ? 'Enter a valid sample ID' : 'Shown on the label'}</span>
+              </span>
+            </div>
+          ))
+        }
+      </div>
+      <span class="qw-cursor" aria-hidden="true" data-cursor>
+        <svg width="16" height="18" viewBox="0 0 16 18"><path d="M1 1l13 7-6 1.5L5 16z" fill="#26251f" /></svg>
+        <span>agent</span>
+      </span>
+    </div>
+    <figcaption class="qw-cap">
+      <span class="caption-sm text-muted">Fig 0.2</span> Input in every state, each one drawn and named, so an agent
+      never has to guess.
+    </figcaption>
+  </figure>
+
+  <!-- 3 · before / after -->
+  <figure class="qw-v m-0" data-variant="3" hidden>
+    <div class="qw-compare" data-compare style="--split:50%">
+      <div class="qw-side qw-before">
+        <span class="qw-mono qw-side-label">Before · one action, six styles</span>
+        <div class="qw-btns">
+          {
+            drifted.map((d) => (
+              <span class="qw-btn" style={d.style}>
+                {d.label}
+              </span>
+            ))
+          }
+        </div>
+      </div>
+      <div class="qw-side qw-after" aria-hidden="true">
+        <span class="qw-mono qw-side-label">After · one Button, from the library</span>
+        <div class="qw-btns">
+          {drifted.map(() => <span class="qw-btn qw-btn--lib">Save</span>)}
+        </div>
+      </div>
+      <input
+        class="qw-range"
+        type="range"
+        min="0"
+        max="100"
+        value="50"
+        aria-label="Compare before and after"
+        data-range
+      />
+      <span class="qw-handle" aria-hidden="true"></span>
+    </div>
+    <figcaption class="qw-cap">
+      <span class="caption-sm text-muted">Fig 0.3</span> Illustration: the same action drawn six ways before, one
+      library Button after. Drag to compare.
+    </figcaption>
+  </figure>
+</div>
+
+<style>
+  .qw-v[hidden] {
+    display: none;
+  }
+  .qw-mono {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption-sm);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-ink-2);
+  }
+  .qw-cap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    margin-top: 12px;
+    font-size: var(--text-body-sm);
+    color: var(--color-ink-2);
+  }
+
+  /* 1 */
+  .qw-panel {
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-panel);
+    background: var(--color-surface);
+    overflow: hidden;
+  }
+  .qw-t-head,
+  .qw-t li {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1.2fr);
+    gap: 16px;
+    align-items: center;
+    padding: 14px 24px;
+  }
+  .qw-t-head {
+    border-bottom: 1px solid var(--color-line);
+  }
+  .qw-t {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+  }
+  .qw-t li + li {
+    border-top: 1px solid var(--color-line);
+  }
+  .qw-t-token {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .qw-t-token i {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+    flex: none;
+  }
+  .qw-t-alias {
+    color: var(--color-ink-2);
+  }
+  .qw-t-code {
+    color: var(--color-accent);
+    overflow-wrap: anywhere;
+  }
+  @media (max-width: 700px) {
+    .qw-t-head {
+      display: none;
+    }
+    .qw-t li {
+      grid-template-columns: 1fr;
+      gap: 4px;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .qw-v.is-play .qw-t li {
+      animation: qw-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-delay: calc(var(--i) * 140ms);
+    }
+  }
+  @keyframes qw-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  }
+
+  /* 2 */
+  .qw-stage {
+    position: relative;
+    padding: 40px;
+    border-radius: var(--radius-panel);
+    overflow: hidden;
+  }
+  .qw-states {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 14px;
+  }
+  .qw-state {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .qw-state-n {
+    color: #4d4a40;
+  }
+  .qw-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 16px;
+    border-radius: 10px;
+    background: #fff;
+    color: #1f2a3d;
+    font-family: Inter, var(--font-sans, system-ui), sans-serif;
+    font-size: 12px;
+  }
+  .qw-label {
+    font-weight: 600;
+  }
+  .qw-input {
+    padding: 8px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+  }
+  .qw-help {
+    color: #64748b;
+  }
+  .is-hover .qw-input {
+    border-color: #94a3b8;
+    background: #f8fafc;
+  }
+  .is-focus .qw-input {
+    border-color: #244d9e;
+    box-shadow: 0 0 0 3px rgba(36, 77, 158, 0.18);
+  }
+  .is-disabled .qw-field {
+    opacity: 0.5;
+  }
+  .is-error .qw-input {
+    border-color: #c0392b;
+  }
+  .is-error .qw-help {
+    color: #c0392b;
+  }
+  .qw-cursor {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 2px;
+    pointer-events: none;
+    transform: translate(var(--cx, 40px), var(--cy, 40px));
+  }
+  .qw-cursor span {
+    margin-top: 12px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #26251f;
+    color: #f3f0e9;
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .qw-cursor {
+      transition: transform 700ms cubic-bezier(0.76, 0, 0.24, 1);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .qw-cursor {
+      display: none;
+    }
+  }
+
+  /* 3 */
+  .qw-compare {
+    position: relative;
+    height: 380px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-panel);
+    overflow: hidden;
+    user-select: none;
+  }
+  .qw-side {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    padding: 28px 40px;
+  }
+  .qw-before {
+    background: var(--color-stone);
+  }
+  .qw-after {
+    background: var(--color-surface);
+    clip-path: inset(0 0 0 var(--split));
+  }
+  .qw-after .qw-side-label {
+    align-self: flex-end;
+  }
+  .qw-btns {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    justify-items: center;
+    align-content: center;
+    gap: 36px 56px;
+  }
+  .qw-btn {
+    justify-self: center;
+    color: #fff;
+    font-family: Inter, var(--font-sans, system-ui), sans-serif;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  .qw-btn--lib {
+    padding: 11px 22px;
+    border-radius: 6px;
+    background: #244d9e;
+    font-size: 15px;
+  }
+  .qw-range {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: ew-resize;
+  }
+  .qw-handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--split);
+    width: 1px;
+    background: var(--color-ink);
+    pointer-events: none;
+  }
+  .qw-handle::after {
+    content: '‹ ›';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    translate: -50% -50%;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: var(--color-ink);
+    color: var(--color-on-ink);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .qw-compare:has(.qw-range:focus-visible) {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+</style>
+
+<script>
+  function mount(root: HTMLElement) {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let tour = 0;
+    let wipe = 0;
+
+    function playStates(v: HTMLElement) {
+      const stage = v.querySelector<HTMLElement>('.qw-stage')!;
+      const cursor = v.querySelector<HTMLElement>('[data-cursor]')!;
+      const items = Array.from(v.querySelectorAll<HTMLElement>('[data-state]'));
+      let k = 0;
+      const go = () => {
+        const s = stage.getBoundingClientRect();
+        const r = items[k].querySelector('.qw-input')!.getBoundingClientRect();
+        cursor.style.setProperty('--cx', `${r.left - s.left + r.width * 0.7}px`);
+        cursor.style.setProperty('--cy', `${r.top - s.top + r.height * 0.4}px`);
+        k = (k + 1) % items.length;
+      };
+      go();
+      window.clearInterval(tour);
+      if (!reduced.matches) tour = window.setInterval(go, 1400);
+    }
+
+    function playCompare(v: HTMLElement) {
+      const box = v.querySelector<HTMLElement>('[data-compare]')!;
+      const range = v.querySelector<HTMLInputElement>('[data-range]')!;
+      const set = (n: number) => {
+        box.style.setProperty('--split', `${n}%`);
+        range.value = String(n);
+      };
+      range.oninput = () => {
+        cancelAnimationFrame(wipe);
+        set(Number(range.value));
+      };
+      if (reduced.matches) return set(50);
+      // one slow wipe from before to after and back to the middle
+      const t0 = performance.now();
+      const step = (now: number) => {
+        const t = Math.min(1, (now - t0) / 2600);
+        const ease = (x: number) => (x < 0.5 ? 2 * x * x : 1 - (-2 * x + 2) ** 2 / 2);
+        // 90% (mostly before) → 10% (mostly after) → rest in the middle
+        const n = t < 0.65 ? 90 - 80 * ease(t / 0.65) : 10 + 40 * ease((t - 0.65) / 0.35);
+        set(Math.round(n));
+        if (t < 1) wipe = requestAnimationFrame(step);
+      };
+      wipe = requestAnimationFrame(step);
+    }
+
+    function show(id: string) {
+      window.clearInterval(tour);
+      cancelAnimationFrame(wipe);
+      root.querySelectorAll<HTMLElement>('[data-variant]').forEach((v) => {
+        v.hidden = v.dataset.variant !== id;
+        if (v.hidden) return;
+        v.classList.remove('is-play');
+        void v.offsetWidth;
+        v.classList.add('is-play');
+        if (id === '2') playStates(v);
+        if (id === '3') playCompare(v);
+      });
+    }
+
+    let current = new URLSearchParams(location.search).get('w') ?? '2';
+    // play when the section comes into view, so the motion is seen
+    new IntersectionObserver(
+      (es) => {
+        if (es[0].isIntersecting) show(current);
+      },
+      { threshold: 0.4 },
+    ).observe(root);
+    show(current);
+    window.addEventListener('qbench-review', (e) => {
+      const d = (e as CustomEvent).detail;
+      if (d.w) {
+        current = d.w;
+        show(current);
+      }
+    });
+  }
+  document.querySelectorAll<HTMLElement>('[data-qw]').forEach(mount);
+</script>

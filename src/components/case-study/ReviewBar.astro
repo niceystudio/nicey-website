@@ -1,0 +1,81 @@
+---
+/** Review-only switcher. Appears only when the URL has ?review. */
+---
+
+<div class="rb" data-review-bar hidden>
+  <span class="rb-k">Hero</span>
+  <button type="button" data-k="h" data-v="a">A</button>
+  <button type="button" data-k="h" data-v="b">B</button>
+  <button type="button" data-k="h" data-v="c">C</button>
+  <span class="rb-k">Work</span>
+  <button type="button" data-k="w" data-v="1">1</button>
+  <button type="button" data-k="w" data-v="2">2</button>
+  <button type="button" data-k="w" data-v="3">3</button>
+</div>
+
+<style>
+  .rb {
+    position: fixed;
+    left: 50%;
+    bottom: 16px;
+    z-index: 50;
+    translate: -50% 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px;
+    border-radius: 999px;
+    background: #26251f;
+    color: #f3f0e9;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  }
+  .rb[hidden] {
+    display: none;
+  }
+  .rb-k {
+    padding: 0 8px 0 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #b6b1a3;
+  }
+  .rb button {
+    min-width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .rb button[aria-pressed='true'] {
+    background: #f3f0e9;
+    color: #26251f;
+  }
+</style>
+
+<script>
+  const bar = document.querySelector<HTMLElement>('[data-review-bar]');
+  const params = new URLSearchParams(location.search);
+  if (bar && params.has('review')) {
+    bar.hidden = false;
+    const state: Record<string, string> = { h: params.get('h') ?? 'b', w: params.get('w') ?? '2' };
+    const sync = () =>
+      bar.querySelectorAll<HTMLButtonElement>('button').forEach((b) =>
+        b.setAttribute('aria-pressed', String(state[b.dataset.k!] === b.dataset.v)),
+      );
+    sync();
+    bar.querySelectorAll<HTMLButtonElement>('button').forEach((b) =>
+      b.addEventListener('click', () => {
+        state[b.dataset.k!] = b.dataset.v!;
+        sync();
+        const p = new URLSearchParams(location.search);
+        p.set(b.dataset.k!, b.dataset.v!);
+        history.replaceState(null, '', `?${p.toString()}`);
+        window.dispatchEvent(new CustomEvent('qbench-review', { detail: { [b.dataset.k!]: b.dataset.v } }));
+      }),
+    );
+  }
+</script>

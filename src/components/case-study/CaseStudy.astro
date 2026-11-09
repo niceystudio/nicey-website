@@ -10,6 +10,9 @@ import Header from '../Header.astro';
 import Gaps from './Gaps.astro';
 import Shot from './Shot.astro';
 import NamesField from './NamesField.astro';
+import QBenchHero from './QBenchHero.astro';
+import QBenchWork from './QBenchWork.astro';
+import ReviewBar from './ReviewBar.astro';
 import Chapters from './Chapters.astro';
 import SiteFooter from '../SiteFooter.astro';
 import { links } from '../../data/links';
@@ -39,10 +42,19 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
   <main id="main" tabindex="-1" class="cs">
     <section aria-labelledby="cs-title" class={band}>
       <div class="container-page cs-hero">
-        <span class="caption text-ink-2">{s.kicker}</span>
-        <p class="m-0 text-case-name">{s.name}</p>
-        <h1 id="cs-title" class="m-0 max-w-[24ch] text-case-h1">{s.statement}</h1>
-        <p class="m-0 max-w-[62ch] text-body-lg text-pretty text-ink-2"><Gaps text={s.lede} /></p>
+        <div class:list={['cs-hero-top', s.heroVisual && 'cs-hero-top--visual']}>
+          <div class="cs-hero-copy">
+            <span class="caption text-ink-2">{s.kicker}</span>
+            <p class="m-0 text-case-name">{s.name}</p>
+            <h1 id="cs-title" class="m-0 max-w-[24ch] text-case-h1">{s.statement}</h1>
+            <p class="m-0 max-w-[62ch] text-body-lg text-pretty text-ink-2"><Gaps text={s.lede} /></p>
+          </div>
+          {s.heroVisual === 'qbench-build' && (
+            <div class="cs-hero-visual">
+              <QBenchHero />
+            </div>
+          )}
+        </div>
         <dl class="cs-facts">
           {
             s.facts.map((f) => (
@@ -182,23 +194,27 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
 
     <section aria-labelledby="work-head" class="container-page cs-block flex flex-col gap-5">
       <h2 id="work-head" class="m-0 text-case-h2">From the work</h2>
+      {s.workVisual === 'qbench' ? (
+        <QBenchWork />
+      ) : (
       <div class:list={['cs-figs', s.work.length === 2 && 'cs-figs--two']}>
-        {
-          s.work.map((w, i) => (
-            <figure class="m-0 flex flex-col gap-3">
-              {w.src ? (
-                <Shot shot={w.src} alt={w.alt ?? ''} />
-              ) : (
-                <div class="placeholder cs-shot">{w.placeholder}</div>
-              )}
-              <figcaption class="flex flex-col gap-1 text-body-sm text-ink-2">
-                <span class="caption-sm text-muted">Fig 0.{i + 1}</span>
-                {w.caption}
-              </figcaption>
-            </figure>
-          ))
-        }
-      </div>
+          {
+            s.work.map((w, i) => (
+              <figure class="m-0 flex flex-col gap-3">
+                {w.src ? (
+                  <Shot shot={w.src} alt={w.alt ?? ''} />
+                ) : (
+                  <div class="placeholder cs-shot">{w.placeholder}</div>
+                )}
+                <figcaption class="flex flex-col gap-1 text-body-sm text-ink-2">
+                  <span class="caption-sm text-muted">Fig 0.{i + 1}</span>
+                  {w.caption}
+                </figcaption>
+              </figure>
+            ))
+          }
+        </div>
+      )}
     </section>
   </main>
 
@@ -216,6 +232,7 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
     </a>
   </section>
   <SiteFooter />
+  {s.heroVisual && <ReviewBar />}
 </Base>
 
 <style>
@@ -247,6 +264,25 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
     flex-direction: column;
     gap: 24px;
     padding-block: var(--cs-lg) 56px;
+  }
+  .cs-hero-top {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+  .cs-hero-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    min-width: 0;
+  }
+  @media (min-width: 1100px) {
+    .cs-hero-top--visual {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: center;
+      gap: 56px;
+    }
   }
   .cs-facts {
     margin: 8px 0 0;
