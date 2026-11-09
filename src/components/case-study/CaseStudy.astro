@@ -12,7 +12,6 @@ import Shot from './Shot.astro';
 import NamesField from './NamesField.astro';
 import QBenchHero from './QBenchHero.astro';
 import QBenchWork from './QBenchWork.astro';
-import ReviewBar from './ReviewBar.astro';
 import Chapters from './Chapters.astro';
 import SiteFooter from '../SiteFooter.astro';
 import { links } from '../../data/links';
@@ -232,7 +231,6 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
     </a>
   </section>
   <SiteFooter />
-  {s.heroVisual && <ReviewBar />}
 </Base>
 
 <style>
