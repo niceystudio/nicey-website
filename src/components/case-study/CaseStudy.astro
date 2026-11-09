@@ -59,7 +59,7 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
     </section>
 
     {
-      s.lead.kind === 'image' ? (
+      !s.lead ? null : s.lead.kind === 'image' ? (
         <section aria-label="Project image" class="container-page cs-lead">
           {s.lead.src ? (
             <Shot shot={s.lead.src} alt={s.lead.alt ?? ''} wide eager />
@@ -87,11 +87,24 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
     <section aria-labelledby="numbers-head" class="container-page cs-block cs-block--md">
       <h2 id="numbers-head" class="caption m-0 mb-5 text-ink-2">{s.numbersHeading}</h2>
       <div class="panel-wrap">
-        <ul class:list={['panel', s.numbers.length === 4 ? 'grid-4' : 'grid-3']}>
+        <ul class:list={['panel', s.numbers.length === 4 ? (s.numbers[0].before ? 'grid-2' : 'grid-4') : 'grid-3']}>
           {
             s.numbers.map((n) => (
               <li class="cs-num">
-                <span class="cs-num-fig">{n.value}</span>
+                {n.before ? (
+                  <span class="cs-ba">
+                    <span class="cs-ba-before">
+                      <span class="caption-sm text-muted">Before</span>
+                      <s class="cs-num-fig cs-num-fig--before">{n.before}</s>
+                    </span>
+                    <span class="cs-ba-after">
+                      <span class="caption-sm text-ink-2">After</span>
+                      <span class="cs-num-fig">{n.value}</span>
+                    </span>
+                  </span>
+                ) : (
+                  <span class="cs-num-fig">{n.value}</span>
+                )}
                 <span class="text-body-sm text-ink-2">{n.label}</span>
                 <span class="cs-num-meaning">{n.meaning}</span>
               </li>
@@ -100,21 +113,6 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
         </ul>
       </div>
     </section>
-
-    {
-      s.steps && (
-        <section aria-labelledby="steps-head" class="container-page cs-block cs-block--md cs-steps">
-          <h2 id="steps-head" class="caption m-0 text-ink-2">
-            Zero Drift steps in this project
-          </h2>
-          <ul class="m-0 flex list-none flex-wrap gap-2 p-0">
-            {s.steps.map((st) => (
-              <li class:list={['cs-step', st.inProgress && 'cs-step--open']}>{st.label}</li>
-            ))}
-          </ul>
-        </section>
-      )
-    }
 
     {
       s.note && (
@@ -195,7 +193,7 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
 
     <section aria-labelledby="work-head" class="container-page cs-block flex flex-col gap-5">
       <h2 id="work-head" class="m-0 text-case-h2">From the work</h2>
-      <div class="cs-figs">
+      <div class:list={['cs-figs', s.work.length === 2 && 'cs-figs--two']}>
         {
           s.work.map((w, i) => (
             <figure class="m-0 flex flex-col gap-3">
@@ -327,6 +325,24 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }
+  .cs-ba {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 8px 28px;
+  }
+  .cs-ba-before,
+  .cs-ba-after {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .cs-num-fig--before {
+    color: var(--color-muted);
+    text-decoration-thickness: 2px;
+    text-decoration-color: var(--color-hot);
+    font-size: min(calc(var(--text-case-figure) * 0.6), 12cqi);
+  }
   .cs-num-meaning {
     padding-top: 10px;
     border-top: 1px solid var(--color-line);
@@ -423,6 +439,24 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
     line-height: 1.5;
   }
 
+  .grid-2 {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  @container panel (min-width: 720px) {
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .cs-figs.cs-figs--two {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  @media (min-width: 900px) {
+    .cs-figs.cs-figs--two {
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 2fr);
+      align-items: start;
+    }
+  }
   .cs-figs {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
