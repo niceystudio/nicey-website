@@ -1,0 +1,337 @@
+---
+/**
+ * QBench before/after, a sibling of the homepage proof field.
+ *
+ * One cell per real variable. Before: V1, 553 variables, 13 with a code name.
+ * After: a reading line moves down the field row by row and names every cell,
+ * and the 554th variable joins at the end (V2 has 554, all named).
+ * The homepage sweeps sideways and collapses cells; this one reads and lights.
+ */
+const BEFORE_TOTAL = 553;
+const AFTER_TOTAL = 554;
+const BEFORE_NAMED = 13;
+
+// 13 cells named in V1, spread through the field (fixed, so the page is static-safe)
+const namedBefore = new Set<number>();
+for (let k = 0; k < BEFORE_NAMED; k++) namedBefore.add(Math.round(((k + 0.37) * BEFORE_TOTAL) / BEFORE_NAMED) % BEFORE_TOTAL);
+const cells = Array.from({ length: AFTER_TOTAL }, (_, i) => ({
+  named: namedBefore.has(i),
+  extra: i === AFTER_TOTAL - 1,
+}));
+
+// real pairs from the QBench V2 library (same as the 03 tab)
+const pairs = [
+  'text/default → var(--text-default)',
+  'surface/default → var(--surface-default)',
+  'primitives/primary/600 → var(--primary-600)',
+  'spacing/4 → var(--spacing-4)',
+  'radius/md → var(--radius-md)',
+];
+
+const NOTE_BEFORE = 'V1 had 553 variables. Only 13 had a name a developer could type in CSS. The rest showed a raw value.';
+const NOTE_AFTER = 'In V2 every variable carries its web code name, so designers, developers and agents use the same word.';
+---
+
+<div class="nf" data-names data-pairs={JSON.stringify(pairs)}>
+  <div class="nf-copy">
+    <span class="caption flex items-center gap-2 text-ink-2">
+      <i aria-hidden="true" class="block size-[7px] rounded-full bg-accent"></i>QBench · Variables
+    </span>
+    <p class="nf-figure" aria-hidden="true">
+      <span data-count>{BEFORE_NAMED}</span><span class="nf-of"> / <span data-total>{BEFORE_TOTAL}</span></span>
+    </p>
+    <p class="sr-only" aria-live="polite" data-live>{BEFORE_NAMED} of {BEFORE_TOTAL} variables named</p>
+    <h3 class="m-0 mt-5 text-title">variables with a name developers can type in CSS</h3>
+    <p
+      class="nf-note m-0 mt-3 max-w-[40ch] text-pretty text-ink-2"
+      data-note
+      data-before={NOTE_BEFORE}
+      data-after={NOTE_AFTER}
+    >
+      {NOTE_BEFORE}
+    </p>
+    <div class="mt-auto flex flex-wrap items-center gap-x-5 gap-y-3 pt-8">
+      <div role="group" aria-label="Show state" class="nf-seg">
+        <button type="button" data-state="0" aria-pressed="true">V1 · Before</button>
+        <button type="button" data-state="1" aria-pressed="false">V2 · After</button>
+      </div>
+    </div>
+  </div>
+  <div class="nf-field-col">
+    <div class="nf-field" data-field>
+      <div
+        class="nf-grid"
+        role="img"
+        aria-label="One square per variable. Before: 13 of 553 named. After: all 554 named."
+      >
+        {cells.map((c) => <i class:list={{ 'is-named': c.named, 'is-extra': c.extra }} />)}
+      </div>
+      <span class="nf-scan" aria-hidden="true" data-scan></span>
+    </div>
+    <p class="nf-ticker" aria-hidden="true">
+      <span class="text-muted">reading</span> <span data-ticker>{pairs[0]}</span>
+    </p>
+  </div>
+</div>
+
+<style>
+  .nf {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+  }
+  .nf-copy {
+    flex: 1 1 360px;
+    min-width: 0;
+    padding: var(--spacing-cell);
+    display: flex;
+    flex-direction: column;
+    container-type: inline-size;
+  }
+  .nf-figure {
+    margin: 28px 0 0 -0.04em;
+    font-size: min(clamp(72px, 8vw, 128px), 30cqi);
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .nf-of {
+    color: var(--color-muted);
+    font-size: 0.42em;
+    letter-spacing: -0.02em;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .nf-note {
+      transition: opacity 0.2s ease;
+    }
+  }
+
+  .nf-seg {
+    display: inline-flex;
+    padding: 3px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-pill);
+  }
+  .nf-seg button {
+    position: relative;
+    min-height: 38px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--color-ink-2);
+    font-size: var(--text-label);
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .nf-seg button::before {
+    content: '';
+    position: absolute;
+    inset: -3px 0;
+  }
+  .nf-seg button[aria-pressed='true'] {
+    background: var(--color-ink);
+    color: var(--color-on-ink);
+  }
+
+  .nf-field-col {
+    flex: 999 1 480px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: var(--spacing-cell) var(--spacing-cell) 28px;
+  }
+  .nf-field {
+    position: relative;
+  }
+  .nf-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(11px, 1fr));
+    gap: 3px;
+  }
+  .nf-grid > i {
+    display: block;
+    aspect-ratio: 1;
+    border-radius: 2px;
+    background: var(--color-cell-quiet);
+  }
+  .nf-grid > i.is-named,
+  .nf-grid > i.is-on {
+    background: var(--color-accent);
+  }
+  .nf-grid > i.is-extra {
+    visibility: hidden;
+  }
+  .nf-grid > i.is-extra.is-on {
+    visibility: visible;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .nf-grid > i {
+      transition:
+        background-color 260ms cubic-bezier(0.22, 1, 0.36, 1),
+        transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .nf-grid > i.is-flash {
+      transform: scale(1.35);
+      background: var(--color-hot);
+    }
+  }
+  .nf-scan {
+    position: absolute;
+    left: -8px;
+    right: -8px;
+    top: 0;
+    height: 1px;
+    background: var(--color-hot);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .nf-scan.is-on {
+    opacity: 1;
+  }
+  .nf-ticker {
+    margin: 0;
+    min-height: 1.6em;
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+    color: var(--color-ink-2);
+    overflow-wrap: anywhere;
+  }
+  @container panel (max-width: 899.98px) {
+    .nf-field-col {
+      padding: 0 var(--spacing-gutter) 28px;
+    }
+    .nf-copy {
+      padding: 28px var(--spacing-gutter);
+    }
+  }
+</style>
+
+<script>
+  const AFTER_TOTAL = 554;
+  const BEFORE_TOTAL = 553;
+  const BEFORE_NAMED = 13;
+  const DURATION = 2600; // ms for the reading line to cross the field
+
+  function mount(root: HTMLElement) {
+    const cells = Array.from(root.querySelectorAll<HTMLElement>('.nf-grid > i'));
+    const grid = root.querySelector<HTMLElement>('.nf-grid')!;
+    const scan = root.querySelector<HTMLElement>('[data-scan]')!;
+    const count = root.querySelector<HTMLElement>('[data-count]')!;
+    const total = root.querySelector<HTMLElement>('[data-total]')!;
+    const live = root.querySelector<HTMLElement>('[data-live]')!;
+    const note = root.querySelector<HTMLElement>('[data-note]')!;
+    const ticker = root.querySelector<HTMLElement>('[data-ticker]')!;
+    const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-state]'));
+    const pairs: string[] = JSON.parse(root.dataset.pairs ?? '[]');
+    const notes = [note.dataset.before ?? '', note.dataset.after ?? ''];
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let state = 0;
+    let raf = 0;
+    let played = false;
+
+    const named = (i: number) => cells[i].classList.contains('is-named');
+
+    function paint(s: 0 | 1) {
+      cells.forEach((c) => c.classList.toggle('is-on', s === 1));
+      count.textContent = String(s ? AFTER_TOTAL : BEFORE_NAMED);
+      total.textContent = String(s ? AFTER_TOTAL : BEFORE_TOTAL);
+      live.textContent = s ? `${AFTER_TOTAL} of ${AFTER_TOTAL} variables named` : `${BEFORE_NAMED} of ${BEFORE_TOTAL} variables named`;
+      scan.classList.remove('is-on');
+      ticker.textContent = pairs[s ? pairs.length - 1 : 0] ?? '';
+    }
+
+    function setNote(s: 0 | 1) {
+      if (reduced.matches) {
+        note.textContent = notes[s];
+        return;
+      }
+      note.style.opacity = '0';
+      window.setTimeout(() => {
+        note.textContent = notes[s];
+        note.style.opacity = '1';
+      }, 200);
+    }
+
+    function play() {
+      cancelAnimationFrame(raf);
+      cells.forEach((c) => c.classList.remove('is-on', 'is-flash'));
+      const top = grid.offsetTop;
+      const h = grid.offsetHeight;
+      const rows = cells.map((c) => c.offsetTop);
+      const start = performance.now();
+      let lit = BEFORE_NAMED;
+      let next = 0;
+      let lastTick = 0;
+      scan.classList.add('is-on');
+      const step = (now: number) => {
+        const t = Math.min(1, (now - start) / DURATION);
+        const e = t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
+        const y = e * h;
+        scan.style.transform = `translateY(${top + y}px)`;
+        while (next < cells.length && rows[next] - top <= y) {
+          const c = cells[next];
+          if (!named(next)) lit++;
+          c.classList.add('is-on', 'is-flash');
+          window.setTimeout(() => c.classList.remove('is-flash'), 220);
+          next++;
+        }
+        if (now - lastTick > 420 && pairs.length) {
+          lastTick = now;
+          ticker.textContent = pairs[Math.floor(now / 420) % pairs.length];
+        }
+        count.textContent = String(Math.min(lit, AFTER_TOTAL));
+        if (t < 1) raf = requestAnimationFrame(step);
+        else paint(1);
+      };
+      raf = requestAnimationFrame(step);
+    }
+
+    function setState(s: 0 | 1) {
+      if (s === state) return;
+      state = s;
+      buttons.forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.state) === s)));
+      setNote(s);
+      if (s === 1 && !reduced.matches) play();
+      else {
+        cancelAnimationFrame(raf);
+        paint(s);
+      }
+    }
+
+    buttons.forEach((b) =>
+      b.addEventListener('click', () => {
+        played = true;
+        setState(Number(b.dataset.state) === 1 ? 1 : 0);
+      }),
+    );
+
+    if (reduced.matches) {
+      played = true;
+      state = 1;
+      buttons.forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.state) === 1)));
+      note.textContent = notes[1];
+      paint(1);
+      return;
+    }
+
+    // play once, the first time the field is half in view
+    const io = new IntersectionObserver(
+      (entries) => {
+        const e = entries[0];
+        if (!played && (e.intersectionRatio >= 0.5 || e.intersectionRect.height >= window.innerHeight * 0.5)) {
+          played = true;
+          io.disconnect();
+          window.setTimeout(() => setState(1), 700);
+        }
+      },
+      { threshold: [0, 0.5, 1] },
+    );
+    io.observe(root);
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-names]').forEach(mount);
+</script>
