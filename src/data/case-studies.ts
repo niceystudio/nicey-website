@@ -389,14 +389,10 @@ export const caseStudies: CaseStudy[] = [
       {
         placeholder: '[Screenshot: token layers]',
         caption: 'The V2 variables in Figma: semantic tokens grouped by role, each one pointing at a primitive.',
-        src: { light: '/work/qbench/variables-panel.png', width: 1148, height: 1007 },
-        alt: 'The Figma variables panel for QBench V2, with collections Semantic Tokens, Primitives, Dimensions, Typography and Elevation, and surface tokens aliased to primitives.',
       },
       {
         placeholder: '[Screenshot: library by function]',
         caption: 'Input and InputGroup in the library, with every state drawn: default, hover, focus, filled, disabled, error.',
-        src: { light: '/work/qbench/input-fields.png', width: 3042, height: 1000 },
-        alt: 'The Input and InputGroup components in six states each: default, hover, focus, filled, disabled and error.',
       },
     ],
     cta: {

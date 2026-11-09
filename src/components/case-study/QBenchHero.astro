@@ -1,158 +1,39 @@
 ---
 /**
- * Three hero visuals for the QBench case study, for review (?review&h=a|b|c).
- * A: tangle → system. Many spellings of the same style settle into named tokens.
- * B: agent trace. The Screen Generator run, then the screen it built.
- * C: human / machine. The same component as people see it and as an agent reads it.
- * Names and counts are the real ones from the QBench libraries and test run.
+ * QBench hero visual: one component, as people see it and as an agent reads it.
+ * Flips every few seconds; the Human / Machine buttons take over.
+ * Prop and token names are the real ones from the QBench V2 library.
  */
-
-// A — legacy spellings (left) and the token each became (right)
-const tangle = [
-  { from: '#244d9e', to: 'primitives/primary/800' },
-  { from: '#244D9E', to: 'surface/primary' },
-  { from: 'rgb(36,77,158)', to: 'text/default' },
-  { from: '#FFFFFF', to: 'surface/default' },
-  { from: 'white', to: 'core/white' },
-  { from: '16px', to: 'spacing/4' },
-  { from: '15px', to: 'radius/md' },
-  { from: '6px', to: 'surface/hover' },
-  { from: 'Lib 3 / Blue', to: 'surface/select' },
-  { from: 'Old/Primary', to: 'surface/elevated' },
-  { from: 'Copy of Blue', to: 'surface/highlight' },
-  { from: '#244d9e 90%', to: 'primitives/primary/900' },
-];
-const scatter = tangle.map((_, i) => {
-  // fixed pseudo-random spots so the server render and the client agree
-  const a = Math.sin(i * 12.9898) * 43758.5453;
-  const b = Math.sin(i * 78.233) * 12345.6789;
-  return {
-    x: Math.round((a - Math.floor(a)) * 62 + 2),
-    y: Math.round((b - Math.floor(b)) * 70 + 6),
-    r: Math.round(((a * 7) % 1) * 40 - 20),
-  };
-});
-
-// B — the Screen Generator test run (Issue list, 239 layers, 0 issues)
-const trace = [
-  { step: 'read', text: 'design-conventions.md' },
-  { step: 'read', text: 'library.json · 243 components' },
-  { step: 'build', text: 'Issue list · 239 layers' },
-  { step: 'check', text: 'check-screen · 0 issues' },
-];
-const issues = [
-  { id: 'CAPA-0142', title: 'Temperature excursion in cold storage', status: 'Open' },
-  { id: 'CAPA-0139', title: 'Pipette calibration overdue', status: 'In review' },
-  { id: 'CAPA-0131', title: 'Label printer misaligned', status: 'Closed' },
-  { id: 'CAPA-0127', title: 'Missing sign-off on batch record', status: 'Overdue' },
-];
 ---
 
 <div class="qh" data-qh>
-  <!-- A · tangle → system -->
-  <div class="qh-v qh-a" data-variant="a" hidden>
-    <div class="qh-card">
-      <div class="qh-bar">
-        <span class="qh-mono">Foundation · styles</span>
-        <span class="qh-chip" data-chip data-before="legacy · 11 libraries" data-after="agent-readable · 1 library"
-          >legacy · 11 libraries</span
-        >
-      </div>
-      <div class="qh-a-field">
-        {
-          tangle.map((t, i) => (
-            <span
-              class="qh-a-item"
-              style={`--x:${scatter[i].x}%;--y:${scatter[i].y}%;--r:${scatter[i].r}deg;--gx:${(i % 3) * 33.4}%;--gy:${Math.floor(i / 3) * 25}%;--i:${i}`}
-            >
-              <i class="qh-a-sw" aria-hidden="true" />
-              <span class="qh-a-from">{t.from}</span>
-              <span class="qh-a-to">{t.to}</span>
-            </span>
-          ))
-        }
+  <div class="qh-card">
+    <div class="qh-bar">
+      <span class="qh-mono">Button · tone primary</span>
+      <div role="group" aria-label="Who is reading" class="qh-seg">
+        <button type="button" data-view="0" aria-pressed="true">Human</button>
+        <button type="button" data-view="1" aria-pressed="false">Machine</button>
       </div>
     </div>
-    <p class="qh-cap">Fig 0.0 · Illustration: styles copied across eleven libraries settle into one set of named tokens.</p>
-  </div>
-
-  <!-- B · agent trace -->
-  <div class="qh-v qh-b" data-variant="b" hidden>
-    <div class="qh-card">
-      <div class="qh-bar">
-        <span class="qh-mono">generate-screen · PRD: Issue list</span>
-        <span class="qh-chip qh-chip--pass" data-pass>pass</span>
-      </div>
-      <ol class="qh-trace">
-        {
-          trace.map((t, i) => (
-            <li style={`--i:${i}`}>
-              <span class="qh-trace-step">{t.step}</span>
-              <span class="qh-trace-text">{t.text}</span>
-              <span class="qh-trace-bar" aria-hidden="true" />
-            </li>
-          ))
-        }
-      </ol>
-      <div class="qh-screen" aria-hidden="true">
-        <div class="qs-head" style="--i:0">
-          <span class="qs-title">Issues</span>
-          <span class="qs-btn">New issue</span>
-        </div>
-        <div class="qs-filters" style="--i:1">
-          <span class="qs-input">Search issues</span>
-          <span class="qs-pill">Status</span>
-          <span class="qs-pill">Owner</span>
-        </div>
-        <div class="qs-table" style="--i:2">
-          {
-            issues.map((r) => (
-              <div class="qs-row">
-                <span class="qs-id">{r.id}</span>
-                <span class="qs-name">{r.title}</span>
-                <span class:list={['qs-tag', `qs-tag--${r.status.toLowerCase().replace(' ', '-')}`]}>{r.status}</span>
-              </div>
-            ))
-          }
-        </div>
-        <div class="qs-pages" style="--i:3">
-          <span>1–4 of 38</span>
-          <span class="qs-pager">‹ ›</span>
+    <div class="qh-stage">
+      <div class="qh-human" data-face="0">
+        <div class="qs-dialog">
+          <span class="qs-title">Report new CAPA</span>
+          <span class="qs-label">Title *</span>
+          <span class="qs-input">Temperature excursion in cold storage</span>
+          <span class="qs-label">Status</span>
+          <span class="qs-tags">
+            <span class="qs-tag qs-tag--open">Open</span>
+            <span class="qs-tag qs-tag--review">In review</span>
+            <span class="qs-tag qs-tag--closed">Closed</span>
+          </span>
+          <span class="qs-actions">
+            <span class="qs-btn qs-btn--ghost">Cancel</span>
+            <span class="qs-btn qs-btn--focus">Create CAPA</span>
+          </span>
         </div>
       </div>
-    </div>
-    <p class="qh-cap">Fig 0.0 · A PRD in, a screen out, built only from the published library.</p>
-  </div>
-
-  <!-- C · human / machine -->
-  <div class="qh-v qh-c" data-variant="c" hidden>
-    <div class="qh-card">
-      <div class="qh-bar">
-        <span class="qh-mono">Button · tone primary</span>
-        <div role="group" aria-label="Who is reading" class="qh-seg">
-          <button type="button" data-view="0" aria-pressed="true">Human</button>
-          <button type="button" data-view="1" aria-pressed="false">Machine</button>
-        </div>
-      </div>
-      <div class="qh-c-stage">
-        <div class="qh-c-human" data-face="0">
-          <div class="qs-dialog">
-            <span class="qs-title">Report new CAPA</span>
-            <span class="qs-label">Title *</span>
-            <span class="qs-input qs-input--filled">Temperature excursion in cold storage</span>
-            <span class="qs-label">Status</span>
-            <span class="qs-tags">
-              <span class="qs-tag qs-tag--open">Open</span>
-              <span class="qs-tag qs-tag--in-review">In review</span>
-              <span class="qs-tag qs-tag--closed">Closed</span>
-            </span>
-            <span class="qs-actions">
-              <span class="qs-btn qs-btn--ghost">Cancel</span>
-              <span class="qs-btn qs-btn--focus">Create CAPA</span>
-            </span>
-          </div>
-        </div>
-        <pre class="qh-c-machine" data-face="1" hidden><code><span class="k">Button</span> {'{'}
+      <pre class="qh-machine" data-face="1" hidden><code><span class="k">Button</span> {'{'}
   <span class="p">variant</span>: <span class="s">"solid"</span>,
   <span class="p">tone</span>: <span class="s">"primary"</span>,
   <span class="p">size</span>: <span class="s">"md"</span>,
@@ -160,24 +41,18 @@ const issues = [
   <span class="p">fill</span>: <span class="t">component/button/surface/solid/primary/default</span>
         → <span class="t">primitives/primary/800</span>,
   <span class="p">hover</span>: <span class="t">primitives/primary/900</span>,
-  <span class="p">use</span>: <span class="s">"The one main action on a form"</span>,
-  <span class="p">notFor</span>: <span class="s">"Navigation. Use a link."</span>
+  <span class="p">focus</span>: <span class="t">ring/ring-selected</span>
 {'}'}</code></pre>
-      </div>
     </div>
-    <p class="qh-cap">Fig 0.0 · One component, as people see it and as an agent reads it.</p>
   </div>
+  <p class="qh-cap">Fig 0.0 · One component, as people see it and as an agent reads it.</p>
 </div>
 
 <style>
   .qh {
     width: 100%;
   }
-  .qh-v[hidden] {
-    display: none;
-  }
   .qh-card {
-    position: relative;
     overflow: hidden;
     border: 1px solid var(--color-line-strong);
     border-radius: var(--radius-panel);
@@ -200,258 +75,12 @@ const issues = [
     text-transform: uppercase;
     color: var(--color-ink-2);
   }
-  .qh-chip {
-    padding: 4px 10px;
-    border-radius: var(--radius-pill);
-    background: var(--color-page);
-    font-family: var(--font-mono);
-    font-size: var(--text-caption-sm);
-    color: var(--color-ink-2);
-    white-space: nowrap;
-  }
-  .qh-chip.is-done,
-  .qh-chip--pass {
-    background: var(--color-sage);
-    color: #26251f;
-  }
   .qh-cap {
     margin: 10px 0 0;
     font-family: var(--font-mono);
     font-size: var(--text-caption-sm);
     color: var(--color-ink-2);
   }
-
-  /* ---------- A ---------- */
-  .qh-a-field {
-    position: relative;
-    height: 360px;
-    margin: 18px;
-  }
-  .qh-a-item {
-    position: absolute;
-    left: var(--x);
-    top: var(--y);
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 10px;
-    border: 1px solid var(--color-line-strong);
-    border-radius: 8px;
-    background: var(--color-surface);
-    font-family: var(--font-mono);
-    font-size: 12px;
-    white-space: nowrap;
-    transform: rotate(var(--r));
-  }
-  .qh-a-sw {
-    width: 10px;
-    height: 10px;
-    border-radius: 2px;
-    background: #244d9e;
-    opacity: 0.85;
-  }
-  .qh-a-to {
-    display: none;
-  }
-  .qh-a.is-done .qh-a-item {
-    left: var(--gx);
-    top: var(--gy);
-    width: calc(33.4% - 8px);
-    transform: none;
-    border-color: var(--color-line);
-  }
-  .qh-a.is-done .qh-a-from {
-    display: none;
-  }
-  .qh-a.is-done .qh-a-to {
-    display: inline;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .qh-a.is-done .qh-a-sw {
-    background: var(--color-accent);
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .qh-a-item {
-      transition:
-        left 900ms cubic-bezier(0.76, 0, 0.24, 1),
-        top 900ms cubic-bezier(0.76, 0, 0.24, 1),
-        transform 900ms cubic-bezier(0.76, 0, 0.24, 1),
-        width 900ms cubic-bezier(0.76, 0, 0.24, 1);
-      transition-delay: calc(var(--i) * 40ms);
-    }
-  }
-
-  /* ---------- B ---------- */
-  .qh-trace {
-    margin: 0;
-    padding: 14px 18px 6px;
-    list-style: none;
-    font-family: var(--font-mono);
-    font-size: 12px;
-  }
-  .qh-trace li {
-    display: grid;
-    grid-template-columns: 52px minmax(0, 1fr) 72px;
-    align-items: center;
-    gap: 10px;
-    padding: 5px 0;
-  }
-  .qh-trace-step {
-    color: var(--color-muted);
-  }
-  .qh-trace-bar {
-    height: 6px;
-    border-radius: 3px;
-    background: var(--color-lavender);
-    transform-origin: left;
-  }
-  .qh-trace li:last-child .qh-trace-bar {
-    background: var(--color-sage);
-  }
-  .qh-screen {
-    margin: 10px 18px 18px;
-    padding: 14px;
-    border: 1px solid #d6dbe4;
-    border-radius: 10px;
-    background: #fff;
-    color: #1f2a3d;
-    font-family: Inter, var(--font-sans, system-ui), sans-serif;
-    font-size: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .qs-head,
-  .qs-filters,
-  .qs-pages {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .qs-head {
-    justify-content: space-between;
-  }
-  .qs-pages {
-    justify-content: space-between;
-    color: #64748b;
-  }
-  .qs-title {
-    font-size: 15px;
-    font-weight: 600;
-  }
-  .qs-btn {
-    padding: 6px 12px;
-    border-radius: 6px;
-    background: #244d9e;
-    color: #fff;
-    font-weight: 600;
-  }
-  .qs-btn--ghost {
-    background: #fff;
-    color: #1f2a3d;
-    border: 1px solid #d6dbe4;
-  }
-  .qs-btn--focus {
-    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #244d9e;
-  }
-  .qs-input {
-    flex: 1;
-    padding: 6px 10px;
-    border: 1px solid #d6dbe4;
-    border-radius: 6px;
-    color: #94a3b8;
-  }
-  .qs-input--filled {
-    color: #1f2a3d;
-  }
-  .qs-pill {
-    padding: 5px 10px;
-    border: 1px solid #d6dbe4;
-    border-radius: 6px;
-    color: #475569;
-  }
-  .qs-table {
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  .qs-row {
-    display: grid;
-    grid-template-columns: 76px minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 10px;
-    padding: 7px 10px;
-    border-top: 1px solid #eef2f6;
-  }
-  .qs-row:first-child {
-    border-top: 0;
-  }
-  .qs-id {
-    color: #64748b;
-    font-variant-numeric: tabular-nums;
-  }
-  .qs-name {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
-  .qs-tag {
-    padding: 2px 8px;
-    border-radius: 999px;
-    font-size: 11px;
-    white-space: nowrap;
-  }
-  .qs-tag--open {
-    background: #dbe7fb;
-    color: #1e3a8a;
-  }
-  .qs-tag--in-review {
-    background: #fbefb0;
-    color: #6b5100;
-  }
-  .qs-tag--closed {
-    background: #cdeadb;
-    color: #14532d;
-  }
-  .qs-tag--overdue {
-    background: #fbd5d5;
-    color: #8a1c1c;
-  }
-  .qs-pager {
-    letter-spacing: 0.3em;
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .qh-b.is-play .qh-trace li {
-      animation: qh-in 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
-      animation-delay: calc(var(--i) * 520ms);
-    }
-    .qh-b.is-play .qh-trace-bar {
-      animation: qh-bar 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
-      animation-delay: calc(var(--i) * 520ms + 120ms);
-    }
-    .qh-b.is-play .qh-screen > * {
-      animation: qh-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
-      animation-delay: calc(1500ms + var(--i) * 260ms);
-    }
-    .qh-b.is-play [data-pass] {
-      animation: qh-in 300ms ease-out both;
-      animation-delay: 2700ms;
-    }
-  }
-  @keyframes qh-in {
-    from {
-      opacity: 0;
-      transform: translateY(8px);
-    }
-  }
-  @keyframes qh-bar {
-    from {
-      transform: scaleX(0);
-    }
-  }
-
-  /* ---------- C ---------- */
   .qh-seg {
     display: inline-flex;
     padding: 3px;
@@ -473,17 +102,19 @@ const issues = [
     background: var(--color-ink);
     color: var(--color-on-ink);
   }
-  .qh-c-stage {
+  .qh-stage {
     display: grid;
     min-height: 330px;
     padding: 22px;
   }
-  .qh-c-stage > * {
+  .qh-stage > * {
     grid-area: 1 / 1;
   }
-  .qh-c-stage > [hidden] {
+  .qh-stage > [hidden] {
     display: none;
   }
+
+  /* the QBench screen, in the product's own light look in both themes */
   .qs-dialog {
     align-self: center;
     display: flex;
@@ -494,17 +125,42 @@ const issues = [
     border-radius: 10px;
     background: #fff;
     color: #1f2a3d;
-    font-family: Inter, var(--font-sans, system-ui), sans-serif;
     font-size: 12px;
+  }
+  .qs-title {
+    font-size: 15px;
+    font-weight: 600;
   }
   .qs-label {
     margin-top: 4px;
     font-weight: 600;
   }
+  .qs-input {
+    padding: 7px 10px;
+    border: 1px solid #d6dbe4;
+    border-radius: 6px;
+  }
   .qs-tags,
   .qs-actions {
     display: flex;
     gap: 6px;
+  }
+  .qs-tag {
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+  }
+  .qs-tag--open {
+    background: #dbe7fb;
+    color: #1e3a8a;
+  }
+  .qs-tag--review {
+    background: #fbefb0;
+    color: #6b5100;
+  }
+  .qs-tag--closed {
+    background: #cdeadb;
+    color: #14532d;
   }
   .qs-actions {
     justify-content: flex-end;
@@ -512,7 +168,25 @@ const issues = [
     padding-top: 12px;
     border-top: 1px solid #eef2f6;
   }
-  .qh-c-machine {
+  .qs-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: #244d9e;
+    color: #fff;
+    font-weight: 600;
+  }
+  .qs-btn--ghost {
+    background: #fff;
+    color: #1f2a3d;
+    border: 1px solid #d6dbe4;
+  }
+  .qs-btn--focus {
+    box-shadow:
+      0 0 0 2px #fff,
+      0 0 0 4px #244d9e;
+  }
+
+  .qh-machine {
     margin: 0;
     align-self: center;
     padding: 18px;
@@ -525,21 +199,27 @@ const issues = [
     white-space: pre-wrap;
     overflow-wrap: anywhere;
   }
-  .qh-c-machine .k {
+  .qh-machine .k {
     color: var(--color-on-band-accent);
   }
-  .qh-c-machine .p {
+  .qh-machine .p {
     color: var(--color-on-band-2);
   }
-  .qh-c-machine .s {
+  .qh-machine .s {
     color: var(--color-sage);
   }
-  .qh-c-machine .t {
+  .qh-machine .t {
     color: var(--color-peach);
   }
   @media (prefers-reduced-motion: no-preference) {
-    .qh-c-stage > .is-entering {
+    .qh-stage > .is-entering {
       animation: qh-in 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+  }
+  @keyframes qh-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
     }
   }
 </style>
@@ -547,33 +227,15 @@ const issues = [
 <script>
   function mount(root: HTMLElement) {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const timers: number[] = [];
-    const clear = () => timers.splice(0).forEach((t) => window.clearTimeout(t));
+    const faces = Array.from(root.querySelectorAll<HTMLElement>('[data-face]'));
+    const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-view]'));
+    let auto = 0;
+    let n = 0;
 
-    function playA(v: HTMLElement) {
-      const chip = v.querySelector<HTMLElement>('[data-chip]')!;
-      v.classList.remove('is-done');
-      chip.classList.remove('is-done');
-      chip.textContent = chip.dataset.before ?? '';
-      const done = () => {
-        v.classList.add('is-done');
-        chip.classList.add('is-done');
-        chip.textContent = chip.dataset.after ?? '';
-      };
-      if (reduced.matches) return done();
-      timers.push(window.setTimeout(done, 1400));
-    }
-
-    function playB(v: HTMLElement) {
-      v.classList.remove('is-play');
-      void v.offsetWidth;
-      v.classList.add('is-play');
-    }
-
-    let cAuto = 0;
-    function showC(v: HTMLElement, n: number) {
-      v.querySelectorAll<HTMLElement>('[data-face]').forEach((f) => {
-        const on = Number(f.dataset.face) === n;
+    function show(k: number) {
+      n = k;
+      faces.forEach((f) => {
+        const on = Number(f.dataset.face) === k;
         f.hidden = !on;
         if (on && !reduced.matches) {
           f.classList.remove('is-entering');
@@ -581,45 +243,17 @@ const issues = [
           f.classList.add('is-entering');
         }
       });
-      v.querySelectorAll<HTMLButtonElement>('[data-view]').forEach((b) =>
-        b.setAttribute('aria-pressed', String(Number(b.dataset.view) === n)),
-      );
+      buttons.forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.view) === k)));
     }
-    function playC(v: HTMLElement) {
-      let n = 0;
-      showC(v, 0);
-      window.clearInterval(cAuto);
-      if (reduced.matches) return;
-      cAuto = window.setInterval(() => {
-        n = 1 - n;
-        showC(v, n);
-      }, 3500);
-    }
-    root.querySelectorAll<HTMLButtonElement>('[data-view]').forEach((b) =>
+
+    buttons.forEach((b) =>
       b.addEventListener('click', () => {
-        window.clearInterval(cAuto);
-        showC(b.closest<HTMLElement>('[data-variant]')!, Number(b.dataset.view));
+        window.clearInterval(auto);
+        show(Number(b.dataset.view));
       }),
     );
 
-    function show(id: string) {
-      clear();
-      window.clearInterval(cAuto);
-      root.querySelectorAll<HTMLElement>('[data-variant]').forEach((v) => {
-        v.hidden = v.dataset.variant !== id;
-        if (v.hidden) return;
-        if (id === 'a') playA(v);
-        if (id === 'b') playB(v);
-        if (id === 'c') playC(v);
-      });
-    }
-
-    const params = new URLSearchParams(location.search);
-    show(params.get('h') ?? 'b');
-    window.addEventListener('qbench-review', (e) => {
-      const d = (e as CustomEvent).detail;
-      if (d.h) show(d.h);
-    });
+    if (!reduced.matches) auto = window.setInterval(() => show(1 - n), 3500);
   }
   document.querySelectorAll<HTMLElement>('[data-qh]').forEach(mount);
 </script>
