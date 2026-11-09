@@ -8,6 +8,7 @@
 import Base from '../../layouts/Base.astro';
 import Header from '../Header.astro';
 import Gaps from './Gaps.astro';
+import Shot from './Shot.astro';
 import Chapters from './Chapters.astro';
 import SiteFooter from '../SiteFooter.astro';
 import { links } from '../../data/links';
@@ -60,7 +61,11 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
     {
       s.lead.kind === 'image' ? (
         <section aria-label="Project image" class="container-page cs-lead">
-          <div class="placeholder cs-shot cs-shot--wide">{s.lead.placeholder}</div>
+          {s.lead.src ? (
+            <Shot shot={s.lead.src} alt={s.lead.alt ?? ''} wide eager />
+          ) : (
+            <div class="placeholder cs-shot cs-shot--wide">{s.lead.placeholder}</div>
+          )}
         </section>
       ) : (
         <section aria-labelledby="audit-head" class="container-page cs-lead">
@@ -194,7 +199,11 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
         {
           s.work.map((w) => (
             <figure class="m-0 flex flex-col gap-3">
-              <div class="placeholder cs-shot">{w.placeholder}</div>
+              {w.src ? (
+                <Shot shot={w.src} alt={w.alt ?? ''} />
+              ) : (
+                <div class="placeholder cs-shot">{w.placeholder}</div>
+              )}
               <figcaption class="text-body-sm text-ink-2">{w.caption}</figcaption>
             </figure>
           ))

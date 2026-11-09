@@ -40,6 +40,14 @@ export interface Chapter {
   proof?: { value: string; caption: string; seenAt?: string }[];
 }
 
+/** an image from the Figma case study; `dark` is the night version if there is one */
+export interface Shot {
+  light: string;
+  dark?: string;
+  width: number;
+  height: number;
+}
+
 export interface CaseStudy {
   slug: string;
   /** used in the "Next case study" link and the page title */
@@ -53,7 +61,7 @@ export interface CaseStudy {
   who: string;
   /** the block under the hero: a project image, or Everbreed's audit callout */
   lead:
-    | { kind: 'image'; placeholder: string }
+    | { kind: 'image'; placeholder: string; src?: Shot; alt?: string }
     | { kind: 'audit'; heading: string; text: string; cta: string };
   numbersHeading: string;
   numbers: { value: string; label: string; meaning: string }[];
@@ -70,7 +78,7 @@ export interface CaseStudy {
   };
   together: { text: string; collect: Collect };
   changed: { text: string; collect: Collect };
-  work: { placeholder: string; caption: string }[];
+  work: { placeholder: string; caption: string; src?: Shot; alt?: string }[];
   cta: { heading: string; text: string; label: string; action: 'audit' | 'call' };
   next: string;
 }
@@ -94,7 +102,12 @@ export const caseStudies: CaseStudy[] = [
       { term: 'Scale', detail: '141 components across three library pages' },
     ],
     who: 'Who did the work: Goran Babarogić, as product designer and design system engineer at QBench, June 2025 to now.',
-    lead: { kind: 'image', placeholder: '[Screenshot: Foundation library, before and after]' },
+    lead: {
+      kind: 'image',
+      placeholder: '[Screenshot: Foundation library, before and after]',
+      src: { light: '/work/qbench/before-day.png', dark: '/work/qbench/before-night.png', width: 3200, height: 2000 },
+      alt: 'Before: 1,071 references to eleven outside libraries, 13 of 553 variables with a code name, and tokens and components kept in two separate files.',
+    },
     numbersHeading: 'In numbers, and what they mean',
     numbers: [
       {
@@ -121,36 +134,6 @@ export const caseStudies: CaseStudy[] = [
       { label: '05 Proof · pilot' },
     ],
     chapters: [
-      {
-        kicker: '02 · Before',
-        heading: 'Tokens and components lived in separate files, and the links between them drifted.',
-        lede: 'QBench V1 kept its variables in a separate Foundation library. Components pointed at copies of those variables, many of them outdated. Developers saw colour values but almost no names they could type in code.',
-        blocks: [
-          {
-            kind: 'stats',
-            items: [
-              {
-                value: '1,071',
-                label: '1,071 references · 11 libraries',
-                caption: 'references to outside libraries. Components looked right, but their values came from eleven libraries.',
-                seenAt: 'Seen at QBench',
-              },
-              {
-                value: '13 / 553',
-                label: '13 named · 553 variables',
-                caption: 'variables had a code name. The rest showed developers a raw value and nothing to match it to in CSS.',
-                seenAt: 'Foundation, V1',
-              },
-              {
-                value: '2 files',
-                label: 'Foundation ⇢ Components',
-                caption: 'held one design system: Foundation for tokens, Components for parts. A change in one did not reach the other on its own.',
-                seenAt: 'V1',
-              },
-            ],
-          },
-        ],
-      },
       {
         kicker: '03 · One file',
         heading: 'One library, and every variable carries the name developers use in code.',
@@ -435,15 +418,21 @@ export const caseStudies: CaseStudy[] = [
     work: [
       {
         placeholder: '[Screenshot: token layers]',
-        caption: 'Primitive, semantic and component layers, with every component bound to the Foundation only.',
+        caption: 'How a button gets its colour: a primitive, named once, reaches the screen through a component token.',
+        src: { light: '/work/qbench/alias-chain.png', width: 1600, height: 1200 },
+        alt: 'The token chain for a primary button: primitives/primary/800, then component/button/surface/solid/primary/default, then the Create CAPA button. Hover uses primitives/primary/900.',
       },
       {
         placeholder: '[Screenshot: library by function]',
-        caption: 'The library reorganised so components are found by what they do.',
+        caption: 'A QBench form built only from library parts: input, status tags, switch and buttons.',
+        src: { light: '/work/qbench/component-sheet.png', width: 1600, height: 1200 },
+        alt: 'A Report new CAPA dialog with a title input, status tags Open, In review, Closed and Overdue, a Notify QA lead switch, and Cancel and Create CAPA buttons.',
       },
       {
         placeholder: '[Screenshot: Code Connect]',
-        caption: 'Code Connect linking the Figma component to the code component.',
+        caption: 'Every Figma variable carries the name developers type in CSS.',
+        src: { light: '/work/qbench/code-names.png', width: 1600, height: 1200 },
+        alt: 'A table pairing Figma variables with web code names, for example text/default with var(--text-default) and spacing/4 with var(--spacing-4).',
       },
     ],
     cta: {
