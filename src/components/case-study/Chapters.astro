@@ -181,14 +181,23 @@ const slug = (k: string) =>
                 {b.kind === 'flow' && (
                   <>
                     <p class="caption-sm m-0 text-ink-2">{b.title}</p>
-                    <ol class="ch-flow">
-                      {b.steps.map((st) => (
-                        <li>
-                          <span class="caption-sm text-ink-2">{st.n}</span>
-                          <span class="text-body-lg">{st.name}</span>
-                          <span class="text-body text-ink-2">{st.text}</span>
+                    <ol class="ch-run">
+                      {b.steps.map((st, k) => (
+                        <li style={`--i:${k}`}>
+                          <span class="ch-run-mark" aria-hidden="true">
+                            {k === b.steps.length - 1 ? '→' : '✓'}
+                          </span>
+                          <span class="ch-run-body">
+                            <span class="ch-run-name">
+                              <span class="ch-run-n">{st.n}</span> {st.name}
+                            </span>
+                            <span class="ch-run-text">{st.text}</span>
+                          </span>
                         </li>
                       ))}
+                      <li class="ch-run-cursor" style={`--i:${b.steps.length}`} aria-hidden="true">
+                        <span class="ch-run-mark">_</span>
+                      </li>
                     </ol>
                   </>
                 )}
@@ -378,6 +387,9 @@ const slug = (k: string) =>
         select(to, true);
       });
     });
+    const fromHash = tabs.findIndex((t) => `#${t.id}` === location.hash);
+    if (fromHash > 0) select(fromHash, false);
+
     prev?.addEventListener('click', () => {
       if (prev.getAttribute('aria-disabled') !== 'true') select(current - 1, false);
     });
@@ -653,6 +665,65 @@ const slug = (k: string) =>
     }
   }
 
+  /* the PRD → screen run, shown as an agent log that plays line by line */
+  .ch-run {
+    margin: 0;
+    padding: 20px 22px;
+    list-style: none;
+    border-radius: 12px;
+    background: var(--color-band);
+    color: var(--color-on-band);
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+    line-height: 1.5;
+  }
+  .ch-run > li {
+    display: grid;
+    grid-template-columns: 18px minmax(0, 1fr);
+    gap: 10px;
+    padding: 7px 0;
+  }
+  .ch-run-mark {
+    color: var(--color-sage);
+  }
+  .ch-run > li:nth-last-child(2) .ch-run-mark {
+    color: var(--color-on-band-accent);
+  }
+  .ch-run-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .ch-run-n {
+    color: var(--color-on-band-2);
+  }
+  .ch-run-text {
+    color: var(--color-on-band-2);
+  }
+  .ch-run-cursor .ch-run-mark {
+    color: var(--color-on-band);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .ch:not([hidden]) .ch-run > li {
+      animation: ch-run-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-delay: calc(var(--i) * 450ms + 200ms);
+    }
+    .ch:not([hidden]) .ch-run-cursor .ch-run-mark {
+      animation: ch-blink 1s steps(1) infinite;
+      animation-delay: calc(var(--i) * 450ms + 200ms);
+    }
+  }
+  @keyframes ch-run-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+  @keyframes ch-blink {
+    50% {
+      opacity: 0;
+    }
+  }
   .ch-flow > li {
     display: grid;
     grid-template-columns: 32px minmax(110px, 0.7fr) minmax(0, 2fr);

@@ -105,7 +105,7 @@ export const caseStudies: CaseStudy[] = [
     lead: {
       kind: 'image',
       placeholder: '[Screenshot: Foundation library, before and after]',
-      src: { light: '/work/qbench/before-day.png', dark: '/work/qbench/before-night.png', width: 3200, height: 2000 },
+      src: { light: '/work/qbench/before-day.png', dark: '/work/qbench/before-night.png', width: 2928, height: 1728 },
       alt: 'Before: 1,071 references to eleven outside libraries, 13 of 553 variables with a code name, and tokens and components kept in two separate files.',
     },
     numbersHeading: 'In numbers, and what they mean',
