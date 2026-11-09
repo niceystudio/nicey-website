@@ -60,11 +60,14 @@ export interface CaseStudy {
   facts: { term: string; detail: string }[];
   who: string;
   /** the block under the hero: a project image, or Everbreed's audit callout */
-  lead:
+  lead?:
     | { kind: 'image'; placeholder: string; src?: Shot; alt?: string }
     | { kind: 'audit'; heading: string; text: string; cta: string };
   numbersHeading: string;
-  numbers: { value: string; label: string; meaning: string }[];
+  /** `before` turns a number into a before → after pair */
+  numbers: { value: string; label: string; meaning: string; before?: string }[];
+  /** a custom visual on the right of the hero */
+  heroVisual?: 'qbench-build';
   steps?: { label: string; inProgress?: boolean }[];
   /** the slides of the Figma case study, one section each */
   chapters?: Chapter[];
@@ -102,36 +105,33 @@ export const caseStudies: CaseStudy[] = [
       { term: 'Scale', detail: '141 components across three library pages' },
     ],
     who: 'Who did the work: Goran Babarogić, as product designer and design system engineer at QBench, June 2025 to now.',
-    lead: {
-      kind: 'image',
-      placeholder: '[Screenshot: Foundation library, before and after]',
-      src: { light: '/work/qbench/before-day.png', dark: '/work/qbench/before-night.png', width: 2928, height: 1728 },
-      alt: 'Before: 1,071 references to eleven outside libraries, 13 of 553 variables with a code name, and tokens and components kept in two separate files.',
-    },
-    numbersHeading: 'In numbers, and what they mean',
+    heroVisual: 'qbench-build',
+    numbersHeading: 'Before and after',
     numbers: [
       {
-        value: '1,071 → 0',
+        before: '1,071',
+        value: '0',
         label: 'references to libraries outside the Foundation',
         meaning: 'So design and code pull from one source, and nothing breaks when an outside file changes.',
       },
       {
-        value: '11 → 0',
+        before: '11',
+        value: '0',
         label: 'external libraries the components depended on',
         meaning: 'So the library no longer leans on files nobody maintains.',
       },
       {
-        value: '141',
-        label: 'components on one Foundation library',
-        meaning: 'So every new screen starts from the same parts.',
+        before: '13 / 553',
+        value: '554 / 554',
+        label: 'variables with a name developers can type in CSS',
+        meaning: 'So the value a designer picks is the variable a developer or an agent writes.',
       },
-    ],
-    steps: [
-      { label: '01 Drift' },
-      { label: '02 Audit' },
-      { label: '03 System' },
-      { label: '04 Context' },
-      { label: '05 Proof · pilot' },
+      {
+        before: '2 files',
+        value: '1 file',
+        label: 'for tokens and components',
+        meaning: 'So a change to a token reaches every component on its own.',
+      },
     ],
     chapters: [
       {
@@ -161,13 +161,6 @@ export const caseStudies: CaseStudy[] = [
               { from: 'spacing/4', to: 'var(--spacing-4)' },
               { from: 'radius/md', to: 'var(--radius-md)' },
             ],
-          },
-        ],
-        proof: [
-          {
-            value: '554 / 554',
-            caption: 'variables with a web code name, up from 13 of 553 in V1.',
-            seenAt: 'Seen at QBench',
           },
         ],
       },
@@ -360,31 +353,12 @@ export const caseStudies: CaseStudy[] = [
           { value: '716', caption: 'layers fade with one opacity token when disabled.' },
         ],
       },
-      {
-        kicker: '09 · Results',
-        heading: 'One system that designers, developers and agents read the same way.',
-        lede: 'Numbers come from the live Figma files, our migration log and the Screen Generator test run.',
-        blocks: [
-          {
-            kind: 'compare',
-            rows: [
-              { label: 'Code names', before: '13 / 553', after: '554 / 554', note: 'variables a developer can use in CSS' },
-              { label: 'Library files', before: '2', after: '1', note: 'tokens and components in one place' },
-              { label: 'Component docs', before: '119 / 124', after: '126 / 126', note: 'component sets with a description' },
-              { label: 'Token coverage', before: '99.1%', after: '99.5%', note: 'values bound to a token' },
-              { label: 'Outside-library references', before: '1,071', after: '0', note: 'across 141 components' },
-              { label: 'Agent-built screen', before: '—', after: '0', note: 'off-library values in 239 layers' },
-            ],
-          },
-        ],
-      },
     ],
     did: [
-      'Audited and consolidated the legacy system: colours, tokens and components that had drifted apart.',
-      'Built a semantic token architecture across libraries, and piloted the migration before rolling it out.',
-      'Designed and shipped components with every state defined, and one action link pattern instead of several.',
-      'Set Code Connect as the contract between Figma and code, so a screen can be built from Figma without anyone correcting it afterwards.',
-      'Reorganised the Figma library so components are found by what they do, not by memory.',
+      'Audited the legacy system and pulled drifted colours, tokens and components back together.',
+      'Built a token architecture in three layers, piloted it, then rolled it out.',
+      'Defined every component state, with one link pattern instead of several.',
+      'Set Code Connect as the contract between Figma and code.',
     ],
     agentic: {
       kicker: 'The agentic layer',
@@ -418,21 +392,15 @@ export const caseStudies: CaseStudy[] = [
     work: [
       {
         placeholder: '[Screenshot: token layers]',
-        caption: 'How a button gets its colour: a primitive, named once, reaches the screen through a component token.',
-        src: { light: '/work/qbench/alias-chain.png', width: 1600, height: 1200 },
-        alt: 'The token chain for a primary button: primitives/primary/800, then component/button/surface/solid/primary/default, then the Create CAPA button. Hover uses primitives/primary/900.',
+        caption: 'The V2 variables in Figma: semantic tokens grouped by role, each one pointing at a primitive.',
+        src: { light: '/work/qbench/variables-panel.png', width: 1148, height: 1007 },
+        alt: 'The Figma variables panel for QBench V2, with collections Semantic Tokens, Primitives, Dimensions, Typography and Elevation, and surface tokens aliased to primitives.',
       },
       {
         placeholder: '[Screenshot: library by function]',
-        caption: 'A QBench form built only from library parts: input, status tags, switch and buttons.',
-        src: { light: '/work/qbench/component-sheet.png', width: 1600, height: 1200 },
-        alt: 'A Report new CAPA dialog with a title input, status tags Open, In review, Closed and Overdue, a Notify QA lead switch, and Cancel and Create CAPA buttons.',
-      },
-      {
-        placeholder: '[Screenshot: Code Connect]',
-        caption: 'Every Figma variable carries the name developers type in CSS.',
-        src: { light: '/work/qbench/code-names.png', width: 1600, height: 1200 },
-        alt: 'A table pairing Figma variables with web code names, for example text/default with var(--text-default) and spacing/4 with var(--spacing-4).',
+        caption: 'Input and InputGroup in the library, with every state drawn: default, hover, focus, filled, disabled, error.',
+        src: { light: '/work/qbench/input-fields.png', width: 3042, height: 1000 },
+        alt: 'The Input and InputGroup components in six states each: default, hover, focus, filled, disabled and error.',
       },
     ],
     cta: {
