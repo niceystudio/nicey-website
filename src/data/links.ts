@@ -12,6 +12,10 @@ export const links = {
   startAudit: '#',
   exploreDesignSystems: '#',
   exploreProductDesign: '#',
+  /** site footer: contact and profiles (placeholders until we have them) */
+  email: '#',
+  linkedin: '#',
+  github: '#',
   /** the case study pages (src/pages/work/[slug].astro) */
   work: {
     qbench: caseHref('qbench-design-system'),

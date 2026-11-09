@@ -9,6 +9,7 @@ import Base from '../../layouts/Base.astro';
 import Header from '../Header.astro';
 import Gaps from './Gaps.astro';
 import Chapters from './Chapters.astro';
+import SiteFooter from '../SiteFooter.astro';
 import { links } from '../../data/links';
 import { caseHref, getCaseStudy, type Band, type CaseStudy } from '../../data/case-studies';
 
@@ -202,7 +203,7 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
     </section>
   </main>
 
-  <footer class="container-page cs-foot">
+  <section aria-label="Next steps" class="container-page cs-foot">
     <div class:list={['cs-cta', band]}>
       <div class="flex max-w-[46ch] flex-col gap-2">
         <p class="m-0 text-case-cta">{s.cta.heading}</p>
@@ -214,7 +215,8 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
       <span class="caption-sm text-ink-2">Next case study</span>
       <span class="text-case-cta">{next.linkName} →</span>
     </a>
-  </footer>
+  </section>
+  <SiteFooter />
 </Base>
 
 <style>

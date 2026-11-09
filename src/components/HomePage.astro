@@ -15,6 +15,7 @@ import Process from './Process.astro';
 import Work from './Work.astro';
 import Faq from './Faq.astro';
 import Footer from './Footer.astro';
+import SiteFooter from './SiteFooter.astro';
 import ReviewSwitch from './ReviewSwitch.astro';
 
 interface Props {
@@ -40,5 +41,6 @@ const { zeroDrift } = Astro.props;
     <Faq />
   </main>
   <Footer />
+  <SiteFooter />
   <ReviewSwitch current={zeroDrift} />
 </Base>
