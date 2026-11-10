@@ -32,7 +32,7 @@ const fmEnd = lines.indexOf('---', 1);
       This is the same case study, as an agent reads it: no layout, no images, only text with structure. We build design
       systems so they read this way too.
     </p>
-    <pre class="mv-doc" data-mv-doc><code>{lines.map((l, i) => <span class:list={['mv-l', kind(l, i, fmEnd) && `mv-${kind(l, i, fmEnd)}`]} style={`--i:${Math.min(i, 80)}`}>{l || ' '}{'\n'}</span>)}</code></pre>
+    <pre class="mv-doc" data-mv-doc><code>{lines.map((l, i) => <span class:list={['mv-l', kind(l, i, fmEnd) && `mv-${kind(l, i, fmEnd)}`]} style={`--i:${Math.min(i, 40)}`}>{l || ' '}{'\n'}</span>)}</code></pre>
     <textarea class="sr-only" data-mv-src aria-hidden="true" tabindex="-1">{markdown}</textarea>
   </div>
 </section>
@@ -124,8 +124,8 @@ const fmEnd = lines.indexOf('---', 1);
   }
   @media (prefers-reduced-motion: no-preference) {
     .mv:not([hidden]) .mv-l {
-      animation: mv-in 0.35s ease-out both;
-      animation-delay: calc(var(--i) * 12ms);
+      animation: mv-in 240ms var(--ease-out) both;
+      animation-delay: calc(var(--i) * 10ms);
     }
     @keyframes mv-in {
       from {
