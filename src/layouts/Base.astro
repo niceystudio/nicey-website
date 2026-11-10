@@ -16,6 +16,17 @@ interface Props {
 }
 
 const { title, description, noindex = false, markdownHref, jsonLd } = Astro.props;
+const siteUrl = (Astro.site ?? new URL('https://nicey-website.vercel.app')).href;
+// who we are, said the same way as the footer and the home page (no sameAs until the profiles exist)
+const org = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Nicey Studio',
+  url: siteUrl,
+  description:
+    'A design systems studio for legacy products and teams scaling with agents. We turn drifted UI into one system of tokens, components and documentation that designers, engineers and coding agents read the same way.',
+  knowsAbout: ['Design systems', 'Design tokens', 'Figma variables', 'AI-ready design systems', 'Product design'],
+};
 ---
 
 <!doctype html>
@@ -28,6 +39,7 @@ const { title, description, noindex = false, markdownHref, jsonLd } = Astro.prop
     {markdownHref && <link rel="alternate" type="text/markdown" href={markdownHref} />}
     <link rel="alternate" type="text/plain" title="llms.txt" href="/llms.txt" />
     {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+    <script type="application/ld+json" set:html={JSON.stringify(org)} />
     {noindex && <meta name="robots" content="noindex" />}
     <meta name="color-scheme" content="light dark" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
