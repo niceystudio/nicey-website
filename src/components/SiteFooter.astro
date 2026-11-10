@@ -6,6 +6,11 @@
 import { links } from '../data/links';
 import { caseStudies, caseHref } from '../data/case-studies';
 
+interface Props {
+  /** the page's Markdown twin; when set, the strip shows the Human / Machine switch */
+  mdHref?: string;
+}
+const { mdHref } = Astro.props;
 const year = new Date().getFullYear();
 const cols = [
   {
@@ -70,6 +75,26 @@ const cols = [
       }
     </nav>
   </div>
+  <div class="container-page site-foot-tools" aria-label="Page tools" role="group">
+    <div class="sft-row">
+      {
+        mdHref ? (
+          <span class="sft-item">
+            <span class="text-ink-2">view:</span>
+            <button type="button" data-mv="human" aria-pressed="true">human</button>
+            <span aria-hidden="true" class="text-ink-2">|</span>
+            <button type="button" data-mv="machine" aria-pressed="false">machine</button>
+            <kbd>m</kbd>
+          </span>
+        ) : null
+      }
+      {mdHref && <a class="sft-item" href={mdHref}>page.md ↗</a>}
+      <a class="sft-item" href="/llms.txt">llms.txt ↗</a>
+    </div>
+    <p class="sft-note">
+      {mdHref ? '// this page reads two ways. Switch to machine to see what an agent reads.' : '// every case study reads two ways. Open one and switch to machine.'}
+    </p>
+  </div>
   <div class="container-page site-foot-base">
     <p class="caption-sm m-0 text-ink-2">© {year} Nicey Studio</p>
     <a href="#main" class="caption-sm text-ink-2 no-underline hover:underline">Back to top ↑</a>
@@ -96,12 +121,64 @@ const cols = [
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
+  .site-foot-tools {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 48px;
+    padding-top: 20px;
+    border-top: 1px solid var(--color-line);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+  }
+  .sft-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 28px;
+  }
+  .sft-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 32px;
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+  a.sft-item:hover {
+    text-decoration: underline;
+  }
+  .sft-item button {
+    padding: 2px 6px;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--color-ink-2);
+    font: inherit;
+    cursor: pointer;
+  }
+  .sft-item button[aria-pressed='true'] {
+    background: var(--color-ink);
+    color: var(--color-on-ink);
+  }
+  .sft-item kbd {
+    padding: 0 5px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 4px;
+    color: var(--color-ink-2);
+    font: inherit;
+    font-size: 0.9em;
+  }
+  .sft-note {
+    margin: 0;
+    color: var(--color-ink-2);
+  }
   .site-foot-base {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     gap: 12px;
-    margin-top: 48px;
+    margin-top: 20px;
     padding-top: 20px;
     border-top: 1px solid var(--color-line);
   }

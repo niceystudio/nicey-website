@@ -27,6 +27,8 @@ function block(b: ChapterBlock): string {
       return `**${b.title}**\n\n${b.steps.map((st) => `${st.n}. **${st.name}**: ${st.text}`).join('\n')}`;
     case 'checks':
       return `**${b.title}** · ${b.subject} · ${b.status}\n\n${b.items.map((i) => `- ${i.value} · ${i.label}`).join('\n')}`;
+    case 'audit':
+      return `**${b.title}** · ${b.layers.toLocaleString('en')} components\n\n${table(['Property', 'Bound'], b.items.map((i) => [i.label, i.value]))}`;
     case 'meters':
       return `**${b.title}**\n\n${table(['Property', 'Bound'], b.items.map((i) => [i.label, i.value]))}`;
     case 'states':
@@ -39,7 +41,6 @@ function block(b: ChapterBlock): string {
 }
 
 export function caseMarkdown(s: CaseStudy, url: string): string {
-  const hero = s.heroOptions?.[0];
   const out: string[] = [];
   out.push(
     '---',
@@ -49,15 +50,13 @@ export function caseMarkdown(s: CaseStudy, url: string): string {
     `url: ${url}`,
     '---',
     '',
-    `# ${s.name}: ${hero?.statement ?? s.statement}`,
+    `# ${s.name}: ${s.statement}`,
     '',
     `> ${s.kicker}`,
     '',
   );
-  if (hero?.result) out.push(hero.result, '');
-  out.push(hero?.lede ?? s.lede, '');
-  if (hero?.points) out.push(...hero.points.map((p) => `- **${p.label}**: ${p.text}`), '');
-  out.push('## Facts', '', ...s.facts.map((f) => `- **${f.term}**: ${f.detail}`), '', s.who, '');
+  out.push(s.lede, '');
+  out.push('## Facts', '', ...s.facts.map((f) => `- **${f.term}**: ${f.detail}`), '', ...(s.who ? [s.who, ''] : []));
   if (!s.proofViz && s.numbers.length) {
     out.push(`## ${s.numbersHeading}`, '', ...s.numbers.map((n) => `- **${n.value}** ${n.label}. ${n.meaning}`), '');
   }
@@ -65,12 +64,13 @@ export function caseMarkdown(s: CaseStudy, url: string): string {
     out.push('## Before and after', '', '- Code names on variables: **13 of 553 → 554 of 554**', '');
   }
   if (s.note) out.push(`## ${s.note.heading}`, '', s.note.text, '');
+  if (s.chapters) out.push('## What we did, step by step', '');
   for (const c of s.chapters ?? []) {
-    out.push(`## ${c.kicker}: ${c.heading}`, '', c.lede, '');
+    out.push(`### ${c.kicker}: ${c.heading}`, '', c.lede, '');
     for (const b of c.blocks) out.push(block(b), '');
     for (const p of c.proof ?? []) out.push(`> **${p.value}** ${p.caption}${p.seenAt ? ` (${p.seenAt})` : ''}`, '');
   }
-  out.push('## What we did', '', ...s.did.map((d, i) => `${i + 1}. ${d}`), '');
+  if (!s.chapters) out.push('## What we did', '', ...s.did.map((d, i) => `${i + 1}. ${d}`), '');
   if (s.agentic) {
     out.push(`## ${s.agentic.kicker}: ${s.agentic.heading}`, '', ...s.agentic.items.map((i) => `- **${i.label}**: ${i.text}`), '', s.agentic.footnote, '');
   }

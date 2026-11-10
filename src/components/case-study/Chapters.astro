@@ -21,7 +21,7 @@ const slug = (k: string) =>
 ---
 
 <section aria-labelledby="chapters-head" class="container-page ch-wrap">
-  <h2 id="chapters-head" class="caption m-0 text-ink-2">The work, step by step</h2>
+  <h2 id="chapters-head" class="caption m-0 text-ink-2">What we did, step by step</h2>
   <div class="panel chs" data-chapters>
     <div class="chs-tabs" role="tablist" aria-label="Steps of the work">
       {
@@ -124,7 +124,7 @@ const slug = (k: string) =>
                     <p class="caption-sm m-0 text-ink-2">{b.title}</p>
                     <ol class="ch-ramp">
                       {b.swatches.map((w) => (
-                        <li class:list={[w.feeds && 'ch-ramp--feeds']}>
+                        <li class:list={[w.feeds && 'ch-ramp--feeds']} data-step={w.step}>
                           <span aria-hidden="true" class="ch-swatch" style={`background:#${w.hex}`} />
                           <span class="text-body-sm tabular-nums">{w.step}</span>
                           <span class="caption-sm text-ink-2">{w.hex}</span>
@@ -140,7 +140,7 @@ const slug = (k: string) =>
                     <p class="caption-sm m-0 text-ink-2">{b.title}</p>
                     <ul class="ch-chain">
                       {b.links.map((l) => (
-                        <li>
+                        <li data-from={l.from.split('/').pop()}>
                           <code class="ch-code">{l.from}</code>
                           <span class="flex items-baseline gap-2">
                             <span aria-hidden="true" class="text-ink-2">
@@ -222,6 +222,28 @@ const slug = (k: string) =>
                   </>
                 )}
 
+                {b.kind === 'audit' && (
+                  <div class="ch-audit" data-audit>
+                    <div class="ch-audit-head">
+                      <span class="caption-sm text-ink-2">{b.title}</span>
+                      <span class="ch-audit-count font-mono text-caption">
+                        Scanning <b data-count={b.layers}>{b.layers.toLocaleString('en')}</b> components
+                      </span>
+                    </div>
+                    <dl class="ch-meters ch-meters--scan">
+                      {b.items.map((m, k) => (
+                        <div style={`--i:${k}`}>
+                          <dt class="text-body">{m.label}</dt>
+                          <dd class="m-0 text-body tabular-nums">{m.value}</dd>
+                          <span aria-hidden="true" class="ch-meter">
+                            <span style={`width:${parseFloat(m.value)}%`} />
+                          </span>
+                        </div>
+                      ))}
+                    </dl>
+                  </div>
+                )}
+
                 {b.kind === 'meters' && (
                   <>
                     <p class="caption-sm m-0 text-ink-2">{b.title}</p>
@@ -240,37 +262,25 @@ const slug = (k: string) =>
                 )}
 
                 {b.kind === 'states' && (
-                  <>
-                    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
-                    <table class="ch-table ch-states">
-                      <thead>
-                        <tr>
-                          <th scope="col" class="caption-sm">
-                            State
-                          </th>
-                          <th scope="col" class="caption-sm">
-                            Token
-                          </th>
-                          <th scope="col" class="caption-sm">
-                            Example
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {b.rows.map((r) => (
-                          <tr>
-                            <th scope="row" class="text-body-lg font-normal">
-                              {r.state}
-                            </th>
-                            <td>
-                              <code class="ch-code">{r.token}</code>
-                            </td>
-                            <td class="text-body text-ink-2">{r.example}</td>
-                          </tr>
+                  <div class="ch-live" data-live>
+                    <div class="ch-live-demo" data-live-demo data-state="0" aria-hidden="true">
+                      <span class="ch-live-label">Batch ID</span>
+                      <span class="ch-live-field">BT-2026-0412</span>
+                      <span class="ch-live-err">Batch ID already exists</span>
+                      <span class="ch-live-btn">Create CAPA</span>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                      <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                      <div role="group" aria-label="Pick a state" class="ch-live-list">
+                        {b.rows.map((r, k) => (
+                          <button type="button" data-live-pick={k} aria-pressed={k === 0 ? 'true' : 'false'}>
+                            <span class="text-body">{r.state}</span>
+                            <code class="ch-code ch-code--accent">{r.token}</code>
+                          </button>
                         ))}
-                      </tbody>
-                    </table>
-                  </>
+                      </div>
+                    </div>
+                  </div>
                 )}
 
                 {b.kind === 'compare' && (
@@ -396,6 +406,57 @@ const slug = (k: string) =>
     next?.addEventListener('click', () => {
       if (next.getAttribute('aria-disabled') !== 'true') select(current + 1, false);
     });
+
+    // 03 · ramp → chain: pointing at a step lights the button state it feeds
+    root.querySelectorAll<HTMLElement>('.ch').forEach((panel) => {
+      const chain = panel.querySelectorAll<HTMLElement>('[data-from]');
+      if (!chain.length) return;
+      panel.querySelectorAll<HTMLElement>('[data-step]').forEach((sw) => {
+        sw.tabIndex = 0;
+        const on = () => {
+          panel.querySelectorAll('[data-step]').forEach((x) => x.classList.toggle('is-on', x === sw));
+          chain.forEach((c) => c.classList.toggle('is-lit', c.dataset.from === sw.dataset.step));
+        };
+        sw.addEventListener('mouseenter', on);
+        sw.addEventListener('focus', on);
+      });
+    });
+
+    // 04 · states: pick a row, the demo shows it
+    root.querySelectorAll<HTMLElement>('[data-live]').forEach((live) => {
+      const demo = live.querySelector<HTMLElement>('[data-live-demo]');
+      const picks = live.querySelectorAll<HTMLButtonElement>('[data-live-pick]');
+      picks.forEach((b) =>
+        b.addEventListener('click', () => {
+          picks.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+          if (demo) demo.dataset.state = b.dataset.livePick!;
+        }),
+      );
+    });
+
+    // 01 · audit: count the components up when the panel opens
+    const countUp = (panel: HTMLElement | null) => {
+      const el = panel?.querySelector<HTMLElement>('[data-count]');
+      if (!el || reduced.matches) return;
+      const to = Number(el.dataset.count);
+      const t0 = performance.now();
+      const tick = (t: number) => {
+        const k = Math.min(1, (t - t0) / 1200);
+        el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))).toLocaleString('en');
+        if (k < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    };
+    tabs.forEach((t, i) => t.addEventListener('click', () => countUp(panels[i])));
+    next?.addEventListener('click', () => countUp(panels[current]));
+    prev?.addEventListener('click', () => countUp(panels[current]));
+    const io = new IntersectionObserver((es) => {
+      if (es.some((e) => e.isIntersecting)) {
+        countUp(panels[current]);
+        io.disconnect();
+      }
+    });
+    io.observe(root);
   }
 
   document.querySelectorAll<HTMLElement>('[data-chapters]').forEach(mountChapters);
@@ -908,6 +969,191 @@ const slug = (k: string) =>
     .ch-block,
     .ch-proof {
       padding-inline: 20px;
+    }
+  }
+
+  /* 01 · audit: the meters fill one after another when the panel opens */
+  .ch-audit {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .ch-audit-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 16px;
+  }
+  .ch-audit-count b {
+    color: var(--color-accent);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .ch-meters--scan {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+    gap: 18px 32px;
+  }
+  .ch-meters--scan .ch-meter > span {
+    background: var(--color-accent);
+  }
+
+  /* 02 · map: each Figma name gets its code name, row by row */
+  /* 03 · ramp: the steps that feed the button, and the chain row they light */
+  .ch-ramp > li[data-step] {
+    cursor: default;
+    border-radius: 6px;
+    outline: none;
+  }
+  .ch-ramp > li.is-on .ch-swatch {
+    transform: translateY(-4px);
+  }
+  .ch-ramp > li:focus-visible .ch-swatch {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+  .ch-swatch {
+    transition: transform 0.2s ease;
+  }
+  .ch-chain > li {
+    transition: background-color 0.2s ease, padding 0.2s ease;
+    border-radius: 6px;
+  }
+  .ch-chain > li.is-lit {
+    padding-inline: 10px;
+    background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  }
+
+  /* 04 · states: a real button and field, switched by the list */
+  .ch-live {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: 24px 40px;
+    align-items: start;
+  }
+  @media (max-width: 767px) {
+    .ch-live {
+      grid-template-columns: 1fr;
+    }
+  }
+  .ch-live-demo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 24px;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-panel);
+    background: #ffffff;
+    color: #1f2937;
+    font-size: 14px;
+    --qb-primary: #244d9e;
+    --qb-critical: #c2341b;
+  }
+  .ch-live-label {
+    font-weight: 500;
+  }
+  .ch-live-field {
+    padding: 9px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  }
+  .ch-live-err {
+    min-height: 1.4em;
+    color: var(--qb-critical);
+    font-size: 13px;
+    visibility: hidden;
+  }
+  .ch-live-btn {
+    align-self: flex-end;
+    margin-top: 8px;
+    padding: 9px 16px;
+    border-radius: 6px;
+    background: var(--qb-primary);
+    color: #fff;
+    font-weight: 500;
+    transition: box-shadow 0.2s ease, opacity 0.2s ease;
+  }
+  .ch-live-demo[data-state='0'] .ch-live-btn {
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--qb-primary);
+  }
+  .ch-live-demo[data-state='1'] .ch-live-field {
+    border-color: var(--qb-primary);
+    box-shadow: 0 0 0 1px var(--qb-primary);
+  }
+  .ch-live-demo[data-state='2'] .ch-live-field {
+    border-color: var(--qb-critical);
+  }
+  .ch-live-demo[data-state='2'] .ch-live-err {
+    visibility: visible;
+  }
+  .ch-live-demo[data-state='3'] .ch-live-btn,
+  .ch-live-demo[data-state='3'] .ch-live-field {
+    opacity: 0.5;
+  }
+  .ch-live-list {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--color-line);
+  }
+  .ch-live-list button {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 4px 16px;
+    min-height: 48px;
+    padding: 12px 10px;
+    border: 0;
+    border-bottom: 1px solid var(--color-line);
+    background: transparent;
+    color: var(--color-ink);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  .ch-live-list button[aria-pressed='true'] {
+    background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  }
+  @media (hover: hover) {
+    .ch-live-list button:hover {
+      background: var(--color-surface-hover);
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .ch:not([hidden]) .ch-meters--scan .ch-meter > span {
+      animation: ch-fill 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-delay: calc(var(--i) * 90ms + 150ms);
+      transform-origin: left;
+    }
+    @keyframes ch-fill {
+      from {
+        transform: scaleX(0);
+      }
+    }
+    .ch:not([hidden]) .ch-map > li {
+      animation: ch-row 0.5s ease-out both;
+    }
+    .ch:not([hidden]) .ch-map > li:nth-child(2) { animation-delay: 0.12s; }
+    .ch:not([hidden]) .ch-map > li:nth-child(3) { animation-delay: 0.24s; }
+    .ch:not([hidden]) .ch-map > li:nth-child(4) { animation-delay: 0.36s; }
+    .ch:not([hidden]) .ch-map > li:nth-child(5) { animation-delay: 0.48s; }
+    .ch:not([hidden]) .ch-map > li .ch-code--accent {
+      animation: ch-type 0.6s steps(18) both;
+      animation-delay: inherit;
+    }
+    @keyframes ch-row {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+    }
+    @keyframes ch-type {
+      from {
+        clip-path: inset(0 100% 0 0);
+      }
     }
   }
 </style>

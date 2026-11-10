@@ -13,7 +13,6 @@ import NamesField from './NamesField.astro';
 import QBenchHero from './QBenchHero.astro';
 import QBenchWork from './QBenchWork.astro';
 import Chapters from './Chapters.astro';
-import ReviewBar from './ReviewBar.astro';
 import MachineView from './MachineView.astro';
 import { caseMarkdown } from '../../lib/case-markdown';
 import SiteFooter from '../SiteFooter.astro';
@@ -38,12 +37,22 @@ const bandBg: Record<Band, string> = {
 const band = bandBg[s.band];
 const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
 const mdHref = `${caseHref(s.slug)}.md`;
+const pageUrl = new URL(caseHref(s.slug), Astro.site ?? 'https://nicey-website.vercel.app').href;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: `${s.name}: ${s.statement}`,
+  description: s.lede,
+  url: pageUrl,
+  about: s.kicker.replace('Case study · ', '').split(' · '),
+  author: { '@type': 'Organization', name: 'Nicey Studio', url: new URL('/', pageUrl).href },
+  mainEntityOfPage: pageUrl,
+};
 const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https://nicey-website.vercel.app').href);
 ---
 
-<Base title={`${s.linkName} case study · Nicey`} description={s.lede}>
+<Base title={`${s.linkName} case study · Nicey`} description={s.lede} markdownHref={mdHref} jsonLd={jsonLd}>
   <Header variant="case" />
-  <MachineView markdown={markdown} mdHref={mdHref} />
   <main id="main" tabindex="-1" class="cs" data-human>
     <section aria-labelledby="cs-title" class={band}>
       <div class="container-page cs-hero">
@@ -51,34 +60,8 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
           <div class="cs-hero-copy">
             <span class="caption text-ink-2">{s.kicker}</span>
             <p class="m-0 text-case-name">{s.name}</p>
-            {s.heroOptions ? (
-              s.heroOptions.map((o, i) => (
-                <div class="cs-hero-opt" data-hero-opt={o.key} hidden={i !== 0}>
-                  {i === 0 ? (
-                    <h1 id="cs-title" class="m-0 max-w-[24ch] text-case-h1">{o.statement}</h1>
-                  ) : (
-                    <p class="m-0 max-w-[24ch] text-case-h1" role="heading" aria-level="1">{o.statement}</p>
-                  )}
-                  {o.result && <p class="cs-hero-result m-0 max-w-[40ch]">{o.result}</p>}
-                  <p class="m-0 max-w-[62ch] text-body-lg text-pretty text-ink-2"><Gaps text={o.lede} /></p>
-                  {o.points && (
-                    <dl class="cs-hero-points">
-                      {o.points.map((pt) => (
-                        <div>
-                          <dt class="caption-sm text-ink-2">{pt.label}</dt>
-                          <dd class="m-0 text-body">{pt.text}</dd>
-                        </div>
-                      ))}
-                    </dl>
-                  )}
-                </div>
-              ))
-            ) : (
-              <>
-                <h1 id="cs-title" class="m-0 max-w-[24ch] text-case-h1">{s.statement}</h1>
-                <p class="m-0 max-w-[62ch] text-body-lg text-pretty text-ink-2"><Gaps text={s.lede} /></p>
-              </>
-            )}
+            <h1 id="cs-title" class="m-0 max-w-[22ch] text-case-h1 text-balance">{s.statement}</h1>
+            <p class="m-0 max-w-[52ch] text-body-lg text-pretty text-ink-2"><Gaps text={s.lede} /></p>
           </div>
           {s.heroVisual === 'qbench-build' && (
             <div class="cs-hero-visual">
@@ -99,7 +82,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
             ))
           }
         </dl>
-        <p class="m-0 text-body-sm text-ink-2"><Gaps text={s.who} /></p>
+        {s.who && <p class="m-0 text-body-sm text-ink-2"><Gaps text={s.who} /></p>}
       </div>
     </section>
 
@@ -164,7 +147,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
 
     {s.chapters && <Chapters chapters={s.chapters} marker={band} />}
 
-    <section aria-labelledby="did-head" class="container-page cs-block cs-split">
+    {!s.chapters && <section aria-labelledby="did-head" class="container-page cs-block cs-split">
       <h2 id="did-head" class="cs-split-head m-0 text-case-h2">What we did</h2>
       <ol class="cs-split-body cs-did">
         {
@@ -176,7 +159,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
           ))
         }
       </ol>
-    </section>
+    </section>}
 
     {
       s.agentic && (
@@ -252,19 +235,37 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
 
   <section aria-label="Next steps" class="container-page cs-foot" data-human>
     <div class:list={['cs-cta', band]}>
-      <div class="flex max-w-[46ch] flex-col gap-2">
+      <div class="cs-cta-copy">
+        {s.cta.action === 'audit' && <span class="caption text-ink-2">Free audit · read-only</span>}
         <p class="m-0 text-case-cta">{s.cta.heading}</p>
         <p class="m-0 text-cta text-ink-2">{s.cta.text}</p>
+        {s.cta.action === 'audit' && (
+          <ul class="cs-cta-gets">
+            <li>A score per pillar</li>
+            <li>The top findings</li>
+            <li>What to fix first</li>
+          </ul>
+        )}
       </div>
-      <a href={ctaHref} class="pill pill-ink pill-lg">{s.cta.label}</a>
+      <div class="cs-cta-act">
+        <a href={ctaHref} class="pill pill-ink pill-lg">{s.cta.label}</a>
+        {s.cta.action === 'audit' ? (
+          <span class="text-body-sm text-ink-2">Only your Figma file. The repo is optional.</span>
+        ) : null}
+        <a href={links.bookCall} class="text-body-sm text-ink underline-offset-4 hover:underline">or book a call →</a>
+      </div>
     </div>
-    <a href={caseHref(next.slug)} class="cs-next">
-      <span class="caption-sm text-ink-2">Next case study</span>
-      <span class="text-case-cta">{next.linkName} →</span>
+    <a href={caseHref(next.slug)} class:list={['cs-next', bandBg[next.band]]}>
+      <span class="caption text-ink-2">Next case study</span>
+      <span class="cs-next-name">{next.linkName}</span>
+      <span class="cs-next-row">
+        <span class="m-0 max-w-[40ch] text-cta text-pretty">{next.statement}</span>
+        <span class="cs-next-arrow" aria-hidden="true">→</span>
+      </span>
     </a>
   </section>
-  <SiteFooter />
-  {s.heroOptions && <ReviewBar options={s.heroOptions.map((o) => o.key)} />}
+  <MachineView markdown={markdown} mdHref={mdHref} />
+  <SiteFooter mdHref={mdHref} />
 </Base>
 
 <style>
@@ -499,7 +500,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     padding: 0;
     list-style: none;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
     gap: 12px;
   }
   .cs-agentic-list > li {
@@ -547,19 +548,86 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     padding: 40px;
     border-radius: var(--radius-panel);
   }
+  .cs-cta-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 46ch;
+  }
+  .cs-cta-gets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 6px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .cs-cta-gets > li {
+    padding: 6px 12px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-pill);
+    font-size: var(--text-body-sm);
+  }
+  .cs-cta-gets > li::before {
+    content: '✓ ';
+    color: var(--color-accent);
+  }
+  .cs-cta-act {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
   .cs-next {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    margin-top: 40px;
+    gap: 12px;
+    margin-top: 24px;
+    padding: 40px;
+    border-radius: var(--radius-panel);
     color: var(--color-ink);
     text-decoration: none;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .cs-next-name {
+    font-size: clamp(36px, 5vw, 72px);
+    line-height: 0.92;
+    letter-spacing: -0.045em;
+    font-weight: 500;
+  }
+  .cs-next-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .cs-next-arrow {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--color-ink);
+    color: var(--color-on-ink);
+    font-size: 22px;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   }
   @media (hover: hover) {
-    .cs-next:hover .text-case-cta {
-      text-decoration: underline;
-      text-decoration-thickness: 2px;
-      text-underline-offset: 6px;
+    .cs-next:hover {
+      transform: translateY(-4px);
+    }
+    .cs-next:hover .cs-next-arrow {
+      transform: translateX(6px);
+    }
+  }
+  @media (max-width: 479px) {
+    .cs-next {
+      padding: 24px;
+    }
+    .cs-next-arrow {
+      width: 44px;
+      height: 44px;
     }
   }
 
