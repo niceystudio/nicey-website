@@ -1,0 +1,81 @@
+/**
+ * A case study as the plain Markdown an agent reads.
+ * Used by the page's Machine view and by the /work/<slug>.md twin, so both show the same text.
+ */
+import type { CaseStudy, ChapterBlock } from '../data/case-studies';
+
+const table = (head: string[], rows: string[][]) =>
+  [`| ${head.join(' | ')} |`, `| ${head.map(() => '---').join(' | ')} |`, ...rows.map((r) => `| ${r.join(' | ')} |`)].join('\n');
+
+function block(b: ChapterBlock): string {
+  switch (b.kind) {
+    case 'stats':
+      return b.items.map((i) => `- **${i.value}** — ${i.label}: ${i.caption}${i.seenAt ? ` (${i.seenAt})` : ''}`).join('\n');
+    case 'rows':
+      return `**${b.title}**\n\n${table(['Item', 'Value'], b.rows.map((r) => [r.label, r.value]))}`;
+    case 'map':
+      return `**${b.title}**\n\n${table(['Figma', 'Code'], b.rows.map((r) => [`\`${r.from}\``, `\`${r.to}\``]))}`;
+    case 'ramp':
+      return `**${b.title}**\n\n${b.swatches.map((w) => `\`${w.step}\` #${w.hex}${w.feeds ? ' ←' : ''}`).join(' · ')}\n\n${b.note}`;
+    case 'chain':
+      return `**${b.title}**\n\n${b.links.map((l) => `- \`${l.from}\` → \`${l.token}\` (${l.state})`).join('\n')}`;
+    case 'docs':
+      return `**${b.title}**\n\n${b.items
+        .map((d) => `- **${d.name}**: ${d.purpose} Use for ${d.useFor} Not for ${d.notFor} ${d.instead}.`)
+        .join('\n')}`;
+    case 'flow':
+      return `**${b.title}**\n\n${b.steps.map((st) => `${st.n}. **${st.name}**: ${st.text}`).join('\n')}`;
+    case 'checks':
+      return `**${b.title}** · ${b.subject} · ${b.status}\n\n${b.items.map((i) => `- ${i.value} · ${i.label}`).join('\n')}`;
+    case 'meters':
+      return `**${b.title}**\n\n${table(['Property', 'Bound'], b.items.map((i) => [i.label, i.value]))}`;
+    case 'states':
+      return `**${b.title}**\n\n${table(['State', 'Token', 'Example'], b.rows.map((r) => [r.state, `\`${r.token}\``, r.example]))}`;
+    case 'compare':
+      return table(['', 'Before', 'After', 'Note'], b.rows.map((r) => [r.label, r.before, r.after, r.note]));
+    case 'images':
+      return b.images.map((i) => `![${i.alt}](${i.src})`).join('\n');
+  }
+}
+
+export function caseMarkdown(s: CaseStudy, url: string): string {
+  const hero = s.heroOptions?.[0];
+  const out: string[] = [];
+  out.push(
+    '---',
+    `title: ${s.linkName} case study`,
+    `client: ${s.name}`,
+    `studio: Nicey`,
+    `url: ${url}`,
+    '---',
+    '',
+    `# ${s.name}: ${hero?.statement ?? s.statement}`,
+    '',
+    `> ${s.kicker}`,
+    '',
+  );
+  if (hero?.result) out.push(hero.result, '');
+  out.push(hero?.lede ?? s.lede, '');
+  if (hero?.points) out.push(...hero.points.map((p) => `- **${p.label}**: ${p.text}`), '');
+  out.push('## Facts', '', ...s.facts.map((f) => `- **${f.term}**: ${f.detail}`), '', s.who, '');
+  if (!s.proofViz && s.numbers.length) {
+    out.push(`## ${s.numbersHeading}`, '', ...s.numbers.map((n) => `- **${n.value}** ${n.label}. ${n.meaning}`), '');
+  }
+  if (s.proofViz === 'names') {
+    out.push('## Before and after', '', '- Code names on variables: **13 of 553 → 554 of 554**', '');
+  }
+  if (s.note) out.push(`## ${s.note.heading}`, '', s.note.text, '');
+  for (const c of s.chapters ?? []) {
+    out.push(`## ${c.kicker}: ${c.heading}`, '', c.lede, '');
+    for (const b of c.blocks) out.push(block(b), '');
+    for (const p of c.proof ?? []) out.push(`> **${p.value}** ${p.caption}${p.seenAt ? ` (${p.seenAt})` : ''}`, '');
+  }
+  out.push('## What we did', '', ...s.did.map((d, i) => `${i + 1}. ${d}`), '');
+  if (s.agentic) {
+    out.push(`## ${s.agentic.kicker}: ${s.agentic.heading}`, '', ...s.agentic.items.map((i) => `- **${i.label}**: ${i.text}`), '', s.agentic.footnote, '');
+  }
+  out.push('## Working together', '', s.together.text, '', `- ${s.together.collect.label}: ${s.together.collect.text}`, '');
+  out.push('## What changed for the team', '', s.changed.text, '', `- ${s.changed.collect.label}: ${s.changed.collect.text}`, '');
+  out.push(`## ${s.cta.heading}`, '', s.cta.text, '', `→ ${s.cta.label}`, '');
+  return out.join('\n');
+}
