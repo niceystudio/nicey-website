@@ -14,6 +14,8 @@ import QBenchHero from './QBenchHero.astro';
 import QBenchWork from './QBenchWork.astro';
 import Chapters from './Chapters.astro';
 import ReviewBar from './ReviewBar.astro';
+import MachineView from './MachineView.astro';
+import { caseMarkdown } from '../../lib/case-markdown';
 import SiteFooter from '../SiteFooter.astro';
 import { links } from '../../data/links';
 import { caseHref, getCaseStudy, type Band, type CaseStudy } from '../../data/case-studies';
@@ -35,11 +37,14 @@ const bandBg: Record<Band, string> = {
 };
 const band = bandBg[s.band];
 const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
+const mdHref = `${caseHref(s.slug)}.md`;
+const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https://nicey-website.vercel.app').href);
 ---
 
 <Base title={`${s.linkName} case study · Nicey`} description={s.lede}>
   <Header variant="case" />
-  <main id="main" tabindex="-1" class="cs">
+  <MachineView markdown={markdown} mdHref={mdHref} />
+  <main id="main" tabindex="-1" class="cs" data-human>
     <section aria-labelledby="cs-title" class={band}>
       <div class="container-page cs-hero">
         <div class:list={['cs-hero-top', s.heroVisual && 'cs-hero-top--visual']}>
@@ -245,7 +250,7 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
     </section>
   </main>
 
-  <section aria-label="Next steps" class="container-page cs-foot">
+  <section aria-label="Next steps" class="container-page cs-foot" data-human>
     <div class:list={['cs-cta', band]}>
       <div class="flex max-w-[46ch] flex-col gap-2">
         <p class="m-0 text-case-cta">{s.cta.heading}</p>

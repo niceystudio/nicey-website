@@ -1,0 +1,230 @@
+---
+/**
+ * Page-wide Human / Machine switch (idea from parallel.ai, applied to the whole case study).
+ * Machine hides the designed page and shows the plain Markdown an agent reads,
+ * the same text that is served at /work/<slug>.md. State lives in ?view=machine.
+ */
+interface Props {
+  markdown: string;
+  mdHref: string;
+}
+const { markdown, mdHref } = Astro.props;
+const words = markdown.split(/\s+/).filter(Boolean).length;
+const lines = markdown.split('\n');
+const kind = (l: string, i: number, fmEnd: number) =>
+  i <= fmEnd ? 'fm' : /^#{1,2} /.test(l) ? 'h' : l.startsWith('> ') ? 'q' : l.startsWith('|') ? 't' : /^(- |\d+\. )/.test(l) ? 'li' : '';
+const fmEnd = lines.indexOf('---', 1);
+---
+
+<div class="mv-bar" data-mv-bar>
+  <div class="container-page mv-bar-in">
+    <span class="mv-hint">Who is reading this page?</span>
+    <div role="group" aria-label="Who is reading this page" class="mv-seg">
+      <button type="button" data-mv="human" aria-pressed="true">Human</button>
+      <button type="button" data-mv="machine" aria-pressed="false">Machine</button>
+    </div>
+  </div>
+</div>
+
+<section class="mv" data-mv-page hidden aria-label="This case study as an agent reads it">
+  <div class="container-page mv-in">
+    <div class="mv-head">
+      <span class="mv-get"><b>GET</b> {mdHref}</span>
+      <span class="mv-meta">200 · text/markdown · {words.toLocaleString('en')} words</span>
+      <span class="mv-actions">
+        <button type="button" class="mv-btn" data-mv-copy>Copy</button>
+        <a class="mv-btn" href={mdHref}>Open .md</a>
+      </span>
+    </div>
+    <p class="mv-lead">
+      This is the same case study, as an agent reads it: no layout, no images, only text with structure. We build design
+      systems so they read this way too.
+    </p>
+    <pre class="mv-doc" data-mv-doc><code>{lines.map((l, i) => <span class:list={['mv-l', kind(l, i, fmEnd) && `mv-${kind(l, i, fmEnd)}`]} style={`--i:${Math.min(i, 80)}`}>{l || ' '}{'\n'}</span>)}</code></pre>
+    <textarea class="sr-only" data-mv-src aria-hidden="true" tabindex="-1">{markdown}</textarea>
+  </div>
+</section>
+
+<style>
+  /* zero height, so the switch floats over the hero instead of adding a strip above it */
+  .mv-bar {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    height: 0;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .mv-bar-in {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    padding-block: 12px;
+  }
+  .mv-hint {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption-sm);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-ink-2);
+    pointer-events: auto;
+  }
+  .mv-seg {
+    display: inline-flex;
+    padding: 4px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-pill);
+    background: var(--color-surface);
+    pointer-events: auto;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  }
+  .mv-seg button {
+    min-height: 36px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--color-ink-2);
+    font: inherit;
+    font-size: var(--text-label);
+    cursor: pointer;
+  }
+  .mv-seg button[aria-pressed='true'] {
+    background: var(--color-ink);
+    color: var(--color-on-ink);
+  }
+  @media (max-width: 479px) {
+    .mv-hint {
+      display: none;
+    }
+  }
+
+  .mv[hidden] {
+    display: none;
+  }
+  .mv-in {
+    padding-block: 24px 72px;
+  }
+  .mv-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 20px;
+    padding: 14px 18px;
+    border: 1px solid var(--color-line-strong);
+    border-bottom: 0;
+    border-radius: var(--radius-panel) var(--radius-panel) 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+  }
+  .mv-get b {
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+  .mv-meta {
+    color: var(--color-ink-2);
+  }
+  .mv-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+  }
+  .mv-btn {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    padding: 0 12px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--color-ink);
+    font: inherit;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .mv-lead {
+    margin: 0;
+    padding: 14px 18px;
+    border: 1px solid var(--color-line-strong);
+    border-bottom: 0;
+    font-size: var(--text-body-sm);
+    color: var(--color-ink-2);
+  }
+  .mv-doc {
+    margin: 0;
+    padding: 24px 18px 32px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 0 0 var(--radius-panel) var(--radius-panel);
+    background: var(--color-surface);
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+    line-height: 1.7;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .mv-l {
+    display: inline;
+  }
+  .mv-fm {
+    color: var(--color-ink-2);
+  }
+  .mv-h {
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+  .mv-q {
+    color: var(--color-ink-2);
+  }
+  .mv-t {
+    color: var(--color-ink);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .mv:not([hidden]) .mv-l {
+      animation: mv-in 0.35s ease-out both;
+      animation-delay: calc(var(--i) * 12ms);
+    }
+    @keyframes mv-in {
+      from {
+        opacity: 0;
+      }
+    }
+  }
+</style>
+
+<script>
+  const page = document.querySelector<HTMLElement>('[data-mv-page]');
+  const bar = document.querySelector<HTMLElement>('[data-mv-bar]');
+  const human = document.querySelectorAll<HTMLElement>('[data-human]');
+  if (page && bar) {
+    const buttons = bar.querySelectorAll<HTMLButtonElement>('[data-mv]');
+    const set = (v: string, push = true) => {
+      const machine = v === 'machine';
+      page.hidden = !machine;
+      human.forEach((h) => (h.hidden = machine));
+      buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mv === v)));
+      if (push) {
+        const p = new URLSearchParams(location.search);
+        if (machine) p.set('view', 'machine');
+        else p.delete('view');
+        const q = p.toString();
+        history.replaceState(null, '', `${location.pathname}${q ? `?${q}` : ''}${location.hash}`);
+        window.scrollTo({ top: 0 });
+      }
+    };
+    buttons.forEach((b) => b.addEventListener('click', () => set(b.dataset.mv!)));
+    if (new URLSearchParams(location.search).get('view') === 'machine') set('machine', false);
+
+    const copy = page.querySelector<HTMLButtonElement>('[data-mv-copy]');
+    const src = page.querySelector<HTMLTextAreaElement>('[data-mv-src]');
+    copy?.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(src?.value ?? '');
+        copy.textContent = 'Copied';
+      } catch {
+        copy.textContent = 'Copy failed';
+      }
+      setTimeout(() => (copy.textContent = 'Copy'), 1600);
+    });
+  }
+</script>
