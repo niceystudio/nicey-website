@@ -67,6 +67,19 @@ export interface CaseStudy {
   numbers: { value: string; label: string; meaning: string }[];
   /** a custom visual on the right of the hero */
   heroVisual?: 'qbench-build';
+  /** one line above the hero visual that says what it shows */
+  heroContext?: string;
+  /** review only: alternative hero texts, picked with ?h=<key> (losers get removed after review) */
+  heroOptions?: {
+    key: string;
+    statement: string;
+    /** a short, bold result line under the headline */
+    result?: string;
+    lede: string;
+    points?: { label: string; text: string }[];
+  }[];
+  /** heading of the "From the work" section */
+  workHeading?: string;
   /** custom "From the work" visuals instead of image figures */
   workVisual?: 'qbench';
   /** an animated before/after above the numbers */
@@ -109,6 +122,31 @@ export const caseStudies: CaseStudy[] = [
     ],
     who: 'Who did the work: Goran Babarogić, as product designer and design system engineer at QBench, June 2025 to now.',
     heroVisual: 'qbench-build',
+    heroContext: 'Today, every component reads two ways: as UI for people, as props and tokens for agents.',
+    heroOptions: [
+      {
+        key: 'a',
+        statement: 'We turned QBench’s design system into one library that people and AI agents read the same way.',
+        lede: 'QBench is lab software built for years without a designer, so every screen was a best guess. We pulled the components back onto one Foundation, gave every token the name developers use in code, and wrote docs an agent can read. Now an agent can build a screen from the library, and a check catches anything that drifts.',
+      },
+      {
+        key: 'b',
+        statement: 'No one owned the design system, so nothing in the product agreed with itself.',
+        result: 'Now it’s one library that designers, developers and AI agents all read the same way.',
+        lede: 'A B2B lab product built for years without a designer in the room. Every screen was a developer’s best guess. If your team copies screens instead of reusing parts, this is your starting point too.',
+      },
+      {
+        key: 'c',
+        statement: 'From a design system no one owned to one AI agents can build with.',
+        lede: 'QBench is lab software (LIMS), built for years without a designer in the room.',
+        points: [
+          { label: 'Before', text: '11 outside libraries behind the components, 1,071 stray references, and decisions nobody wrote down.' },
+          { label: 'What we did', text: 'One Foundation, a code name on every token, a description on every component.' },
+          { label: 'Now', text: 'An agent builds screens from 243 allowed components, and a check flags anything off the system.' },
+        ],
+      },
+    ],
+    workHeading: 'What the agent reads',
     proofViz: 'names',
     workVisual: 'qbench',
     numbersHeading: 'Before and after',
@@ -217,7 +255,7 @@ export const caseStudies: CaseStudy[] = [
           },
           {
             kind: 'docs',
-            title: 'What the panel and the API both return',
+            title: 'Example · what the panel and the API both return',
             items: [
               {
                 name: 'Switch',
@@ -225,20 +263,6 @@ export const caseStudies: CaseStudy[] = [
                 useFor: 'immediate settings.',
                 notFor: 'single-choice lists. Use',
                 instead: 'RadioButton',
-              },
-              {
-                name: 'Input',
-                purpose: 'Single-line field for entering short text or values.',
-                useFor: 'text and numbers.',
-                notFor: 'selecting options. Use',
-                instead: 'Select',
-              },
-              {
-                name: 'ToggleButton',
-                purpose: 'Icon-only button that switches an option on or off and stays selected while on.',
-                useFor: 'toggling a view or setting in place.',
-                notFor: 'one-off actions like save, delete or open. Use',
-                instead: 'Button',
               },
             ],
           },
