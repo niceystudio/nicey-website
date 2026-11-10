@@ -68,8 +68,8 @@ const states = [
     </div>
   </div>
   <figcaption class="qw-cap">
-    <span class="caption-sm text-muted">Fig 0.1</span> People see five fields. An agent sees five sets of props and
-    tokens, and picks the right one without looking.
+    <span class="qw-cap-k">Fig 01</span>
+    <span>People see five fields. An agent reads five sets of props and tokens, and picks the right one without guessing.</span>
   </figcaption>
 </figure>
 
@@ -80,13 +80,23 @@ const states = [
     letter-spacing: 0.06em;
     text-transform: uppercase;
   }
+  /* label and sentence share one baseline, the sentence wraps under itself */
   .qw-cap {
     display: flex;
-    flex-wrap: wrap;
-    gap: 4px 10px;
-    margin-top: 12px;
+    align-items: baseline;
+    gap: 12px;
+    margin-top: 14px;
     font-size: var(--text-body-sm);
+    line-height: 1.5;
     color: var(--color-ink-2);
+  }
+  .qw-cap-k {
+    flex: none;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption-sm);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-muted);
   }
   .qw-stage {
     display: flex;

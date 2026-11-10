@@ -5,13 +5,32 @@
  * (readable by search engines and screen readers, themed day and night).
  */
 import type { Chapter } from '../../data/case-studies';
+import SectionHead from '../SectionHead.astro';
 
 interface Props {
   chapters: Chapter[];
   /** marker colour class, e.g. 'bg-lavender' */
   marker: string;
+  /** homepage-style opener; without it the section keeps its small caption */
+  head?: { caption: string; heading: string };
 }
-const { chapters, marker } = Astro.props;
+const { chapters, marker, head } = Astro.props;
+
+// 02 · Model: place each status in a column by its distance from the first one
+function layout(edges: { from: string; to: string }[]) {
+  const depth = new Map<string, number>();
+  depth.set(edges[0].from, 0);
+  for (let k = 0; k < edges.length; k++)
+    for (const e of edges) if (depth.has(e.from) && !depth.has(e.to)) depth.set(e.to, depth.get(e.from)! + 1);
+  const cols = new Map<number, string[]>();
+  depth.forEach((d, n) => cols.set(d, [...(cols.get(d) ?? []), n]));
+  const W = 560, H = 200, maxD = Math.max(...depth.values());
+  const pos = new Map<string, { x: number; y: number }>();
+  cols.forEach((names, d) =>
+    names.forEach((n, i) => pos.set(n, { x: 70 + (d * (W - 140)) / Math.max(1, maxD), y: (H * (i + 1)) / (names.length + 1) })),
+  );
+  return { pos, W, H };
+}
 const slug = (k: string) =>
   'ch-' +
   k
@@ -21,7 +40,11 @@ const slug = (k: string) =>
 ---
 
 <section aria-labelledby="chapters-head" class="container-page ch-wrap">
-  <h2 id="chapters-head" class="caption m-0 text-ink-2">What we did, step by step</h2>
+  {head ? (
+    <SectionHead id="chapters-head" caption={head.caption} class="mb-6" headingClass="max-w-[18ch]">{head.heading}</SectionHead>
+  ) : (
+    <h2 id="chapters-head" class="caption m-0 text-ink-2">What we did, step by step</h2>
+  )}
   <div class="panel chs" data-chapters>
     <div class="chs-tabs" role="tablist" aria-label="Steps of the work">
       {
@@ -222,12 +245,129 @@ const slug = (k: string) =>
                   </>
                 )}
 
+                {b.kind === 'surfaces' && (
+                  <>
+                    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                    <ul class="ch-surf">
+                      {b.items.map((it, k) => (
+                        <li style={`--i:${k}`}>
+                          <span class="ch-surf-n font-mono text-caption text-ink-2">{String(k + 1).padStart(2, '0')}</span>
+                          <span class="text-body-lg">{it.name}</span>
+                          <span class="ch-surf-how caption-sm">{it.how}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+
+                {b.kind === 'graph' && (() => {
+                  const g = layout(b.edges);
+                  return (
+                    <div class="ch-graph" data-graph>
+                      <div class="flex flex-col gap-3">
+                        <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                        <svg viewBox={`0 0 ${g.W} ${g.H}`} class="ch-graph-svg" aria-hidden="true">
+                          {b.edges.map((e, k) => {
+                            const a = g.pos.get(e.from)!, z = g.pos.get(e.to)!;
+                            return <path data-edge={k} class:list={[k === b.edges.length - 2 && 'is-on']} d={`M${a.x + 58} ${a.y} C ${a.x + 120} ${a.y}, ${z.x - 120} ${z.y}, ${z.x - 58} ${z.y}`} />;
+                          })}
+                          {[...g.pos].map(([n, p]) => (
+                            <g>
+                              <rect x={p.x - 58} y={p.y - 16} width="116" height="32" rx="16" />
+                              <text x={p.x} y={p.y + 4} text-anchor="middle">{n}</text>
+                            </g>
+                          ))}
+                        </svg>
+                      </div>
+                      <div class="flex flex-col gap-2">
+                        <p class="caption-sm m-0 text-ink-2">Pick a move</p>
+                        <div role="group" aria-label="Pick a move" class="ch-pick">
+                          {b.edges.map((e, k) => (
+                            <button type="button" class="press" data-edge-pick={k} data-rules={e.rules.join('|')} aria-pressed={k === b.edges.length - 2 ? 'true' : 'false'}>
+                              {e.from} → {e.to}
+                            </button>
+                          ))}
+                        </div>
+                        <p class="caption-sm m-0 mt-3 text-ink-2">Rules on this move</p>
+                        <ul class="ch-chips" data-graph-rules aria-live="polite">
+                          {b.edges[b.edges.length - 2].rules.map((r) => <li>{r}</li>)}
+                        </ul>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {b.kind === 'order' && (
+                  <div class="ch-order">
+                    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                    <ol class="ch-order-list">
+                      {b.steps.map((st, k) => (
+                        <li style={`--i:${k}`}>
+                          <span class="ch-order-n" aria-hidden="true">{k + 1}</span>
+                          <span class="flex flex-col gap-1">
+                            <span class="text-body-lg">{st.name}</span>
+                            <span class="text-body-sm text-ink-2">{st.text}</span>
+                          </span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
+
+                {b.kind === 'everywhere' && (
+                  <div class="ch-every" data-every>
+                    <div class="flex flex-col gap-2">
+                      <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                      <div role="group" aria-label="Pick where the change starts" class="ch-pick">
+                        {b.surfaces.map((sf, k) => (
+                          <button type="button" class="press" data-every-pick={k} data-note={sf.note} aria-pressed={k === 0 ? 'true' : 'false'}>
+                            {sf.name}
+                          </button>
+                        ))}
+                      </div>
+                      <p class="m-0 mt-2 text-body text-ink-2" data-every-note aria-live="polite">{b.surfaces[0].note}</p>
+                    </div>
+                    <div class="ch-modal" data-every-modal aria-hidden="true">
+                      <span class="ch-modal-t">Complete required actions</span>
+                      <span class="ch-modal-move"><b>In progress</b> → <b>Completed</b></span>
+                      <span class="ch-modal-steps"><i class="is-on">1 · Required fields</i><i>2 · Signature</i></span>
+                      <span class="ch-modal-body"><span>Turnaround *</span><span>Assigned technician *</span></span>
+                      <span class="ch-modal-btn">Next</span>
+                    </div>
+                  </div>
+                )}
+
+                {b.kind === 'bulk' && (
+                  <div class="ch-bulk" data-bulk>
+                    <div class="flex flex-col gap-2">
+                      <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                      <div role="group" aria-label="Pick an outcome" class="ch-pick">
+                        {b.outcomes.map((o, k) => (
+                          <button type="button" class="press" data-bulk-pick={k} aria-pressed={k === 1 ? 'true' : 'false'}>
+                            {o.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div class="ch-bulk-stage">
+                      {b.outcomes.map((o, k) => (
+                        <div class="ch-modal ch-modal--bulk" data-bulk-card={k} hidden={k !== 1}>
+                          <span class="ch-bars" data-o={k} aria-hidden="true"><i /><i /></span>
+                          <span class="ch-modal-t">{o.title}</span>
+                          <span class="text-body-sm">{o.text}</span>
+                          <span class="ch-modal-btn">{o.cta}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {b.kind === 'audit' && (
                   <div class="ch-audit" data-audit>
                     <div class="ch-audit-head">
                       <span class="caption-sm text-ink-2">{b.title}</span>
                       <span class="ch-audit-count font-mono text-caption">
-                        Scanning <b data-count={b.layers}>{b.layers.toLocaleString('en')}</b> components
+                        Scanning <b data-count={b.layers}>{b.layers.toLocaleString('en')}</b> variants
                       </span>
                     </div>
                     <dl class="ch-meters ch-meters--scan">
@@ -273,7 +413,7 @@ const slug = (k: string) =>
                       <p class="caption-sm m-0 text-ink-2">{b.title}</p>
                       <div role="group" aria-label="Pick a state" class="ch-live-list">
                         {b.rows.map((r, k) => (
-                          <button type="button" data-live-pick={k} aria-pressed={k === 0 ? 'true' : 'false'}>
+                          <button type="button" class="press" data-live-pick={k} aria-pressed={k === 0 ? 'true' : 'false'}>
                             <span class="text-body">{r.state}</span>
                             <code class="ch-code ch-code--accent">{r.token}</code>
                           </button>
@@ -434,6 +574,50 @@ const slug = (k: string) =>
       );
     });
 
+    // status · 02 graph: pick a move, its path lights and its rules show
+    root.querySelectorAll<HTMLElement>('[data-graph]').forEach((g) => {
+      const picks = g.querySelectorAll<HTMLButtonElement>('[data-edge-pick]');
+      const paths = g.querySelectorAll<SVGPathElement>('[data-edge]');
+      const list = g.querySelector<HTMLElement>('[data-graph-rules]');
+      picks.forEach((b) =>
+        b.addEventListener('click', () => {
+          picks.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+          paths.forEach((p) => p.classList.toggle('is-on', p.dataset.edge === b.dataset.edgePick));
+          if (list) list.innerHTML = (b.dataset.rules ?? '').split('|').map((r) => `<li>${r}</li>`).join('');
+        }),
+      );
+    });
+
+    // status · 04 everywhere: another surface, the same modal opens again
+    root.querySelectorAll<HTMLElement>('[data-every]').forEach((d) => {
+      const picks = d.querySelectorAll<HTMLButtonElement>('[data-every-pick]');
+      const note = d.querySelector<HTMLElement>('[data-every-note]');
+      const modal = d.querySelector<HTMLElement>('[data-every-modal]');
+      picks.forEach((b) =>
+        b.addEventListener('click', () => {
+          picks.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+          if (note) note.textContent = b.dataset.note ?? '';
+          if (modal && !reduced.matches) {
+            modal.classList.remove('is-open');
+            void modal.offsetWidth;
+            modal.classList.add('is-open');
+          }
+        }),
+      );
+    });
+
+    // status · 05 bulk: pick an outcome, its modal shows
+    root.querySelectorAll<HTMLElement>('[data-bulk]').forEach((d) => {
+      const picks = d.querySelectorAll<HTMLButtonElement>('[data-bulk-pick]');
+      const cards = d.querySelectorAll<HTMLElement>('[data-bulk-card]');
+      picks.forEach((b) =>
+        b.addEventListener('click', () => {
+          picks.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+          cards.forEach((c) => (c.hidden = c.dataset.bulkCard !== b.dataset.bulkPick));
+        }),
+      );
+    });
+
     // 01 · audit: count the components up when the panel opens
     const countUp = (panel: HTMLElement | null) => {
       const el = panel?.querySelector<HTMLElement>('[data-count]');
@@ -467,17 +651,7 @@ const slug = (k: string) =>
     display: flex;
     flex-direction: column;
     gap: 24px;
-    padding-top: 72px;
-  }
-  @media (max-width: 767px) {
-    .ch-wrap {
-      padding-top: 56px;
-    }
-  }
-  @media (max-width: 479px) {
-    .ch-wrap {
-      padding-top: 48px;
-    }
+    padding-top: var(--spacing-section);
   }
   .chs {
     display: flex;
@@ -558,11 +732,12 @@ const slug = (k: string) =>
   }
   @media (prefers-reduced-motion: no-preference) {
     .ch {
-      transition: opacity 220ms ease;
+      transition: opacity 220ms var(--ease-out), transform 220ms var(--ease-out);
     }
   }
   .ch.is-entering {
     opacity: 0;
+    transform: translateY(6px);
   }
   .chs-controls {
     display: flex;
@@ -1056,7 +1231,7 @@ const slug = (k: string) =>
     padding: 9px 12px;
     border: 1px solid #d1d5db;
     border-radius: 6px;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    transition: border-color 180ms var(--ease-out), box-shadow 180ms var(--ease-out), opacity 180ms var(--ease-out);
   }
   .ch-live-err {
     min-height: 1.4em;
@@ -1072,7 +1247,7 @@ const slug = (k: string) =>
     background: var(--qb-primary);
     color: #fff;
     font-weight: 500;
-    transition: box-shadow 0.2s ease, opacity 0.2s ease;
+    transition: box-shadow 180ms var(--ease-out), opacity 180ms var(--ease-out);
   }
   .ch-live-demo[data-state='0'] .ch-live-btn {
     box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--qb-primary);
@@ -1154,6 +1329,324 @@ const slug = (k: string) =>
       from {
         clip-path: inset(0 100% 0 0);
       }
+    }
+  }
+
+  /* ---- status workflows blocks ---- */
+  .ch-surf {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+    gap: 0 32px;
+  }
+  .ch-surf > li {
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .ch-surf-how {
+    padding: 2px 8px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-pill);
+    color: var(--color-ink-2);
+  }
+  .ch-pick {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--color-line);
+  }
+  .ch-pick > button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 48px;
+    padding: 12px 10px;
+    border: 0;
+    border-bottom: 1px solid var(--color-line);
+    background: transparent;
+    color: var(--color-ink);
+    font: inherit;
+    font-size: var(--text-body);
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 200ms var(--ease-out), transform 160ms var(--ease-out);
+  }
+  .ch-pick > button[aria-pressed='true'] {
+    background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .ch-pick > button:hover {
+      background: var(--color-surface-hover);
+    }
+    .ch-pick > button[aria-pressed='true']:hover {
+      background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+    }
+  }
+  .ch-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ch-chips :global(li) {
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    background: var(--color-accent);
+    color: var(--color-on-ink);
+    font-size: var(--text-body-sm);
+  }
+
+  .ch-graph,
+  .ch-rules,
+  .ch-every,
+  .ch-bulk {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 24px 40px;
+    align-items: start;
+  }
+  .ch-rules,
+  .ch-every,
+  .ch-bulk {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  @media (max-width: 767px) {
+    .ch-graph,
+    .ch-rules,
+    .ch-every,
+    .ch-bulk {
+      grid-template-columns: 1fr;
+    }
+  }
+  .ch-graph-svg {
+    width: 100%;
+    height: auto;
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+  .ch-graph-svg rect {
+    fill: var(--color-surface);
+    stroke: var(--color-line-strong);
+  }
+  .ch-graph-svg text {
+    fill: var(--color-ink);
+  }
+  .ch-graph-svg path {
+    fill: none;
+    stroke: var(--color-line-strong);
+    stroke-width: 2;
+    transition: stroke 200ms var(--ease-out), stroke-width 200ms var(--ease-out);
+  }
+  .ch-graph-svg path.is-on {
+    stroke: var(--color-accent);
+    stroke-width: 3;
+  }
+
+  .ch-switch {
+    flex: none;
+    position: relative;
+    width: 34px;
+    height: 20px;
+    border-radius: 10px;
+    background: var(--color-cell-quiet);
+    transition: background-color 200ms var(--ease-out);
+  }
+  .ch-switch::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 200ms var(--ease-out);
+  }
+  .ch-toggle[aria-pressed='true'] .ch-switch {
+    background: var(--color-accent);
+  }
+  .ch-toggle[aria-pressed='true'] .ch-switch::after {
+    transform: translateX(14px);
+  }
+
+  /* a small QBench-style modal, drawn in code (illustration, not a screenshot) */
+  .ch-modal {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 22px;
+    border: 1px solid var(--color-line);
+    border-radius: 12px;
+    background: #ffffff;
+    color: #1f2937;
+    font-size: 14px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+  }
+  .ch-modal[hidden] {
+    display: none;
+  }
+  .ch-modal-t {
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .ch-modal-move {
+    font-size: 13px;
+    color: #6b7280;
+  }
+  .ch-modal-move b {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #e4effc;
+    color: #244d9e;
+    font-weight: 500;
+  }
+  .ch-modal-steps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 13px;
+    color: #9ca3af;
+  }
+  .ch-modal-steps :global(i) {
+    font-style: normal;
+  }
+  .ch-modal-steps :global(i.is-on) {
+    color: #1f2937;
+    font-weight: 500;
+  }
+  .ch-modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 74px;
+  }
+  .ch-modal-body :global(span) {
+    padding: 9px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    color: #4b5563;
+  }
+  .ch-modal-body :global(.ch-modal-none) {
+    border: 0;
+    padding: 9px 0;
+    color: #6b7280;
+  }
+  .ch-modal-btn {
+    align-self: flex-end;
+    padding: 8px 16px;
+    border-radius: 6px;
+    background: #244d9e;
+    color: #fff;
+    font-weight: 500;
+  }
+  .ch-bars {
+    display: flex;
+    gap: 4px;
+    height: 8px;
+  }
+  .ch-bars :global(i) {
+    border-radius: 4px;
+  }
+  .ch-bars[data-o='0'] :global(i:first-child) {
+    flex: 1;
+    background: #16a34a;
+  }
+  .ch-bars[data-o='0'] :global(i:last-child) {
+    display: none;
+  }
+  .ch-bars[data-o='1'] :global(i:first-child) {
+    flex: 6;
+    background: #16a34a;
+  }
+  .ch-bars[data-o='1'] :global(i:last-child) {
+    flex: 2;
+    background: #c2341b;
+  }
+  .ch-bars[data-o='2'] :global(i:first-child) {
+    display: none;
+  }
+  .ch-bars[data-o='2'] :global(i:last-child) {
+    flex: 1;
+    background: #c2341b;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .ch:not([hidden]) .ch-surf > li {
+      animation: ch-row 400ms var(--ease-out) both;
+      animation-delay: calc(var(--i) * 60ms);
+    }
+    .ch-modal.is-open,
+    .ch-modal--bulk:not([hidden]) {
+      animation: ch-pop 240ms var(--ease-out) both;
+    }
+    @keyframes ch-pop {
+      from {
+        opacity: 0;
+        transform: scale(0.97);
+      }
+    }
+  }
+
+  .ch-order-list {
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+  @media (max-width: 767px) {
+    .ch-order-list {
+      grid-template-columns: 1fr;
+    }
+  }
+  .ch-order-list > li {
+    position: relative;
+    display: flex;
+    gap: 14px;
+    padding: 20px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-code);
+    background: var(--color-surface);
+  }
+  .ch-order-n {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    color: var(--color-on-ink);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+  }
+  @media (min-width: 768px) {
+    .ch-order-list > li:not(:last-child)::after {
+      content: '→';
+      position: absolute;
+      right: -11px;
+      top: 50%;
+      translate: 0 -50%;
+      z-index: 1;
+      color: var(--color-ink-2);
+      background: var(--color-surface);
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .ch:not([hidden]) .ch-order-list > li {
+      animation: ch-row 360ms var(--ease-out) both;
+      animation-delay: calc(var(--i) * 120ms + 80ms);
     }
   }
 </style>

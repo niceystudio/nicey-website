@@ -12,18 +12,24 @@ import Shot from './Shot.astro';
 import NamesField from './NamesField.astro';
 import QBenchHero from './QBenchHero.astro';
 import QBenchWork from './QBenchWork.astro';
+import StatusHero from './StatusHero.astro';
+import SurfacesField from './SurfacesField.astro';
+import TwoSides from './TwoSides.astro';
+import Decisions from './Decisions.astro';
 import Chapters from './Chapters.astro';
+import SectionHead from '../SectionHead.astro';
 import MachineView from './MachineView.astro';
 import { caseMarkdown } from '../../lib/case-markdown';
 import SiteFooter from '../SiteFooter.astro';
 import { links } from '../../data/links';
-import { caseHref, getCaseStudy, type Band, type CaseStudy } from '../../data/case-studies';
+import { caseHref, caseStudies, getCaseStudy, type Band, type CaseStudy } from '../../data/case-studies';
 
 interface Props {
   study: CaseStudy;
 }
 const { study: s } = Astro.props;
 const next = getCaseStudy(s.next);
+const prev = caseStudies.find((c) => c.next === s.slug);
 
 // literal class names so Tailwind sees them
 const bandBg: Record<Band, string> = {
@@ -63,10 +69,10 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
             <h1 id="cs-title" class="m-0 max-w-[22ch] text-case-h1 text-balance">{s.statement}</h1>
             <p class="m-0 max-w-[52ch] text-body-lg text-pretty text-ink-2"><Gaps text={s.lede} /></p>
           </div>
-          {s.heroVisual === 'qbench-build' && (
+          {s.heroVisual && (
             <div class="cs-hero-visual">
               {s.heroContext && <p class="cs-hero-context">{s.heroContext}</p>}
-              <QBenchHero />
+              {s.heroVisual === 'qbench-build' ? <QBenchHero /> : <StatusHero />}
             </div>
           )}
         </div>
@@ -113,9 +119,14 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     }
 
     <section aria-labelledby="numbers-head" class="container-page cs-block cs-block--md">
-      <h2 id="numbers-head" class:list={['caption m-0 mb-5 text-ink-2', s.proofViz && 'sr-only']}>{s.numbersHeading}</h2>
+      {s.heads?.proof ? (
+        <SectionHead id="numbers-head" caption={s.heads.proof.caption} class="mb-12" headingClass="max-w-[18ch]">{s.heads.proof.heading}</SectionHead>
+      ) : (
+        <h2 id="numbers-head" class:list={['caption m-0 mb-5 text-ink-2', s.proofViz && 'sr-only']}>{s.numbersHeading}</h2>
+      )}
       <div class:list={['panel-wrap', s.proofViz && 'panel flex flex-col']}>
         {s.proofViz === 'names' && <NamesField />}
+        {s.proofViz === 'surfaces' && <SurfacesField />}
         {!s.proofViz && <ul class:list={['panel', s.numbers.length === 4 ? 'grid-4' : 'grid-3']}>
           {
             s.numbers.map((n) => (
@@ -145,7 +156,9 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
       )
     }
 
-    {s.chapters && <Chapters chapters={s.chapters} marker={band} />}
+    {s.chapters && <Chapters chapters={s.chapters} marker={band} head={s.heads?.chapters} />}
+
+    {s.decisions && <Decisions heading={s.decisions.heading} head={s.heads?.decisions} items={s.decisions.items} />}
 
     {!s.chapters && <section aria-labelledby="did-head" class="container-page cs-block cs-split">
       <h2 id="did-head" class="cs-split-head m-0 text-case-h2">What we did</h2>
@@ -171,7 +184,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
                 {s.agentic.heading}
               </h2>
             </div>
-            <ol class="cs-agentic-list">
+            <ol class="cs-agentic-list" data-stagger>
               {s.agentic.items.map((it) => (
                 <li>
                   <span class="font-mono text-caption text-on-band-accent">{it.label}</span>
@@ -208,9 +221,15 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     }
 
     <section aria-labelledby="work-head" class="container-page cs-block flex flex-col gap-5">
-      <h2 id="work-head" class="m-0 text-case-h2">{s.workHeading ?? 'From the work'}</h2>
+      {s.heads?.work ? (
+        <SectionHead id="work-head" caption={s.heads.work.caption} class="mb-7" headingClass="max-w-[18ch]">{s.heads.work.heading}</SectionHead>
+      ) : (
+        <h2 id="work-head" class="m-0 text-case-h2">{s.workHeading ?? 'From the work'}</h2>
+      )}
       {s.workVisual === 'qbench' ? (
         <QBenchWork />
+      ) : s.workVisual === 'qbench-status' ? (
+        <TwoSides />
       ) : (
       <div class:list={['cs-figs', s.work.length === 2 && 'cs-figs--two']}>
           {
@@ -252,44 +271,64 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
         {s.cta.action === 'audit' ? (
           <span class="text-body-sm text-ink-2">Only your Figma file. The repo is optional.</span>
         ) : null}
-        <a href={links.bookCall} class="text-body-sm text-ink underline-offset-4 hover:underline">or book a call →</a>
+        {s.cta.action === 'audit' && (
+          <a href={links.bookCall} class="text-body-sm text-ink underline-offset-4 hover:underline">or book a call →</a>
+        )}
       </div>
     </div>
-    <a href={caseHref(next.slug)} class:list={['cs-next', bandBg[next.band]]}>
-      <span class="caption text-ink-2">Next case study</span>
-      <span class="cs-next-name">{next.linkName}</span>
-      <span class="cs-next-row">
-        <span class="m-0 max-w-[40ch] text-cta text-pretty">{next.statement}</span>
-        <span class="cs-next-arrow" aria-hidden="true">→</span>
+    <a href={caseHref(next.slug)} class="cs-next">
+      <span class="cs-next-copy">
+        <span class="caption text-ink-2">Next case study</span>
+        <span class="cs-next-name">{next.linkName}</span>
+        <span class="max-w-[48ch] text-body-lg text-pretty text-ink-2">{next.statement}</span>
+      </span>
+      <span class="cs-next-side" aria-hidden="true">
+        <span class="cs-next-arrow">→</span>
       </span>
     </a>
+    <nav aria-label="More case studies" class="cs-more">
+      {prev ? (
+        <a href={caseHref(prev.slug)} class="cs-more-link">
+          <span aria-hidden="true">←</span> Previous: {prev.linkName}
+        </a>
+      ) : <span />}
+      <a href="/#work" class="cs-more-link">All case studies</a>
+    </nav>
   </section>
   <MachineView markdown={markdown} mdHref={mdHref} />
   <SiteFooter mdHref={mdHref} />
 </Base>
 
+<script>
+  // agentic cards: hold them until the list scrolls in, then let the CSS stagger play once
+  const lists = document.querySelectorAll<HTMLElement>('[data-stagger]');
+  if (lists.length && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const io = new IntersectionObserver(
+      (es) =>
+        es.forEach((e) => {
+          if (!e.isIntersecting) return;
+          e.target.classList.remove('is-waiting');
+          io.unobserve(e.target);
+        }),
+      { threshold: 0.25 },
+    );
+    lists.forEach((l) => {
+      if (l.getBoundingClientRect().top < innerHeight) return;
+      l.classList.add('is-waiting');
+      io.observe(l);
+    });
+  }
+</script>
+
 <style>
+  /* same rhythm as the home page: --spacing-section between sections (128 / 96 / 72),
+     48px from a section heading to its container */
   .cs,
   .cs-foot {
-    --cs-lg: 72px;
-    --cs-md: 64px;
+    --cs-lg: var(--spacing-section);
+    --cs-md: var(--spacing-section);
     --cs-sm: 48px;
-  }
-  @media (max-width: 767px) {
-    .cs,
-    .cs-foot {
-      --cs-lg: 56px;
-      --cs-md: 48px;
-      --cs-sm: 40px;
-    }
-  }
-  @media (max-width: 479px) {
-    .cs,
-    .cs-foot {
-      --cs-lg: 48px;
-      --cs-md: 40px;
-      --cs-sm: 32px;
-    }
+    --cs-head: 48px;
   }
 
   .cs-hero {
@@ -511,6 +550,20 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     border-radius: var(--radius-code);
     background: color-mix(in srgb, var(--color-on-band) 8%, transparent);
   }
+  /* group entrance once, when the cards scroll in: 50ms apart, never blocks reading */
+  @media (prefers-reduced-motion: no-preference) {
+    .cs-agentic-list.is-waiting > li {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    .cs-agentic-list > li {
+      transition: opacity 300ms var(--ease-out), transform 300ms var(--ease-out);
+    }
+    .cs-agentic-list > li:nth-child(2) { transition-delay: 50ms; }
+    .cs-agentic-list > li:nth-child(3) { transition-delay: 100ms; }
+    .cs-agentic-list > li:nth-child(4) { transition-delay: 150ms; }
+    .cs-agentic-list > li:nth-child(5) { transition-delay: 200ms; }
+  }
 
   .cs-collect {
     margin: 0;
@@ -578,56 +631,100 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     align-items: flex-start;
     gap: 10px;
   }
+  /* the next case study is a second path, not a second card: an open row between two lines */
   .cs-next {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 24px;
-    padding: 40px;
-    border-radius: var(--radius-panel);
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px 40px;
+    margin-top: 56px;
+    padding-block: 32px;
+    border-top: 1px solid var(--color-line-strong);
+    border-bottom: 1px solid var(--color-line-strong);
     color: var(--color-ink);
     text-decoration: none;
-    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .cs-next-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
   }
   .cs-next-name {
-    font-size: clamp(36px, 5vw, 72px);
-    line-height: 0.92;
-    letter-spacing: -0.045em;
+    width: fit-content;
+    font-size: clamp(32px, 4.4vw, 60px);
+    line-height: 1;
+    letter-spacing: -0.04em;
     font-weight: 500;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 8px;
+    transition: text-decoration-color 200ms var(--ease-out);
   }
-  .cs-next-row {
+  .cs-next-side {
+    flex: none;
     display: flex;
-    align-items: flex-end;
+    align-items: center;
+    gap: 20px;
+  }
+  .cs-more {
+    display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
-    gap: 24px;
+    gap: 12px 24px;
+    padding-top: 18px;
+  }
+  .cs-more-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    color: var(--color-ink-2);
+    font-size: var(--text-body-sm);
+    text-decoration: none;
+    transition: color 200ms var(--ease-out);
+  }
+  .cs-more-link span {
+    transition: transform 200ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .cs-more-link:hover {
+      color: var(--color-ink);
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+    .cs-more-link:hover span {
+      transform: translateX(-4px);
+    }
   }
   .cs-next-arrow {
-    flex: none;
     display: grid;
     place-items: center;
-    width: 56px;
-    height: 56px;
+    width: 48px;
+    height: 48px;
+    border: 1px solid var(--color-line-strong);
     border-radius: 50%;
-    background: var(--color-ink);
-    color: var(--color-on-ink);
-    font-size: 22px;
-    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    font-size: 20px;
+    transition: transform 200ms var(--ease-out), background-color 200ms var(--ease-out), color 200ms var(--ease-out);
   }
-  @media (hover: hover) {
-    .cs-next:hover {
-      transform: translateY(-4px);
+  .cs-next:active .cs-next-arrow {
+    transform: scale(0.95);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .cs-next:hover .cs-next-name {
+      text-decoration-color: currentColor;
     }
     .cs-next:hover .cs-next-arrow {
       transform: translateX(6px);
+      background: var(--color-ink);
+      color: var(--color-on-ink);
     }
   }
-  @media (max-width: 479px) {
+  @media (max-width: 767px) {
     .cs-next {
-      padding: 24px;
-    }
-    .cs-next-arrow {
-      width: 44px;
-      height: 44px;
+      flex-direction: column;
+      align-items: flex-start;
     }
   }
 
