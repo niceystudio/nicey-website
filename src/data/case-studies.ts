@@ -27,11 +27,12 @@ export type ChapterBlock =
   | { kind: 'checks'; title: string; subject: string; status: string; items: { value: string; label: string }[] }
   | { kind: 'meters'; title: string; items: { label: string; value: string }[] }
   | { kind: 'states'; title: string; rows: { state: string; token: string; example: string }[] }
+  | { kind: 'audit'; title: string; layers: number; items: { label: string; value: string }[] }
   | { kind: 'compare'; rows: { label: string; before: string; after: string; note: string }[] }
   | { kind: 'images'; images: { src: string; alt: string; width: number; height: number }[] };
 
 export interface Chapter {
-  /** e.g. "02 · Before" */
+  /** e.g. "01 · Audit" */
   kicker: string;
   heading: string;
   lede: string;
@@ -69,15 +70,6 @@ export interface CaseStudy {
   heroVisual?: 'qbench-build';
   /** one line above the hero visual that says what it shows */
   heroContext?: string;
-  /** review only: alternative hero texts, picked with ?h=<key> (losers get removed after review) */
-  heroOptions?: {
-    key: string;
-    statement: string;
-    /** a short, bold result line under the headline */
-    result?: string;
-    lede: string;
-    points?: { label: string; text: string }[];
-  }[];
   /** heading of the "From the work" section */
   workHeading?: string;
   /** custom "From the work" visuals instead of image figures */
@@ -109,8 +101,8 @@ export const caseStudies: CaseStudy[] = [
     name: 'QBench',
     band: 'lavender',
     kicker: 'Case study · Design system · LIMS software',
-    statement: 'No one owned the design system, so nothing in the product agreed with itself.',
-    lede: 'A B2B SaaS product built for years without a designer in the room. Every screen was a developer’s best guess, and each new feature meant relearning decisions nobody had written down. If your team copies screens instead of reusing parts, this is your starting point too.',
+    statement: 'A design system AI agents can build with.',
+    lede: 'QBench’s lab software grew for years without a designer. We rebuilt its design system as one Figma library that designers, developers and AI agents read the same way.',
     facts: [
       { term: 'Company', detail: 'Lab information management (LIMS), B2B SaaS' },
       { term: 'Team', detail: '[Team size: engineers and designers]' },
@@ -119,33 +111,11 @@ export const caseStudies: CaseStudy[] = [
         detail: 'Legacy product plus a new app, Figma Foundation and Components libraries [confirm stack]',
       },
       { term: 'Scale', detail: '141 components across three library pages' },
+      { term: 'Work by', detail: 'Goran Babarogić, product designer and design system engineer, June 2025 to now' },
     ],
-    who: 'Who did the work: Goran Babarogić, as product designer and design system engineer at QBench, June 2025 to now.',
+    who: '',
     heroVisual: 'qbench-build',
     heroContext: 'Today, every component reads two ways: as UI for people, as props and tokens for agents.',
-    heroOptions: [
-      {
-        key: 'a',
-        statement: 'We turned QBench’s design system into one library that people and AI agents read the same way.',
-        lede: 'QBench is lab software built for years without a designer, so every screen was a best guess. We pulled the components back onto one Foundation, gave every token the name developers use in code, and wrote docs an agent can read. Now an agent can build a screen from the library, and a check catches anything that drifts.',
-      },
-      {
-        key: 'b',
-        statement: 'No one owned the design system, so nothing in the product agreed with itself.',
-        result: 'Now it’s one library that designers, developers and AI agents all read the same way.',
-        lede: 'A B2B lab product built for years without a designer in the room. Every screen was a developer’s best guess. If your team copies screens instead of reusing parts, this is your starting point too.',
-      },
-      {
-        key: 'c',
-        statement: 'From a design system no one owned to one AI agents can build with.',
-        lede: 'QBench is lab software (LIMS), built for years without a designer in the room.',
-        points: [
-          { label: 'Before', text: '11 outside libraries behind the components, 1,071 stray references, and decisions nobody wrote down.' },
-          { label: 'What we did', text: 'One Foundation, a code name on every token, a description on every component.' },
-          { label: 'Now', text: 'An agent builds screens from 243 allowed components, and a check flags anything off the system.' },
-        ],
-      },
-    ],
     workHeading: 'What the agent reads',
     proofViz: 'names',
     workVisual: 'qbench',
@@ -169,22 +139,35 @@ export const caseStudies: CaseStudy[] = [
     ],
     chapters: [
       {
-        kicker: '03 · One file',
-        heading: 'One library, and every variable carries the name developers use in code.',
-        lede: 'V2 brings tokens and components into a single file. Each variable has a web code name, so the value a designer picks in Figma is the same CSS variable a developer or an agent writes.',
+        kicker: '01 · Audit',
+        heading: 'First, we measured what was really there.',
+        lede: 'Scripts read every layer and report what is bound to a token, instead of trusting how it looks.',
         blocks: [
           {
-            kind: 'rows',
-            title: 'Variable collections · V2',
-            rows: [
-              { label: 'Primitives', value: '256' },
-              { label: 'Semantic Tokens', value: '178' },
-              { label: 'Dimensions', value: '84' },
-              { label: 'Typography', value: '28' },
-              { label: 'Elevation', value: '6' },
-              { label: 'Component Tokens', value: '2' },
+            kind: 'audit',
+            title: 'Token coverage · values bound to a token',
+            layers: 1610,
+            items: [
+              { label: 'Fill', value: '97%' },
+              { label: 'Stroke', value: '99.7%' },
+              { label: 'Text', value: '99.8%' },
+              { label: 'Corner radius', value: '100%' },
+              { label: 'Gap', value: '99.8%' },
+              { label: 'Padding', value: '100%' },
+              { label: 'Effects', value: '99%' },
             ],
           },
+        ],
+        proof: [
+          { value: '1,071 → 0', caption: 'references to outside libraries, repointed to the system.', seenAt: 'Seen at QBench' },
+          { value: '99.5%', caption: 'of values bound to a token, across 1,610 components.' },
+        ],
+      },
+      {
+        kicker: '02 · One file',
+        heading: 'One library, with the names developers type.',
+        lede: 'Tokens and components moved into one file, and every variable got its CSS name.',
+        blocks: [
           {
             kind: 'map',
             title: 'Figma variable → web code name',
@@ -197,11 +180,12 @@ export const caseStudies: CaseStudy[] = [
             ],
           },
         ],
+        proof: [{ value: '2 files → 1', caption: 'for tokens and components, so a token change reaches every component.' }],
       },
       {
-        kicker: '04 · Token system',
-        heading: 'One ramp, aliased down to the button.',
-        lede: 'Components never point at a hex. A button reads its component token, the token aliases a primitive, so one change to the ramp reaches every screen that uses it.',
+        kicker: '03 · Tokens',
+        heading: 'One colour ramp, aliased down to the button.',
+        lede: 'Point at a step of the ramp to see which button state it feeds.',
         blocks: [
           {
             kind: 'ramp',
@@ -231,54 +215,33 @@ export const caseStudies: CaseStudy[] = [
             ],
           },
         ],
-        proof: [
-          {
-            value: '256 → 178 → 2',
-            caption: 'primitives, semantic tokens and component tokens in the V2 library.',
-            seenAt: 'Three layers',
-          },
-        ],
+        proof: [{ value: '256 → 178 → 2', caption: 'primitives, semantic tokens and component tokens.', seenAt: 'Three layers' }],
       },
       {
-        kicker: '05 · Docs agents can read',
-        heading: 'Each component says when to use it, and what to use instead.',
-        lede: 'Designers read it in the panel. Agents read the same text through the API.',
+        kicker: '04 · States',
+        heading: 'Every state comes from one shared token.',
+        lede: 'Pick a state to see it on a real button and field, and the token behind it.',
         blocks: [
           {
-            kind: 'rows',
-            title: 'Component descriptions · V2',
+            kind: 'states',
+            title: 'Shared across the library',
             rows: [
-              { label: 'Start with a one-line purpose', value: '126' },
-              { label: 'Include Use for', value: '62' },
-              { label: 'Include Not for', value: '68' },
-            ],
-          },
-          {
-            kind: 'docs',
-            title: 'Example · what the panel and the API both return',
-            items: [
-              {
-                name: 'Switch',
-                purpose: 'Toggles a setting with label and description.',
-                useFor: 'immediate settings.',
-                notFor: 'single-choice lists. Use',
-                instead: 'RadioButton',
-              },
+              { state: 'Focus · button', token: 'ring/ring-selected', example: 'Create CAPA' },
+              { state: 'Focus · text field', token: 'border/primary/default', example: 'Batch ID' },
+              { state: 'Error · text field', token: 'border/critical/default', example: 'Batch ID' },
+              { state: 'Disabled', token: 'opacity/disabled · 50%', example: 'Create CAPA' },
             ],
           },
         ],
         proof: [
-          {
-            value: '126 / 126',
-            caption: 'component sets with a description, up from 119 of 124 in V1.',
-            seenAt: 'Seen at QBench',
-          },
+          { value: '28', caption: 'components focus with the same ring style.', seenAt: 'Seen at QBench' },
+          { value: '716', caption: 'layers fade with one opacity token when disabled.' },
         ],
       },
       {
-        kicker: '06 · Screen Generator',
-        heading: 'A developer hands over a PRD, and an agent builds the screen from the library.',
-        lede: 'One skill builds the screen in Figma with published components. A second checks every layer against the library. Designers then refine the result.',
+        kicker: '05 · Agents build',
+        heading: 'A developer hands over a PRD. An agent builds the screen.',
+        lede: 'One skill builds in Figma from the library, a second checks every layer, a designer refines.',
         blocks: [
           {
             kind: 'flow',
@@ -302,76 +265,7 @@ export const caseStudies: CaseStudy[] = [
             ],
           },
         ],
-        proof: [
-          {
-            value: '243',
-            caption: 'components the agent is allowed to use, all from the published library.',
-            seenAt: 'Seen at QBench',
-          },
-        ],
-      },
-      {
-        kicker: '07 · Audited, not assumed',
-        heading: 'Scripts read the files and report what is really bound to a token.',
-        lede: 'Instead of trusting how a component looks, we scan every layer.',
-        blocks: [
-          {
-            kind: 'stats',
-            items: [
-              {
-                value: '1,071 → 0',
-                label: 'Library scan · V2',
-                caption: 'references to outside libraries, across 141 components, repointed to the system.',
-                seenAt: 'Seen at QBench',
-              },
-              {
-                value: '121 / 121',
-                label: 'Library scan · V2',
-                caption: 'V1 components matched to their V2 version.',
-              },
-            ],
-          },
-          {
-            kind: 'meters',
-            title: 'Token coverage · V2 · values bound to a token',
-            items: [
-              { label: 'Fill', value: '97%' },
-              { label: 'Stroke', value: '99.7%' },
-              { label: 'Text', value: '99.8%' },
-              { label: 'Corner radius', value: '100%' },
-              { label: 'Gap', value: '99.8%' },
-              { label: 'Padding', value: '100%' },
-              { label: 'Effects', value: '99%' },
-            ],
-          },
-        ],
-        proof: [
-          {
-            value: '99.5%',
-            caption: 'Across 1,610 components. V1 measured 99.1% with the same script.',
-          },
-        ],
-      },
-      {
-        kicker: '08 · State rules',
-        heading: 'Every state comes from a shared style or a token, not a one-off colour.',
-        lede: 'One ring for focus, one border token for fields, one opacity for disabled.',
-        blocks: [
-          {
-            kind: 'states',
-            title: 'Shared across the library',
-            rows: [
-              { state: 'Focus · button', token: 'ring/ring-selected', example: 'Create CAPA' },
-              { state: 'Focus · text field', token: 'border/primary/default', example: 'Batch ID' },
-              { state: 'Error · text field', token: 'border/critical/default', example: 'Batch ID' },
-              { state: 'Disabled', token: 'opacity/disabled · 50%', example: 'Create CAPA' },
-            ],
-          },
-        ],
-        proof: [
-          { value: '28', caption: 'components focus with the same ring style.', seenAt: 'Seen at QBench' },
-          { value: '716', caption: 'layers fade with one opacity token when disabled.' },
-        ],
+        proof: [{ value: '243', caption: 'components the agent may use, all from the published library.', seenAt: 'Seen at QBench' }],
       },
     ],
     did: [
@@ -387,6 +281,7 @@ export const caseStudies: CaseStudy[] = [
         { label: 'Rules', text: 'State the target. They never get softened to match the code.' },
         { label: 'Facts', text: 'Measure what the code actually does today, generated, not written by hand.' },
         { label: 'Gap list', text: 'Maps one to the other. Deleting a row is the unit of progress.' },
+        { label: 'Docs', text: 'Every component says when to use it and what to use instead: 126 of 126 sets.' },
         {
           label: 'Gate',
           text: 'A lint rule enforces the tokens, whether or not an agent read a single document.',

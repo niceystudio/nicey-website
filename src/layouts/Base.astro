@@ -8,10 +8,14 @@ import geistMonoLatin from '@fontsource-variable/geist-mono/files/geist-mono-lat
 interface Props {
   title: string;
   description: string;
+  /** the page's Markdown twin, for agents */
+  markdownHref?: string;
+  /** schema.org data for search and AI answers */
+  jsonLd?: Record<string, unknown>;
   noindex?: boolean;
 }
 
-const { title, description, noindex = false } = Astro.props;
+const { title, description, noindex = false, markdownHref, jsonLd } = Astro.props;
 ---
 
 <!doctype html>
@@ -21,6 +25,9 @@ const { title, description, noindex = false } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    {markdownHref && <link rel="alternate" type="text/markdown" href={markdownHref} />}
+    <link rel="alternate" type="text/plain" title="llms.txt" href="/llms.txt" />
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
     {noindex && <meta name="robots" content="noindex" />}
     <meta name="color-scheme" content="light dark" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />

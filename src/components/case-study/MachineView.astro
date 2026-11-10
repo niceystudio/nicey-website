@@ -1,6 +1,7 @@
 ---
 /**
- * Page-wide Human / Machine switch (idea from parallel.ai, applied to the whole case study).
+ * Machine view of a case study (idea from parallel.ai, applied to the whole page).
+ * The switch lives in the footer tool strip (SiteFooter, [data-mv] buttons, key m).
  * Machine hides the designed page and shows the plain Markdown an agent reads,
  * the same text that is served at /work/<slug>.md. State lives in ?view=machine.
  */
@@ -16,16 +17,6 @@ const kind = (l: string, i: number, fmEnd: number) =>
 const fmEnd = lines.indexOf('---', 1);
 ---
 
-<div class="mv-bar" data-mv-bar>
-  <div class="container-page mv-bar-in">
-    <span class="mv-hint">Who is reading this page?</span>
-    <div role="group" aria-label="Who is reading this page" class="mv-seg">
-      <button type="button" data-mv="human" aria-pressed="true">Human</button>
-      <button type="button" data-mv="machine" aria-pressed="false">Machine</button>
-    </div>
-  </div>
-</div>
-
 <section class="mv" data-mv-page hidden aria-label="This case study as an agent reads it">
   <div class="container-page mv-in">
     <div class="mv-head">
@@ -34,6 +25,7 @@ const fmEnd = lines.indexOf('---', 1);
       <span class="mv-actions">
         <button type="button" class="mv-btn" data-mv-copy>Copy</button>
         <a class="mv-btn" href={mdHref}>Open .md</a>
+        <button type="button" class="mv-btn mv-btn--ink" data-mv="human">← Human view</button>
       </span>
     </div>
     <p class="mv-lead">
@@ -46,60 +38,6 @@ const fmEnd = lines.indexOf('---', 1);
 </section>
 
 <style>
-  /* zero height, so the switch floats over the hero instead of adding a strip above it */
-  .mv-bar {
-    position: sticky;
-    top: 0;
-    z-index: 30;
-    height: 0;
-    overflow: visible;
-    pointer-events: none;
-  }
-  .mv-bar-in {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 12px;
-    padding-block: 12px;
-  }
-  .mv-hint {
-    font-family: var(--font-mono);
-    font-size: var(--text-caption-sm);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--color-ink-2);
-    pointer-events: auto;
-  }
-  .mv-seg {
-    display: inline-flex;
-    padding: 4px;
-    border: 1px solid var(--color-line-strong);
-    border-radius: var(--radius-pill);
-    background: var(--color-surface);
-    pointer-events: auto;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-  }
-  .mv-seg button {
-    min-height: 36px;
-    padding: 0 16px;
-    border: 0;
-    border-radius: var(--radius-pill);
-    background: transparent;
-    color: var(--color-ink-2);
-    font: inherit;
-    font-size: var(--text-label);
-    cursor: pointer;
-  }
-  .mv-seg button[aria-pressed='true'] {
-    background: var(--color-ink);
-    color: var(--color-on-ink);
-  }
-  @media (max-width: 479px) {
-    .mv-hint {
-      display: none;
-    }
-  }
-
   .mv[hidden] {
     display: none;
   }
@@ -142,6 +80,11 @@ const fmEnd = lines.indexOf('---', 1);
     font: inherit;
     text-decoration: none;
     cursor: pointer;
+  }
+  .mv-btn--ink {
+    background: var(--color-ink);
+    border-color: var(--color-ink);
+    color: var(--color-on-ink);
   }
   .mv-lead {
     margin: 0;
@@ -194,11 +137,12 @@ const fmEnd = lines.indexOf('---', 1);
 
 <script>
   const page = document.querySelector<HTMLElement>('[data-mv-page]');
-  const bar = document.querySelector<HTMLElement>('[data-mv-bar]');
   const human = document.querySelectorAll<HTMLElement>('[data-human]');
-  if (page && bar) {
-    const buttons = bar.querySelectorAll<HTMLButtonElement>('[data-mv]');
+  if (page) {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('[data-mv]');
+    let view = 'human';
     const set = (v: string, push = true) => {
+      view = v;
       const machine = v === 'machine';
       page.hidden = !machine;
       human.forEach((h) => (h.hidden = machine));
@@ -208,12 +152,18 @@ const fmEnd = lines.indexOf('---', 1);
         if (machine) p.set('view', 'machine');
         else p.delete('view');
         const q = p.toString();
-        history.replaceState(null, '', `${location.pathname}${q ? `?${q}` : ''}${location.hash}`);
+        history.replaceState(null, '', `${location.pathname}${q ? `?${q}` : ''}`);
         window.scrollTo({ top: 0 });
       }
     };
     buttons.forEach((b) => b.addEventListener('click', () => set(b.dataset.mv!)));
     if (new URLSearchParams(location.search).get('view') === 'machine') set('machine', false);
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'm' || e.metaKey || e.ctrlKey || e.altKey) return;
+      const t = e.target as HTMLElement;
+      if (t.closest('input, textarea, select, [contenteditable]')) return;
+      set(view === 'machine' ? 'human' : 'machine');
+    });
 
     const copy = page.querySelector<HTMLButtonElement>('[data-mv-copy]');
     const src = page.querySelector<HTMLTextAreaElement>('[data-mv-src]');
