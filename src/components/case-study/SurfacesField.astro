@@ -1,0 +1,279 @@
+---
+/**
+ * QBench status workflows, before / after: the eight places a test status can change.
+ * Before, each surface ends in its own rule set. After, every line runs into one status model.
+ * The surface names are the ones listed in the QBench Figma (Status Workflows page).
+ */
+const surfaces = [
+  'Order detail page',
+  'Test detail page',
+  'Test list page',
+  'Batch detail page',
+  'Publishing a report',
+  'Spreadsheet import',
+  'Automations',
+  'API',
+];
+const W = 500;
+const H = 360;
+const rowY = (i: number) => 28 + i * ((H - 56) / (surfaces.length - 1));
+const x0 = 168; // right edge of the labels
+const before = surfaces.map((_, i) => {
+  const y = rowY(i);
+  const ex = 270 + ((i * 47) % 120);
+  const ey = y + (((i * 37) % 5) - 2) * 6;
+  return { d: `M${x0} ${y} C ${x0 + 60} ${y}, ${ex - 60} ${ey}, ${ex} ${ey}`, ex, ey };
+});
+const mx = 350;
+const my = H / 2;
+const after = surfaces.map((_, i) => {
+  const y = rowY(i);
+  return `M${x0} ${y} C ${x0 + 120} ${y}, ${mx - 140} ${my}, ${mx - 52} ${my}`;
+});
+const NOTE_BEFORE = 'Each place had its own idea of what happens next, and of which compliance steps to ask for.';
+const NOTE_AFTER = 'Now every place runs the same status model, with the same steps in the same order.';
+---
+
+<div class="sf" data-sf>
+  <div class="sf-copy">
+    <span class="caption flex items-center gap-2 text-ink-2">
+      <i aria-hidden="true" class="block size-[7px] rounded-full bg-accent"></i>QBench · Status changes
+    </span>
+    <p class="sf-figure" aria-hidden="true"><span data-sf-fig>8</span><span class="sf-of"> rule sets</span></p>
+    <p class="sr-only" aria-live="polite" data-sf-live>Before: 8 places, each with its own rules.</p>
+    <h3 class="m-0 mt-5 text-title">places that can change a test’s status</h3>
+    <p class="sf-note m-0 mt-3 max-w-[40ch] text-pretty text-ink-2" data-sf-note data-before={NOTE_BEFORE} data-after={NOTE_AFTER}>
+      {NOTE_BEFORE}
+    </p>
+    <div class="mt-auto pt-8">
+      <div role="group" aria-label="Show state" class="sf-seg">
+        <button type="button" data-sf-state="0" aria-pressed="true">Before</button>
+        <button type="button" data-sf-state="1" aria-pressed="false">After</button>
+      </div>
+    </div>
+  </div>
+  <div class="sf-field-col">
+    <svg
+      class="sf-svg"
+      viewBox={`0 0 ${W} ${H}`}
+      role="img"
+      aria-label="Eight places that change a status. Before: each ends in its own rule set. After: all run into one status model."
+    >
+      {
+        surfaces.map((name, i) => (
+          <g class="sf-src" style={`--i:${i}`}>
+            <rect x="0" y={rowY(i) - 13} width={x0 - 8} height="26" rx="13" />
+            <text x="12" y={rowY(i) + 4}>{name}</text>
+            <circle cx={x0} cy={rowY(i)} r="3" />
+          </g>
+        ))
+      }
+      <g class="sf-before">
+        {
+          before.map((b, i) => (
+            <g style={`--i:${i}`}>
+              <path d={b.d} pathLength="1" />
+              <rect x={b.ex} y={b.ey - 7} width="14" height="14" rx={i % 3 === 0 ? 7 : 2} />
+            </g>
+          ))
+        }
+      </g>
+      <g class="sf-after">
+        {after.map((d, i) => <path d={d} pathLength="1" style={`--i:${i}`} />)}
+        <rect class="sf-model" x={mx - 52} y={my - 22} width="104" height="44" rx="10" />
+        <text class="sf-model-t" x={mx} y={my + 5} text-anchor="middle">Status model</text>
+        <path class="sf-out" d={`M${mx + 52} ${my} L ${W - 16} ${my}`} pathLength="1" />
+        <text class="sf-out-t" x={W - 16} y={my + 22} text-anchor="end">recorded</text>
+        <circle class="sf-out-dot" cx={W - 16} cy={my} r="4" />
+      </g>
+    </svg>
+  </div>
+</div>
+
+<style>
+  .sf {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+  }
+  .sf-copy {
+    flex: 1 1 360px;
+    min-width: 0;
+    padding: var(--spacing-cell);
+    display: flex;
+    flex-direction: column;
+    container-type: inline-size;
+  }
+  .sf-figure {
+    margin: 28px 0 0 -0.04em;
+    font-size: min(clamp(72px, 8vw, 128px), 30cqi);
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .sf-of {
+    color: var(--color-muted);
+    font-size: 0.3em;
+    letter-spacing: -0.02em;
+  }
+  .sf-seg {
+    display: inline-flex;
+    padding: 3px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-pill);
+  }
+  .sf-seg button {
+    min-height: 38px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--color-ink-2);
+    font-size: var(--text-label);
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 160ms var(--ease-out);
+  }
+  .sf-seg button:active {
+    transform: scale(0.97);
+  }
+  .sf-seg button[aria-pressed='true'] {
+    background: var(--color-ink);
+    color: var(--color-on-ink);
+  }
+  .sf-field-col {
+    flex: 999 1 480px;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-cell);
+  }
+  .sf-svg {
+    width: 100%;
+    max-width: 540px;
+    margin-inline: auto;
+    height: auto;
+    overflow: visible;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+  }
+  .sf-src rect {
+    fill: var(--color-surface);
+    stroke: var(--color-line-strong);
+  }
+  .sf-src text {
+    fill: var(--color-ink);
+  }
+  .sf-src circle {
+    fill: var(--color-ink-2);
+  }
+  .sf-before path,
+  .sf-after path {
+    fill: none;
+    stroke-width: 1.5;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 600ms var(--ease-out), opacity 300ms var(--ease-out);
+    transition-delay: calc(var(--i, 0) * 40ms);
+  }
+  .sf-before path {
+    stroke: var(--color-hot);
+  }
+  .sf-before rect {
+    fill: none;
+    stroke: var(--color-hot);
+    stroke-width: 1.5;
+    transition: opacity 300ms var(--ease-out);
+  }
+  .sf-after path {
+    stroke: var(--color-accent);
+  }
+  .sf-model {
+    fill: var(--color-accent);
+  }
+  .sf-model-t {
+    fill: var(--color-on-ink);
+    font-weight: 600;
+  }
+  :global([data-theme='dark']) .sf-model-t {
+    fill: #141410;
+  }
+  .sf-out-t {
+    fill: var(--color-ink-2);
+  }
+  .sf-out-dot {
+    fill: var(--color-accent);
+  }
+  .sf-model,
+  .sf-model-t,
+  .sf-out-t,
+  .sf-out-dot {
+    transition: opacity 300ms var(--ease-out) 300ms;
+  }
+
+  /* before: own rule sets visible, the model hidden */
+  .sf:not(.is-after) .sf-after path {
+    stroke-dashoffset: 1;
+    opacity: 0;
+  }
+  .sf:not(.is-after) .sf-model,
+  .sf:not(.is-after) .sf-model-t,
+  .sf:not(.is-after) .sf-out-t,
+  .sf:not(.is-after) .sf-out-dot {
+    opacity: 0;
+  }
+  .sf.is-after .sf-before path {
+    stroke-dashoffset: 1;
+    opacity: 0;
+  }
+  .sf.is-after .sf-before rect {
+    opacity: 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sf-before path,
+    .sf-after path {
+      transition: opacity 200ms ease;
+      transition-delay: 0ms;
+    }
+  }
+  .sf-note {
+    transition: opacity 200ms var(--ease-out);
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-sf]').forEach((root) => {
+    const btns = root.querySelectorAll<HTMLButtonElement>('[data-sf-state]');
+    const fig = root.querySelector<HTMLElement>('[data-sf-fig]');
+    const of = root.querySelector<HTMLElement>('.sf-of');
+    const note = root.querySelector<HTMLElement>('[data-sf-note]');
+    const live = root.querySelector<HTMLElement>('[data-sf-live]');
+    let touched = false;
+    const set = (after: boolean) => {
+      root.classList.toggle('is-after', after);
+      btns.forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.sfState === '1') === after)));
+      if (fig) fig.textContent = after ? '1' : '8';
+      if (of) of.textContent = after ? ' model' : ' rule sets';
+      if (note) note.textContent = (after ? note.dataset.after : note.dataset.before) ?? '';
+      if (live) live.textContent = after ? 'After: all 8 places run one status model.' : 'Before: 8 places, each with its own rules.';
+    };
+    btns.forEach((b) =>
+      b.addEventListener('click', () => {
+        touched = true;
+        set(b.dataset.sfState === '1');
+      }),
+    );
+    // play the change once when it scrolls into view, unless the visitor already chose
+    const io = new IntersectionObserver(
+      (es) => {
+        if (!es.some((e) => e.isIntersecting)) return;
+        io.disconnect();
+        setTimeout(() => !touched && set(true), 1400);
+      },
+      { threshold: 0.5 },
+    );
+    io.observe(root);
+  });
+</script>

@@ -28,6 +28,11 @@ export type ChapterBlock =
   | { kind: 'meters'; title: string; items: { label: string; value: string }[] }
   | { kind: 'states'; title: string; rows: { state: string; token: string; example: string }[] }
   | { kind: 'audit'; title: string; layers: number; items: { label: string; value: string }[] }
+  | { kind: 'surfaces'; title: string; items: { name: string; how: string }[] }
+  | { kind: 'graph'; title: string; edges: { from: string; to: string; rules: string[] }[] }
+  | { kind: 'order'; title: string; steps: { name: string; text: string }[] }
+  | { kind: 'everywhere'; title: string; surfaces: { name: string; note: string }[] }
+  | { kind: 'bulk'; title: string; outcomes: { label: string; title: string; text: string; cta: string }[] }
   | { kind: 'compare'; rows: { label: string; before: string; after: string; note: string }[] }
   | { kind: 'images'; images: { src: string; alt: string; width: number; height: number }[] };
 
@@ -67,15 +72,27 @@ export interface CaseStudy {
   numbersHeading: string;
   numbers: { value: string; label: string; meaning: string }[];
   /** a custom visual on the right of the hero */
-  heroVisual?: 'qbench-build';
+  heroVisual?: 'qbench-build' | 'qbench-status';
   /** one line above the hero visual that says what it shows */
   heroContext?: string;
+  /** product decisions: the problem, what we did, and a small UI piece that shows it */
+  decisions?: {
+    heading: string;
+    items: { ui: 'table' | 'toast' | 'move' | 'log' | 'search'; title: string; problem: string; solved: string }[];
+  };
+  /** homepage-style section openers (caption + heading) above the custom sections */
+  heads?: {
+    proof?: { caption: string; heading: string };
+    chapters?: { caption: string; heading: string };
+    decisions?: { caption: string; heading: string };
+    work?: { caption: string; heading: string };
+  };
   /** heading of the "From the work" section */
   workHeading?: string;
   /** custom "From the work" visuals instead of image figures */
-  workVisual?: 'qbench';
+  workVisual?: 'qbench' | 'qbench-status';
   /** an animated before/after above the numbers */
-  proofViz?: 'names';
+  proofViz?: 'names' | 'surfaces';
   steps?: { label: string; inProgress?: boolean }[];
   /** the slides of the Figma case study, one section each */
   chapters?: Chapter[];
@@ -117,6 +134,11 @@ export const caseStudies: CaseStudy[] = [
     heroVisual: 'qbench-build',
     heroContext: 'Today, every component reads two ways: as UI for people, as props and tokens for agents.',
     workHeading: 'What the agent reads',
+    heads: {
+      proof: { caption: 'Before and after', heading: 'Every variable now has a name developers can type.' },
+      chapters: { caption: 'What we did', heading: 'Five steps, from an audit to agents building screens.' },
+      work: { caption: 'See it work', heading: 'What the agent reads' },
+    },
     proofViz: 'names',
     workVisual: 'qbench',
     numbersHeading: 'Before and after',
@@ -160,7 +182,7 @@ export const caseStudies: CaseStudy[] = [
         ],
         proof: [
           { value: '1,071 → 0', caption: 'references to outside libraries, repointed to the system.', seenAt: 'Seen at QBench' },
-          { value: '99.5%', caption: 'of values bound to a token, across 1,610 components.' },
+          { value: '99.5%', caption: 'of values bound to a token, across 1,610 component variants.' },
         ],
       },
       {
@@ -185,7 +207,7 @@ export const caseStudies: CaseStudy[] = [
       {
         kicker: '03 · Tokens',
         heading: 'One colour ramp, aliased down to the button.',
-        lede: 'Point at a step of the ramp to see which button state it feeds.',
+        lede: 'Point at or tap a step of the ramp to see which button state it feeds.',
         blocks: [
           {
             kind: 'ramp',
@@ -279,7 +301,7 @@ export const caseStudies: CaseStudy[] = [
       heading: 'Docs agents might skip. A gate they can’t.',
       items: [
         { label: 'Rules', text: 'State the target. They never get softened to match the code.' },
-        { label: 'Facts', text: 'Measure what the code actually does today, generated, not written by hand.' },
+        { label: 'Facts', text: 'Measure what the code does today. Generated, not written by hand.' },
         { label: 'Gap list', text: 'Maps one to the other. Deleting a row is the unit of progress.' },
         { label: 'Docs', text: 'Every component says when to use it and what to use instead: 126 of 126 sets.' },
         {
@@ -298,7 +320,7 @@ export const caseStudies: CaseStudy[] = [
       },
     },
     changed: {
-      text: 'The component library now runs on one Foundation, with no outside libraries behind it, and the Figma to code contract is in place for the rollout.',
+      text: 'The component library now runs on one Foundation, with no outside libraries behind it, and the Figma-to-code contract is in place for the rollout.',
       collect: {
         label: 'To collect · business result',
         text: '[One real result: time to build a screen, UI bugs, or how often an agent’s first attempt was usable, before and after.]',
@@ -329,46 +351,193 @@ export const caseStudies: CaseStudy[] = [
     name: 'QBench',
     band: 'sage',
     kicker: 'Case study · Product design · LIMS software',
-    statement: 'A status change could skip the compliance step it legally needed.',
-    lede: 'A test’s status could change from eight places, from the order screen to imports, automations and the API. None agreed on what should happen next, and none accounted for the e-signatures and PINs some changes legally needed. If one action in your product behaves differently depending on where it’s triggered, this is the same problem.',
+    statement: 'One status model for every place a test can change.',
+    lede: 'In QBench’s lab software, admins now draw one workflow for a test, and lab staff move tests through it with the compliance steps it needs, from any screen.',
     facts: [
       { term: 'Company', detail: 'Lab information management (LIMS), regulated industries' },
       { term: 'Team', detail: '[Team size]' },
       { term: 'Scope', detail: '8 surfaces that change a status, single and bulk' },
       { term: 'Timeline', detail: 'January to February 2026' },
+      { term: 'Work by', detail: 'Goran Babarogić, product designer at QBench' },
     ],
-    who: 'Who did the work: Goran Babarogić, as product designer at QBench.',
-    lead: { kind: 'image', placeholder: '[Screenshot: a status change with its compliance step]' },
-    numbersHeading: 'In numbers, and what they mean',
+    who: '',
+    heroVisual: 'qbench-status',
+    heroContext: 'Wherever a status changes, the same rules run in the same order.',
+    proofViz: 'surfaces',
+    workVisual: 'qbench-status',
+    workHeading: 'Two people, one workflow',
+    heads: {
+      proof: { caption: 'Before and after', heading: 'Eight places that change a status. One model.' },
+      chapters: { caption: 'What we did', heading: 'Five steps to one workflow on every screen.' },
+      decisions: { caption: 'Product decisions', heading: 'Problems we solved' },
+      work: { caption: 'See it work', heading: 'Two people, one workflow' },
+    },
+    numbersHeading: 'Before and after',
     numbers: [
       {
         value: '8 → 1',
         label: 'places a status could change, now on one model',
         meaning: 'So a status behaves the same wherever it’s changed.',
       },
+    ],
+    chapters: [
       {
-        value: '4',
-        label: 'compliance steps in the flow: required fields, comments, e-signatures, PIN',
-        meaning: 'So required steps can’t be skipped, and people aren’t stuck at dead ends.',
+        kicker: '01 · Map',
+        heading: 'First, we found every place a status can change.',
+        lede: 'Screens, bulk edits, imports, automations and the API. Each one had its own idea of what happens next.',
+        blocks: [
+          {
+            kind: 'surfaces',
+            title: 'Places a test status can change',
+            items: [
+              { name: 'Order detail page', how: 'Single' },
+              { name: 'Test detail page', how: 'Single' },
+              { name: 'Test list page', how: 'Bulk' },
+              { name: 'Batch detail page', how: 'Bulk' },
+              { name: 'Publishing a report', how: 'Prompt' },
+              { name: 'Spreadsheet import', how: 'Import' },
+              { name: 'Automations', how: 'System' },
+              { name: 'API', how: 'System' },
+            ],
+          },
+        ],
       },
       {
-        value: 'MVP',
-        label: 'shipped, including bulk status update',
-        meaning: 'So the model was proven in the product, not only in Figma.',
+        kicker: '02 · Model',
+        heading: 'One workflow: statuses, and the moves between them.',
+        lede: 'An admin draws the workflow once. Pick a move to see the rules that travel with it.',
+        blocks: [
+          {
+            kind: 'graph',
+            title: 'Test approval workflow · example',
+            edges: [
+              { from: 'Not started', to: 'In progress', rules: ['Assigned people only'] },
+              { from: 'In progress', to: 'Completed', rules: ['Required fields', 'E-signature', 'Reason'] },
+              { from: 'In progress', to: 'Cancelled', rules: ['Reason'] },
+            ],
+          },
+        ],
+      },
+      {
+        kicker: '03 · Rules',
+        heading: 'Compliance lives on the move, in one fixed order.',
+        lede: 'However many rules a move has, people meet them the same way: fields on the first page, then signature, PIN and comment together.',
+        blocks: [
+          {
+            kind: 'order',
+            title: 'The order every move follows',
+            steps: [
+              { name: 'Required fields', text: 'Page 1: the fields the admin picked for this move.' },
+              { name: 'Signature and PIN', text: 'Page 2: one step, so nobody signs twice.' },
+              { name: 'Comment', text: 'Page 2: why the status changed, when a reason is required.' },
+            ],
+          },
+        ],
+      },
+      {
+        kicker: '04 · Everywhere',
+        heading: 'Every surface opens the same steps.',
+        lede: 'From a status badge, a dropdown or a publish prompt, the same two-page flow runs.',
+        blocks: [
+          {
+            kind: 'everywhere',
+            title: 'Where the flow starts',
+            surfaces: [
+              { name: 'Order detail page', note: 'The status badge becomes a dropdown of the next allowed statuses.' },
+              { name: 'Test detail page', note: 'The dropdown lists only the statuses the workflow allows next.' },
+              { name: 'Publishing a report', note: 'Tests that aren’t completed are moved first.' },
+            ],
+          },
+        ],
+      },
+      {
+        kicker: '05 · Bulk',
+        heading: 'Many tests at once, with an honest answer.',
+        lede: 'When some tests can’t move, the modal says how many, and lets the user go on with the rest.',
+        blocks: [
+          {
+            kind: 'bulk',
+            title: 'Publishing a report for selected tests',
+            outcomes: [
+              {
+                label: 'All can move',
+                title: 'Move tests to completed?',
+                text: 'Every selected test can move. The same steps run, then the report is published.',
+                cta: 'Yes, continue',
+              },
+              {
+                label: 'Some can move',
+                title: '6 tests can move to completed',
+                text: '2 tests can’t, because of workflow rules. Go on with the 6, or review the blocked ones.',
+                cta: 'Proceed with 6 tests',
+              },
+              {
+                label: 'None can move',
+                title: 'Selected tests can’t be moved',
+                text: 'Workflow rules block every selected test, so the report can’t be published yet.',
+                cta: 'Back to tests',
+              },
+            ],
+          },
+        ],
+        proof: [{ value: 'MVP', caption: 'shipped, including bulk status update.' }],
       },
     ],
-    note: {
-      heading: 'Why it’s on a design systems site',
-      text: 'It’s the same thinking applied to behaviour: one definition, used everywhere. A status model works like a token, and every surface consumes it.',
-    },
     did: [
       'Designed one model for how a status change happens, gets validated and gets recorded, and applied it on every surface that can trigger one.',
       'Designed the compliance layer as steps in the flow, not dead ends.',
       'Designed bulk status update, with a field-set based flow for changing many records at once.',
       'Shipped an MVP.',
     ],
+    decisions: {
+      heading: 'Problems we solved',
+      items: [
+        {
+          ui: 'table',
+          title: 'Different rules in one bulk move',
+          problem: 'Moving many tests at once, from different statuses, meant a different set of rules for each one.',
+          solved: 'Rules always run in one order, with signature and PIN as one step. For the MVP a bulk move starts from one status, and required fields show as a table: a row per test, a column per field.',
+        },
+        {
+          ui: 'toast',
+          title: 'No signature set up',
+          problem: 'A move needed a signature the user had never set up, so the flow hit a dead end.',
+          solved: 'No extra modal. A short error toast says what’s missing, with a link straight to the setup.',
+        },
+        {
+          ui: 'move',
+          title: 'Removing a status in use',
+          problem: 'Removing a status from a workflow would strand the tests sitting in it.',
+          solved: 'The admin sees how many tests are affected, picks where they go, and gets a link to the filtered list.',
+        },
+        {
+          ui: 'log',
+          title: 'Automations can’t sign',
+          problem: 'Automations run with no person there, so they can’t fill a field or sign.',
+          solved: 'A move with rules can’t be automated. If a run breaks the workflow, it fails and says exactly why.',
+        },
+        {
+          ui: 'search',
+          title: 'Hundreds of fields',
+          problem: 'A test can have hundreds of fields. A switch for each one wouldn’t scale.',
+          solved: 'Admins search and add the fields they need, and drag them into the order people will fill them.',
+        },
+      ],
+    },
+    agentic: {
+      kicker: 'Why it’s on a design systems site',
+      heading: 'Designed in the new system, built in the old one.',
+      items: [
+        { label: 'New system', text: 'The screens were designed with the new QBench design system.' },
+        { label: 'Old UI', text: 'The MVP was built with the existing QBench UI, with no new parts where old ones worked.' },
+        { label: 'One modal', text: 'The required-actions modal became one component, the same on every screen.' },
+        { label: 'One notice', text: 'Inline notifications used across the flow became a component too.' },
+      ],
+      footnote:
+        'The workflow is the same idea as a design system, applied to behaviour: one definition, used on every surface, so nothing drifts.',
+    },
     together: {
-      text: 'Two months from zero to a shipped MVP, working inside the product team. [Add who the work was reviewed with, such as compliance or support, and one decision that came out of it.]',
+      text: 'Inside the product team, with a product lead and developers. Flows were reviewed in design syncs, and feedback rounds with technical account managers shaped the MVP and what was held for the next version.',
       collect: {
         label: 'To collect · client quote',
         text: '“[A sentence from a QBench product lead or a lab user on the new status flow.]”',
@@ -381,17 +550,7 @@ export const caseStudies: CaseStudy[] = [
         text: '[One result since launch: adoption of bulk update, fewer compliance errors, or fewer support tickets about status changes.]',
       },
     },
-    work: [
-      {
-        placeholder: '[Screenshot: the status model]',
-        caption: 'One model for every surface that can change a status.',
-      },
-      {
-        placeholder: '[Screenshot: e-signature step]',
-        caption: 'Compliance as a step in the flow, not a blocked screen.',
-      },
-      { placeholder: '[Screenshot: bulk update]', caption: 'Bulk status update, driven by field sets.' },
-    ],
+    work: [],
     cta: {
       heading: 'Complex, regulated workflows?',
       text: 'We design them on a system, so every surface behaves the same way.',
