@@ -52,7 +52,7 @@ const { heading, head, items } = Astro.props;
       </div>
       {
         items.map((it, i) => (
-          <div class="dc-item" data-dc-item={i} hidden={i !== 0}>
+          <div class="dc-item" data-dc-item={i} data-off={i !== 0 ? '' : undefined} aria-hidden={i !== 0 ? 'true' : undefined}>
             <div class="dc-ui" aria-hidden="true">
               {it.ui === 'table' && (
                 <>
@@ -201,6 +201,16 @@ const { heading, head, items } = Astro.props;
     cursor: pointer;
     transition: background-color 200ms var(--ease-out), color 200ms var(--ease-out);
   }
+  /* tabs share the full height of the panel, so no empty gap under the last one */
+  @media (min-width: 861px) {
+    .dc-tab {
+      flex: 1 1 auto;
+      justify-content: center;
+    }
+    .dc-tab:last-child {
+      border-bottom: 0;
+    }
+  }
   @media (max-width: 860px) {
     .dc-tab {
       flex: none;
@@ -243,15 +253,19 @@ const { heading, head, items } = Astro.props;
   }
 
   .dc-stage {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    align-content: start;
     gap: 20px;
     padding: 24px 28px 32px;
     min-width: 0;
   }
+  /* the switch sits on the left, where the eye starts after picking a problem */
   .dc-top {
+    grid-row: 1;
+    grid-column: 1;
     display: flex;
-    justify-content: flex-end;
+    justify-content: flex-start;
   }
   .dc-seg {
     display: inline-flex;
@@ -278,10 +292,15 @@ const { heading, head, items } = Astro.props;
     background: var(--color-ink);
     color: var(--color-on-ink);
   }
-  .dc-item[hidden] {
-    display: none;
+  /* all problems share one cell: the panel keeps the height of the tallest one,
+     so it doesn't jump when you switch */
+  /* data-off, not [hidden]: the base styles force [hidden] out of the layout */
+  .dc-item[data-off] {
+    visibility: hidden;
   }
   .dc-item {
+    grid-row: 2;
+    grid-column: 1;
     display: grid;
     grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
     gap: 24px 36px;
@@ -369,6 +388,10 @@ const { heading, head, items } = Astro.props;
   .qb-mini {
     gap: 4px;
     padding: 12px 14px;
+  }
+  /* staggered cards: each one is narrower by the full offset, so the last stays inside the box */
+  .qb-stack3 .qb-mini {
+    width: calc(100% - 36px);
   }
   .qb-stack3 .qb-mini:nth-child(2) {
     margin-left: 18px;
@@ -549,10 +572,21 @@ const { heading, head, items } = Astro.props;
     color: #4b5563;
   }
   .qb-sw {
+    position: relative;
     width: 28px;
     height: 16px;
     border-radius: 8px;
     background: #d1d5db;
+  }
+  .qb-sw::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fff;
   }
   .qb-drag {
     display: flex;
@@ -598,7 +632,12 @@ const { heading, head, items } = Astro.props;
         t.tabIndex = k === i ? 0 : -1;
         t.classList.remove('is-timing');
       });
-      items.forEach((it, k) => (it.hidden = k !== i));
+      items.forEach((it, k) => {
+        it.toggleAttribute('data-off', k !== i);
+        it.toggleAttribute('inert', k !== i);
+        if (k !== i) it.setAttribute('aria-hidden', 'true');
+        else it.removeAttribute('aria-hidden');
+      });
       stage?.setAttribute('aria-labelledby', `dc-tab-${i}`);
       setState('problem');
       if (!play || reduced) return;

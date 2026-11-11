@@ -1,0 +1,343 @@
+---
+/**
+ * The agentic layer, shown working: an agent's change travels through the five
+ * layers. It skips the docs (agents might), and the gate stops it anyway.
+ * The class name in the run is an example; the five layers are QBench's.
+ */
+interface Props {
+  kicker: string;
+  heading: string;
+  items: { label: string; text: string }[];
+  footnote: string;
+}
+const { kicker, heading, items, footnote } = Astro.props;
+const log = [
+  { at: 0, text: 'rules     colour comes from a token, always' },
+  { at: 1, text: 'facts     code today: 1 class with no token behind it' },
+  { at: 2, text: 'gap list  1 row open' },
+  { at: 3, text: 'docs      not read by the agent', tone: 'muted' },
+  { at: 4, text: '✕ lint    bg-brand-purple has no token. Use bg-primary.', tone: 'bad' },
+  { at: 5, text: '✓ fixed   bg-primary · gap list row deleted · merged', tone: 'ok' },
+];
+---
+
+<section aria-labelledby="agentic-head" class="container-page cs-block ag" data-ag>
+  <div class="ag-head">
+    <span class="caption text-ink-2">{kicker}</span>
+    <h2 id="agentic-head" class="m-0 max-w-[16ch] text-h2 text-balance">{heading}</h2>
+  </div>
+
+  <div class="panel ag-panel">
+    <div class="ag-bar">
+      <span class="ag-mono">Example run · an agent opens a pull request</span>
+      <button type="button" class="ag-replay" data-ag-replay>Replay</button>
+    </div>
+
+    <div class="ag-run" aria-hidden="true">
+      <div class="ag-lane"><span class="ag-chip" data-ag-chip>bg-brand-purple</span></div>
+    </div>
+
+    <ol class="ag-stations">
+      {
+        items.map((it, i) => (
+          <li class:list={['ag-st', i === 3 && 'ag-st--soft', i === 4 && 'ag-st--gate']} data-ag-st={i}>
+            <span class="ag-mono">{String(i + 1).padStart(2, '0')}</span>
+            <span class="ag-label">{it.label}</span>
+            <span class="ag-text">{it.text}</span>
+            {i === 3 && <span class="ag-tag">may be skipped</span>}
+            {i === 4 && <span class="ag-tag ag-tag--gate">can’t be skipped</span>}
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="ag-log" aria-hidden="true">
+      {log.map((l) => <p class:list={['ag-line', l.tone && `is-${l.tone}`]} data-ag-line={l.at}>{l.text}</p>)}
+    </div>
+  </div>
+
+  <p class="m-0 max-w-[64ch] text-cta text-pretty text-ink-2">{footnote}</p>
+</section>
+
+<style>
+  /* same section rhythm as the rest of the case page (the page's .cs-block rule is scoped and doesn't reach here) */
+  .ag {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    padding-top: var(--spacing-section);
+  }
+  .ag-head {
+    margin-bottom: 20px;
+  }
+  .ag-head {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .ag-panel {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .ag-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 52px;
+    padding: 8px 12px 8px 24px;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .ag-mono {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption-sm);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-ink-2);
+  }
+  .ag-replay {
+    min-height: 36px;
+    padding: 0 14px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--color-ink);
+    font: inherit;
+    font-size: var(--text-body-sm);
+    cursor: pointer;
+    transition: transform 160ms var(--ease-out);
+  }
+  .ag-replay:active {
+    transform: scale(0.97);
+  }
+
+  /* the change travels along this lane, above the five stations */
+  .ag-run {
+    padding: 0 24px;
+    background: var(--color-surface);
+  }
+  .ag-lane {
+    position: relative;
+    height: 64px;
+  }
+  .ag-lane::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    border-top: 1px dashed var(--color-dashed);
+  }
+  .ag-chip {
+    position: absolute;
+    top: 50%;
+    left: calc((var(--at, 0) + 0.5) * 20%);
+    padding: 6px 12px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-pill);
+    background: var(--color-surface);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    white-space: nowrap;
+    transform: translate(-50%, -50%);
+    transition: left 520ms var(--ease-out), transform 320ms var(--ease-out), border-color 200ms, color 200ms,
+      background-color 200ms;
+  }
+  .ag-chip.is-skip {
+    transform: translate(-50%, -110%);
+    opacity: 0.7;
+  }
+  .ag-chip.is-stopped {
+    border-color: var(--color-hot);
+    color: var(--color-hot);
+    animation: ag-shake 360ms var(--ease-out);
+  }
+  .ag-chip.is-fixed {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+    color: var(--color-on-ink);
+  }
+  @keyframes ag-shake {
+    25% { margin-left: -4px; }
+    50% { margin-left: 4px; }
+    75% { margin-left: -2px; }
+  }
+
+  .ag-stations {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--color-line);
+  }
+  .ag-st {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 20px 20px 24px;
+    border-right: 1px solid var(--color-line);
+    transition: background-color 240ms var(--ease-out);
+  }
+  .ag-st:last-child {
+    border-right: 0;
+  }
+  .ag-label {
+    font-size: var(--text-body-lg);
+    font-weight: 500;
+  }
+  .ag-text {
+    color: var(--color-ink-2);
+    font-size: var(--text-body-sm);
+    line-height: 1.5;
+    text-wrap: pretty;
+  }
+  .ag-tag {
+    align-self: flex-start;
+    margin-top: 4px;
+    padding: 2px 8px;
+    border: 1px dashed var(--color-dashed);
+    border-radius: var(--radius-pill);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-ink-2);
+  }
+  .ag-tag--gate {
+    border: 1px solid var(--color-ink);
+    background: var(--color-ink);
+    color: var(--color-on-ink);
+  }
+  .ag-st--soft .ag-label {
+    color: var(--color-ink-2);
+  }
+  /* the station the change is at */
+  .ag-st.is-here {
+    background: var(--color-surface-hover);
+  }
+  .ag-st--gate.is-here {
+    box-shadow: inset 0 3px 0 var(--color-hot);
+  }
+  .ag-st--gate.is-pass {
+    box-shadow: inset 0 3px 0 var(--color-accent);
+  }
+
+  .ag-log {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-height: 196px;
+    padding: 18px 24px 22px;
+    background: var(--color-band);
+    color: var(--color-on-band);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    white-space: pre-wrap;
+  }
+  .ag-line {
+    margin: 0;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 240ms var(--ease-out), transform 240ms var(--ease-out);
+  }
+  .ag-line.is-on {
+    opacity: 1;
+    transform: none;
+  }
+  .ag-line.is-muted {
+    color: var(--color-on-band-2);
+  }
+  .ag-line.is-bad {
+    color: #f08a6c;
+  }
+  .ag-line.is-ok {
+    color: var(--color-on-band-accent);
+  }
+
+  @media (max-width: 860px) {
+    .ag-run {
+      display: none;
+    }
+    .ag-stations {
+      grid-template-columns: 1fr;
+    }
+    .ag-st {
+      border-right: 0;
+      border-bottom: 1px solid var(--color-line);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ag-chip,
+    .ag-line,
+    .ag-st {
+      transition: none;
+    }
+    .ag-chip.is-stopped {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-ag]').forEach((root) => {
+    const chip = root.querySelector<HTMLElement>('[data-ag-chip]');
+    const stations = root.querySelectorAll<HTMLElement>('[data-ag-st]');
+    const lines = root.querySelectorAll<HTMLElement>('[data-ag-line]');
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let timers: number[] = [];
+
+    const at = (i: number) => {
+      chip?.style.setProperty('--at', String(i));
+      stations.forEach((s, k) => s.classList.toggle('is-here', k === i));
+      lines.forEach((l) => l.classList.toggle('is-on', Number(l.dataset.agLine) <= i));
+    };
+    const finish = () => {
+      if (!chip) return;
+      chip.classList.remove('is-stopped', 'is-skip');
+      chip.classList.add('is-fixed');
+      chip.textContent = 'bg-primary';
+      stations[4]?.classList.add('is-pass');
+      lines.forEach((l) => l.classList.add('is-on'));
+    };
+    const reset = () => {
+      timers.forEach(clearTimeout);
+      timers = [];
+      if (chip) {
+        chip.className = 'ag-chip';
+        chip.textContent = 'bg-brand-purple';
+      }
+      stations.forEach((s) => s.classList.remove('is-pass'));
+      lines.forEach((l) => l.classList.remove('is-on'));
+    };
+    const play = () => {
+      reset();
+      if (reduced) {
+        at(4);
+        finish();
+        return;
+      }
+      const step = 900;
+      [0, 1, 2].forEach((i) => timers.push(window.setTimeout(() => at(i), 200 + i * step)));
+      // docs: the agent goes over it, not through it
+      timers.push(window.setTimeout(() => { at(3); chip?.classList.add('is-skip'); }, 200 + 3 * step));
+      // gate: stopped, then fixed, then through
+      timers.push(window.setTimeout(() => {
+        chip?.classList.remove('is-skip');
+        at(4);
+        chip?.classList.add('is-stopped');
+      }, 200 + 4 * step));
+      timers.push(window.setTimeout(finish, 200 + 6 * step));
+    };
+
+    root.querySelector('[data-ag-replay]')?.addEventListener('click', play);
+    at(0);
+    const io = new IntersectionObserver((es) => {
+      if (es.some((e) => e.isIntersecting)) {
+        play();
+        io.disconnect();
+      }
+    }, { threshold: 0.4 });
+    io.observe(root);
+  });
+</script>

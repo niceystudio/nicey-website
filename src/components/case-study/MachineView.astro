@@ -8,8 +8,10 @@
 interface Props {
   markdown: string;
   mdHref: string;
+  /** what this page is, in the lead line: 'case study' (default) or 'site' */
+  what?: string;
 }
-const { markdown, mdHref } = Astro.props;
+const { markdown, mdHref, what = 'case study' } = Astro.props;
 const words = markdown.split(/\s+/).filter(Boolean).length;
 const lines = markdown.split('\n');
 const kind = (l: string, i: number, fmEnd: number) =>
@@ -17,19 +19,20 @@ const kind = (l: string, i: number, fmEnd: number) =>
 const fmEnd = lines.indexOf('---', 1);
 ---
 
-<section class="mv" data-mv-page hidden aria-label="This case study as an agent reads it">
+<section class="mv" data-mv-page hidden aria-label={`This ${what} as an agent reads it`}>
   <div class="container-page mv-in">
+    <p class="mv-back" aria-hidden="true">↑ pull up to go back</p>
     <div class="mv-head">
       <span class="mv-get"><b>GET</b> {mdHref}</span>
       <span class="mv-meta">200 · text/markdown · {words.toLocaleString('en')} words</span>
       <span class="mv-actions">
         <button type="button" class="mv-btn" data-mv-copy>Copy</button>
         <a class="mv-btn" href={mdHref}>Open .md</a>
-        <button type="button" class="mv-btn mv-btn--ink" data-mv="human">← Human view</button>
+
       </span>
     </div>
     <p class="mv-lead">
-      This is the same case study, as an agent reads it: no layout, no images, only text with structure. We build design
+      This is the same {what}, as an agent reads it: no layout, no images, only text with structure. We build design
       systems so they read this way too.
     </p>
     <pre class="mv-doc" data-mv-doc><code>{lines.map((l, i) => <span class:list={['mv-l', kind(l, i, fmEnd) && `mv-${kind(l, i, fmEnd)}`]} style={`--i:${Math.min(i, 40)}`}>{l || ' '}{'\n'}</span>)}</code></pre>
@@ -43,6 +46,13 @@ const fmEnd = lines.indexOf('---', 1);
   }
   .mv-in {
     padding-block: 24px 72px;
+  }
+  .mv-back {
+    margin: 0 0 12px;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    text-align: center;
+    color: var(--color-ink-2);
   }
   .mv-head {
     display: flex;
@@ -141,7 +151,7 @@ const fmEnd = lines.indexOf('---', 1);
   if (page) {
     const buttons = document.querySelectorAll<HTMLButtonElement>('[data-mv]');
     let view = 'human';
-    const set = (v: string, push = true) => {
+    const set = (v: string, push = true, at: 'top' | 'bottom' = 'top') => {
       view = v;
       const machine = v === 'machine';
       page.hidden = !machine;
@@ -153,10 +163,17 @@ const fmEnd = lines.indexOf('---', 1);
         else p.delete('view');
         const q = p.toString();
         history.replaceState(null, '', `${location.pathname}${q ? `?${q}` : ''}`);
-        window.scrollTo({ top: 0 });
+        window.scrollTo({ top: at === 'bottom' ? document.documentElement.scrollHeight : 0 });
       }
     };
     buttons.forEach((b) => b.addEventListener('click', () => set(b.dataset.mv!)));
+    // the footer reveal (SiteFooter) asks for machine view once the page has slid away
+    // detail: 'machine' | 'human' | { view, at: 'top' | 'bottom' }
+    document.addEventListener('nicey:view', (e) => {
+      const d = (e as CustomEvent).detail;
+      if (typeof d === 'string') set(d);
+      else set(d.view, true, d.at);
+    });
     if (new URLSearchParams(location.search).get('view') === 'machine') set('machine', false);
     document.addEventListener('keydown', (e) => {
       if (e.key !== 'm' || e.metaKey || e.ctrlKey || e.altKey) return;

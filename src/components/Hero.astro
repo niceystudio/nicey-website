@@ -1,24 +1,332 @@
 ---
+/**
+ * Homepage hero, with three variations for review (Emir, 11 Nov):
+ *   now · the earlier type-only hero
+ *   a   · Two readers: one component as people see it and as an agent reads it (QBenchHero)
+ *   b   · The audit is the hero: the buyer's question + a sample audit report (AuditPaper) — chosen, default (Emir, 11 Nov)
+ *   c   · Brand blocks: scattered pastel blocks settle into one ordered system beside the headline
+ * A review pill (dev, or ?review) switches them; ?hero=a|b|c picks one by URL.
+ */
 import { links } from '../data/links';
+import QBenchHero from './case-study/QBenchHero.astro';
+import AuditPaper from './AuditPaper.astro';
+const sub =
+  'We turn years of drifted UI into one system: tokens, components and documentation that a designer, an engineer and a coding agent understand the same way. Product design when you need the screens too.';
 ---
 
-<section class="container-page flex flex-col gap-8 pt-[120px] pb-20 max-md:pt-20 max-md:pb-16">
-  <span class="caption text-ink-2"
-    >A design systems studio · for legacy products and teams scaling with agents</span
-  >
-  <h1 class="m-0 max-w-[11ch] text-h1">Design systems people and agents read the same way.</h1>
-  <div class="flex flex-wrap items-end justify-between gap-x-16 gap-y-7">
-    <p class="m-0 max-w-[52ch] text-body-lg text-pretty text-ink-2">
-      We turn years of drifted UI into one system: tokens, components and documentation that a
-      designer, an engineer and a coding agent understand the same way. Product design when you need
-      the screens too.
-    </p>
-    <div class="flex flex-wrap gap-2.5">
-      <a href="#audit" class="pill pill-ink pill-lg">Get a free audit</a>
-      <a href={links.bookCall} class="pill pill-outline pill-lg">Book a call</a>
+<div class="hero" data-hero>
+  {/* now · current */}
+  <section class="hv container-page flex flex-col gap-8 pt-[120px] pb-20 max-md:pt-20 max-md:pb-16" data-hv="now" hidden>
+    <span class="caption text-ink-2">A design systems studio · for legacy products and teams scaling with agents</span>
+    <p class="m-0 max-w-[11ch] text-h1">Design systems people and agents read the same way.</p>
+    <div class="flex flex-wrap items-end justify-between gap-x-16 gap-y-7">
+      <p class="m-0 max-w-[52ch] text-body-lg text-pretty text-ink-2">{sub}</p>
+      <div class="flex flex-wrap gap-2.5">
+        <a href="#audit" class="pill pill-ink pill-lg">Get a free audit</a>
+        <a href={links.bookCall} class="pill pill-outline pill-lg">Book a call</a>
+      </div>
     </div>
-  </div>
-  <p class="m-0 font-mono text-code leading-normal text-ink-2">
-    We audit before we quote. The first look at your system is free and read-only.
-  </p>
-</section>
+    <p class="m-0 font-mono text-code leading-normal text-ink-2">
+      We audit before we quote. The first look at your system is free and read-only.
+    </p>
+  </section>
+
+  {/* a · two readers */}
+  <section class="hv hv-split container-page" data-hv="a" hidden>
+    <div class="hv-copy">
+      <span class="caption text-ink-2">A design systems studio · for legacy products and teams scaling with agents</span>
+      <p class="hv-h m-0">Design systems people and agents read the same way.</p>
+      <p class="m-0 max-w-[46ch] text-body-lg text-pretty text-ink-2">{sub}</p>
+      <div class="flex flex-wrap gap-2.5">
+        <a href="#audit" class="pill pill-ink pill-lg">Get a free audit</a>
+        <a href={links.bookCall} class="pill pill-outline pill-lg">Book a call</a>
+      </div>
+    </div>
+    <div class="hv-visual">
+      <p class="hv-context">One component, two readers. Switch to see what an agent reads.</p>
+      <QBenchHero />
+    </div>
+  </section>
+
+  {/* b · the audit is the hero */}
+  <section class="hv hv-split container-page" data-hv="b">
+    <div class="hv-copy">
+      <span class="caption text-ink-2">Free design system audit · read-only</span>
+      <h1 class="hv-h m-0">Is your design system ready for AI agents?</h1>
+      <p class="m-0 max-w-[46ch] text-body-lg text-pretty text-ink-2">
+        Send us your Figma file. You get a score per pillar, the top findings and what to fix first. Free, and we never
+        edit your file.
+      </p>
+      <div class="flex flex-wrap gap-2.5">
+        <a href="#audit" class="pill pill-ink pill-lg">Get a free audit</a>
+        <a href={links.bookCall} class="pill pill-outline pill-lg">Book a call</a>
+      </div>
+      <p class="m-0 font-mono text-code leading-normal text-ink-2">
+        Then we build systems people and agents read the same way.
+      </p>
+    </div>
+    <div class="hv-visual hv-visual--paper">
+      <AuditPaper tilt />
+    </div>
+  </section>
+
+  {/* c · brand blocks */}
+  <section class="hv hv-blocks container-page" data-hv="c" hidden>
+    <canvas class="hv-canvas" data-hv-canvas aria-hidden="true"></canvas>
+    <div class="hv-copy hv-copy--over">
+      <span class="caption text-ink-2">A design systems studio · for legacy products and teams scaling with agents</span>
+      <p class="hv-h hv-h--xl m-0">Design systems people and agents read the same way.</p>
+      <p class="m-0 max-w-[46ch] text-body-lg text-pretty text-ink-2">{sub}</p>
+      <div class="flex flex-wrap gap-2.5">
+        <a href="#audit" class="pill pill-ink pill-lg">Get a free audit</a>
+        <a href={links.bookCall} class="pill pill-outline pill-lg">Book a call</a>
+      </div>
+    </div>
+  </section>
+</div>
+
+<nav aria-label="Hero variation (review)" class="hv-review" data-hv-review hidden>
+  <span class="hv-mono">Hero</span>
+  {['now', 'a', 'b', 'c'].map((v) => (
+    <button type="button" data-hv-pick={v} aria-pressed={v === 'b' ? 'true' : 'false'}>{v === 'now' ? 'Now' : v.toUpperCase()}</button>
+  ))}
+</nav>
+
+<style>
+  .hv[hidden] {
+    display: none !important;
+  }
+  .hv-split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 48px 64px;
+    padding-top: 104px;
+    padding-bottom: 88px;
+  }
+  @media (max-width: 1023px) {
+    .hv-split {
+      grid-template-columns: 1fr;
+      padding-top: 72px;
+      padding-bottom: 64px;
+    }
+  }
+  .hv-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+  /* the h1 stays the page's only h1 in the live variant; review variants use the same look */
+  .hv-h {
+    font-size: clamp(44px, 5.6vw, 80px);
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+    font-weight: 500;
+    text-wrap: balance;
+  }
+  .hv-h--xl {
+    max-width: 11ch;
+    font-size: clamp(48px, 7.4vw, 108px);
+    line-height: 0.95;
+    letter-spacing: -0.05em;
+  }
+  .hv-visual {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+  }
+  .hv-context {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--color-ink-2);
+  }
+  .hv-visual--paper {
+    align-items: center;
+  }
+
+  /* c · the block field sits behind the right side of the copy */
+  .hv-blocks {
+    position: relative;
+    padding-top: 120px;
+    padding-bottom: 96px;
+    min-height: 640px;
+  }
+  .hv-canvas {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 52%;
+    height: 100%;
+  }
+  @media (max-width: 1023px) {
+    .hv-canvas {
+      position: relative;
+      width: 100%;
+      height: 260px;
+      margin-bottom: 24px;
+    }
+    .hv-blocks {
+      display: flex;
+      flex-direction: column-reverse;
+      padding-top: 56px;
+      min-height: 0;
+    }
+  }
+  .hv-copy--over {
+    position: relative;
+  }
+
+  .hv-review {
+    position: fixed;
+    left: 12px;
+    bottom: 12px;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 0 6px 0 14px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-pill);
+    background: var(--color-surface);
+  }
+  .hv-review[hidden] {
+    display: none;
+  }
+  .hv-mono {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--color-ink-2);
+  }
+  .hv-review button {
+    min-width: 44px;
+    min-height: 44px;
+    border: 0;
+    background: transparent;
+    color: var(--color-ink-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    cursor: pointer;
+  }
+  .hv-review button[aria-pressed='true'] {
+    color: var(--color-ink);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+</style>
+
+<script>
+  import { LIGHT_PALETTE, DARK_PALETTE } from '../lib/pixel-field';
+
+  // ---- variation switch (review only) ----
+  const root = document.querySelector<HTMLElement>('[data-hero]');
+  const views = root ? Array.from(root.querySelectorAll<HTMLElement>('[data-hv]')) : [];
+  const picks = document.querySelectorAll<HTMLButtonElement>('[data-hv-pick]');
+  const params = new URLSearchParams(location.search);
+  const review = document.querySelector<HTMLElement>('[data-hv-review]');
+  if (review && (import.meta.env.DEV || params.has('review'))) review.hidden = false;
+  let blocks: { start: () => void } | null = null;
+  const show = (v: string) => {
+    views.forEach((el) => {
+      el.hidden = el.dataset.hv !== v;
+      // only the visible variant carries the page's h1
+      const h = el.querySelector('h1, .hv-h');
+      if (h) h.setAttribute('role', el.dataset.hv === v ? 'heading' : 'presentation');
+      if (h && el.dataset.hv === v && h.tagName !== 'H1') h.setAttribute('aria-level', '1');
+    });
+    picks.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.hvPick === v)));
+    if (v === 'c') blocks?.start();
+  };
+  picks.forEach((b) =>
+    b.addEventListener('click', () => {
+      show(b.dataset.hvPick!);
+      const u = new URL(location.href);
+      u.searchParams.set('hero', b.dataset.hvPick!);
+      history.replaceState(null, '', u);
+    }),
+  );
+
+  // ---- c · brand blocks: scattered pastel blocks settle into one ordered grid; the pointer nudges them ----
+  const canvas = document.querySelector<HTMLCanvasElement>('[data-hv-canvas]');
+  if (canvas) {
+    const ctx = canvas.getContext('2d')!;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    type B = { tx: number; ty: number; x: number; y: number; c: number[]; tc: number[]; d: number };
+    let bs: B[] = [], W = 0, H = 0, dpr = 1, t0 = 0, raf = 0, px = -999, py = -999, running = false;
+    const isDark = () =>
+      document.documentElement.dataset.theme === 'dark' ||
+      (!document.documentElement.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
+    const tints = () => (isDark() ? DARK_PALETTE : LIGHT_PALETTE).stops.slice(1).map((s) => (isDark() ? [s[0] * 1.5, s[1] * 1.5, s[2] * 1.5] : [s[0] - 24, s[1] - 24, s[2] - 24]));
+    const build = () => {
+      const r = canvas.getBoundingClientRect();
+      W = r.width; H = r.height;
+      if (!W || !H) return false;
+      dpr = Math.min(2, devicePixelRatio || 1);
+      canvas.width = W * dpr; canvas.height = H * dpr;
+      const t = tints();
+      // the system: five columns, one colour each, like a token ramp; the scatter: random colour anywhere
+      const s = Math.max(14, Math.round(W / 24)), gap = 4, cols = 5, rows = Math.floor((H * 0.72) / (s + gap));
+      const gx = W - cols * (s + gap) * 2 - 24, gy = (H - rows * (s + gap)) / 2;
+      bs = [];
+      for (let c = 0; c < cols; c++)
+        for (let r2 = 0; r2 < rows; r2++)
+          for (let k = 0; k < 2; k++) {
+            const tc = t[c % t.length];
+            bs.push({
+              tx: gx + (c * 2 + k) * (s + gap), ty: gy + r2 * (s + gap),
+              x: Math.random() * W, y: Math.random() * H,
+              c: t[Math.floor(Math.random() * t.length)], tc,
+              d: Math.random() * 600 + (c / cols) * 300,
+            });
+          }
+      (canvas as any)._s = s;
+      return true;
+    };
+    const mix = (a: number[], b: number[], k: number) => a.map((v, i) => Math.round(v + (b[i] - v) * k));
+    const ease = (k: number) => 1 - Math.pow(1 - k, 3);
+    const frame = (now: number) => {
+      const s = (canvas as any)._s as number;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+      for (const b of bs) {
+        const k = reduced ? 1 : Math.min(1, Math.max(0, (now - t0 - b.d) / 1100));
+        const e = ease(k);
+        let x = b.x + (b.tx - b.x) * e, y = b.y + (b.ty - b.y) * e;
+        // the pointer pushes nearby blocks out of line: drift you can see, the system pulls them back
+        const dx = x - px, dy = y - py, dist = Math.hypot(dx, dy);
+        if (dist < 90 && k === 1) { const f = (1 - dist / 90) * 18; x += (dx / (dist || 1)) * f; y += (dy / (dist || 1)) * f; }
+        const col = mix(b.c, b.tc, Math.max(0, (k - 0.5) / 0.5));
+        ctx.fillStyle = `rgb(${col[0]},${col[1]},${col[2]})`;
+        ctx.globalAlpha = Math.min(1, 0.25 + k);
+        ctx.fillRect(x, y, s, s);
+      }
+      ctx.globalAlpha = 1;
+      if (running && !reduced) raf = requestAnimationFrame(frame);
+    };
+    blocks = {
+      start: () => {
+        if (!build()) return;
+        t0 = performance.now();
+        running = true;
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(frame);
+      },
+    };
+    canvas.parentElement?.addEventListener('pointermove', (e) => {
+      const r = canvas.getBoundingClientRect();
+      px = e.clientX - r.left; py = e.clientY - r.top;
+    });
+    canvas.parentElement?.addEventListener('pointerleave', () => { px = py = -999; });
+    // stop drawing when the hero is off screen
+    new IntersectionObserver((es) => {
+      const vis = es.some((e) => e.isIntersecting);
+      if (!vis) { running = false; cancelAnimationFrame(raf); }
+      else if (!running && !canvas.closest('[hidden]') && bs.length) { running = true; raf = requestAnimationFrame(frame); }
+    }).observe(canvas);
+  }
+
+  const start = params.get('hero');
+  show(start === 'a' || start === 'now' || start === 'c' ? start : 'b');
+</script>

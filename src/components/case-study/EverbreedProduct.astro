@@ -1,0 +1,399 @@
+---
+/**
+ * Everbreed "What we built": the Student app, on phone and desktop.
+ * Phone clips are real recordings of the coded Student prototype (motion copied from the
+ * Figma "Animation" section, Design – Mobile v1.1 1254:222800). Desktop screens are the
+ * Student Project Book from Design – Desktop v1.1 (3106:101020, 3119:90454).
+ * Desktop: the phone stays pinned and plays the clip of the step being read.
+ * Phone width: every step carries its own phone.
+ */
+const base = '/work/everbreed';
+const steps = [
+  {
+    id: 'dailycare',
+    kicker: 'Daily Care',
+    title: 'Tap what you did.',
+    text: 'Four cards and one “Mark all done”. Logging the day takes about 15 seconds.',
+  },
+  {
+    id: 'care',
+    kicker: 'Care saved',
+    title: 'A full week gets its moment.',
+    text: 'The week fills in one day at a time. A missed day is never shown as a failure, and there is no streak to lose.',
+  },
+  {
+    id: 'homeback',
+    kicker: 'Home',
+    title: 'Back on Home, it’s done.',
+    text: 'The task leaves the list and the week fills in, so the next thing to do is always on top.',
+  },
+  {
+    id: 'logweight',
+    kicker: 'Log Weight',
+    title: '24 or 2.4?',
+    text: 'A jump that big from the last weigh-in is flagged before saving, so a typo never reaches the record.',
+  },
+  {
+    id: 'weightsaved',
+    kicker: 'Weight saved',
+    title: 'Every weigh-in on one line.',
+    text: 'The growth line runs against the show weight range, and the next weigh-in is already set.',
+  },
+  {
+    id: 'milestone',
+    kicker: 'Milestone',
+    title: 'Milestones, not points.',
+    text: 'A handful of real moments per season, like adding the rabbit. The app rewards accuracy, not activity.',
+  },
+];
+const clip = (id: string) => ({ src: `${base}/mobile-${id}.webm`, poster: `${base}/mobile-${id}.jpg` });
+---
+
+<div class="ep" data-ep>
+  <div class="ep-story">
+    <ol class="ep-steps">
+      {
+        steps.map((s, i) => (
+          <li class="ep-step" data-ep-step={i}>
+            <span class="ep-mono">
+              {String(i + 1).padStart(2, '0')} · {s.kicker}
+            </span>
+            <h3 class="m-0 text-case-h2 text-balance">{s.title}</h3>
+            <p class="m-0 max-w-[40ch] text-lede text-pretty text-ink-2">{s.text}</p>
+            <div class="ep-phone ep-phone--inline">
+              <video class="ep-video" muted loop playsinline preload="none" poster={clip(s.id).poster} data-ep-inline>
+                <source src={clip(s.id).src} type="video/webm" />
+              </video>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="ep-stage" aria-hidden="true">
+      <div class="ep-phone">
+        {
+          steps.map((s, i) => (
+            <video
+              class="ep-video ep-layer"
+              muted
+              playsinline
+              preload={i === 0 ? 'auto' : 'none'}
+              poster={clip(s.id).poster}
+              data-ep-clip={i}
+              data-on={i === 0 ? '' : undefined}
+            >
+              <source src={clip(s.id).src} type="video/webm" />
+            </video>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+
+  <button type="button" class="ep-pause" data-ep-pause aria-pressed="false">Pause motion</button>
+
+  <figure class="ep-desk m-0">
+    <div class="ep-desk-copy">
+      <span class="ep-mono">Desktop · Project Book</span>
+      <h3 class="m-0 text-case-h2 text-balance">The same records, ready for the fair.</h3>
+      <p class="m-0 max-w-[44ch] text-lede text-pretty text-ink-2">
+        Every task a student logs on the phone fills in their Project Book on desktop: care logs, health
+        observations and photos, in one place.
+      </p>
+    </div>
+    <div class="ep-desk-stack" data-stagger>
+      <div class="ep-browser ep-browser--back">
+        <span class="ep-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        <img src={`${base}/desktop-photos.jpg`} width="2160" height="1712" loading="lazy" decoding="async"
+          alt="Everbreed Project Book on desktop, Photos section: photos from completed tasks grouped by care check, grooming, animal ID, fair submission, showmanship practice, feed label and fair results." />
+      </div>
+      <div class="ep-browser ep-browser--front">
+        <span class="ep-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        <img src={`${base}/desktop-care.jpg`} width="2160" height="2045" loading="lazy" decoding="async"
+          alt="Everbreed Project Book on desktop, Care & Health section: weekly care log consistency, grooming notes, health observations and a treatment record." />
+      </div>
+    </div>
+  </figure>
+</div>
+
+<style>
+  .ep {
+    --phone-w: 300px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 96px;
+  }
+  .ep-mono {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption-sm);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-ink-2);
+  }
+
+  /* the story: steps on the left, a pinned phone on the right */
+  .ep-story {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0 64px;
+  }
+  .ep-steps {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ep-step {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 14px;
+    min-height: 72vh;
+    opacity: 0.35;
+    transition: opacity 300ms var(--ease-out);
+  }
+  .ep-step.is-on {
+    opacity: 1;
+  }
+  .ep-stage {
+    position: sticky;
+    top: calc(50vh - (var(--phone-w) * 852 / 393 + 24px) / 2);
+    align-self: start;
+    display: flex;
+    justify-content: center;
+    margin-top: 10vh;
+  }
+
+  .ep-phone {
+    position: relative;
+    width: var(--phone-w);
+    aspect-ratio: 393 / 852;
+    padding: 10px;
+    border-radius: 52px;
+    background: var(--color-band);
+    box-shadow: 0 30px 60px -20px rgba(38, 37, 31, 0.35);
+  }
+  .ep-video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 42px;
+    object-fit: cover;
+    background: #f1f3f5;
+  }
+  .ep-layer {
+    position: absolute;
+    inset: 10px;
+    width: calc(100% - 20px);
+    height: calc(100% - 20px);
+    opacity: 0;
+    transition: opacity 260ms var(--ease-out);
+  }
+  .ep-layer[data-on] {
+    opacity: 1;
+  }
+  .ep-phone--inline {
+    display: none;
+  }
+
+  .ep-pause {
+    position: sticky;
+    bottom: 20px;
+    align-self: flex-end;
+    margin-top: -64px;
+    min-height: 40px;
+    padding: 0 16px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-pill);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    font: inherit;
+    font-size: var(--text-body-sm);
+    cursor: pointer;
+    transition: transform 160ms var(--ease-out);
+  }
+  .ep-pause:active {
+    transform: scale(0.97);
+  }
+
+  /* desktop screens, layered */
+  .ep-desk {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr);
+    align-items: center;
+    gap: 48px 64px;
+  }
+  .ep-desk-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .ep-desk-stack {
+    position: relative;
+    padding: 0 0 18% 12%;
+  }
+  .ep-browser {
+    overflow: hidden;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 14px;
+    background: var(--color-surface);
+    box-shadow: 0 30px 60px -24px rgba(38, 37, 31, 0.3);
+  }
+  .ep-browser img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .ep-dots {
+    display: flex;
+    gap: 6px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .ep-dots i {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-line-strong);
+  }
+  .ep-browser--back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 78%;
+    transform: rotate(-2deg);
+    opacity: 0.95;
+  }
+  .ep-browser--front {
+    position: relative;
+    margin-top: 14%;
+    margin-left: auto;
+    width: 82%;
+  }
+  /* once, when the screens scroll in: the back one tilts into place, the front one lands after it */
+  @media (prefers-reduced-motion: no-preference) {
+    .ep-browser {
+      transition: opacity 600ms var(--ease-out), transform 600ms var(--ease-out);
+    }
+    .ep-browser--front {
+      transition-delay: 120ms;
+    }
+    .ep-desk-stack.is-waiting .ep-browser--back {
+      opacity: 0;
+      transform: rotate(0deg) translateY(24px);
+    }
+    .ep-desk-stack.is-waiting .ep-browser--front {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+  }
+
+  @media (max-width: 860px) {
+    .ep {
+      gap: 64px;
+    }
+    .ep-story {
+      grid-template-columns: 1fr;
+    }
+    .ep-stage {
+      display: none;
+    }
+    .ep-step {
+      min-height: 0;
+      padding-bottom: 56px;
+      opacity: 1;
+    }
+    .ep-phone--inline {
+      display: block;
+      --phone-w: min(78vw, 300px);
+      align-self: center;
+      margin-top: 12px;
+    }
+    .ep-pause {
+      margin-top: -32px;
+    }
+    .ep-desk {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ep-step,
+    .ep-layer {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-ep]').forEach((root) => {
+    const steps = Array.from(root.querySelectorAll<HTMLElement>('[data-ep-step]'));
+    const clips = Array.from(root.querySelectorAll<HTMLVideoElement>('[data-ep-clip]'));
+    const inline = Array.from(root.querySelectorAll<HTMLVideoElement>('[data-ep-inline]'));
+    const pauseBtn = root.querySelector<HTMLButtonElement>('[data-ep-pause]');
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const wide = matchMedia('(min-width: 861px)');
+    // reduced motion: posters only, until someone presses play
+    let paused = reduced;
+    let current = 0;
+    const setBtn = () => {
+      if (!pauseBtn) return;
+      pauseBtn.textContent = paused ? 'Play motion' : 'Pause motion';
+      pauseBtn.setAttribute('aria-pressed', String(paused));
+    };
+    setBtn();
+
+    const playFromStart = (v: HTMLVideoElement) => {
+      if (paused) return;
+      if (v.preload === 'none') v.preload = 'auto';
+      try {
+        v.currentTime = 0;
+      } catch {
+        /* not loaded yet */
+      }
+      v.play().catch(() => {});
+    };
+
+    // pinned phone (wide screens): the clip of the step being read plays once, then holds its last frame
+    const show = (i: number) => {
+      current = i;
+      steps.forEach((s, k) => s.classList.toggle('is-on', k === i));
+      clips.forEach((v, k) => {
+        v.toggleAttribute('data-on', k === i);
+        if (k === i) playFromStart(v);
+        else v.pause();
+        // load the next clip ahead of time
+        if (k === i + 1 && v.preload === 'none') v.preload = 'auto';
+      });
+    };
+    const spy = new IntersectionObserver(
+      (es) => es.forEach((e) => e.isIntersecting && wide.matches && show(steps.indexOf(e.target as HTMLElement))),
+      { rootMargin: '-45% 0px -50% 0px' },
+    );
+    steps.forEach((s) => spy.observe(s));
+
+    // phone width: each inline phone loops while it is on screen
+    const seen = new IntersectionObserver(
+      (es) =>
+        es.forEach((e) => {
+          const v = e.target as HTMLVideoElement;
+          if (wide.matches) return;
+          if (e.isIntersecting && !paused) {
+            v.preload = 'auto';
+            v.loop = true;
+            v.play().catch(() => {});
+          } else v.pause();
+        }),
+      { threshold: 0.5 },
+    );
+    inline.forEach((v) => seen.observe(v));
+
+    pauseBtn?.addEventListener('click', () => {
+      paused = !paused;
+      setBtn();
+      if (paused) [...clips, ...inline].forEach((v) => v.pause());
+      else if (wide.matches) clips[current] && playFromStart(clips[current]);
+    });
+    show(0);
+  });
+</script>

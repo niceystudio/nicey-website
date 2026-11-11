@@ -93,6 +93,7 @@ export function caseMarkdown(s: CaseStudy, url: string): string {
   }
   out.push('## Working together', '', s.together.text, '', `- ${s.together.collect.label}: ${s.together.collect.text}`, '');
   out.push('## What changed for the team', '', s.changed.text, '', `- ${s.changed.collect.label}: ${s.changed.collect.text}`, '');
+  if (s.faq) out.push('## About this project', '', ...s.faq.flatMap((f) => [`**${f.q}**`, '', f.a, '']));
   out.push(`## ${s.cta.heading}`, '', s.cta.text, '', `→ ${s.cta.label}`, '');
   return out.join('\n');
 }

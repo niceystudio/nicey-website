@@ -10,6 +10,11 @@ interface Row {
   figure: { value: string; arrow?: boolean } | null;
   caption: string;
   description: string;
+  /** what the hover preview shows once the blocks have gathered */
+  preview:
+    | { kind: 'img'; src: string; w: number; h: number }
+    | { kind: 'video'; src: string; poster: string; w: number; h: number }
+    | { kind: 'card'; text: string; band: string; w: number; h: number };
 }
 
 const rows: Row[] = [
@@ -19,17 +24,19 @@ const rows: Row[] = [
     href: links.work.qbench,
     figure: { value: '1,071', arrow: true },
     caption: 'Outside-library references',
+    preview: { kind: 'img', src: '/work/qbench/product.jpg', w: 320, h: 197 },
     description:
       'Years without a designer, consolidated into one semantic token system. Plus one status model for eight entry points, compliance steps included, shipped as an MVP.',
   },
   {
     name: 'Everbreed',
-    meta: 'Design system · Agtech',
+    meta: 'Design system + product · Agtech',
     href: links.work.everbreed,
     figure: { value: '302' },
     caption: 'Variables made machine-readable',
+    preview: { kind: 'video', src: '/work/everbreed/mobile-care.webm', poster: '/work/everbreed/mobile-care.jpg', w: 150, h: 325 },
     description:
-      'A mature Figma library made machine-readable: IDs, scopes and code names on 302 variables, so the code config can come from Figma. In progress.',
+      'A mature Figma library made machine-readable, so the code config comes from Figma. And the student app built on it, on phone and desktop.',
   },
   {
     name: 'Clerky',
@@ -37,6 +44,7 @@ const rows: Row[] = [
     href: links.work.clerky,
     figure: { value: '0 T1' },
     caption: 'Defects at the pilot gate',
+    preview: { kind: 'card', text: '0 T1', band: 'butter', w: 260, h: 170 },
     description:
       'Three-tier tokens, AI-context docs on every component and token, and a zero-T1 defect gate. Validated at pilot scale on the Documents App.',
   },
@@ -46,6 +54,7 @@ const rows: Row[] = [
     href: links.work.omnisafe,
     figure: { value: '16' },
     caption: 'Modules tested before build',
+    preview: { kind: 'card', text: '16', band: 'mauve', w: 260, h: 170 },
     description: 'Sixteen modules, tested end to end with real employees before engineering began.',
   },
   {
@@ -54,6 +63,7 @@ const rows: Row[] = [
     href: links.work.flyr,
     figure: null,
     caption: 'One business result',
+    preview: { kind: 'card', text: 'FLYR', band: 'stone', w: 260, h: 170 },
     description: 'Group Quotation MVP shipped, so hotels can see whether a group booking makes money.',
   },
 ];
@@ -65,7 +75,7 @@ const rows: Row[] = [
     {
       rows.map((r) => (
         <li>
-          <a href={r.href} class="work-row">
+          <a href={r.href} class="work-row" data-wp={JSON.stringify(r.preview)}>
             <span class="flex flex-[1_1_220px] flex-col gap-2.5">
               <span class="text-work">{r.name}</span>
               <span class="caption-sm text-ink-2">{r.meta}</span>
@@ -93,6 +103,11 @@ const rows: Row[] = [
       ))
     }
   </ul>
+  {/* hover preview: one floating frame for the whole list, follows the cursor */}
+  <div class="wp" data-wp-box aria-hidden="true">
+    <canvas class="wp-canvas" data-wp-canvas></canvas>
+    <div class="wp-frame" data-wp-frame></div>
+  </div>
 </section>
 
 <style>
@@ -134,3 +149,180 @@ const rows: Row[] = [
     }
   }
 </style>
+
+<style>
+  /* ---- hover preview ---- */
+  .wp {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 30;
+    width: 600px;
+    height: 640px;
+    margin: -320px 0 0 -300px;
+    pointer-events: none;
+    visibility: hidden;
+  }
+  .wp.is-on {
+    visibility: visible;
+  }
+  .wp-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .wp-frame {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    overflow: hidden;
+    border-radius: 10px;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+    transition: opacity 220ms var(--ease-out), transform 220ms var(--ease-out);
+    box-shadow: 0 24px 48px -20px rgba(38, 37, 31, 0.35);
+  }
+  .wp-frame.is-shown {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  /* children are injected by the script, so these rules must be global */
+  .wp-frame :global(img),
+  .wp-frame :global(video) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .wp-frame--phone {
+    border: 6px solid var(--color-band);
+    border-radius: 26px;
+  }
+  .wp-frame :global(.wp-card) {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    color: var(--color-ink);
+    font-size: 64px;
+    font-weight: 500;
+    letter-spacing: -0.05em;
+  }
+  @media (hover: none), (prefers-reduced-motion: reduce) {
+    .wp {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import { LIGHT_PALETTE, DARK_PALETTE } from '../lib/pixel-field';
+  // Work hover: pastel blocks scattered around the cursor gather into a small frame,
+  // then the project's preview fades in on top of them (Emir, 11 Nov).
+  const box = document.querySelector<HTMLElement>('[data-wp-box]');
+  const canvas = document.querySelector<HTMLCanvasElement>('[data-wp-canvas]');
+  const frame = document.querySelector<HTMLElement>('[data-wp-frame]');
+  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (box && canvas && frame && fine && !reduced) {
+    const ctx = canvas.getContext('2d')!;
+    const BW = 600, BH = 640, CELL = 12;
+    const dpr = Math.min(2, devicePixelRatio || 1);
+    canvas.width = BW * dpr; canvas.height = BH * dpr;
+    type Bk = { tx: number; ty: number; sx: number; sy: number; c: number[]; d: number };
+    let blocks: Bk[] = [], t0 = 0, raf = 0, mode: 'in' | 'out' = 'in';
+    let x = 0, y = 0, tx = 0, ty = 0, active = false;
+    const dark = () =>
+      document.documentElement.dataset.theme === 'dark' ||
+      (!document.documentElement.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
+    const tints = () => (dark() ? DARK_PALETTE : LIGHT_PALETTE).stops.slice(1).map((s) => (dark() ? [s[0] * 1.6, s[1] * 1.6, s[2] * 1.6] : [s[0] - 24, s[1] - 24, s[2] - 24]));
+    const build = (w: number, h: number) => {
+      const t = tints();
+      const cols = Math.floor(w / CELL), rows = Math.floor(h / CELL);
+      const ox = (BW - cols * CELL) / 2, oy = (BH - rows * CELL) / 2;
+      blocks = [];
+      for (let r = 0; r < rows; r++)
+        for (let c = 0; c < cols; c++) {
+          if (Math.random() < 0.45) continue; // a cloud, not a solid sheet
+          const a = Math.random() * Math.PI * 2, rad = 60 + Math.random() * 190;
+          blocks.push({
+            tx: ox + c * CELL, ty: oy + r * CELL,
+            sx: BW / 2 + Math.cos(a) * rad, sy: BH / 2 + Math.sin(a) * rad,
+            c: t[Math.floor(Math.random() * t.length)],
+            d: Math.random() * 160,
+          });
+        }
+    };
+    const ease = (k: number) => 1 - Math.pow(1 - k, 3);
+    const draw = (now: number) => {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, BW, BH);
+      const el = now - t0;
+      let busy = false;
+      for (const b of blocks) {
+        let k = Math.min(1, Math.max(0, (el - (mode === 'in' ? b.d : 0)) / (mode === 'in' ? 380 : 220)));
+        if (k < 1) busy = true;
+        const e = ease(k);
+        // in: fly from the scatter to the frame, then fade under the preview; out: scatter and fade
+        const p = mode === 'in' ? e : 1 - e;
+        const px = b.sx + (b.tx - b.sx) * p, py = b.sy + (b.ty - b.sy) * p;
+        const alpha = mode === 'in' ? Math.min(1, k * 2) * (el > 520 ? Math.max(0, 1 - (el - 520) / 220) : 1) : 1 - e;
+        if (alpha <= 0) continue;
+        if (mode === 'in' && el < 760) busy = true;
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = `rgb(${b.c[0]},${b.c[1]},${b.c[2]})`;
+        ctx.fillRect(px, py, CELL - 2, CELL - 2);
+      }
+      ctx.globalAlpha = 1;
+      return busy;
+    };
+    const loop = (now: number) => {
+      // the frame follows the cursor with a little lag
+      x += (tx - x) * 0.18; y += (ty - y) * 0.18;
+      box.style.transform = `translate(${x}px, ${y}px)`;
+      const busy = draw(now);
+      if (active || busy || Math.abs(tx - x) > 0.5 || Math.abs(ty - y) > 0.5) raf = requestAnimationFrame(loop);
+      else { raf = 0; box.classList.remove('is-on'); }
+    };
+    const kick = () => { if (!raf) raf = requestAnimationFrame(loop); };
+    let showTimer = 0;
+    const open = (data: any) => {
+      frame.className = 'wp-frame' + (data.kind === 'video' ? ' wp-frame--phone' : '');
+      frame.style.width = data.w + 'px';
+      frame.style.height = data.h + 'px';
+      frame.innerHTML =
+        data.kind === 'img' ? `<img src="${data.src}" alt="">`
+        : data.kind === 'video' ? `<video src="${data.src}" poster="${data.poster}" muted playsinline autoplay loop></video>`
+        : `<div class="wp-card" style="background: var(--color-${data.band})">${data.text}</div>`;
+      build(data.w, data.h);
+      mode = 'in'; t0 = performance.now(); active = true;
+      box.classList.add('is-on');
+      clearTimeout(showTimer);
+      showTimer = window.setTimeout(() => frame.classList.add('is-shown'), 420);
+      kick();
+    };
+    const close = () => {
+      clearTimeout(showTimer);
+      frame.classList.remove('is-shown');
+      mode = 'out'; t0 = performance.now(); active = false;
+      kick();
+    };
+    // sit beside the cursor (not on the row being read), and stay inside the window
+    const place = (cx: number, cy: number) => {
+      const side = cx < innerWidth * 0.6 ? 1 : -1;
+      return [Math.min(innerWidth - 120, Math.max(120, cx + side * 210)), Math.min(innerHeight - 140, Math.max(140, cy))];
+    };
+    document.querySelectorAll<HTMLAnchorElement>('[data-wp]').forEach((row) => {
+      row.addEventListener('pointerenter', (e) => {
+        [tx, ty] = place(e.clientX, e.clientY);
+        if (!active) { x = tx; y = ty; }
+        open(JSON.parse(row.dataset.wp!));
+      });
+      row.addEventListener('pointermove', (e) => { [tx, ty] = place(e.clientX, e.clientY); });
+      row.addEventListener('pointerleave', close);
+    });
+    // preload the media so the preview is ready when the blocks land
+    ['/work/qbench/product.jpg', '/work/everbreed/mobile-care.jpg'].forEach((src) => { const i = new Image(); i.src = src; });
+  }
+</script>

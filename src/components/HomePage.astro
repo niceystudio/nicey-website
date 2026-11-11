@@ -17,11 +17,14 @@ import Faq from './Faq.astro';
 import Footer from './Footer.astro';
 import SiteFooter from './SiteFooter.astro';
 import ReviewSwitch from './ReviewSwitch.astro';
+import MachineView from './case-study/MachineView.astro';
+import { siteMarkdown } from '../lib/site-markdown';
 
 interface Props {
   zeroDrift: 'static' | 'story';
 }
 const { zeroDrift } = Astro.props;
+const markdown = siteMarkdown(Astro.site ?? new URL('https://nicey-website.vercel.app'));
 ---
 
 <Base
@@ -30,7 +33,7 @@ const { zeroDrift } = Astro.props;
   noindex={zeroDrift === 'story'}
 >
   <Header />
-  <main id="main" tabindex="-1">
+  <main id="main" tabindex="-1" data-human>
     <Hero />
     <ProofPanel />
     <WhenToBring />
@@ -41,6 +44,7 @@ const { zeroDrift } = Astro.props;
     <Faq />
   </main>
   <Footer />
-  <SiteFooter />
+  <MachineView markdown={markdown} mdHref="/llms.txt" what="site" />
+  <SiteFooter mdHref="/llms.txt" />
   <ReviewSwitch current={zeroDrift} />
 </Base>
