@@ -13,8 +13,11 @@ interface Props {
   marker: string;
   /** homepage-style opener; without it the section keeps its small caption */
   head?: { caption: string; heading: string };
+  /** 'scroll': the homepage Zero Drift layout, a sticky rail on the left and every step stacked on the right */
+  layout?: 'tabs' | 'scroll';
 }
-const { chapters, marker, head } = Astro.props;
+const { chapters, marker, head, layout: mode = 'tabs' } = Astro.props;
+const scroll = mode === 'scroll';
 
 // 02 · Model: place each status in a column by its distance from the first one
 function layout(edges: { from: string; to: string }[]) {
@@ -39,14 +42,33 @@ const slug = (k: string) =>
     .replace(/^-|-$/g, '');
 ---
 
-<section aria-labelledby="chapters-head" class="container-page ch-wrap">
-  {head ? (
+<section aria-labelledby="chapters-head" class:list={['container-page ch-wrap', scroll && 'ch-wrap--scroll']}>
+  {scroll ? (
+    <div class="ch-rail">
+      <span class="caption text-ink-2">{head?.caption ?? 'What we did'}</span>
+      <h2 id="chapters-head" class="m-0 text-h2 text-balance">{head?.heading ?? 'What we did, step by step'}</h2>
+      <ol class="ch-rail-list">
+        {chapters.map((c) => {
+          const [num, ...rest] = c.kicker.split(' · ');
+          return (
+            <li>
+              <a href={`#panel-${slug(c.kicker)}`} data-rail={`panel-${slug(c.kicker)}`}>
+                <i aria-hidden="true" class:list={['marker', marker]} />
+                <span class="font-mono text-caption text-ink-2">{num}</span>
+                {rest.join(' · ')}
+              </a>
+            </li>
+          );
+        })}
+      </ol>
+    </div>
+  ) : head ? (
     <SectionHead id="chapters-head" caption={head.caption} class="mb-6" headingClass="max-w-[18ch]">{head.heading}</SectionHead>
   ) : (
     <h2 id="chapters-head" class="caption m-0 text-ink-2">What we did, step by step</h2>
   )}
-  <div class="panel chs" data-chapters>
-    <div class="chs-tabs" role="tablist" aria-label="Steps of the work">
+  <div class:list={['panel chs', scroll && 'chs--scroll']} data-chapters data-layout={mode}>
+    {!scroll && <div class="chs-tabs" role="tablist" aria-label="Steps of the work">
       {
         chapters.map((c, i) => {
           const [num, ...rest] = c.kicker.split(' · ');
@@ -69,7 +91,7 @@ const slug = (k: string) =>
           );
         })
       }
-    </div>
+    </div>}
   {
     chapters.map((c, i) => {
       const id = slug(c.kicker);
@@ -77,10 +99,10 @@ const slug = (k: string) =>
       return (
         <div
           id={`panel-${id}`}
-          role="tabpanel"
-          aria-labelledby={`tab-${id}`}
-          tabindex="0"
-          hidden={i !== 0}
+          role={scroll ? undefined : 'tabpanel'}
+          aria-labelledby={scroll ? id : `tab-${id}`}
+          tabindex={scroll ? undefined : '0'}
+          hidden={!scroll && i !== 0}
           class="ch"
         >
           <header class="ch-head">
@@ -468,14 +490,15 @@ const slug = (k: string) =>
           </div>
 
           {c.proof && (
-            <ul class="ch-proof">
+            <ul class="ch-proof" data-stagger>
+              {/* "Seen at …" once, as the row's label; every column is then just number + caption */}
+              {c.proof.find((p) => p.seenAt) && (
+                <li class="ch-proof-label caption-sm text-hot">{c.proof.find((p) => p.seenAt)!.seenAt}</li>
+              )}
               {c.proof.map((p) => (
-                <li>
+                <li class="ch-proof-item">
                   <span class="ch-fig">{p.value}</span>
-                  <span class="flex flex-col gap-1">
-                    {p.seenAt && <span class="caption-sm text-hot">{p.seenAt}</span>}
-                    <span class="text-body text-pretty">{p.caption}</span>
-                  </span>
+                  <span class="max-w-[36ch] text-body text-pretty">{p.caption}</span>
                 </li>
               ))}
             </ul>
@@ -484,15 +507,16 @@ const slug = (k: string) =>
       );
     })
   }
-    <div class="chs-controls">
-      <button type="button" class="pill pill-outline chs-btn" data-prev aria-disabled="true">Previous</button>
-      <button type="button" class="pill pill-ink chs-btn chs-btn--next" data-next>Next step</button>
-    </div>
+    {!scroll && <div class="chs-controls">
+      <button type="button" class="chs-btn" data-prev aria-disabled="true" aria-label="Previous step"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9H4M8 4.5 3.5 9 8 13.5" /></svg></button>
+      <button type="button" class="chs-btn chs-btn--next" data-next aria-label="Next step"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h10M10 4.5 14.5 9 10 13.5" /></svg></button>
+    </div>}
   </div>
 </section>
 
 <script>
   function mountChapters(root: HTMLElement) {
+    const isScroll = root.dataset.layout === 'scroll';
     const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
     const panels = tabs.map((t) => document.getElementById(t.getAttribute('aria-controls') ?? ''));
     const prev = root.querySelector<HTMLButtonElement>('[data-prev]');
@@ -539,6 +563,19 @@ const slug = (k: string) =>
     });
     const fromHash = tabs.findIndex((t) => `#${t.id}` === location.hash);
     if (fromHash > 0) select(fromHash, false);
+
+    // scroll layout: every step is open; the rail marks the one being read
+    if (isScroll) {
+      const links = document.querySelectorAll<HTMLAnchorElement>('[data-rail]');
+      const steps = Array.from(root.querySelectorAll<HTMLElement>('.ch'));
+      const mark = (id: string) => links.forEach((a) => a.toggleAttribute('aria-current', a.dataset.rail === id));
+      const spy = new IntersectionObserver(
+        (es) => es.forEach((e) => e.isIntersecting && mark((e.target as HTMLElement).id)),
+        { rootMargin: '-40% 0px -55% 0px' },
+      );
+      steps.forEach((st) => spy.observe(st));
+      if (steps[0]) mark(steps[0].id);
+    }
 
     prev?.addEventListener('click', () => {
       if (prev.getAttribute('aria-disabled') !== 'true') select(current - 1, false);
@@ -632,6 +669,17 @@ const slug = (k: string) =>
       requestAnimationFrame(tick);
     };
     tabs.forEach((t, i) => t.addEventListener('click', () => countUp(panels[i])));
+    if (isScroll) {
+      root.querySelectorAll<HTMLElement>('.ch').forEach((panel) => {
+        const once = new IntersectionObserver((es) => {
+          if (es.some((e) => e.isIntersecting)) {
+            countUp(panel);
+            once.disconnect();
+          }
+        });
+        once.observe(panel);
+      });
+    }
     next?.addEventListener('click', () => countUp(panels[current]));
     prev?.addEventListener('click', () => countUp(panels[current]));
     const io = new IntersectionObserver((es) => {
@@ -656,6 +704,70 @@ const slug = (k: string) =>
   .chs {
     display: flex;
     flex-direction: column;
+  }
+
+  /* scroll layout: the homepage Zero Drift pattern, sticky rail + stacked steps */
+  .ch-wrap--scroll {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 48px 72px;
+  }
+  .ch-rail {
+    position: sticky;
+    top: 24px;
+    flex: 1 1 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  @media (max-width: 860px) {
+    .ch-rail {
+      position: static;
+    }
+  }
+  .ch-rail-list {
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--color-line-strong);
+  }
+  .ch-rail-list li {
+    border-bottom: 1px solid var(--color-line);
+  }
+  .ch-rail-list a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    color: var(--color-ink-2);
+    font-size: var(--text-body);
+    text-decoration: none;
+    transition: color 200ms var(--ease-out);
+  }
+  .ch-rail-list a[aria-current] {
+    color: var(--color-ink);
+  }
+  .ch-rail-list a[aria-current] .marker {
+    transform: scale(1.4);
+  }
+  .ch-rail-list .marker {
+    transition: transform 200ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .ch-rail-list a:hover {
+      color: var(--color-ink);
+    }
+  }
+  .chs--scroll {
+    flex: 999 1 560px;
+    min-width: 0;
+  }
+  .chs--scroll > .ch + .ch {
+    border-top: 1px solid var(--color-line-strong);
+  }
+  .chs--scroll > .ch {
+    scroll-margin-top: 24px;
   }
   .chs-tabs {
     display: flex;
@@ -739,23 +851,38 @@ const slug = (k: string) =>
     opacity: 0;
     transform: translateY(6px);
   }
+  /* arrow buttons: back on the left, forward on the right */
   .chs-controls {
     display: flex;
-    flex-wrap: wrap;
+    justify-content: space-between;
     gap: 8px;
-    padding: 20px 44px;
+    padding: 16px 44px;
   }
   .chs-btn {
-    padding: 0 18px;
-    font-size: var(--text-body-sm);
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--color-ink);
     cursor: pointer;
+    transition: transform 160ms var(--ease-out), background-color 200ms var(--ease-out);
+  }
+  .chs-btn:active:not([aria-disabled='true']) {
+    transform: scale(0.94);
   }
   .chs-btn--next {
-    padding: 0 22px;
-    border: 0;
+    border-color: var(--color-ink);
+    background: var(--color-ink);
+    color: var(--color-on-ink);
   }
-  .chs-btn.pill-outline {
-    background: transparent;
+  @media (hover: hover) and (pointer: fine) {
+    .chs-btn:not(.chs-btn--next):not([aria-disabled='true']):hover {
+      background: var(--color-surface-hover);
+    }
   }
   .chs-btn[aria-disabled='true'] {
     opacity: 0.4;
@@ -1119,12 +1246,43 @@ const slug = (k: string) =>
     grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
     gap: 24px 48px;
   }
-  .ch-proof > li {
+  /* each figure is a column: number, "Seen at", caption; columns split by a line */
+  .ch-proof-label {
+    grid-column: 1 / -1;
+    margin-bottom: -4px;
+  }
+  /* numbers rise in once when the row scrolls in (CaseStudy's [data-stagger] observer):
+     the label fades in place, the first figure leads, the second follows 90ms later */
+  @media (prefers-reduced-motion: no-preference) {
+    .ch-proof > li {
+      transition: opacity 420ms var(--ease-out), transform 420ms var(--ease-out);
+    }
+    .ch-proof.is-waiting > li {
+      opacity: 0;
+    }
+    .ch-proof.is-waiting > .ch-proof-item {
+      transform: translateY(12px);
+    }
+    .ch-proof > .ch-proof-item:nth-child(2) { transition-delay: 60ms; }
+    .ch-proof > .ch-proof-item:nth-child(3) { transition-delay: 150ms; }
+  }
+  .ch-proof-item {
     display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    gap: 8px 24px;
+    flex-direction: column;
+    gap: 12px;
     container-type: inline-size;
+  }
+  @media (min-width: 768px) {
+    .ch-proof-item + .ch-proof-item {
+      padding-left: 48px;
+      border-left: 1px solid var(--color-line);
+    }
+  }
+  @media (max-width: 767px) {
+    .ch-proof-item + .ch-proof-item {
+      padding-top: 24px;
+      border-top: 1px solid var(--color-line);
+    }
   }
 
   @media (max-width: 767px) {

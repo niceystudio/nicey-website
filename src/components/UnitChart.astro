@@ -10,11 +10,13 @@ interface Props {
   columns: number;
   cell: number;
   label: string;
+  /** every cell checked and clear (accent), instead of quiet grey */
+  ok?: boolean;
 }
-const { count, hot = 0, columns, cell, label } = Astro.props;
+const { count, hot = 0, columns, cell, label, ok = false } = Astro.props;
 const cells = Array.from({ length: count }, (_, i) => i < hot);
 ---
 
-<div role="img" aria-label={label} class="units" style={`--u: ${cell}px; --n: ${columns}`}>
+<div role="img" aria-label={label} class:list={['units', ok && 'units--ok']} style={`--u: ${cell}px; --n: ${columns}`}>
   {cells.map((isHot) => <i class:list={{ 'is-hot': isHot }} />)}
 </div>

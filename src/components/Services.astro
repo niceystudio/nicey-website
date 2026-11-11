@@ -2,6 +2,7 @@
 import SectionHead from './SectionHead.astro';
 import { links } from '../data/links';
 import { markerBg } from '../data/zero-drift';
+import QBenchWork from './case-study/QBenchWork.astro';
 
 const primary = [
   'Audit and consolidation',
@@ -30,9 +31,10 @@ const alongside = ['Product and UX design', 'Design engineering', 'AI workflows 
       <ul class="svc-list svc-list--grid">
         {primary.map((item) => <li>{item}</li>)}
       </ul>
-      <div class="placeholder flex aspect-[16/7] items-center justify-center rounded-code p-4 text-center">
-        [Video intro, 60–90 s]
-      </div>
+      {/* real work instead of an intro video (Emir, 11 Nov): QBench, what the agent reads */}
+      <figure class="m-0 flex flex-col gap-2">
+        <QBenchWork />
+      </figure>
       <a href={links.exploreDesignSystems} class="svc-link">Explore design systems →</a>
     </article>
     <article class="svc flex-[1_1_320px] gap-5">
@@ -46,6 +48,15 @@ const alongside = ['Product and UX design', 'Design engineering', 'AI workflows 
       <ul class="svc-list">
         {alongside.map((item) => <li>{item}</li>)}
       </ul>
+      {/* real work: the Everbreed student app, weight check */}
+      <figure class="svc-phone m-0">
+        <div class="svc-phone-frame">
+          <video muted loop playsinline preload="none" poster="/work/everbreed/mobile-logweight.jpg" data-svc-video>
+            <source src="/work/everbreed/mobile-logweight.webm" type="video/webm" />
+          </video>
+        </div>
+        <figcaption class="font-mono text-caption text-ink-2">Everbreed student app · a typo caught before it saves</figcaption>
+      </figure>
       <a href={links.exploreProductDesign} class="svc-link mt-auto">Explore product design →</a>
     </article>
   </div>
@@ -74,6 +85,28 @@ const alongside = ['Product and UX design', 'Design engineering', 'AI workflows 
     border-bottom: 1px solid var(--color-line);
     font-size: var(--text-body);
   }
+  .svc-phone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .svc-phone-frame {
+    width: 200px;
+    aspect-ratio: 393 / 852;
+    padding: 7px;
+    border-radius: 36px;
+    background: var(--color-band);
+    box-shadow: 0 24px 44px -22px rgba(38, 37, 31, 0.4);
+  }
+  .svc-phone-frame video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 29px;
+    object-fit: cover;
+    background: #f1f3f5;
+  }
   .svc-link {
     align-self: flex-start;
     display: inline-flex;
@@ -85,3 +118,14 @@ const alongside = ['Product and UX design', 'Design engineering', 'AI workflows 
     text-underline-offset: 4px;
   }
 </style>
+
+<script>
+  // the phone clip plays while it's on screen (not for reduced motion)
+  const v = document.querySelector<HTMLVideoElement>('[data-svc-video]');
+  if (v && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    new IntersectionObserver((es) =>
+      es.forEach((e) => {
+        if (e.isIntersecting) { v.preload = 'auto'; v.play().catch(() => {}); } else v.pause();
+      }), { threshold: 0.5 }).observe(v);
+  }
+</script>

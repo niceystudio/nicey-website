@@ -72,7 +72,7 @@ export interface CaseStudy {
   numbersHeading: string;
   numbers: { value: string; label: string; meaning: string }[];
   /** a custom visual on the right of the hero */
-  heroVisual?: 'qbench-build' | 'qbench-status';
+  heroVisual?: 'qbench-build' | 'qbench-status' | 'everbreed';
   /** one line above the hero visual that says what it shows */
   heroContext?: string;
   /** product decisions: the problem, what we did, and a small UI piece that shows it */
@@ -90,14 +90,18 @@ export interface CaseStudy {
   /** heading of the "From the work" section */
   workHeading?: string;
   /** custom "From the work" visuals instead of image figures */
-  workVisual?: 'qbench' | 'qbench-status';
+  workVisual?: 'qbench' | 'qbench-status' | 'everbreed';
   /** an animated before/after above the numbers */
   proofViz?: 'names' | 'surfaces';
   steps?: { label: string; inProgress?: boolean }[];
   /** the slides of the Figma case study, one section each */
   chapters?: Chapter[];
+  /** 'scroll' = sticky rail + stacked steps (homepage Zero Drift layout); default tabs */
+  chaptersLayout?: 'tabs' | 'scroll';
   note?: { heading: string; text: string };
   did: string[];
+  /** 'gate': the five layers shown working (AgenticGate) instead of the dark card */
+  agenticStyle?: 'band' | 'gate';
   agentic?: {
     kicker: string;
     heading: string;
@@ -107,6 +111,8 @@ export interface CaseStudy {
   together: { text: string; collect: Collect };
   changed: { text: string; collect: Collect };
   work: { placeholder: string; caption: string; src?: Shot; alt?: string }[];
+  /** questions about this project, shown before the CTA (facts from the page only) */
+  faq?: { q: string; a: string }[];
   cta: { heading: string; text: string; label: string; action: 'audit' | 'call' };
   next: string;
 }
@@ -140,6 +146,7 @@ export const caseStudies: CaseStudy[] = [
       work: { caption: 'See it work', heading: 'What the agent reads' },
     },
     proofViz: 'names',
+    agenticStyle: 'gate',
     workVisual: 'qbench',
     numbersHeading: 'Before and after',
     numbers: [
@@ -336,6 +343,28 @@ export const caseStudies: CaseStudy[] = [
         caption: 'Input and InputGroup in the library, with every state drawn: default, hover, focus, filled, disabled, error.',
       },
     ],
+    faq: [
+      {
+        q: 'Did the product have to stop while the system changed?',
+        a: '[Answer to add]',
+      },
+      {
+        q: 'What happened to the old libraries?',
+        a: '[Answer to add]',
+      },
+      {
+        q: 'How do AI agents use the system?',
+        a: '[Answer to add]',
+      },
+      {
+        q: 'What stops the code from drifting again?',
+        a: '[Answer to add]',
+      },
+      {
+        q: 'How are component states kept consistent?',
+        a: '[Answer to add]',
+      },
+    ],
     cta: {
       heading: 'Product built without a designer?',
       text: 'The free audit shows how far your design and code have drifted, and where to start.',
@@ -366,6 +395,7 @@ export const caseStudies: CaseStudy[] = [
     proofViz: 'surfaces',
     workVisual: 'qbench-status',
     workHeading: 'Two people, one workflow',
+    chaptersLayout: 'scroll',
     heads: {
       proof: { caption: 'Before and after', heading: 'Eight places that change a status. One model.' },
       chapters: { caption: 'What we did', heading: 'Five steps to one workflow on every screen.' },
@@ -551,6 +581,28 @@ export const caseStudies: CaseStudy[] = [
       },
     },
     work: [],
+    faq: [
+      {
+        q: 'Is this design system work or product design?',
+        a: '[Answer to add]',
+      },
+      {
+        q: 'What did the MVP include?',
+        a: '[Answer to add]',
+      },
+      {
+        q: 'How did you handle e-signatures?',
+        a: '[Answer to add]',
+      },
+      {
+        q: 'What happens when some tests in a bulk move can’t move?',
+        a: '[Answer to add]',
+      },
+      {
+        q: 'Who was involved?',
+        a: '[Answer to add]',
+      },
+    ],
     cta: {
       heading: 'Complex, regulated workflows?',
       text: 'We design them on a system, so every surface behaves the same way.',
@@ -565,83 +617,214 @@ export const caseStudies: CaseStudy[] = [
     linkName: 'Everbreed',
     name: 'Everbreed',
     band: 'peach',
-    kicker: 'Case study · Design system · Agtech · In progress',
+    kicker: 'Case study · Design system · Agtech',
     statement: 'The library looked healthy. No pipeline could read it.',
-    lede: 'A mature Figma design system with most styles already bound to tokens. But the tokens carried no metadata, the code had drifted from the file, and the team assumed the fix was renaming everything. If your design system looks fine in Figma but engineers still copy values by hand, this is likely you.',
+    lede: 'Everbreed had a mature Figma library, but the code had drifted from it and no tool could read it. We gave every token an ID, a scope and a code name, so the code config now comes from Figma, for web and for mobile.',
     facts: [
-      { term: 'Company', detail: 'Agtech platform, web and mobile' },
+      { term: 'Company', detail: 'Agtech platform: a web app and a student app on iOS and Android' },
       { term: 'Team', detail: '[Team size]' },
-      { term: 'Stack', detail: 'Figma library, Tailwind config in the web app [confirm stack]' },
+      { term: 'Stack', detail: 'Figma DS Desktop and DS Mobile, Vue on web, React Native on mobile' },
       { term: 'Scale', detail: '302 variables, 89 component sets' },
+      { term: 'Work by', detail: 'Goran Babarogić, design systems, [2025 to now]' },
     ],
-    who: 'Who did the work: Goran Babarogić, design systems, 2025 to now. [Confirm how to describe the engagement.]',
-    lead: {
-      kind: 'audit',
-      heading: 'This is what our audit looks like.',
-      text: 'The findings below come from a review of the full Figma file. The free audit gives you the same kind of picture for your system.',
-      cta: 'Get yours free',
+    who: '',
+    heroVisual: 'everbreed',
+    workVisual: 'everbreed',
+    heroContext: 'Every token now carries an ID, a scope and a code name, so code reads it straight from Figma.',
+    heads: {
+      proof: { caption: 'Before and after', heading: 'Figma and code hold the same tokens, matched by ID.' },
+      chapters: { caption: 'What we did', heading: 'Four steps, from drift to agents building screens.' },
+      work: { caption: 'What we built', heading: 'The student app, on phone and desktop.' },
     },
-    numbersHeading: 'What the review found, and what it means',
+    numbersHeading: 'Before and after',
     numbers: [
       {
-        value: '98%',
-        label: 'of text styles bound to tokens',
-        meaning: 'So no redesign was needed. The design work was already good.',
+        value: '53 → 0',
+        label: 'tokens out of sync between Figma and code',
+        meaning: 'So engineers can trust that the code matches the design.',
+      },
+      {
+        value: '210 → 0',
+        label: 'hand-written token aliases',
+        meaning: 'So the utility config is generated from Figma, not kept by hand.',
       },
       {
         value: '302 / 302',
-        label: 'variables with no scope and no code name',
-        meaning: 'So no tool could tell what a token is for, or turn it into code.',
+        label: 'tokens with a code name and a scope',
+        meaning: 'So code reads the system mechanically. Nothing was renamed.',
       },
       {
-        value: '53',
-        label: 'variables drifted: 17 only in Figma, 36 only in code',
-        meaning: 'So engineers couldn’t trust that the code matched the design.',
-      },
-      {
-        value: '144',
-        label: 'button variants and no focus state',
-        meaning: 'So adding focus would have doubled the work. Fixing the structure first halves it to 72.',
+        value: '144 → 72',
+        label: 'button variants',
+        meaning: 'So Focus and Pressed were added without doubling the matrix.',
       },
     ],
-    steps: [
-      { label: '01 Drift' },
-      { label: '02 Audit' },
-      { label: '03 System · in progress', inProgress: true },
-      { label: '04 Context' },
+    chapters: [
+      {
+        kicker: '01 · Drift',
+        heading: 'Figma and the code had drifted 53 tokens apart.',
+        lede: 'Same names lived in three libraries, and an agent can’t tell which one is right.',
+        blocks: [
+          {
+            kind: 'rows',
+            title: 'Web · Figma ↔ code, before',
+            rows: [
+              { label: 'Only in Figma', value: '17 · surface/hover, border/selected/default …' },
+              { label: 'Only in the repo', value: '36 · bg-eb-neutral-subtle, bg-eb-accent-red …' },
+              { label: 'One name, three libraries', value: 'spacing/4 in Desktop, the old DS and an old UI kit' },
+            ],
+          },
+        ],
+        proof: [
+          { value: '53', caption: 'tokens drifted between the Figma file and the repo.', seenAt: 'Seen at Everbreed' },
+          { value: '3,046', caption: 'token issues on the student mobile screens, and 10,471 on web, before the clean-up.' },
+        ],
+      },
+      {
+        kicker: '02 · Tokens',
+        heading: 'Better metadata, not new names.',
+        lede: 'No token was renamed. Three fields Figma already has became the contract between design and code, and almost every value now points to a token.',
+        blocks: [
+          {
+            kind: 'rows',
+            title: 'Token field · from Figma · what it buys',
+            rows: [
+              { label: '$figmaId', value: 'variable.id · identity across renames' },
+              { label: '$property', value: 'variable.scopes · the CSS property it paints' },
+              { label: '$codeSyntax', value: 'codeSyntax.WEB · the name code uses' },
+            ],
+          },
+          {
+            kind: 'meters',
+            title: 'Token coverage · mobile, after',
+            items: [
+              { label: 'Spacing', value: '99.4%' },
+              { label: 'Text styles', value: '99.5%' },
+              { label: 'Corner radius', value: '97.8%' },
+              { label: 'Effects', value: '85.6%' },
+            ],
+          },
+        ],
+        proof: [
+          { value: '210 → 0', caption: 'hand-written aliases. The config is generated from Figma.', seenAt: 'Seen at Everbreed' },
+          { value: '99%', caption: 'of values bound to a token, 5,373 of 5,433.' },
+        ],
+      },
+      {
+        kicker: '03 · Components',
+        heading: 'One vocabulary, so agents read the API straight from Figma.',
+        lede: 'Across 89 component sets almost every one named its axes differently. Nothing broke on screen; it broke the mapping to code.',
+        blocks: [
+          {
+            kind: 'compare',
+            rows: [
+              { label: 'Axis name', before: 'Property 1', after: 'Variant', note: 'The same four words in every set' },
+              { label: 'State', before: 'Status / State / States', after: 'state', note: 'Focus and Pressed added' },
+              { label: 'Size', before: 'Large (48)', after: 'size: "lg"', note: 'No pixels in the name' },
+              { label: 'Label', before: 'Show Label axis', after: 'iconOnly: boolean', note: 'Halves the matrix' },
+            ],
+          },
+        ],
+        proof: [
+          { value: '144 → 72', caption: 'button variants, with Focus and Pressed added.', seenAt: 'Seen at Everbreed' },
+        ],
+      },
+      {
+        kicker: '04 · Agents build',
+        heading: 'Agents build from the system, and checks stop new drift.',
+        lede: 'A rulebook written for Everbreed’s system, so any AI agent builds screens the way the team would. Every pull request is checked, raw colours and shadows included.',
+        blocks: [
+          {
+            kind: 'flow',
+            title: 'From spec to screen',
+            steps: [
+              { n: '01', name: 'Read the spec', text: 'A handoff spec on the Figma canvas says where everything is.' },
+              { n: '02', name: 'Load the rules', text: 'design-conventions.md and allowed-components.json, per platform.' },
+              { n: '03', name: 'generate-screen', text: 'Builds with library components and tokens only.' },
+              { n: '04', name: 'check-screen', text: 'Compares the screen with the library before a designer sees it.' },
+            ],
+          },
+          {
+            kind: 'checks',
+            title: 'Every pull request',
+            subject: 'macOS, Linux and Windows',
+            status: 'Blocks new drift',
+            items: [
+              { value: '0', label: 'Raw colours' },
+              { value: '0', label: 'Raw shadows' },
+              { value: '0', label: 'Tokens missing a field' },
+            ],
+          },
+        ],
+        proof: [
+          { value: '0 issues', caption: 'on the test screen, Log Grooming 01, at the first check.', seenAt: 'Seen at Everbreed' },
+        ],
+      },
     ],
     did: [
-      'Reviewed the whole Figma file and counted every binding, so the conversation started from facts.',
-      'Defined three fields that do the work: an ID that survives renames, where a token may be used, and its name in code.',
-      'Wrote the sync plan, so the code config is generated from Figma and the 210-line hand-written alias layer goes away.',
-      'Wrote the agent instructions, with one rule above the rest: report the gap, don’t invent the value.',
+      'Measured the drift between Figma and code, token by token.',
+      'Made three Figma fields the contract between design and code, without renaming anything.',
+      'Gave every component the same four axis names and added Focus and Pressed.',
+      'Wrote the agent rulebook and the checks that block new drift.',
     ],
+    agentic: {
+      kicker: 'Two platforms',
+      heading: 'One source of truth, adapted for each platform, not copied.',
+      items: [
+        { label: 'Source', text: 'Figma: DS Desktop and DS Mobile.' },
+        { label: 'Contract', text: 'Token JSON with $figmaId, $property and $codeSyntax.' },
+        { label: 'Web', text: 'A generated utility config and Vue components. Shipped first.' },
+        { label: 'Mobile', text: 'A typed React Native export for iOS and Android.' },
+        { label: 'Verified', text: 'Button and Input in a create and edit flow, checked on iOS and Android, including enlarged text.' },
+      ],
+      footnote:
+        'Native differences are written down instead of guessed: elevation, text scaling, touch targets, keyboard and safe areas.',
+    },
     together: {
       text: 'The plan started as a rename of all 302 variables. Everbreed’s engineer proposed a better route: don’t rename, track every token by its Figma ID, and let Figma stay the source of truth. We agreed, and the plan got smaller and safer. The best fix came from their side, and the process made room for it.',
       collect: {
         label: 'To collect · client quote and permission',
-        text: '“[A sentence from the Everbreed engineer on the review.]” Also confirm Everbreed is happy for these figures to be published by name.',
+        text: '“[A sentence from the Everbreed engineer on the work.]” Also confirm Everbreed is happy for these figures to be published by name.',
       },
     },
     changed: {
-      text: 'Design and engineering agreed one path: no rename, metadata instead, and a prioritised work list. Generating the code config from Figma is the next step.',
+      text: 'Figma and the code now hold the same tokens, matched by ID. The web config is generated from Figma, checks stop new drift on every pull request, and mobile follows the same contract for React Native.',
       collect: {
-        label: 'To collect · result once the sync ships',
-        text: '[Drift count after sync, hours saved maintaining the config by hand, or time from a Figma change to code.]',
+        label: 'To collect · business result',
+        text: '[One result since the sync shipped: hours saved maintaining the config by hand, or time from a Figma change to code.]',
       },
     },
+    // shown by EverbreedProduct (workVisual); these lines are what the Markdown twin lists
     work: [
       {
-        placeholder: '[Image: binding coverage]',
-        caption: 'Binding coverage by property. Shadows were the weak spot at 40%.',
+        placeholder: 'Student app clips: Daily Care, care saved, Home, Log Weight typo check, weight saved, milestone',
+        caption: 'The Everbreed student app on the phone, recorded from the coded prototype.',
       },
       {
-        placeholder: '[Image: the three metadata fields]',
-        caption: 'ID, usage and code name: the metadata that keeps Figma the source of truth.',
+        placeholder: 'Project Book on desktop: Care & Health and Photos',
+        caption: 'The same records on desktop, ready for the fair.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Did you rename the tokens?',
+        a: '[Answer to add]',
       },
       {
-        placeholder: '[Image: the work list]',
-        caption: 'A prioritised work list, agreed with the engineer who owns the code side.',
+        q: 'How long did adding the metadata take?',
+        a: '[Answer to add]',
+      },
+      {
+        q: 'Does it work for the mobile app?',
+        a: '[Answer to add]',
+      },
+      {
+        q: 'What stops new drift?',
+        a: '[Answer to add]',
+      },
+      {
+        q: 'Can AI agents build Everbreed screens?',
+        a: '[Answer to add]',
       },
     ],
     cta: {

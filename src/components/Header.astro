@@ -3,20 +3,19 @@ import { links } from '../data/links';
 import ThemeToggle from './ThemeToggle.astro';
 
 interface Props {
-  /** 'case': the case study nav from canvas 08.x (← All work, Free audit) */
+  /** 'case': pages other than the homepage, so section links point back to it */
   variant?: 'home' | 'case';
 }
 const { variant = 'home' } = Astro.props;
 
-const nav =
-  variant === 'case'
-    ? [{ href: '/#work', label: '← All work' }]
-    : [
-        { href: '#services', label: 'Design systems' },
-        { href: '#services', label: 'Product design' },
-        { href: '#work', label: 'Work' },
-        { href: '#how', label: 'How we work' },
-      ];
+// one menu on every page (Emir, 11 Nov); on other pages the links go back to the homepage sections
+const base = variant === 'case' ? '/' : '';
+const nav = [
+  { href: `${base}#services`, label: 'Design systems' },
+  { href: `${base}#services`, label: 'Product design' },
+  { href: `${base}#work`, label: 'Work' },
+  { href: `${base}#how`, label: 'How we work' },
+];
 const audit = variant === 'case' ? '/#audit' : '#audit';
 ---
 

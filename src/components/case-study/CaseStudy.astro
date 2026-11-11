@@ -13,6 +13,10 @@ import NamesField from './NamesField.astro';
 import QBenchHero from './QBenchHero.astro';
 import QBenchWork from './QBenchWork.astro';
 import StatusHero from './StatusHero.astro';
+import EverbreedHero from './EverbreedHero.astro';
+import Faq from '../Faq.astro';
+import AgenticGate from './AgenticGate.astro';
+import EverbreedProduct from './EverbreedProduct.astro';
 import SurfacesField from './SurfacesField.astro';
 import TwoSides from './TwoSides.astro';
 import Decisions from './Decisions.astro';
@@ -41,11 +45,9 @@ const bandBg: Record<Band, string> = {
   stone: 'bg-stone',
 };
 const band = bandBg[s.band];
-const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
 const mdHref = `${caseHref(s.slug)}.md`;
 const pageUrl = new URL(caseHref(s.slug), Astro.site ?? 'https://nicey-website.vercel.app').href;
-const jsonLd = {
-  '@context': 'https://schema.org',
+const article = {
   '@type': 'Article',
   headline: `${s.name}: ${s.statement}`,
   description: s.lede,
@@ -54,6 +56,13 @@ const jsonLd = {
   author: { '@type': 'Organization', name: 'Nicey Studio', url: new URL('/', pageUrl).href },
   mainEntityOfPage: pageUrl,
 };
+// only answered questions go into structured data; [placeholders] stay out
+const answered = s.faq?.filter((f) => !/\[[^\]]+\]/.test(f.a)) ?? [];
+const faqLd = answered.length > 0 && {
+  '@type': 'FAQPage',
+  mainEntity: answered.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+const jsonLd = { '@context': 'https://schema.org', '@graph': faqLd ? [article, faqLd] : [article] };
 const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https://nicey-website.vercel.app').href);
 ---
 
@@ -72,7 +81,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
           {s.heroVisual && (
             <div class="cs-hero-visual">
               {s.heroContext && <p class="cs-hero-context">{s.heroContext}</p>}
-              {s.heroVisual === 'qbench-build' ? <QBenchHero /> : <StatusHero />}
+              {s.heroVisual === 'qbench-build' ? <QBenchHero /> : s.heroVisual === 'everbreed' ? <EverbreedHero /> : <StatusHero />}
             </div>
           )}
         </div>
@@ -156,7 +165,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
       )
     }
 
-    {s.chapters && <Chapters chapters={s.chapters} marker={band} head={s.heads?.chapters} />}
+    {s.chapters && <Chapters chapters={s.chapters} marker={band} head={s.heads?.chapters} layout={s.chaptersLayout} />}
 
     {s.decisions && <Decisions heading={s.decisions.heading} head={s.heads?.decisions} items={s.decisions.items} />}
 
@@ -174,8 +183,9 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
       </ol>
     </section>}
 
+    {s.agentic && s.agenticStyle === 'gate' && <AgenticGate {...s.agentic} />}
     {
-      s.agentic && (
+      s.agentic && s.agenticStyle !== 'gate' && (
         <section aria-labelledby="agentic-head" class="container-page cs-block">
           <div class="cs-agentic bg-band text-on-band">
             <div class="flex flex-col gap-2.5">
@@ -230,6 +240,8 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
         <QBenchWork />
       ) : s.workVisual === 'qbench-status' ? (
         <TwoSides />
+      ) : s.workVisual === 'everbreed' ? (
+        <EverbreedProduct />
       ) : (
       <div class:list={['cs-figs', s.work.length === 2 && 'cs-figs--two']}>
           {
@@ -250,32 +262,36 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
         </div>
       )}
     </section>
+    {s.faq && (
+      <div class="cs-faq">
+        <Faq items={s.faq} heading="About this project" id="case-faq" />
+      </div>
+    )}
   </main>
 
-  <section aria-label="Next steps" class="container-page cs-foot" data-human>
-    <div class:list={['cs-cta', band]}>
-      <div class="cs-cta-copy">
-        {s.cta.action === 'audit' && <span class="caption text-ink-2">Free audit · read-only</span>}
-        <p class="m-0 text-case-cta">{s.cta.heading}</p>
-        <p class="m-0 text-cta text-ink-2">{s.cta.text}</p>
-        {s.cta.action === 'audit' && (
-          <ul class="cs-cta-gets">
-            <li>A score per pillar</li>
-            <li>The top findings</li>
-            <li>What to fix first</li>
-          </ul>
-        )}
-      </div>
-      <div class="cs-cta-act">
-        <a href={ctaHref} class="pill pill-ink pill-lg">{s.cta.label}</a>
+  {/* one CTA on every page: the homepage closing band, only the words change (Emir, 11 Nov) */}
+  <section aria-labelledby="cs-cta-head" class="cs-cta bg-band text-on-band" data-human>
+    <div class="container-page flex flex-col items-start gap-6 py-section">
+      <span class="caption text-on-band-2">{s.cta.action === 'audit' ? 'Free audit · read-only' : 'Work with us'}</span>
+      <h2 id="cs-cta-head" class="m-0 max-w-[16ch] text-h1">{s.cta.heading}</h2>
+      <p class="m-0 max-w-[40ch] text-sub text-on-band-2">{s.cta.text}</p>
+      <div class="mt-4 flex flex-wrap gap-2.5">
         {s.cta.action === 'audit' ? (
-          <span class="text-body-sm text-ink-2">Only your Figma file. The repo is optional.</span>
-        ) : null}
-        {s.cta.action === 'audit' && (
-          <a href={links.bookCall} class="text-body-sm text-ink underline-offset-4 hover:underline">or book a call →</a>
+          <>
+            <a href="/#audit" class="pill pill-lg bg-on-band text-band">Get a free audit</a>
+            <a href={links.bookCall} class="pill pill-lg border border-on-band px-[23px] py-[15px] text-on-band">Book a call</a>
+          </>
+        ) : (
+          <>
+            <a href={links.bookCall} class="pill pill-lg bg-on-band text-band">Book a call</a>
+            <a href="/#audit" class="pill pill-lg border border-on-band px-[23px] py-[15px] text-on-band">Get a free audit</a>
+          </>
         )}
       </div>
     </div>
+  </section>
+
+  <section aria-label="More case studies" class="container-page cs-foot" data-human>
     <a href={caseHref(next.slug)} class="cs-next">
       <span class="cs-next-copy">
         <span class="caption text-ink-2">Next case study</span>
@@ -592,44 +608,16 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
   .cs-foot {
     padding-block: var(--cs-lg);
   }
+  /* same as the homepage band: the accent ring is under 3:1 on the day band, so it turns cream */
+  .cs-faq {
+    padding-top: var(--spacing-section);
+  }
+  .cs-faq :global(#case-faq) {
+    padding-bottom: 0;
+  }
   .cs-cta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-    padding: 40px;
-    border-radius: var(--radius-panel);
-  }
-  .cs-cta-copy {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    max-width: 46ch;
-  }
-  .cs-cta-gets {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin: 6px 0 0;
-    padding: 0;
-    list-style: none;
-  }
-  .cs-cta-gets > li {
-    padding: 6px 12px;
-    border: 1px solid var(--color-line-strong);
-    border-radius: var(--radius-pill);
-    font-size: var(--text-body-sm);
-  }
-  .cs-cta-gets > li::before {
-    content: '✓ ';
-    color: var(--color-accent);
-  }
-  .cs-cta-act {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
+    --color-focus: var(--color-on-band);
+    margin-top: var(--spacing-section);
   }
   /* the next case study is a second path, not a second card: an open row between two lines */
   .cs-next {
@@ -637,7 +625,6 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     align-items: center;
     justify-content: space-between;
     gap: 24px 40px;
-    margin-top: 56px;
     padding-block: 32px;
     border-top: 1px solid var(--color-line-strong);
     border-bottom: 1px solid var(--color-line-strong);
@@ -730,8 +717,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
 
   @media (max-width: 479px) {
     .cs-audit,
-    .cs-agentic,
-    .cs-cta {
+    .cs-agentic {
       padding: 24px;
     }
     .cs-num {

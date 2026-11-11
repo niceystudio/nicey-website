@@ -1,0 +1,265 @@
+---
+/**
+ * A sample page of the free audit report, as a small "PDF": a sheet with a folded corner
+ * and a second page peeking out behind it. Mostly skeleton lines, so it reads as
+ * "a real report" at a glance without asking to be read (Emir, 11 Nov: less information).
+ * What is spelled out is real: the seven pillars of our audit (ds-audit) and the A–E grade.
+ * The scores are an example (labelled for screen readers). Bars fill once when it scrolls in.
+ */
+interface Props {
+  tilt?: boolean;
+}
+const { tilt = false } = Astro.props;
+const pillars = [
+  { name: 'Token metadata', score: 34 },
+  { name: 'Token binding', score: 82 },
+  { name: 'Interaction states', score: 51 },
+  { name: 'Component API', score: 46 },
+  { name: 'Elevation & effects', score: 40 },
+  { name: 'AI readiness', score: 38 },
+  { name: 'Design ↔ code sync', score: 57 },
+];
+---
+
+<figure class:list={['ap', tilt && 'ap--tilt']} data-ap aria-label="Sample audit report: a grade, a score per pillar, the top findings and what to fix first">
+  <div class="ap-stack">
+    <div class="ap-sheet ap-sheet--back" aria-hidden="true"></div>
+    <div class="ap-sheet">
+      <header class="ap-head">
+        <span class="ap-brand">nicey<span class="text-accent">.</span></span>
+        <span class="ap-mono">Audit · p. 1</span>
+      </header>
+
+      <div class="ap-score">
+        <div class="ap-lines" aria-hidden="true"><i style="width:70%"></i><i style="width:46%"></i></div>
+        <span class="ap-grade" aria-label="Grade C">C</span>
+      </div>
+
+      <ul class="ap-pillars" aria-label="Score per pillar">
+        {
+          pillars.map((p) => (
+            <li title={`${p.name}: ${p.score}`}>
+              <span class="sr-only">{p.name}</span>
+              <span class="ap-bar">
+                <i style={`--w:${p.score}%`} />
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="ap-findings" aria-hidden="true">
+        <span><b></b><i style="width:88%"></i></span>
+        <span><b></b><i style="width:72%"></i></span>
+        <span><b></b><i style="width:80%"></i></span>
+      </div>
+
+      <div class="ap-fix">
+        <span class="ap-mono">Fix first</span>
+        <span class="ap-chip">3 days</span>
+      </div>
+      <span class="ap-fold" aria-hidden="true"></span>
+    </div>
+  </div>
+</figure>
+
+<style>
+  /* full width of its column: without the caption nothing else sets the width */
+  .ap {
+    width: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+  }
+  .ap-stack {
+    position: relative;
+    width: 100%;
+    max-width: 292px; /* the size Emir approved (it used to follow the caption's width) */
+  }
+  .ap--tilt .ap-stack {
+    transform: rotate(2deg);
+  }
+  .ap-sheet {
+    position: relative;
+    aspect-ratio: 210 / 297;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 26px 24px 22px;
+    border: 1px solid var(--color-line);
+    border-radius: 10px;
+    background: var(--color-surface);
+    color: var(--color-ink);
+    box-shadow:
+      0 1px 2px rgba(38, 37, 31, 0.06),
+      0 24px 44px -22px rgba(38, 37, 31, 0.32);
+    /* the folded corner: cut the top-right off the sheet */
+    clip-path: polygon(0 0, calc(100% - 28px) 0, 100% 28px, 100% 100%, 0 100%);
+  }
+  .ap-sheet--back {
+    position: absolute;
+    inset: 0;
+    transform: translate(14px, 10px) rotate(4deg);
+    background: var(--color-surface-hover);
+    clip-path: none;
+  }
+  .ap-fold {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(225deg, transparent 50%, var(--color-line-strong) 50%, var(--color-surface-hover) 56%);
+    border-bottom-left-radius: 6px;
+  }
+  .ap-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-right: 18px;
+  }
+  .ap-brand {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.04em;
+  }
+  .ap-mono {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-ink-2);
+  }
+  .ap-score {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .ap-lines {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .ap-lines i,
+  .ap-findings i {
+    display: block;
+    height: 8px;
+    border-radius: 4px;
+    background: var(--color-line-strong);
+  }
+  .ap-lines i:first-child {
+    height: 14px;
+    border-radius: 5px;
+    background: var(--color-ink);
+    opacity: 0.85;
+  }
+  .ap-grade {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: var(--color-butter);
+    font-size: 20px;
+    font-weight: 600;
+  }
+  .ap-pillars {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .ap-bar {
+    display: block;
+    height: 7px;
+    border-radius: 4px;
+    background: var(--color-line);
+    overflow: hidden;
+  }
+  .ap-bar i {
+    display: block;
+    height: 100%;
+    width: var(--w);
+    border-radius: 4px;
+    background: var(--color-accent);
+    transform-origin: left;
+  }
+  .ap-findings {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    padding-top: 14px;
+    border-top: 1px solid var(--color-line);
+  }
+  .ap-findings span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .ap-findings b {
+    flex: none;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-hot);
+  }
+  .ap-fix {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 12px;
+    border-top: 1px dashed var(--color-dashed);
+  }
+  .ap-chip {
+    padding: 3px 10px;
+    border-radius: var(--radius-pill);
+    background: var(--color-sage);
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .ap-cap {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--color-ink-2);
+  }
+
+  /* bars fill one after another when the sheet scrolls in (seen once) */
+  @media (prefers-reduced-motion: no-preference) {
+    .ap-bar i {
+      transition: transform 700ms var(--ease-out);
+    }
+    .ap-pillars li:nth-child(2) .ap-bar i { transition-delay: 60ms; }
+    .ap-pillars li:nth-child(3) .ap-bar i { transition-delay: 115ms; }
+    .ap-pillars li:nth-child(4) .ap-bar i { transition-delay: 165ms; }
+    .ap-pillars li:nth-child(5) .ap-bar i { transition-delay: 210ms; }
+    .ap-pillars li:nth-child(6) .ap-bar i { transition-delay: 250ms; }
+    .ap-pillars li:nth-child(7) .ap-bar i { transition-delay: 285ms; }
+    .ap.is-waiting .ap-bar i {
+      transform: scaleX(0);
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-ap]').forEach((ap) => {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    ap.classList.add('is-waiting');
+    const io = new IntersectionObserver(
+      (es) => {
+        if (!es.some((e) => e.isIntersecting)) return;
+        io.disconnect();
+        setTimeout(() => ap.classList.remove('is-waiting'), 250);
+      },
+      { threshold: 0.3 },
+    );
+    io.observe(ap);
+  });
+</script>
