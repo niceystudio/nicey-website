@@ -1,37 +1,26 @@
 ---
 /**
- * The free-audit section (Emir picked idea 1 · A on 12 Nov; Darwin Flux + Koombea from the 11 Nov research):
- * the report as three labelled pages, an honest scope line, and the four steps with a time on each.
- * Skeleton pages (AuditSheet), like the hero's AuditPaper. Times are [gaps] for Goran, no invented numbers.
+ * The free-audit section (Emir picked "report first", 12 Nov: less text, show don't explain).
+ * Top: the three report pages, fanned, with one line each, and the four steps with a time on each.
+ * Bottom: a dark band for visitors not ready to share their file: copy the prompt, and an example
+ * run of the self-check plays in a terminal (SelfCheckRun). Times are [gaps] for Goran.
  */
 import SectionHead from './SectionHead.astro';
-import { links } from '../data/links';
-import { markerBg } from '../data/zero-drift';
 import AuditSheet from './AuditSheet.astro';
 import CopyPrompt from './CopyPrompt.astro';
+import SelfCheckRun from './SelfCheckRun.astro';
+import { links } from '../data/links';
 
 const pages = [
-  {
-    n: 'p. 1',
-    name: 'Score',
-    holds: 'A grade, and a score for each pillar of the audit.',
-  },
-  {
-    n: 'p. 2',
-    name: 'Drift map',
-    holds: 'What exists, what it should be, and where design and code disagree.',
-  },
-  {
-    n: 'p. 3',
-    name: 'Fix first',
-    holds: 'The top findings in order, each with a size in days.',
-  },
+  { n: 'p. 1', name: 'Score', holds: 'A grade and a score per pillar.' },
+  { n: 'p. 2', name: 'Drift map', holds: 'Where design and code disagree.' },
+  { n: 'p. 3', name: 'Fix first', holds: 'Top findings, each sized in days.' },
 ];
 const steps = [
-  { n: '01', free: true, title: 'Share your Figma file', time: '[time]', body: 'The repo is optional. With it, we can also check Figma against code.' },
-  { n: '02', free: true, title: 'Get the audit report', time: '[days]', body: 'The three pages above, sent to you.' },
-  { n: '03', free: false, title: 'Talk it through', time: '[call length]', body: 'A call with the people who will do the work, then a scoped proposal.' },
-  { n: '04', free: false, title: 'Build, pilot, roll out', time: 'Set in the proposal', body: 'Architecture agreed with your engineers, a gated pilot, then migration in slices.' },
+  { n: '01', title: 'Share your Figma file', time: '[time]' },
+  { n: '02', title: 'Get the report', time: '[days]' },
+  { n: '03', title: 'Talk it through', time: '[call length]' },
+  { n: '04', title: 'Build, pilot, roll out', time: 'Set in the proposal' },
 ];
 ---
 
@@ -43,167 +32,202 @@ const steps = [
     <a href={links.startAudit} class="pill pill-ink pill-lg">Get a free audit</a>
   </div>
 
-  <div class="panel-wrap">
-    <div class="panel flex flex-col">
-      <!-- the report: three pages, each says what it holds -->
-      <ol class="aud-pages" aria-label="What the audit report holds">
-        {
-          pages.map((p, i) => (
-            <li class="aud-page">
-              <AuditSheet kind={i} n={p.n} />
-              <div class="aud-label">
-                <span class="font-mono text-caption text-ink-2">
-                  {p.n} · {p.name}
-                </span>
-                <p class="m-0 text-body-sm text-pretty text-ink-2">{p.holds}</p>
+  <div class="panel ad">
+    <div class="ad-top">
+      <div class="ad-stage bg-lavender">
+        <div class="ad-fan" aria-hidden="true">
+          {
+            pages.map((p, i) => (
+              <div class="ad-card" style={`--i:${i}`}>
+                <AuditSheet kind={i} n={p.n} />
               </div>
-            </li>
-          ))
-        }
-      </ol>
-
-      <!-- scope, said plainly -->
-      <p class="aud-scope m-0 text-body-sm text-ink-2">
-        <span class="font-mono text-caption text-ink">Scope</span>
-        Your Figma file, read-only. The repo only if you share it. We never edit your file, and the audit is free.
-      </p>
-
-      <!-- not ready to share the file: the self-check runs with their own agent, then a call (Emir, 12 Nov) -->
-      <div class="aud-self">
-        <div class="flex flex-col gap-1.5">
-          <span class="font-mono text-caption text-ink">Not ready to share your file?</span>
-          <p class="m-0 max-w-[58ch] text-body-sm text-pretty text-ink-2">
-            Run our self-check with your own coding agent. It reads your Figma file on your side; nothing is sent to us.
-            Then bring the results to a call.
-          </p>
+            ))
+          }
         </div>
+      </div>
+      <div class="ad-text">
+        <ul class="ad-legend" aria-label="What the report holds">
+          {
+            pages.map((p) => (
+              <li>
+                <b>{p.name}</b> {p.holds}
+              </li>
+            ))
+          }
+        </ul>
+        <ol class="ad-steps">
+          {
+            steps.map((s) => (
+              <li>
+                <span class="font-mono text-caption text-ink-2">{s.n}</span>
+                <span>{s.title}</span>
+                <span class="ad-time">{s.time}</span>
+              </li>
+            ))
+          }
+        </ol>
+        <span class="font-mono text-caption text-ink-2">Read-only. Your Figma file, the repo only if you share it. Free.</span>
+      </div>
+    </div>
+    <div class="ad-band">
+      <div class="flex flex-col items-start gap-3">
+        <span class="ad-band-k font-mono text-caption">Or start on your own</span>
+        <p class="ad-band-p m-0 text-cta text-pretty">
+          Not ready to share your file? Let your agent run our seven checks, then bring the results to a call.
+        </p>
         <CopyPrompt />
       </div>
-
-      <!-- the same four steps, each with a time -->
-      <ol class="aud-steps panel-sub grid-4">
-        {
-          steps.map((s) => (
-            <li class="aud-step">
-              <span class="caption flex items-center justify-between gap-3 text-ink-2">
-                <span>Step {s.n}</span>
-                {s.free && (
-                  <span class="inline-flex items-center gap-1.5">
-                    <i aria-hidden="true" class:list={['marker', markerBg.sage]} />
-                    Free
-                  </span>
-                )}
-              </span>
-              <span class="aud-time">{s.time}</span>
-              <div class="flex flex-col gap-2">
-                <h3 class="m-0 text-h3-card">{s.title}</h3>
-                <p class="m-0 text-body-sm text-pretty text-ink-2">{s.body}</p>
-              </div>
-            </li>
-          ))
-        }
-      </ol>
+      <SelfCheckRun />
     </div>
   </div>
 </section>
 
 <style>
-  .aud-pages {
-    margin: 0;
-    padding: 48px 44px 40px;
-    list-style: none;
+  .ad {
+    display: flex;
+    flex-direction: column;
+  }
+  .ad-top {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 40px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 36px;
+    padding: var(--spacing-cell-lg);
   }
-  /* phone: the pages become a row you swipe, the next one peeks in */
-  @media (max-width: 767px) {
-    .aud-pages {
-      grid-template-columns: none;
-      grid-auto-flow: column;
-      grid-auto-columns: 72%;
-      gap: 20px;
-      padding: 28px 24px;
-      overflow-x: auto;
-      overscroll-behavior-x: contain;
-      scroll-snap-type: x mandatory;
-      scroll-padding-inline: 24px;
-      scrollbar-width: none;
+  @media (min-width: 1024px) {
+    .ad-top {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: 48px;
+      align-items: center;
     }
-    .aud-pages::-webkit-scrollbar {
-      display: none;
-    }
-    .aud-page {
-      scroll-snap-align: start;
-    }
-  }
-  .aud-page {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-  }
-  .aud-page:nth-child(1) :global(.aud-sheet) {
-    transform: rotate(-1.5deg);
-  }
-  .aud-page:nth-child(3) :global(.aud-sheet) {
-    transform: rotate(1.2deg);
-  }
-  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-    .aud-page:hover :global(.aud-sheet) {
-      transform: translateY(-6px) rotate(0deg);
-    }
-  }
-
-  .aud-label {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    max-width: 32ch;
-  }
-  .aud-scope {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 6px 14px;
-    padding: 18px 44px;
-  }
-  @media (max-width: 767px) {
-    .aud-scope {
-      padding: 18px 24px;
-    }
-  }
-  .aud-self {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px 32px;
-    padding: 22px 44px;
-  }
-  @media (max-width: 767px) {
-    .aud-self {
-      padding: 22px 24px;
-    }
-  }
-  .aud-steps {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-  .aud-step {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    padding: 28px 32px 32px;
   }
   @media (max-width: 639px) {
-    .aud-step {
+    .ad-top {
       padding: 24px;
     }
   }
-  .aud-time {
-    font-family: var(--font-mono);
+  .ad-stage {
+    min-width: 0;
+    min-height: 380px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 36px 28px;
+    border-radius: var(--radius-panel);
+    overflow: hidden;
+  }
+  @media (max-width: 639px) {
+    .ad-stage {
+      min-height: 280px;
+    }
+  }
+  /* the three pages, fanned: p. 2 in front; on hover the outer two open a little more */
+  .ad-fan {
+    position: relative;
+    width: min(230px, 44%);
+    aspect-ratio: 210 / 297;
+  }
+  .ad-card {
+    position: absolute;
+    inset: 0;
+    z-index: calc(3 - var(--i));
+    transform: translateX(calc((var(--i) - 1) * 58%)) rotate(calc((var(--i) - 1) * 6deg));
+    transition: transform 320ms var(--ease-out);
+  }
+  .ad-card:nth-child(2) {
+    z-index: 4;
+    transform: translateY(-8px);
+  }
+  .ad-card :global(.aud-sheet) {
+    max-width: none;
+    height: 100%;
+  }
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .ad-fan:hover .ad-card:nth-child(1) {
+      transform: translateX(-66%) rotate(-8deg);
+    }
+    .ad-fan:hover .ad-card:nth-child(3) {
+      transform: translateX(66%) rotate(8deg);
+    }
+  }
+  .ad-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    min-width: 0;
+  }
+  .ad-legend {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
     font-size: var(--text-body-sm);
+    color: var(--color-ink-2);
+  }
+  .ad-legend b {
+    font-weight: 600;
     color: var(--color-ink);
+  }
+  .ad-steps {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--color-line);
+  }
+  .ad-steps li {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .ad-time {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--color-ink);
+  }
+  /* the dark band: same in day and night */
+  .panel > .ad-band {
+    background: #26251f;
+  }
+  .ad-band {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+    align-items: center;
+    padding: 36px var(--spacing-cell-lg);
+  }
+  @media (min-width: 1024px) {
+    .ad-band {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    }
+  }
+  @media (max-width: 639px) {
+    .ad-band {
+      padding: 28px 24px;
+    }
+  }
+  .ad-band-k {
+    color: #b6b1a3;
+  }
+  .ad-band-p {
+    color: #f3f0e9;
+  }
+  .ad-band :global(.cp-btn) {
+    color: #f3f0e9;
+    border-color: rgba(243, 240, 233, 0.35);
+  }
+  .ad-band :global(.cp-btn:hover) {
+    background: rgba(243, 240, 233, 0.08);
+  }
+  .ad-band :global(.cp-btn.is-done) {
+    border-color: #f3f0e9;
+  }
+  .ad-band :global(.cp-file) {
+    color: #b6b1a3;
   }
 </style>

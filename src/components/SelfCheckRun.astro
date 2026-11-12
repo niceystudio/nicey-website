@@ -1,0 +1,277 @@
+---
+/**
+ * The self-check as a live example session (Emir, 12 Nov): a prompt is pasted, the agent thinks,
+ * reads /ai-ready.md, opens the Figma file and checks the seven pillars one by one, then gives the
+ * summary and points to a call. The terminal keeps one height; the text scrolls inside it.
+ * It plays once when it scrolls in, and again when the visitor presses "Copy prompt".
+ * It is an example: statuses only, no invented counts. Reduced motion shows the finished run.
+ */
+import { aiReadyPrompt } from '../lib/ai-ready';
+import { links } from '../data/links';
+
+const prompt = aiReadyPrompt(Astro.site ?? new URL('https://nicey-website.vercel.app'));
+const pillars: [string, 'pass' | 'partial' | 'fail' | 'skipped'][] = [
+  ['Token metadata', 'partial'],
+  ['Token binding', 'pass'],
+  ['Interaction states', 'fail'],
+  ['Component API', 'partial'],
+  ['Elevation & effects', 'pass'],
+  ['AI readiness', 'fail'],
+  ['Design ↔ code sync', 'skipped'],
+];
+const script = {
+  prompt,
+  pillars,
+  fixFirst: ['Focus and Pressed states on interactive components', 'Descriptions on components', 'Scopes on variables'],
+  book: links.bookCall,
+};
+---
+
+<div class="scr" data-scr={JSON.stringify(script)} data-md-skip>
+  <div class="scr-bar">
+    <span class="scr-dot" aria-hidden="true"></span>
+    <span>example run · your machine</span>
+    <button type="button" class="scr-replay" data-scr-replay>Replay</button>
+  </div>
+  <div class="scr-out" data-scr-out tabindex="0" aria-label="Example self-check run" role="log">
+    <!-- filled by the script; this is the finished run for no-JS and reduced motion -->
+    <div class="scr-l is-you"><b>›</b> {prompt}</div>
+    {
+      pillars.map(([p, s]) => (
+        <div class="scr-l scr-row">
+          <span>{p}</span>
+          <span class:list={['scr-st', `is-${s}`]}>{s === 'skipped' ? 'skipped · no repo' : s}</span>
+        </div>
+      ))
+    }
+    <div class="scr-l"><b>●</b> Fix first: {script.fixFirst.join(' · ')}</div>
+    <div class="scr-l"><b>→</b> <a href={links.bookCall}>Book a call with Nicey</a></div>
+  </div>
+</div>
+
+<style is:global>
+  /* global: the run adds its lines from the script, and scoped styles would not reach them (every class starts with scr-) */
+  .scr {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(243, 240, 233, 0.12);
+    border-radius: 12px;
+    background: rgba(243, 240, 233, 0.05);
+    color: #f3f0e9;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.75;
+    overflow: hidden;
+  }
+  .scr-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px 6px 14px;
+    border-bottom: 1px solid rgba(243, 240, 233, 0.1);
+    color: #b6b1a3;
+    font-size: 11px;
+  }
+  .scr-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #cbdac4;
+  }
+  .scr-replay {
+    margin-left: auto;
+    min-height: 26px;
+    padding: 0 10px;
+    border: 1px solid rgba(243, 240, 233, 0.2);
+    border-radius: 999px;
+    background: transparent;
+    color: #f3f0e9;
+    font: inherit;
+    cursor: pointer;
+    transition: background-color 160ms var(--ease-out), transform 160ms var(--ease-out);
+  }
+  .scr-replay:active {
+    transform: scale(0.96);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .scr-replay:hover {
+      background: rgba(243, 240, 233, 0.08);
+    }
+  }
+  /* the terminal keeps one height; the run scrolls inside it */
+  .scr-out {
+    height: 120px;
+    padding: 10px 16px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(243, 240, 233, 0.25) transparent;
+  }
+  .scr-out:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: -2px;
+  }
+  .scr-l {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .scr-l b {
+    font-weight: 400;
+    color: #b6b1a3;
+  }
+  .scr-l.is-you {
+    color: #d9d2ef;
+  }
+  .scr-l.is-dim {
+    color: #b6b1a3;
+  }
+  .scr-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding-left: 14px;
+  }
+  .scr-st {
+    color: #b6b1a3;
+  }
+  .scr-st.is-pass {
+    color: #cbdac4;
+  }
+  .scr-st.is-partial {
+    color: #f2e6bc;
+  }
+  .scr-st.is-fail {
+    color: #e8805c;
+  }
+  .scr-l a {
+    color: #f3f0e9;
+    text-underline-offset: 3px;
+  }
+  .scr-paste {
+    display: inline-block;
+    margin-right: 6px;
+    padding: 0 6px;
+    border-radius: 4px;
+    background: rgba(217, 210, 239, 0.18);
+    color: #d9d2ef;
+    font-size: 10.5px;
+  }
+  .scr-spin {
+    display: inline-block;
+    width: 1ch;
+    color: #cbdac4;
+  }
+  .scr-cursor::after {
+    content: '▍';
+    color: #cbdac4;
+    animation: scr-blink 1s steps(1) infinite;
+  }
+  @keyframes scr-blink {
+    50% {
+      opacity: 0;
+    }
+  }
+  @media (max-width: 639px) {
+    .scr-out {
+      height: 146px;
+    }
+  }
+</style>
+
+<script>
+  type Script = { prompt: string; pillars: [string, string][]; fixFirst: string[]; book: string };
+  const SPIN = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll<HTMLElement>('[data-scr]').forEach((root) => {
+    const s: Script = JSON.parse(root.dataset.scr!);
+    const out = root.querySelector<HTMLElement>('[data-scr-out]')!;
+    let run = 0; // bumps on every restart, so an old run stops writing
+    let stick = true; // follow the newest line unless the visitor scrolled up
+
+    out.addEventListener('scroll', () => {
+      stick = out.scrollTop + out.clientHeight >= out.scrollHeight - 6;
+    });
+    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+    const follow = () => {
+      if (stick) out.scrollTop = out.scrollHeight;
+    };
+    const line = (html: string, cls = '') => {
+      const d = document.createElement('div');
+      d.className = `scr-l ${cls}`;
+      d.innerHTML = html;
+      out.appendChild(d);
+      follow();
+      return d;
+    };
+    const esc = (t: string) => t.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]!);
+    // a line with a spinner that turns into its result
+    const work = async (id: number, label: string, ms: number) => {
+      const d = line(`<span class="scr-spin">${SPIN[0]}</span> ${esc(label)}`, 'is-dim');
+      const sp = d.querySelector<HTMLElement>('.scr-spin')!;
+      const t0 = performance.now();
+      while (performance.now() - t0 < ms) {
+        if (id !== run) return null;
+        sp.textContent = SPIN[Math.floor((performance.now() - t0) / 80) % SPIN.length];
+        await sleep(80);
+      }
+      return d;
+    };
+
+    async function play() {
+      const id = ++run;
+      stick = true;
+      out.innerHTML = '';
+      // 1 · an empty prompt, then the paste
+      const p = line('<b>›</b> <span class="scr-cursor"></span>', 'is-you');
+      await sleep(700);
+      if (id !== run) return;
+      p.innerHTML = `<b>›</b> <span class="scr-paste">⌘V</span>${esc(s.prompt)}`;
+      follow();
+      await sleep(900);
+      if (id !== run) return;
+      // 2 · thinking
+      const th = await work(id, 'Thinking…', 1300);
+      if (!th) return;
+      th.innerHTML = '<b>●</b> Reading the self-check · 7 pillars';
+      const op = await work(id, 'Opening your Figma file…', 1100);
+      if (!op) return;
+      op.innerHTML = '<b>●</b> Figma file open · read-only, nothing leaves this machine';
+      // 3 · the pillars, one by one
+      for (const [name, st] of s.pillars) {
+        const d = await work(id, `Checking ${name}…`, 520);
+        if (!d) return;
+        d.className = 'scr-l scr-row';
+        d.innerHTML = `<span>${esc(name)}</span><span class="scr-st is-${st}">${st === 'skipped' ? 'skipped · no repo' : st}</span>`;
+        follow();
+      }
+      await sleep(400);
+      if (id !== run) return;
+      // 4 · summary and the call
+      const sum = await work(id, 'Writing the summary…', 900);
+      if (!sum) return;
+      sum.innerHTML = '<b>●</b> Fix first:';
+      s.fixFirst.forEach((f, i) => line(`  ${i + 1}. ${esc(f)}`));
+      await sleep(500);
+      if (id !== run) return;
+      line(`<b>→</b> Want to go through these? <a href="${s.book}">Book a call with Nicey</a>`);
+      line('<b>›</b> <span class="scr-cursor"></span>', 'is-you');
+    }
+
+    if (reduced) return; // keep the finished run that is already in the markup
+    out.innerHTML = '';
+    root.querySelector('[data-scr-replay]')?.addEventListener('click', play);
+    // the Copy prompt button in the same section starts the run again, as if it was just pasted
+    root.closest('section')?.querySelectorAll('[data-copy-prompt]').forEach((b) => b.addEventListener('click', play));
+    const io = new IntersectionObserver(
+      (es) => {
+        if (!es[0].isIntersecting) return;
+        io.disconnect();
+        play();
+      },
+      { threshold: 0.5 },
+    );
+    io.observe(root);
+  });
+</script>

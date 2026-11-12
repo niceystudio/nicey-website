@@ -1,98 +1,258 @@
 ---
+/**
+ * "What we help with": one service at a time behind a segment control (Emir, 12 Nov: the old two-column
+ * layout showed too much at once). Each service is a row in `services` below; add a row and the segment
+ * control and its panel appear (e.g. an animation service later). Every panel has the same shape:
+ * text on the left (kicker, title, lede, what's included, link), one visual on a stage on the right.
+ */
 import SectionHead from './SectionHead.astro';
-import { links } from '../data/links';
-import { markerBg } from '../data/zero-drift';
 import QBenchWork from './case-study/QBenchWork.astro';
+import { links } from '../data/links';
 
-const primary = [
-  'Audit and consolidation',
-  'Token architecture and theming',
-  'Component library, Figma to code',
-  'AI-ready documentation',
-  'Systems partner, monthly',
-  'Free audit to start',
+type Visual = 'qbench' | 'phone';
+const services: {
+  id: string;
+  label: string;
+  kicker: string;
+  lede: string;
+  items: string[];
+  link: { href: string; label: string };
+  visual: Visual;
+  stage: string;
+}[] = [
+  {
+    id: 'design-systems',
+    label: 'Design systems',
+    kicker: 'Primary practice',
+    lede: 'For products with years of drift, and teams that want their coding agents to build on-system.',
+    items: [
+      'Audit and consolidation',
+      'Token architecture and theming',
+      'Component library, Figma to code',
+      'AI-ready documentation',
+      'Systems partner, monthly',
+      'Free audit to start',
+    ],
+    link: { href: links.exploreDesignSystems, label: 'Explore design systems' },
+    visual: 'qbench',
+    stage: 'bg-lavender',
+  },
+  {
+    id: 'product-design',
+    label: 'Product design',
+    kicker: 'Alongside',
+    lede: 'Complex workflows designed on the system we build, so new screens ship consistent from day one.',
+    items: ['Product and UX design', 'Design engineering', 'AI workflows in delivery'],
+    link: { href: links.exploreProductDesign, label: 'Explore product design' },
+    visual: 'phone',
+    stage: 'bg-peach',
+  },
 ];
-const alongside = ['Product and UX design', 'Design engineering', 'AI workflows in delivery'];
 ---
 
 <section id="services" aria-labelledby="services-head" class="container-page flex flex-col gap-12 pb-section">
   <SectionHead id="services-head" caption="What we help with" headingClass="max-w-[16ch]">
     Design systems first. Product design alongside.
   </SectionHead>
-  <div class="panel flex flex-wrap">
-    <article class="svc flex-[999_1_560px] gap-6">
-      <span class="caption flex items-center gap-2 text-ink-2"
-        ><i aria-hidden="true" class:list={['marker', markerBg.lavender]}></i>01 · Primary practice</span
-      >
-      <h3 class="m-0 text-h3-practice">Design systems</h3>
-      <p class="m-0 max-w-[44ch] text-lede text-pretty text-ink-2">
-        For products with years of drift, and teams that want their coding agents to build on-system.
-      </p>
-      <ul class="svc-list svc-list--grid">
-        {primary.map((item) => <li>{item}</li>)}
-      </ul>
-      {/* real work instead of an intro video (Emir, 11 Nov): QBench, what the agent reads */}
-      <figure class="m-0 flex flex-col gap-2">
-        <QBenchWork />
-      </figure>
-      <a href={links.exploreDesignSystems} class="svc-link">Explore design systems <span class="arr" aria-hidden="true">→</span></a>
-    </article>
-    <article class="svc flex-[1_1_320px] gap-5">
-      <span class="caption flex items-center gap-2 text-ink-2"
-        ><i aria-hidden="true" class:list={['marker', markerBg.peach]}></i>02 · Alongside</span
-      >
-      <h3 class="m-0 text-h3-alongside">Product design</h3>
-      <p class="m-0 text-cta text-pretty text-ink-2">
-        Complex workflows designed on the system we build, so new screens ship consistent from day one.
-      </p>
-      <ul class="svc-list">
-        {alongside.map((item) => <li>{item}</li>)}
-      </ul>
-      {/* real work: the Everbreed student app, weight check */}
-      <figure class="svc-phone m-0">
-        <div class="svc-phone-frame">
-          <video muted loop playsinline preload="none" poster="/work/everbreed/mobile-logweight.jpg" data-svc-video>
-            <source src="/work/everbreed/mobile-logweight.webm" type="video/webm" />
-          </video>
-        </div>
-        <figcaption class="font-mono text-caption text-ink-2">Everbreed student app · a typo caught before it saves</figcaption>
-      </figure>
-      <a href={links.exploreProductDesign} class="svc-link mt-auto">Explore product design <span class="arr" aria-hidden="true">→</span></a>
-    </article>
+
+  <div class="svc-wrap" data-svc>
+    <div class="svc-seg" role="tablist" aria-label="Services">
+      {
+        services.map((s, i) => (
+          <button
+            type="button"
+            role="tab"
+            id={`svc-tab-${s.id}`}
+            aria-controls={`svc-${s.id}`}
+            aria-selected={i === 0 ? 'true' : 'false'}
+            tabindex={i === 0 ? 0 : -1}
+            data-svc-tab={s.id}
+          >
+            {s.label}
+          </button>
+        ))
+      }
+    </div>
+
+    <div class="panel">
+      {
+        services.map((s, i) => (
+          <div
+            class="svc-pane"
+            role="tabpanel"
+            id={`svc-${s.id}`}
+            aria-labelledby={`svc-tab-${s.id}`}
+            data-svc-pane={s.id}
+            hidden={i !== 0}
+          >
+            <div class="svc-text">
+              <div class="flex flex-col gap-4">
+                <span class="caption text-ink-2">{s.kicker}</span>
+                <h3 class="m-0 text-h3-alongside">{s.label}</h3>
+                <p class="m-0 text-body text-pretty text-ink-2">{s.lede}</p>
+              </div>
+              <div class="flex w-full flex-col gap-3">
+                <span class="font-mono text-caption text-ink-2">What's included</span>
+                <ul class="svc-list">
+                  {s.items.map((item) => (
+                    <li>{item}</li>
+                  ))}
+                </ul>
+              </div>
+              <a href={s.link.href} class="svc-link">
+                {s.link.label} <span class="arr" aria-hidden="true">→</span>
+              </a>
+            </div>
+            <figure class:list={['svc-stage m-0', s.stage]}>
+              {s.visual === 'qbench' ? (
+                <QBenchWork tabs bare />
+              ) : (
+                <div class="svc-phone-frame">
+                  <video
+                    muted
+                    loop
+                    playsinline
+                    preload="none"
+                    poster="/work/everbreed/mobile-logweight.jpg"
+                    aria-label="Everbreed student app: logging a weight, a typo caught before it saves"
+                    data-svc-video
+                  >
+                    <source src="/work/everbreed/mobile-logweight.webm" type="video/webm" />
+                  </video>
+                </div>
+              )}
+            </figure>
+          </div>
+        ))
+      }
+    </div>
   </div>
 </section>
 
 <style>
-  .svc {
-    min-width: 0;
+  .svc-wrap {
     display: flex;
     flex-direction: column;
+    gap: 20px;
+  }
+  /* segment control: one button per service, wraps if more are added */
+  .svc-seg {
+    align-self: flex-start;
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    max-width: 100%;
+    padding: 4px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 28px;
+  }
+  .svc-seg button {
+    min-height: 44px;
+    padding: 0 22px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--color-ink-2);
+    font: inherit;
+    font-size: var(--text-body);
+    cursor: pointer;
+    transition: background-color 160ms var(--ease-out), color 160ms var(--ease-out), transform 160ms var(--ease-out);
+  }
+  .svc-seg button:active {
+    transform: scale(0.97);
+  }
+  .svc-seg button[aria-selected='true'] {
+    background: var(--color-ink);
+    color: var(--color-on-ink);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .svc-seg button[aria-selected='false']:hover {
+      background: var(--color-surface-hover);
+      color: var(--color-ink);
+    }
+  }
+
+  /* one panel shape for every service: text left, stage right */
+  .svc-pane {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
     padding: var(--spacing-cell-lg);
   }
+  .svc-pane[hidden] {
+    display: none;
+  }
+  @media (min-width: 1024px) {
+    .svc-pane {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: 48px;
+    }
+  }
+  @media (max-width: 639px) {
+    .svc-pane {
+      padding: 24px;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .svc-pane:not([hidden]) {
+      animation: svc-in 220ms var(--ease-out) both;
+    }
+  }
+  @keyframes svc-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+  .svc-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 28px;
+    min-width: 0;
+  }
   .svc-list {
+    width: 100%;
     margin: 0;
     padding: 0;
     list-style: none;
     border-top: 1px solid var(--color-line);
   }
-  .svc-list--grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    column-gap: 28px;
-  }
   .svc-list li {
-    padding: 14px 0;
+    padding: 11px 0;
     border-bottom: 1px solid var(--color-line);
-    font-size: var(--text-body);
+    font-size: var(--text-body-sm);
   }
-  .svc-phone {
-    display: flex;
-    flex-direction: column;
+  .svc-link {
+    margin-top: auto;
+    display: inline-flex;
     align-items: center;
-    gap: 12px;
+    gap: 0.3em; /* flex drops the space before the arrow */
+    min-height: 44px;
+    font-size: var(--text-cta);
+    font-weight: 500;
+    color: var(--color-ink);
+    text-underline-offset: 4px;
+  }
+  /* the stage: every visual sits on its own pastel, same corners and padding */
+  .svc-stage {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    border-radius: var(--radius-panel);
+  }
+  @media (max-width: 639px) {
+    .svc-stage {
+      padding: 20px;
+    }
+  }
+  .svc-stage > :global(.qw) {
+    width: 100%;
   }
   .svc-phone-frame {
-    width: 200px;
+    width: 220px;
     aspect-ratio: 393 / 852;
     padding: 7px;
     border-radius: 36px;
@@ -107,26 +267,52 @@ const alongside = ['Product and UX design', 'Design engineering', 'AI workflows 
     object-fit: cover;
     background: #f1f3f5;
   }
-  .svc-link {
-    align-self: flex-start;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3em; /* flex drops the space before the arrow */
-    min-height: 44px;
-    font-size: var(--text-cta);
-    font-weight: 500;
-    color: var(--color-ink);
-    text-underline-offset: 4px;
-  }
 </style>
 
 <script>
-  // the phone clip plays while it's on screen (not for reduced motion)
-  const v = document.querySelector<HTMLVideoElement>('[data-svc-video]');
-  if (v && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    new IntersectionObserver((es) =>
-      es.forEach((e) => {
-        if (e.isIntersecting) { v.preload = 'auto'; v.play().catch(() => {}); } else v.pause();
-      }), { threshold: 0.5 }).observe(v);
-  }
+  document.querySelectorAll<HTMLElement>('[data-svc]').forEach((root) => {
+    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-svc-tab]'));
+    const panes = Array.from(root.querySelectorAll<HTMLElement>('[data-svc-pane]'));
+    const videos = Array.from(root.querySelectorAll<HTMLVideoElement>('[data-svc-video]'));
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // the phone clip plays only while it is on screen
+    const io = new IntersectionObserver(
+      (es) =>
+        es.forEach((e) => {
+          const v = e.target as HTMLVideoElement;
+          if (e.isIntersecting && !reduced) {
+            v.preload = 'auto';
+            v.play().catch(() => {});
+          } else v.pause();
+        }),
+      { threshold: 0.5 },
+    );
+    const watch = () => videos.forEach((v) => (io.unobserve(v), io.observe(v)));
+
+    const pick = (i: number, focus = false) => {
+      tabs.forEach((t, k) => {
+        t.setAttribute('aria-selected', String(k === i));
+        t.tabIndex = k === i ? 0 : -1;
+      });
+      panes.forEach((p, k) => (p.hidden = k !== i));
+      if (focus) tabs[i].focus();
+      watch();
+    };
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => pick(i));
+      t.addEventListener('keydown', (e) => {
+        const n = tabs.length;
+        let to = -1;
+        if (e.key === 'ArrowRight') to = (i + 1) % n;
+        else if (e.key === 'ArrowLeft') to = (i - 1 + n) % n;
+        else if (e.key === 'Home') to = 0;
+        else if (e.key === 'End') to = n - 1;
+        if (to < 0) return;
+        e.preventDefault();
+        pick(to, true);
+      });
+    });
+    watch();
+  });
 </script>

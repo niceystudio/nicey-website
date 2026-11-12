@@ -113,6 +113,12 @@ const { kind, n } = Astro.props;
       display: none;
     }
   }
+  /* a tiny sheet (phone, fanned) keeps only the brand */
+  @container (max-width: 130px) {
+    .aud-sheet-head > span:last-child {
+      display: none;
+    }
+  }
   .aud-sheet-head {
     display: flex;
     align-items: baseline;
