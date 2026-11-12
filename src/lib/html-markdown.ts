@@ -48,7 +48,11 @@ export function htmlToMarkdown(html: string, base: URL): string {
     const tag = m[2].toLowerCase();
     const attrs = m[3] || '';
     if (!closing) {
-      const hidden = /\baria-hidden="true"|\bhidden(\s|=|$)|\bdata-md-skip\b/.test(attrs) && !/\bclass="[^"]*sr-only/.test(attrs);
+      // a hidden tab panel is still content (only not shown yet), so it stays in the text
+      const hidden =
+        /\baria-hidden="true"|\bhidden(\s|=|$)|\bdata-md-skip\b/.test(attrs) &&
+        !/\bclass="[^"]*sr-only/.test(attrs) &&
+        !(/\brole="tabpanel"/.test(attrs) && !/\baria-hidden="true"/.test(attrs));
       // a labelled figure (a drawn illustration) is read as its label, not as its parts
       const figLabel = tag === 'figure' ? attrs.match(/\baria-label="([^"]*)"/)?.[1] : undefined;
       if (figLabel && !skipping()) {

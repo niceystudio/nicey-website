@@ -29,10 +29,17 @@
   :global([data-theme='dark']) .theme-toggle svg {
     transform: scaleX(-1);
   }
-  @media (hover: hover) {
+  .theme-toggle {
+    transition: background-color 160ms var(--ease-out), border-color 160ms var(--ease-out), transform 160ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
     .theme-toggle:hover {
       background: var(--color-surface-hover);
+      border-color: var(--color-ink);
     }
+  }
+  .theme-toggle:active {
+    transform: scale(0.94);
   }
 </style>
 

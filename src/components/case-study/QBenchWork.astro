@@ -5,6 +5,14 @@
  * the tokens behind the selected state, typed out line by line in the panel.
  * Props are the real V2 Input props; tokens are the ones in the 08 State rules tab.
  */
+interface Props {
+  /** Figma | Tokens | Agent tabs over the reading panel (idea 3, approved 12 Nov; used on the homepage) */
+  tabs?: boolean;
+  /** no own lavender stage: the parent (homepage Services) already draws it */
+  bare?: boolean;
+}
+const { tabs = false, bare = false } = Astro.props;
+
 const states = [
   {
     id: 'default',
@@ -32,10 +40,47 @@ const states = [
     read: ['state: "default"', 'hasError: true', 'border: border/critical/default', '→ show the message, say what to fix'],
   },
 ];
+
+// the same selected state, as three readers see it. Description and tokens read from the
+// QBench V2 Input (795:10188, variants content=filled) on 12 Nov.
+const DESC = [
+  'Input. Single-line field for entering short text or values.',
+  'Use for text and numbers. Not for selecting options — use Select.',
+  'Not for showing saved values that cannot be edited — use Field.',
+];
+const tokensOf: Record<string, Record<string, string>> = {
+  default: { border: 'border/default', background: 'component/input/surface/default', text: 'text/default' },
+  hover: { border: 'border/hover', background: 'component/input/surface/hover', text: 'text/default' },
+  focus: { border: 'border/primary/default', background: 'component/input/surface/default', text: 'text/default' },
+  disabled: { border: 'border/default', background: 'component/input/surface/default', opacity: 'opacity/disabled', text: 'text/placeholder' },
+  error: { border: 'border/critical/default', background: 'component/input/surface/default', helperText: 'text/critical/default' },
+};
+const propsOf: Record<string, [string, string][]> = {
+  default: [['state', 'default'], ['content', 'filled'], ['hasError', 'false']],
+  hover: [['state', 'hover'], ['content', 'filled'], ['hasError', 'false']],
+  focus: [['state', 'focus'], ['content', 'filled'], ['hasError', 'false']],
+  disabled: [['state', 'disabled'], ['content', 'filled'], ['hasError', 'false']],
+  error: [['state', 'default'], ['content', 'filled'], ['hasError', 'true']],
+};
+const readers = states.map((s) => {
+  const props = propsOf[s.id];
+  const toks = tokensOf[s.id];
+  const meaning = s.read[s.read.length - 1];
+  return {
+    figma: ['Input', ...props.map(([k, v]) => `  ${k.padEnd(9)} ${v}`)],
+    tokens: ['{', ...Object.entries(toks).map(([k, v], i, a) => `  "${k}": "${v}"${i < a.length - 1 ? ',' : ''}`), '}'],
+    agent: ['## Input', ...DESC, '', ...props.map(([k, v]) => `${k}: ${v}`), ...Object.entries(toks).map(([k, v]) => `${k}: ${v}`), meaning],
+  };
+});
+const tabList = [
+  { id: 'figma', label: 'Figma', who: 'designer · properties panel', src: 'Input.fig' },
+  { id: 'tokens', label: 'Tokens', who: 'engineer · tokens', src: 'tokens.json' },
+  { id: 'agent', label: 'Agent', who: 'agent · reading', src: 'input.md' },
+];
 ---
 
-<figure class="qw m-0" data-qw data-states={JSON.stringify(states.map((s) => s.read))}>
-  <div class="qw-stage bg-lavender">
+<figure class="qw m-0" data-qw data-states={JSON.stringify(states.map((s) => s.read))} data-readers={tabs ? JSON.stringify(readers) : undefined}>
+  <div class:list={['qw-stage', bare ? 'qw-stage--bare' : 'bg-lavender']}>
     <div class="qw-states" role="group" aria-label="Input states">
       {
         states.map((s, i) => (
@@ -57,20 +102,41 @@ const states = [
         ))
       }
     </div>
-    <div class="qw-agent" aria-live="polite">
-      <div class="qw-agent-bar">
-        <span class="qw-dot" aria-hidden="true"></span>
-        <span>agent · reading</span>
-        <span class="qw-agent-k">Input</span>
-        <span class="qw-agent-src">library.json</span>
-      </div>
-      <pre class="qw-agent-out" data-out>{states[0].read.join('\n')}</pre>
+    <div class="qw-agent" aria-live="polite" data-md-skip>
+      {
+        tabs ? (
+          <div class="qw-agent-bar qw-tabs-bar">
+            <div class="qw-tabs" role="tablist" aria-label="Who is reading">
+              {tabList.map((t, i) => (
+                <button type="button" role="tab" class="qw-tab" data-tab={t.id} aria-selected={i === 2 ? 'true' : 'false'}>
+                  {t.label}
+                </button>
+              ))}
+            </div>
+            <span class="qw-agent-src" data-src>
+              {tabList[2].src}
+            </span>
+          </div>
+        ) : (
+          <div class="qw-agent-bar">
+            <span class="qw-dot" aria-hidden="true" />
+            <span>agent · reading</span>
+            <span class="qw-agent-k">Input</span>
+            <span class="qw-agent-src">library.json</span>
+          </div>
+        )
+      }
+      <pre class="qw-agent-out" data-out>{tabs ? readers[0].agent.join('\n') : states[0].read.join('\n')}</pre>
     </div>
   </div>
-  <figcaption class="qw-cap">
-    <span class="qw-cap-k">Fig 01</span>
-    <span>People see five fields. An agent reads five sets of props and tokens, and picks the right one without guessing.</span>
-  </figcaption>
+  {
+    !bare && (
+      <figcaption class="qw-cap">
+        <span class="qw-cap-k">Fig 01</span>
+        <span>People see five fields. An agent reads five sets of props and tokens, and picks the right one without guessing.</span>
+      </figcaption>
+    )
+  }
 </figure>
 
 <style>
@@ -80,7 +146,7 @@ const states = [
     letter-spacing: 0.06em;
     text-transform: uppercase;
   }
-  /* label and sentence share one baseline, the sentence wraps under itself */
+  /* label and sentence share one baseline, the sentence wraps under itself (case study only) */
   .qw-cap {
     display: flex;
     align-items: baseline;
@@ -97,6 +163,21 @@ const states = [
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--color-muted);
+  }
+  .qw-stage--bare {
+    width: 100%;
+    padding: 0 !important;
+  }
+  /* on a phone the five fields go two by two instead of one long column */
+  @media (max-width: 600px) {
+    .qw-stage--bare .qw-states {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .qw-stage--bare .qw-field {
+      padding: 12px;
+      font-size: 11px;
+    }
   }
   .qw-stage {
     display: flex;
@@ -143,6 +224,13 @@ const states = [
   }
   .qw-state[aria-pressed='true'] .qw-state-n {
     color: #26251f;
+  }
+  /* the lavender stage is dark at night: the state labels go light so they stay readable */
+  :global([data-theme='dark']) .qw-state-n {
+    color: rgba(243, 240, 233, 0.55);
+  }
+  :global([data-theme='dark']) .qw-state[aria-pressed='true'] .qw-state-n {
+    color: #f3f0e9;
   }
   .qw-state:focus-visible {
     outline: none;
@@ -213,6 +301,41 @@ const states = [
   .qw-agent-src {
     margin-left: auto;
   }
+  /* the agent reading is the longest of the three: keep the panel that tall on every tab */
+  .qw[data-readers] .qw-agent-out {
+    min-height: calc(13 * 1.7em + 32px);
+  }
+  .qw-tabs-bar {
+    padding-block: 6px;
+  }
+  .qw-tabs {
+    display: flex;
+    gap: 2px;
+  }
+  .qw-tab {
+    min-height: 32px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: #b6b1a3;
+    font: inherit;
+    cursor: pointer;
+    transition: background-color 160ms var(--ease-out), color 160ms var(--ease-out), transform 160ms var(--ease-out);
+  }
+  .qw-tab:active {
+    transform: scale(0.97);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .qw-tab[aria-selected='false']:hover {
+      color: #f3f0e9;
+      background: rgba(243, 240, 233, 0.06);
+    }
+  }
+  .qw-tab[aria-selected='true'] {
+    background: rgba(243, 240, 233, 0.12);
+    color: #f3f0e9;
+  }
   .qw-agent-out {
     min-height: calc(4 * 1.7em + 32px);
     margin: 0;
@@ -247,7 +370,14 @@ const states = [
 <script>
   function mount(root: HTMLElement) {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const reads: string[][] = JSON.parse(root.dataset.states ?? '[]');
+    const plain: string[][] = JSON.parse(root.dataset.states ?? '[]');
+    // with tabs, each state has three readings and the tab picks one
+    const readers: Record<string, string[]>[] | null = root.dataset.readers ? JSON.parse(root.dataset.readers) : null;
+    const tabEls = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-tab]'));
+    const srcEl = root.querySelector<HTMLElement>('[data-src]');
+    const SRC: Record<string, string> = { figma: 'Input.fig', tokens: 'tokens.json', agent: 'input.md' };
+    let tab = 'agent';
+    const linesFor = (i: number) => (readers ? readers[i][tab] : plain[i]);
     const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-i]'));
     const out = root.querySelector<HTMLElement>('[data-out]')!;
     let current = 0;
@@ -259,7 +389,7 @@ const states = [
       current = i;
       buttons.forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.i) === i)));
       window.clearInterval(typing);
-      const text = reads[i].join('\n');
+      const text = linesFor(i).join('\n');
       if (reduced.matches) {
         out.textContent = text;
         return;
@@ -276,8 +406,19 @@ const states = [
     function startTour() {
       window.clearInterval(tour);
       if (reduced.matches || userTook) return;
-      tour = window.setInterval(() => read((current + 1) % reads.length), 2600);
+      tour = window.setInterval(() => read((current + 1) % plain.length), 2600);
     }
+
+    tabEls.forEach((t) => {
+      t.addEventListener('click', () => {
+        tab = t.dataset.tab!;
+        tabEls.forEach((x) => x.setAttribute('aria-selected', String(x === t)));
+        if (srcEl) srcEl.textContent = SRC[tab];
+        userTook = true;
+        window.clearInterval(tour);
+        read(current);
+      });
+    });
 
     buttons.forEach((b) => {
       const i = Number(b.dataset.i);
