@@ -18,25 +18,34 @@ const READOUT_AFTER = '0 outside libraries · 141 components';
         <p class="proof-figure" aria-hidden="true" data-figure>1,071</p>
         <p class="sr-only" aria-live="polite" data-figure-live>1,071</p>
         <h2 id="proof-label" class="m-0 mt-6 text-title">references to outside libraries</h2>
-        <p
-          class="proof-note m-0 mt-3 min-h-[3.2em] max-w-[34ch] text-pretty text-ink-2"
-          data-note
-          data-before={NOTE_BEFORE}
-          data-after={NOTE_AFTER}
-        >
-          {NOTE_BEFORE}
-        </p>
+        <!-- both texts take their space up front, so Before ↔ After never changes the panel's height (Emir, 12 Nov) -->
+        <div class="swap mt-3 max-w-[34ch]">
+          <span class="swap-ghost proof-note text-pretty" aria-hidden="true">{NOTE_BEFORE}</span>
+          <span class="swap-ghost proof-note text-pretty" aria-hidden="true">{NOTE_AFTER}</span>
+          <p
+            class="proof-note m-0 min-h-[3.2em] text-pretty text-ink-2"
+            data-note
+            data-before={NOTE_BEFORE}
+            data-after={NOTE_AFTER}
+          >
+            {NOTE_BEFORE}
+          </p>
+        </div>
         <div class="mt-auto flex flex-wrap items-center gap-x-5 gap-y-3 pt-9">
           <div role="group" aria-label="Show state" class="seg">
             <button type="button" data-state="0" aria-pressed="true">Before</button>
             <button type="button" data-state="1" aria-pressed="false">After</button>
           </div>
-          <span
-            class="caption text-muted tabular-nums"
-            data-readout
-            data-before={READOUT_BEFORE}
-            data-after={READOUT_AFTER}>{READOUT_BEFORE}</span
-          >
+          <span class="swap">
+            <span class="swap-ghost caption tabular-nums" aria-hidden="true">{READOUT_BEFORE}</span>
+            <span class="swap-ghost caption tabular-nums" aria-hidden="true">{READOUT_AFTER}</span>
+            <span
+              class="caption text-muted tabular-nums"
+              data-readout
+              data-before={READOUT_BEFORE}
+              data-after={READOUT_AFTER}>{READOUT_BEFORE}</span
+            >
+          </span>
         </div>
       </div>
       <div class="proof-field-col">
@@ -56,6 +65,17 @@ const READOUT_AFTER = '0 outside libraries · 141 components';
 </section>
 
 <style>
+  /* stack the live text on invisible copies of both versions: the box is as big as the longer one */
+  .swap {
+    display: grid;
+  }
+  .swap > * {
+    grid-area: 1 / 1;
+  }
+  .swap-ghost {
+    visibility: hidden;
+    pointer-events: none;
+  }
   .proof-hero {
     display: flex;
     flex-wrap: wrap;

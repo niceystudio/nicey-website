@@ -105,6 +105,20 @@ const pillars = [
     background: var(--color-surface-hover);
     clip-path: none;
   }
+  /* hover: the page behind slides out a little more, the front page lifts (Emir, 12 Nov).
+     Pointer devices only; with reduced motion nothing moves. */
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .ap-sheet,
+    .ap-sheet--back {
+      transition: transform 260ms var(--ease-out);
+    }
+    .ap-stack:hover .ap-sheet:not(.ap-sheet--back) {
+      transform: translateY(-4px);
+    }
+    .ap-stack:hover .ap-sheet--back {
+      transform: translate(26px, 14px) rotate(7deg);
+    }
+  }
   .ap-fold {
     position: absolute;
     top: 0;

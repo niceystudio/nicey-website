@@ -7,7 +7,7 @@ import { links } from '../data/links';
 import { caseStudies, caseHref } from '../data/case-studies';
 
 interface Props {
-  /** the page's Markdown twin; when set, the strip shows the Human / Machine switch */
+  /** the page's Markdown twin; when set, the base line shows the Human / Machine switch (no gesture, no animation — Emir, 12 Nov) */
   mdHref?: string;
 }
 const { mdHref } = Astro.props;
@@ -92,11 +92,26 @@ const contact = [
   </div>
   <div class="container-page site-foot-base">
     <p class="caption-sm m-0 text-ink-2">© {year} Nicey Studio · Design systems people and agents read the same way</p>
-    <a href="#main" class="caption-sm text-ink-2 no-underline hover:underline">Back to top ↑</a>
+    <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
+      {
+        mdHref && (
+          <div class="view-switch" role="group" aria-label="Read this page as">
+            <span class="caption-sm text-ink-2">Read as</span>
+            <span class="view-seg">
+              <button type="button" data-mv="human" aria-pressed="true">Human</button>
+              <button type="button" data-mv="machine" aria-pressed="false">Machine</button>
+            </span>
+          </div>
+        )
+      }
+      <a href="#main" class="caption-sm text-ink-2 no-underline hover:underline">Back to top <span class="arr-up" aria-hidden="true">↑</span></a>
+    </div>
   </div>
   <div class="container-page site-foot-markwrap" aria-hidden="true" data-human>
-    <p class="site-foot-mark" data-mark>nicey<span class="text-accent">.</span></p>
-    <canvas class="site-foot-canvas" data-mark-canvas></canvas>
+    <div class="site-foot-markin">
+      <p class="site-foot-mark" data-mark>nicey<span class="text-accent">.</span></p>
+      <canvas class="site-foot-canvas" data-mark-canvas></canvas>
+    </div>
   </div>
 </footer>
 
@@ -129,8 +144,11 @@ const contact = [
   /* the closing wordmark: the brand, big, as the last thing on the page.
      The text sets the size; the canvas on top redraws it in brand blocks. */
   .site-foot-markwrap {
-    position: relative;
     margin-top: 48px;
+  }
+  /* the canvas sits exactly on the text, inside the page padding */
+  .site-foot-markin {
+    position: relative;
   }
   .site-foot-canvas {
     position: absolute;
@@ -145,17 +163,45 @@ const contact = [
   .site-foot-mark {
     margin: 0;
     padding-bottom: 0.14em; /* room for the y's tail */
-    font-size: clamp(96px, 33vw, 470px);
+    font-size: clamp(80px, 28vw, 400px);
     font-weight: 600;
     line-height: 0.85;
     white-space: nowrap;
-    letter-spacing: -0.06em;
+    letter-spacing: 0.01em; /* blocks need a visible gap between letters (Emir, 12 Nov) */
     color: var(--color-ink);
     user-select: none;
+  }
+  /* Human / Machine: a plain two-option switch in the base line. Machine shows the page as an agent reads it. */
+  .view-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .view-seg {
+    display: inline-flex;
+    padding: 2px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-pill);
+  }
+  .view-seg button {
+    min-height: 32px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--color-ink-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    cursor: pointer;
+  }
+  .view-seg button[aria-pressed='true'] {
+    background: var(--color-ink);
+    color: var(--color-on-ink);
   }
   .site-foot-base {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     justify-content: space-between;
     gap: 12px;
     margin-top: 20px;
@@ -302,168 +348,4 @@ const contact = [
     new MutationObserver(() => { cells.forEach((c) => (c.c = pastel())); draw(performance.now()); })
       .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   });
-</script>
-
-{mdHref && <div data-mr-on hidden></div>}
-
-<style is:global>
-  /* ---- the machine pull (Emir, 11 Nov) — an easter egg, nothing on the page announces it ----
-     At the very bottom of the designed page, scrolling on meets resistance: the page lifts a little
-     like a sheet, the machine view waits behind it. Let go and it drops back. Pull hard enough and
-     the sheet flies up and the machine page is the page. At the top of the machine page, pulling up
-     the same way brings the designed page back down. */
-  html.mr-pull body > *:not([data-mv-page]):not(script):not(style),
-  html.mr-fly body > *:not([data-mv-page]):not(script):not(style) {
-    position: relative;
-    z-index: 1;
-    background: var(--color-page);
-    transform: translateY(calc(var(--pull, 0) * -1px));
-  }
-  html.mr-pull .site-foot,
-  html.mr-fly .site-foot {
-    box-shadow: 0 40px 60px -30px rgba(38, 37, 31, 0.45);
-  }
-  html.mr-pull [data-mv-page],
-  html.mr-fly [data-mv-page] {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    overflow: hidden;
-    transform: scale(calc(0.94 + 0.06 * var(--p, 0)));
-    opacity: calc(0.35 + 0.65 * var(--p, 0));
-    transform-origin: 50% 0;
-  }
-  /* letting go: the sheet drops back with a soft settle */
-  html.mr-release body > *:not([data-mv-page]):not(script):not(style),
-  html.mr-release [data-mv-page] {
-    transition: transform 520ms cubic-bezier(0.2, 1.25, 0.4, 1), opacity 360ms var(--ease-out);
-  }
-  /* committing: the sheet flies off the top */
-  html.mr-fly body > *:not([data-mv-page]):not(script):not(style),
-  html.mr-fly [data-mv-page] {
-    transition: transform 640ms cubic-bezier(0.65, 0, 0.35, 1), opacity 400ms var(--ease-out);
-  }
-  /* machine page, pulled down at its top: it slides down, showing the designed page is above */
-  html.mr-up [data-mv-page] {
-    transform: translateY(calc(var(--pull, 0) * 1px));
-  }
-  html.mr-up.mr-release [data-mv-page] {
-    transition: transform 520ms cubic-bezier(0.2, 1.25, 0.4, 1);
-  }
-  html.mr-up.mr-fly [data-mv-page] {
-    position: static;
-    opacity: 1;
-    transition: transform 520ms cubic-bezier(0.65, 0, 0.35, 1), opacity 400ms ease;
-  }
-  /* coming back: the designed page drops in from above */
-  html.mr-drop body > *:not([data-mv-page]):not(script):not(style) {
-    transform: translateY(calc(var(--pull, 0) * -1px));
-  }
-  html.mr-drop.mr-release body > *:not([data-mv-page]):not(script):not(style) {
-    transition: transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  @media (prefers-reduced-motion: reduce) {
-    html.mr-release *, html.mr-fly * {
-      transition-duration: 1ms !important;
-    }
-  }
-</style>
-
-<script>
-  const armed = document.querySelector('[data-mr-on]');
-  const mv = document.querySelector<HTMLElement>('[data-mv-page]');
-  if (armed && mv) {
-    const root = document.documentElement;
-    const H = () => innerHeight;
-    const MAX = () => H() * 0.5; // how far the sheet can be dragged
-    const GO = () => MAX() * 0.62; // pull past this and it commits
-    let pull = 0, busy = false, idle = 0;
-    const machine = () => !mv.hidden && !root.classList.contains('mr-pull');
-    const atBottom = () => scrollY + innerHeight >= document.documentElement.scrollHeight - 2;
-    const atTop = () => scrollY <= 0;
-    const setPull = (v: number) => {
-      pull = Math.max(0, v);
-      root.style.setProperty('--pull', String(pull));
-      root.style.setProperty('--p', String(Math.min(1, pull / GO())));
-    };
-    // resistance: each step moves the sheet less the further it already is
-    const resist = (d: number) => d * 0.45 * Math.pow(1 - Math.min(pull, MAX()) / MAX(), 1.6);
-
-    const release = () => {
-      if (busy || pull <= 0) return;
-      if (pull >= GO()) return commit();
-      root.classList.add('mr-release');
-      setPull(0);
-      setTimeout(() => {
-        root.classList.remove('mr-release', 'mr-pull', 'mr-up');
-        if (!root.classList.contains('mr-pull') && mv.dataset.mrPeek) { mv.hidden = true; delete mv.dataset.mrPeek; }
-      }, 540);
-    };
-    const commit = () => {
-      busy = true;
-      const up = root.classList.contains('mr-up');
-      if (!up) {
-        // designed → machine: the sheet flies off the top, the machine page settles into place
-        root.classList.remove('mr-pull');
-        root.classList.add('mr-fly');
-        setPull(H() * 1.1);
-        root.style.setProperty('--p', '1');
-        setTimeout(() => {
-          delete mv.dataset.mrPeek;
-          // switch first (hides the designed page), then drop the animation state: no flash
-          document.dispatchEvent(new CustomEvent('nicey:view', { detail: 'machine' }));
-          root.classList.remove('mr-fly');
-          setPull(0);
-          busy = false;
-        }, 660);
-      } else {
-        // machine → designed: the machine page slides down and away, the designed page drops in at its end
-        root.classList.add('mr-fly');
-        setPull(H());
-        setTimeout(() => {
-          document.dispatchEvent(new CustomEvent('nicey:view', { detail: { view: 'human', at: 'bottom' } }));
-          root.classList.remove('mr-fly', 'mr-up');
-          root.classList.add('mr-drop');
-          setPull(H() * 0.6);
-          requestAnimationFrame(() => requestAnimationFrame(() => {
-            root.classList.add('mr-release');
-            setPull(0);
-            setTimeout(() => { root.classList.remove('mr-drop', 'mr-release'); busy = false; }, 720);
-          }));
-        }, 540);
-      }
-    };
-
-    const step = (d: number) => {
-      // d > 0 = trying to go further down
-      if (busy) return false;
-      if (!machine()) {
-        if (!(atBottom() && (d > 0 || pull > 0))) return false;
-        if (!root.classList.contains('mr-pull')) {
-          root.classList.remove('mr-release');
-          root.classList.add('mr-pull');
-          if (mv.hidden) { mv.hidden = false; mv.dataset.mrPeek = '1'; }
-        }
-        setPull(d > 0 ? pull + resist(d) : pull + d);
-      } else {
-        if (!(atTop() && (d < 0 || pull > 0))) return false;
-        root.classList.remove('mr-release');
-        root.classList.add('mr-up');
-        setPull(d < 0 ? pull + resist(-d) : pull - d);
-      }
-      clearTimeout(idle);
-      idle = window.setTimeout(release, 160);
-      return true;
-    };
-
-    addEventListener('wheel', (e) => { if (step(e.deltaY)) e.preventDefault(); }, { passive: false });
-    let ty = 0;
-    addEventListener('touchstart', (e) => { ty = e.touches[0].clientY; }, { passive: true });
-    addEventListener('touchmove', (e) => {
-      const y = e.touches[0].clientY;
-      if (step((ty - y) * 1.4)) e.preventDefault();
-      ty = y;
-    }, { passive: false });
-    addEventListener('touchend', () => { clearTimeout(idle); release(); });
-  }
 </script>

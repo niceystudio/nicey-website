@@ -1,0 +1,304 @@
+---
+/** One skeleton page of the audit report (kind 0 Score, 1 Drift map, 2 Fix first), used by the free-audit section. */
+interface Props {
+  kind: number;
+  n: string;
+}
+const { kind, n } = Astro.props;
+---
+
+  <div class="aud-sheet" aria-hidden="true" data-kind={kind}>
+    <span class="aud-sheet-head">
+      <b>
+        nicey<span class="text-accent">.</span>
+      </b>
+      <span><span class="aud-k">Audit · </span>{n}</span>
+    </span>
+    {kind === 0 && (
+      <>
+        <span class="aud-score">
+          <span class="aud-lines">
+            <i style="width:72%" />
+            <i style="width:44%" />
+          </span>
+          <span class="aud-grade">C</span>
+        </span>
+        <span class="aud-bars">
+          {[34, 82, 51, 46, 40, 38, 57].map((w) => (
+            <span>
+              <i style={`width:${w}%`} />
+            </span>
+          ))}
+        </span>
+        <span class="aud-findings">
+          {[86, 70, 78].map((w) => (
+            <span>
+              <b />
+              <i style={`width:${w}%`} />
+            </span>
+          ))}
+        </span>
+      </>
+    )}
+    {kind === 1 && (
+      <span class="aud-map">
+        <span class="aud-map-head">
+          <span>Figma</span>
+          <span>Code</span>
+        </span>
+        {[0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1].map((bad) => (
+          <span class:list={['aud-map-row', bad && 'is-bad']}>
+            <i />
+            <b />
+            <i />
+          </span>
+        ))}
+      </span>
+    )}
+    {kind === 2 && (
+      <span class="aud-fix">
+        {[88, 70, 80, 62, 74, 66, 84, 58].map((w, k) => (
+          <span class="aud-fix-row">
+            <em>{String(k + 1).padStart(2, '0')}</em>
+            <i style={`width:${w}%`} />
+            <u />
+          </span>
+        ))}
+      </span>
+    )}
+    <span class="aud-foot">
+      <i />
+      <u />
+    </span>
+    <span class="aud-fold" />
+  </div>
+
+<style>
+  .aud-sheet {
+    position: relative;
+    aspect-ratio: 210 / 297;
+    max-width: 260px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px 18px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 8px;
+    background: var(--sheet-bg);
+    box-shadow: 0 1px 2px rgba(38, 37, 31, 0.06), 0 18px 34px -20px rgba(38, 37, 31, 0.3);
+    clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%);
+    transition: transform 260ms var(--ease-out);
+  }
+  .aud-fold {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 22px;
+    height: 22px;
+    background: linear-gradient(225deg, transparent 50%, var(--color-line-strong) 50%, var(--color-surface-hover) 56%);
+    border-bottom-left-radius: 5px;
+  }
+  .aud-sheet {
+    container-type: inline-size;
+    /* the paper stands out from the panel it sits on (Emir, 12 Nov): white by day, a lifted tone at night */
+    --sheet-bg: #ffffff;
+  }
+  :global([data-theme='dark']) .aud-sheet {
+    --sheet-bg: #2b2a22;
+  }
+  /* a small sheet keeps only the page number in its header */
+  @container (max-width: 190px) {
+    .aud-k {
+      display: none;
+    }
+  }
+  .aud-sheet-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-right: 14px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-ink-2);
+  }
+  .aud-sheet-head b {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    text-transform: none;
+    color: var(--color-ink);
+  }
+  /* p. 1 · score */
+  .aud-score {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .aud-lines {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .aud-lines i,
+  .aud-fix i {
+    display: block;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--color-line-strong);
+  }
+  .aud-lines i:first-child {
+    height: 11px;
+    background: var(--color-ink);
+    opacity: 0.85;
+  }
+  .aud-grade {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--color-butter);
+    color: var(--color-ink);
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .aud-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .aud-bars span {
+    display: block;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--color-line);
+    overflow: hidden;
+  }
+  .aud-bars i {
+    display: block;
+    height: 100%;
+    border-radius: 3px;
+    background: var(--color-accent);
+  }
+  /* p. 2 · drift map: Figma | Code rows, the drifted ones marked */
+  .aud-map {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .aud-map-head {
+    display: grid;
+    grid-template-columns: 1fr 10px 1fr;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-ink-2);
+  }
+  .aud-map-head span:last-child {
+    grid-column: 3;
+  }
+  .aud-map-row {
+    display: grid;
+    grid-template-columns: 1fr 10px 1fr;
+    align-items: center;
+    gap: 8px;
+  }
+  .aud-map-row i {
+    display: block;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--color-line-strong);
+  }
+  .aud-map-row b {
+    display: block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-sage);
+    justify-self: center;
+  }
+  .aud-map-row.is-bad b {
+    background: var(--color-hot);
+  }
+  .aud-map-row.is-bad i:last-child {
+    background: color-mix(in srgb, var(--color-hot) 45%, var(--color-line-strong));
+  }
+  /* p. 3 · fix first: ordered rows, each with a size chip */
+  .aud-fix {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+  .aud-fix-row {
+    display: grid;
+    grid-template-columns: 16px 1fr 24px;
+    align-items: center;
+    gap: 8px;
+  }
+  .aud-fix-row em {
+    font-family: var(--font-mono);
+    font-size: 8px;
+    font-style: normal;
+    color: var(--color-ink-2);
+  }
+  .aud-fix-row u {
+    display: block;
+    height: 12px;
+    border-radius: var(--radius-pill);
+    background: var(--color-sage);
+  }
+  .aud-findings {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    padding-top: 12px;
+    border-top: 1px solid var(--color-line);
+  }
+  .aud-findings span {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .aud-findings b {
+    flex: none;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-hot);
+  }
+  .aud-findings i {
+    display: block;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--color-line-strong);
+  }
+  .aud-foot {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 10px;
+    border-top: 1px dashed var(--color-dashed);
+  }
+  .aud-foot i {
+    display: block;
+    width: 34%;
+    height: 5px;
+    border-radius: 3px;
+    background: var(--color-line-strong);
+  }
+  .aud-foot u {
+    display: block;
+    width: 34px;
+    height: 14px;
+    border-radius: var(--radius-pill);
+    background: var(--color-line);
+  }
+</style>

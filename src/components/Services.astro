@@ -35,7 +35,7 @@ const alongside = ['Product and UX design', 'Design engineering', 'AI workflows 
       <figure class="m-0 flex flex-col gap-2">
         <QBenchWork />
       </figure>
-      <a href={links.exploreDesignSystems} class="svc-link">Explore design systems →</a>
+      <a href={links.exploreDesignSystems} class="svc-link">Explore design systems <span class="arr" aria-hidden="true">→</span></a>
     </article>
     <article class="svc flex-[1_1_320px] gap-5">
       <span class="caption flex items-center gap-2 text-ink-2"
@@ -57,7 +57,7 @@ const alongside = ['Product and UX design', 'Design engineering', 'AI workflows 
         </div>
         <figcaption class="font-mono text-caption text-ink-2">Everbreed student app · a typo caught before it saves</figcaption>
       </figure>
-      <a href={links.exploreProductDesign} class="svc-link mt-auto">Explore product design →</a>
+      <a href={links.exploreProductDesign} class="svc-link mt-auto">Explore product design <span class="arr" aria-hidden="true">→</span></a>
     </article>
   </div>
 </section>
@@ -111,6 +111,7 @@ const alongside = ['Product and UX design', 'Design engineering', 'AI workflows 
     align-self: flex-start;
     display: inline-flex;
     align-items: center;
+    gap: 0.3em; /* flex drops the space before the arrow */
     min-height: 44px;
     font-size: var(--text-cta);
     font-weight: 500;

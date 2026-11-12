@@ -305,7 +305,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     <nav aria-label="More case studies" class="cs-more">
       {prev ? (
         <a href={caseHref(prev.slug)} class="cs-more-link">
-          <span aria-hidden="true">←</span> Previous: {prev.linkName}
+          <span class="arr-left" aria-hidden="true">←</span> Previous: {prev.linkName}
         </a>
       ) : <span />}
       <a href="/#work" class="cs-more-link">All case studies</a>

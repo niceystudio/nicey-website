@@ -20,17 +20,15 @@ const audit = variant === 'case' ? '/#audit' : '#audit';
 ---
 
 <a href="#main" class="skip-link pill pill-ink px-[18px] text-label">Skip to content</a>
-<header class="border-b border-line">
-  <nav
-    aria-label="Main"
-    class="container-page flex flex-wrap items-center justify-between gap-x-6 gap-y-3 py-4"
-  >
+<header class="site-head border-b border-line" data-site-head>
+  <nav aria-label="Main" class="container-page flex items-center justify-between gap-6 py-4">
     <a
       href={links.home}
       class="text-[22px] leading-none font-semibold tracking-[-0.04em] text-ink no-underline"
       >nicey<span class="text-accent">.</span></a
     >
-    <div class="flex flex-wrap items-center gap-x-6 gap-y-1 text-body-sm">
+    <!-- desktop: everything on one row -->
+    <div class="head-row items-center gap-x-6 text-body-sm">
       {
         nav.map((item) => (
           <a href={item.href} class="py-3 text-ink no-underline">
@@ -43,7 +41,40 @@ const audit = variant === 'case' ? '/#audit' : '#audit';
         <ThemeToggle />
       </div>
     </div>
+    <!-- phone: Free audit stays visible, the rest sits behind the menu button (Emir, 12 Nov) -->
+    <div class="head-compact items-center gap-2">
+      <a href={audit} class="pill pill-ink px-[18px] py-3 text-body-sm">Free audit</a>
+      <button
+        type="button"
+        class="menu-btn"
+        aria-expanded="false"
+        aria-controls="site-menu"
+        aria-label="Menu"
+        data-menu-btn
+      >
+        <span class="menu-icon" aria-hidden="true"><span></span><span></span></span>
+      </button>
+    </div>
   </nav>
+  <div id="site-menu" class="menu-panel" data-menu hidden>
+    <div class="container-page">
+      <ul class="m-0 flex list-none flex-col p-0">
+        {
+          nav.map((item) => (
+            <li class="border-b border-line">
+              <a href={item.href} class="menu-link text-ink no-underline">
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <div class="container-page flex items-center justify-between py-4">
+      <span class="font-mono text-caption text-ink-2">Theme</span>
+      <ThemeToggle />
+    </div>
+  </div>
 </header>
 
 <style>
@@ -57,4 +88,131 @@ const audit = variant === 'case' ? '/#audit' : '#audit';
   .skip-link:focus-visible {
     transform: none;
   }
+  .site-head {
+    position: relative;
+    z-index: 40;
+  }
+  .head-row {
+    display: none;
+  }
+  .head-compact {
+    display: flex;
+  }
+  @media (min-width: 900px) {
+    .head-row {
+      display: flex;
+    }
+    .head-compact {
+      display: none;
+    }
+    .menu-panel {
+      display: none !important;
+    }
+  }
+  .menu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--color-ink);
+    cursor: pointer;
+  }
+  .menu-icon {
+    position: relative;
+    width: 16px;
+    height: 10px;
+  }
+  .menu-icon span {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 1.5px;
+    background: currentColor;
+    transition: transform 200ms var(--ease-out), top 200ms var(--ease-out);
+  }
+  .menu-icon span:first-child {
+    top: 0;
+  }
+  .menu-icon span:last-child {
+    top: calc(100% - 1.5px);
+  }
+  /* open: the two lines turn into an x */
+  .menu-btn[aria-expanded='true'] .menu-icon span {
+    top: calc(50% - 0.75px);
+  }
+  .menu-btn[aria-expanded='true'] .menu-icon span:first-child {
+    transform: rotate(45deg);
+  }
+  .menu-btn[aria-expanded='true'] .menu-icon span:last-child {
+    transform: rotate(-45deg);
+  }
+  .menu-panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--color-page);
+    border-bottom: 1px solid var(--color-line);
+  }
+  .menu-panel:not([hidden]) {
+    animation: menu-in 200ms var(--ease-out) both;
+  }
+  @keyframes menu-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .menu-panel:not([hidden]) {
+      animation-name: menu-fade;
+    }
+    @keyframes menu-fade {
+      from {
+        opacity: 0;
+      }
+    }
+    .menu-icon span {
+      transition: none;
+    }
+  }
+  .menu-link {
+    display: block;
+    padding-block: 16px;
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
 </style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-site-head]').forEach((head) => {
+    const btn = head.querySelector<HTMLButtonElement>('[data-menu-btn]');
+    const panel = head.querySelector<HTMLElement>('[data-menu]');
+    if (!btn || !panel) return;
+    const set = (open: boolean) => {
+      btn.setAttribute('aria-expanded', String(open));
+      btn.setAttribute('aria-label', open ? 'Close menu' : 'Menu');
+      panel.hidden = !open;
+    };
+    btn.addEventListener('click', () => set(panel.hasAttribute('hidden')));
+    // close on a link, on Esc, on a tap outside, and when the window grows past the phone layout
+    panel.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).closest('a')) set(false);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !panel.hidden) {
+        set(false);
+        btn.focus();
+      }
+    });
+    document.addEventListener('click', (e) => {
+      if (!panel.hidden && !head.contains(e.target as Node)) set(false);
+    });
+    matchMedia('(min-width: 900px)').addEventListener('change', (m) => m.matches && set(false));
+  });
+</script>
