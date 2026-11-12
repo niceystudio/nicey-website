@@ -18,19 +18,21 @@ import Footer from './Footer.astro';
 import SiteFooter from './SiteFooter.astro';
 import ReviewSwitch from './ReviewSwitch.astro';
 import MachineView from './case-study/MachineView.astro';
-import { siteMarkdown } from '../lib/site-markdown';
+import { homeMarkdown } from '../lib/home-markdown';
 
 interface Props {
   zeroDrift: 'static' | 'story';
 }
 const { zeroDrift } = Astro.props;
-const markdown = siteMarkdown(Astro.site ?? new URL('https://nicey-website.vercel.app'));
+// the machine view shows the whole homepage as text (Emir, 12 Nov), same as /index.md
+const markdown = await homeMarkdown(Astro.site ?? new URL('https://nicey-website.vercel.app'));
 ---
 
 <Base
   title="Nicey · Design systems people and agents read the same way"
   description="We turn years of drifted UI into one system: tokens, components and documentation that a designer, an engineer and a coding agent understand the same way. Product design when you need the screens too."
   noindex={zeroDrift === 'story'}
+  markdownHref="/index.md"
 >
   <Header />
   <main id="main" tabindex="-1" data-human>
@@ -44,7 +46,7 @@ const markdown = siteMarkdown(Astro.site ?? new URL('https://nicey-website.verce
     <Faq />
   </main>
   <Footer />
-  <MachineView markdown={markdown} mdHref="/llms.txt" what="site" />
-  <SiteFooter mdHref="/llms.txt" />
+  <MachineView markdown={markdown} mdHref="/index.md" what="homepage" />
+  <SiteFooter mdHref="/index.md" />
   <ReviewSwitch current={zeroDrift} />
 </Base>

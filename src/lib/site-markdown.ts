@@ -1,4 +1,4 @@
-/** The site as an agent reads it: served at /llms.txt and shown as the homepage's machine view. */
+/** The site index for agents, served at /llms.txt. (The homepage's machine view shows /index.md.) */
 import { caseStudies, caseHref } from '../data/case-studies';
 
 export function siteMarkdown(base: URL): string {
@@ -14,7 +14,7 @@ export function siteMarkdown(base: URL): string {
     '',
     '## Studio',
     '',
-    `- [Home](${abs('/')}): services, how we work, FAQ`,
+    `- [Home](${abs('/index.md')}): the homepage as Markdown: services, how we work, work, FAQ`,
     `- [Free audit](${abs('/#audit')}): share your Figma file; get a score per pillar, the top findings, and what to fix first`,
     '',
   ].join('\n');

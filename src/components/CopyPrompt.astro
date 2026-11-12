@@ -1,0 +1,86 @@
+---
+/**
+ * "Copy prompt for your agent" (idea 2 from the 11 Nov research, Clerk; placed in the free-audit section, 12 Nov).
+ * One click puts a prompt on the clipboard that points the visitor's own coding agent at /ai-ready.md.
+ */
+import { aiReadyPrompt } from '../lib/ai-ready';
+
+const prompt = aiReadyPrompt(Astro.site ?? new URL('https://nicey-website.vercel.app'));
+---
+
+<div class="cp">
+  <button type="button" class="cp-btn" data-copy-prompt={prompt}>
+    <svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"
+      ><rect x="5" y="5" width="9" height="9" rx="2"></rect><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"></path></svg
+    >
+    <span data-copy-label>Copy prompt for your agent</span>
+  </button>
+  <a href="/ai-ready.md" class="cp-file">/ai-ready.md</a>
+  <span class="sr-only" aria-live="polite" data-copy-live></span>
+</div>
+
+<style>
+  .cp {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 12px;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+  }
+  .cp-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 36px;
+    padding: 0 14px;
+    border: 1px dashed var(--color-line-strong);
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--color-ink);
+    font: inherit;
+    cursor: pointer;
+    transition: transform 160ms var(--ease-out), background-color 160ms var(--ease-out), border-color 160ms var(--ease-out);
+  }
+  .cp-btn:active {
+    transform: scale(0.97);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .cp-btn:hover {
+      background: var(--color-surface-hover);
+      border-style: solid;
+    }
+  }
+  .cp-btn.is-done {
+    border-style: solid;
+    border-color: var(--color-ink);
+  }
+  .cp-file {
+    color: var(--color-ink-2);
+    text-underline-offset: 3px;
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-copy-prompt]').forEach((btn) => {
+    const label = btn.querySelector<HTMLElement>('[data-copy-label]')!;
+    const live = btn.parentElement?.querySelector<HTMLElement>('[data-copy-live]');
+    let t = 0;
+    btn.addEventListener('click', async () => {
+      let ok = true;
+      try {
+        await navigator.clipboard.writeText(btn.dataset.copyPrompt ?? '');
+      } catch {
+        ok = false;
+      }
+      label.textContent = ok ? 'Copied. Paste it into your agent' : 'Copy failed';
+      if (live) live.textContent = label.textContent;
+      btn.classList.toggle('is-done', ok);
+      clearTimeout(t);
+      t = window.setTimeout(() => {
+        label.textContent = 'Copy prompt for your agent';
+        btn.classList.remove('is-done');
+      }, 2200);
+    });
+  });
+</script>

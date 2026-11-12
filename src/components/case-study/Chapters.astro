@@ -754,6 +754,14 @@ const slug = (k: string) =>
   .ch-rail-list .marker {
     transition: transform 200ms var(--ease-out);
   }
+  /* pressed: ink + the marker settles (same as the Zero Drift rail) */
+  .ch-rail-list a:active {
+    color: var(--color-ink);
+  }
+  .ch-rail-list a:active .marker {
+    transform: scale(1.15);
+    transition-duration: 100ms;
+  }
   @media (hover: hover) and (pointer: fine) {
     .ch-rail-list a:hover {
       color: var(--color-ink);

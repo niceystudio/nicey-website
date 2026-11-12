@@ -1,33 +1,37 @@
 ---
+/**
+ * The free-audit section (Emir picked idea 1 · A on 12 Nov; Darwin Flux + Koombea from the 11 Nov research):
+ * the report as three labelled pages, an honest scope line, and the four steps with a time on each.
+ * Skeleton pages (AuditSheet), like the hero's AuditPaper. Times are [gaps] for Goran, no invented numbers.
+ */
 import SectionHead from './SectionHead.astro';
 import { links } from '../data/links';
 import { markerBg } from '../data/zero-drift';
+import AuditSheet from './AuditSheet.astro';
+import CopyPrompt from './CopyPrompt.astro';
 
+const pages = [
+  {
+    n: 'p. 1',
+    name: 'Score',
+    holds: 'A grade, and a score for each pillar of the audit.',
+  },
+  {
+    n: 'p. 2',
+    name: 'Drift map',
+    holds: 'What exists, what it should be, and where design and code disagree.',
+  },
+  {
+    n: 'p. 3',
+    name: 'Fix first',
+    holds: 'The top findings in order, each with a size in days.',
+  },
+];
 const steps = [
-  {
-    n: '01',
-    free: true,
-    title: 'Share your Figma file',
-    body: 'The repo is optional. With it, we can also check Figma against code.',
-  },
-  {
-    n: '02',
-    free: true,
-    title: 'Get the audit report',
-    body: 'A score per pillar, the top findings, and what to fix first.',
-  },
-  {
-    n: '03',
-    free: false,
-    title: 'Talk it through',
-    body: 'A call with the people who will do the work, then a scoped proposal.',
-  },
-  {
-    n: '04',
-    free: false,
-    title: 'Build, pilot, roll out',
-    body: 'Architecture agreed with your engineers, a gated pilot, then migration in slices. For product work, scope is locked in week one: built, documented, or parked with a reason.',
-  },
+  { n: '01', free: true, title: 'Share your Figma file', time: '[time]', body: 'The repo is optional. With it, we can also check Figma against code.' },
+  { n: '02', free: true, title: 'Get the audit report', time: '[days]', body: 'The three pages above, sent to you.' },
+  { n: '03', free: false, title: 'Talk it through', time: '[call length]', body: 'A call with the people who will do the work, then a scoped proposal.' },
+  { n: '04', free: false, title: 'Build, pilot, roll out', time: 'Set in the proposal', body: 'Architecture agreed with your engineers, a gated pilot, then migration in slices.' },
 ];
 ---
 
@@ -38,27 +42,168 @@ const steps = [
     </SectionHead>
     <a href={links.startAudit} class="pill pill-ink pill-lg">Get a free audit</a>
   </div>
+
   <div class="panel-wrap">
-    <ol class="panel grid-4">
-      {
-        steps.map((s) => (
-          <li class="flex min-h-[260px] flex-col justify-between gap-10 px-8 pt-7 pb-8 max-sm:min-h-0 max-sm:px-6">
-            <span class="caption flex items-center justify-between gap-3 text-ink-2">
-              <span>Step {s.n}</span>
-              {s.free && (
-                <span class="inline-flex items-center gap-1.5">
-                  <i aria-hidden="true" class:list={['marker', markerBg.sage]} />
-                  Free
+    <div class="panel flex flex-col">
+      <!-- the report: three pages, each says what it holds -->
+      <ol class="aud-pages" aria-label="What the audit report holds">
+        {
+          pages.map((p, i) => (
+            <li class="aud-page">
+              <AuditSheet kind={i} n={p.n} />
+              <div class="aud-label">
+                <span class="font-mono text-caption text-ink-2">
+                  {p.n} · {p.name}
                 </span>
-              )}
-            </span>
-            <div class="flex flex-col gap-2.5">
-              <h3 class="m-0 text-h3-card">{s.title}</h3>
-              <p class="m-0 text-body-sm text-pretty text-ink-2">{s.body}</p>
-            </div>
-          </li>
-        ))
-      }
-    </ol>
+                <p class="m-0 text-body-sm text-pretty text-ink-2">{p.holds}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+
+      <!-- scope, said plainly -->
+      <p class="aud-scope m-0 text-body-sm text-ink-2">
+        <span class="font-mono text-caption text-ink">Scope</span>
+        Your Figma file, read-only. The repo only if you share it. We never edit your file, and the audit is free.
+      </p>
+
+      <!-- not ready to share the file: the self-check runs with their own agent, then a call (Emir, 12 Nov) -->
+      <div class="aud-self">
+        <div class="flex flex-col gap-1.5">
+          <span class="font-mono text-caption text-ink">Not ready to share your file?</span>
+          <p class="m-0 max-w-[58ch] text-body-sm text-pretty text-ink-2">
+            Run our self-check with your own coding agent. It reads your Figma file on your side; nothing is sent to us.
+            Then bring the results to a call.
+          </p>
+        </div>
+        <CopyPrompt />
+      </div>
+
+      <!-- the same four steps, each with a time -->
+      <ol class="aud-steps panel-sub grid-4">
+        {
+          steps.map((s) => (
+            <li class="aud-step">
+              <span class="caption flex items-center justify-between gap-3 text-ink-2">
+                <span>Step {s.n}</span>
+                {s.free && (
+                  <span class="inline-flex items-center gap-1.5">
+                    <i aria-hidden="true" class:list={['marker', markerBg.sage]} />
+                    Free
+                  </span>
+                )}
+              </span>
+              <span class="aud-time">{s.time}</span>
+              <div class="flex flex-col gap-2">
+                <h3 class="m-0 text-h3-card">{s.title}</h3>
+                <p class="m-0 text-body-sm text-pretty text-ink-2">{s.body}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
   </div>
 </section>
+
+<style>
+  .aud-pages {
+    margin: 0;
+    padding: 48px 44px 40px;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 40px;
+  }
+  /* phone: the pages become a row you swipe, the next one peeks in */
+  @media (max-width: 767px) {
+    .aud-pages {
+      grid-template-columns: none;
+      grid-auto-flow: column;
+      grid-auto-columns: 72%;
+      gap: 20px;
+      padding: 28px 24px;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: 24px;
+      scrollbar-width: none;
+    }
+    .aud-pages::-webkit-scrollbar {
+      display: none;
+    }
+    .aud-page {
+      scroll-snap-align: start;
+    }
+  }
+  .aud-page {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .aud-page:nth-child(1) :global(.aud-sheet) {
+    transform: rotate(-1.5deg);
+  }
+  .aud-page:nth-child(3) :global(.aud-sheet) {
+    transform: rotate(1.2deg);
+  }
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .aud-page:hover :global(.aud-sheet) {
+      transform: translateY(-6px) rotate(0deg);
+    }
+  }
+
+  .aud-label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-width: 32ch;
+  }
+  .aud-scope {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 14px;
+    padding: 18px 44px;
+  }
+  @media (max-width: 767px) {
+    .aud-scope {
+      padding: 18px 24px;
+    }
+  }
+  .aud-self {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px 32px;
+    padding: 22px 44px;
+  }
+  @media (max-width: 767px) {
+    .aud-self {
+      padding: 22px 24px;
+    }
+  }
+  .aud-steps {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .aud-step {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 28px 32px 32px;
+  }
+  @media (max-width: 639px) {
+    .aud-step {
+      padding: 24px;
+    }
+  }
+  .aud-time {
+    font-family: var(--font-mono);
+    font-size: var(--text-body-sm);
+    color: var(--color-ink);
+  }
+</style>

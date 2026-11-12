@@ -1,7 +1,7 @@
 ---
 /**
  * Machine view of a case study (idea from parallel.ai, applied to the whole page).
- * The switch lives in the footer tool strip (SiteFooter, [data-mv] buttons, key m).
+ * The switch lives in the footer base line (SiteFooter, [data-mv] buttons; key m also toggles).
  * Machine hides the designed page and shows the plain Markdown an agent reads,
  * the same text that is served at /work/<slug>.md. State lives in ?view=machine.
  */
@@ -21,7 +21,6 @@ const fmEnd = lines.indexOf('---', 1);
 
 <section class="mv" data-mv-page hidden aria-label={`This ${what} as an agent reads it`}>
   <div class="container-page mv-in">
-    <p class="mv-back" aria-hidden="true">↑ pull up to go back</p>
     <div class="mv-head">
       <span class="mv-get"><b>GET</b> {mdHref}</span>
       <span class="mv-meta">200 · text/markdown · {words.toLocaleString('en')} words</span>
@@ -35,7 +34,7 @@ const fmEnd = lines.indexOf('---', 1);
       This is the same {what}, as an agent reads it: no layout, no images, only text with structure. We build design
       systems so they read this way too.
     </p>
-    <pre class="mv-doc" data-mv-doc><code>{lines.map((l, i) => <span class:list={['mv-l', kind(l, i, fmEnd) && `mv-${kind(l, i, fmEnd)}`]} style={`--i:${Math.min(i, 40)}`}>{l || ' '}{'\n'}</span>)}</code></pre>
+    <pre class="mv-doc" data-mv-doc><code>{lines.map((l, i) => <span class:list={['mv-l', kind(l, i, fmEnd) && `mv-${kind(l, i, fmEnd)}`]}>{l || ' '}{'\n'}</span>)}</code></pre>
     <textarea class="sr-only" data-mv-src aria-hidden="true" tabindex="-1">{markdown}</textarea>
   </div>
 </section>
@@ -46,13 +45,6 @@ const fmEnd = lines.indexOf('---', 1);
   }
   .mv-in {
     padding-block: 24px 72px;
-  }
-  .mv-back {
-    margin: 0 0 12px;
-    font-family: var(--font-mono);
-    font-size: var(--text-caption);
-    text-align: center;
-    color: var(--color-ink-2);
   }
   .mv-head {
     display: flex;
@@ -132,17 +124,6 @@ const fmEnd = lines.indexOf('---', 1);
   .mv-t {
     color: var(--color-ink);
   }
-  @media (prefers-reduced-motion: no-preference) {
-    .mv:not([hidden]) .mv-l {
-      animation: mv-in 240ms var(--ease-out) both;
-      animation-delay: calc(var(--i) * 10ms);
-    }
-    @keyframes mv-in {
-      from {
-        opacity: 0;
-      }
-    }
-  }
 </style>
 
 <script>
@@ -167,7 +148,6 @@ const fmEnd = lines.indexOf('---', 1);
       }
     };
     buttons.forEach((b) => b.addEventListener('click', () => set(b.dataset.mv!)));
-    // the footer reveal (SiteFooter) asks for machine view once the page has slid away
     // detail: 'machine' | 'human' | { view, at: 'top' | 'bottom' }
     document.addEventListener('nicey:view', (e) => {
       const d = (e as CustomEvent).detail;

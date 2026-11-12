@@ -432,6 +432,28 @@
   .press {
     transition: transform 160ms var(--ease-out);
   }
+  /* arrow nudge: the arrow in a link moves a little toward where it goes on hover (same 4px as the
+     Work rows; Emir, 12 Nov). Put the arrow in <span class="arr"> (or arr-left / arr-up). */
+  .arr,
+  .arr-left,
+  .arr-up {
+    display: inline-block;
+    transition: transform 150ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    a:hover .arr {
+      transform: translateX(4px);
+    }
+    a:hover .arr-left {
+      transform: translateX(-4px);
+    }
+    a:hover .arr-up {
+      transform: translateY(-3px);
+    }
+  }
+  a:focus-visible .arr {
+    transform: translateX(4px);
+  }
   .pill-ink {
     background: var(--color-ink);
     color: var(--color-on-ink);

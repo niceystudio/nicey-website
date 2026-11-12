@@ -22,7 +22,7 @@ export const KEEP = 141;
 const BLOCK_COLS = 12;
 const BLOCK_ROWS = Math.ceil(KEEP / BLOCK_COLS);
 const DURATION = 2.8; // seconds for a full sweep
-const AUTOPLAY_DELAY = 1000; // ms after the panel is half in view
+const AUTOPLAY_DELAY = 1000; // ms after the visitor scrolled the panel into view
 const FPS_ACTIVE = 30;
 const FPS_IDLE = 12;
 const HOVER_RADIUS = 64;
@@ -389,19 +389,28 @@ export function mountProofField(root: HTMLElement): void {
     hover = null;
   });
 
-  // play once, the first time the panel is at least half in view
+  // play once, when the visitor has scrolled down to it: not on page load, even on a tall screen
+  // where the panel is already half in view (Emir, 12 Nov). Needs a scroll, then the panel's top
+  // in the upper 60% of the window and most of it on screen.
+  const tryPlay = () => {
+    if (played || reduced || !visible || window.scrollY < 80) return;
+    const r = root.getBoundingClientRect();
+    const shown = Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0);
+    const inView = r.top <= window.innerHeight * 0.6 && shown >= Math.min(r.height, window.innerHeight) * 0.6;
+    if (!inView) return;
+    played = true;
+    window.removeEventListener('scroll', onScroll);
+    window.setTimeout(() => {
+      if (target === 0 && p === 0) setTarget(1);
+    }, AUTOPLAY_DELAY);
+  };
+  const onScroll = () => tryPlay();
+  window.addEventListener('scroll', onScroll, { passive: true });
   new IntersectionObserver(
     (entries) => {
-      const e = entries[0];
-      visible = e.isIntersecting;
+      visible = entries[0].isIntersecting;
       if (visible) start();
-      const halfIn = e.intersectionRatio >= 0.5 || e.intersectionRect.height >= window.innerHeight * 0.5;
-      if (visible && halfIn && !played && !reduced) {
-        played = true;
-        window.setTimeout(() => {
-          if (target === 0 && p === 0) setTarget(1);
-        }, AUTOPLAY_DELAY);
-      }
+      tryPlay();
     },
     { threshold: [0, 0.25, 0.5, 0.75, 1] },
   ).observe(root);
