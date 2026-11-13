@@ -67,7 +67,7 @@ export function caseMarkdown(s: CaseStudy, url: string): string {
   );
   out.push(s.lede, '');
   out.push('## Facts', '', ...s.facts.map((f) => `- **${f.term}**: ${f.detail}`), '', ...(s.who ? [s.who, ''] : []));
-  if (!s.proofViz && s.numbers.length) {
+  if ((!s.proofViz || s.proofViz === 'aliases') && s.numbers.length) {
     out.push(`## ${s.numbersHeading}`, '', ...s.numbers.map((n) => `- **${n.value}** ${n.label}. ${n.meaning}`), '');
   }
   if (s.proofViz === 'surfaces') {

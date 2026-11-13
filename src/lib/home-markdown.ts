@@ -5,7 +5,6 @@
  */
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import Hero from '../components/Hero.astro';
-import ProofPanel from '../components/ProofPanel.astro';
 import WhenToBring from '../components/WhenToBring.astro';
 import ZeroDriftStatic from '../components/zero-drift/ZeroDriftStatic.astro';
 import Services from '../components/Services.astro';
@@ -15,7 +14,7 @@ import Faq from '../components/Faq.astro';
 import Footer from '../components/Footer.astro';
 import { htmlToMarkdown } from './html-markdown';
 
-const sections = [Hero, ProofPanel, WhenToBring, ZeroDriftStatic, Services, Process, Work, Faq, Footer];
+const sections = [Hero, WhenToBring, Services, Work, ZeroDriftStatic, Process, Faq, Footer];
 
 export async function homeMarkdown(base: URL): Promise<string> {
   const container = await AstroContainer.create();

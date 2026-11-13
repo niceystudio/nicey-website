@@ -15,9 +15,10 @@ import QBenchWork from './QBenchWork.astro';
 import StatusHero from './StatusHero.astro';
 import EverbreedHero from './EverbreedHero.astro';
 import Faq from '../Faq.astro';
-import AgenticGate from './AgenticGate.astro';
+import AgenticCompare from './AgenticCompare.astro';
 import EverbreedProduct from './EverbreedProduct.astro';
 import SurfacesField from './SurfacesField.astro';
+import AliasesField from './AliasesField.astro';
 import TwoSides from './TwoSides.astro';
 import Decisions from './Decisions.astro';
 import Chapters from './Chapters.astro';
@@ -136,6 +137,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
       <div class:list={['panel-wrap', s.proofViz && 'panel flex flex-col']}>
         {s.proofViz === 'names' && <NamesField />}
         {s.proofViz === 'surfaces' && <SurfacesField />}
+        {s.proofViz === 'aliases' && <AliasesField />}
         {!s.proofViz && <ul class:list={['panel', s.numbers.length === 4 ? 'grid-4' : 'grid-3']}>
           {
             s.numbers.map((n) => (
@@ -183,7 +185,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
       </ol>
     </section>}
 
-    {s.agentic && s.agenticStyle === 'gate' && <AgenticGate {...s.agentic} />}
+    {s.agentic && s.agenticStyle === 'gate' && <AgenticCompare kicker={s.agentic.kicker} heading={s.agentic.heading} />}
     {
       s.agentic && s.agenticStyle !== 'gate' && (
         <section aria-labelledby="agentic-head" class="container-page cs-block">
