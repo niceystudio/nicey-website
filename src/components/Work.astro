@@ -74,7 +74,7 @@ const rows: Row[] = [
   <ul class="panel flex flex-col">
     {
       rows.map((r) => (
-        <li>
+        <li id={`work-${r.name.toLowerCase()}`}>
           <a href={r.href} class="work-row" data-wp={JSON.stringify(r.preview)}>
             <span class="flex flex-[1_1_220px] flex-col gap-2.5">
               <span class="text-work">{r.name}</span>

@@ -1,0 +1,352 @@
+---
+/**
+ * DRAFT kept by Emir (13 Nov): A went live in Header.astro; B (pixel island) stays here as a draft at /lab/nav-b.
+ * Variants a and c are no longer routed.
+ * LAB: three header directions (research 13 Nov). Live Header.astro is untouched.
+ *  a · index bar     — sticky; numbered mono links, each with a 1px line that fills as you read that section
+ *                       (southleft numbering + section-progress nav); Work shows the real case count
+ *  b · pixel island  — a floating pill that tightens after the hero; hover fills the link with brand cells,
+ *                       left to right (same block language as the footer wordmark)
+ *  c · command bar   — the links stay; a '› jump to … ⌘K' bar opens a terminal-style palette:
+ *                       sections, case studies, and the files written for agents (index.md, llms.txt, ai-ready.md)
+ * Phone: same compact row + menu panel as today (A adds the progress line, B keeps the island shape).
+ */
+import { links } from '../../data/links';
+import { caseStudies, caseHref } from '../../data/case-studies';
+import ThemeToggle from '../ThemeToggle.astro';
+
+interface Props {
+  variant: 'a' | 'b' | 'c';
+}
+const { variant } = Astro.props;
+const nav = [
+  { href: '#services', label: 'Services', id: 'services' },
+  { href: '#work', label: 'Work', id: 'work', count: caseStudies.length },
+  { href: '#audit', label: 'Process', id: 'audit' },
+  { href: '#faq', label: 'FAQ', id: 'faq' },
+];
+const COLS = 12;
+const ROWS = 4;
+const cells = Array.from({ length: COLS * ROWS }, (_, i) => i % COLS);
+const palette = [
+  { group: 'Sections', items: [...nav.map((n, i) => ({ label: `${String(i + 1).padStart(2, '0')}  ${n.label}`, href: n.href })), { label: '05  Free audit', href: '#audit' }] },
+  { group: 'Case studies', items: caseStudies.map((c) => ({ label: c.linkName, href: caseHref(c.slug) })) },
+  {
+    group: 'For your agent',
+    items: [
+      { label: 'index.md  · this page as Markdown', href: '/index.md' },
+      { label: 'llms.txt  · the site map for AI', href: '/llms.txt' },
+      { label: 'ai-ready.md  · check your own system', href: '/ai-ready.md' },
+    ],
+  },
+];
+---
+
+<a href="#main" class="skip-link pill pill-ink px-[18px] text-label">Skip to content</a>
+<header class:list={['lh', `lh--${variant}`]} data-lh={variant}>
+  <nav aria-label="Main" class="lh-nav container-page">
+    <a href={links.home} class="lh-logo text-ink no-underline">
+      <span class="lh-logo-full">nicey</span><span class="text-accent">.</span>
+    </a>
+
+    <div class="lh-links">
+      {
+        nav.map((item, i) => (
+          <a href={item.href} class="lh-link" data-sec={item.id}>
+            {variant === 'a' && <span class="lh-num">{String(i + 1).padStart(2, '0')}</span>}
+            <span class="lh-label">{item.label}</span>
+            {variant === 'a' && item.count && <span class="lh-count">({item.count})</span>}
+            {variant === 'a' && (
+              <span class="lh-track" aria-hidden="true">
+                <span class="lh-fill" />
+              </span>
+            )}
+            {variant === 'b' && (
+              <span class="lh-cells" aria-hidden="true">
+                {cells.map((c) => (
+                  <i style={`--c:${c}`} />
+                ))}
+              </span>
+            )}
+          </a>
+        ))
+      }
+      {
+        variant === 'c' && (
+          <button type="button" class="lh-cmd" data-cmd-open aria-haspopup="dialog">
+            <span class="text-accent">›</span> jump to …<kbd>⌘K</kbd>
+          </button>
+        )
+      }
+    </div>
+
+    <div class="lh-end">
+      <a href="#audit" class="pill pill-ink px-[18px] py-3 text-body-sm">Free audit</a>
+      <span class="lh-theme"><ThemeToggle /></span>
+      <button type="button" class="menu-btn lh-menu-btn" aria-expanded="false" aria-controls="lh-menu" aria-label="Menu" data-menu-btn>
+        <span class="menu-icon" aria-hidden="true"><span></span><span></span></span>
+      </button>
+    </div>
+  </nav>
+  {variant === 'a' && <span class="lh-phone-progress" aria-hidden="true"><span data-phone-fill></span></span>}
+
+  <div id="lh-menu" class="lh-menu" data-menu hidden>
+    <ul>
+      {
+        nav.map((item, i) => (
+          <li style={`--i:${i}`}>
+            <a href={item.href}>
+              <span class="lh-num">{String(i + 1).padStart(2, '0')}</span>
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="lh-menu-theme">
+      <span class="font-mono text-caption text-ink-2">Theme</span>
+      <ThemeToggle />
+    </div>
+  </div>
+</header>
+{variant === 'b' && <div class="lh-spacer" aria-hidden="true"></div>}
+
+{
+  variant === 'c' && (
+    <dialog class="cmd" data-cmd aria-label="Jump to">
+      <div class="cmd-top">
+        <span class="text-accent">›</span>
+        <input type="text" placeholder="jump to a section, a case study or a file" aria-label="Search" data-cmd-input autocomplete="off" />
+        <kbd>esc</kbd>
+      </div>
+      <div class="cmd-list" data-cmd-list>
+        {palette.map((g) => (
+          <div class="cmd-group">
+            <p class="cmd-head">{g.group}</p>
+            {g.items.map((it) => (
+              <a href={it.href} class="cmd-item" data-cmd-item>
+                {it.label}
+              </a>
+            ))}
+          </div>
+        ))}
+        <p class="cmd-empty" data-cmd-empty hidden>No match. Try 'work' or 'llms'.</p>
+      </div>
+      <div class="cmd-foot">
+        <span>↑ ↓ move</span>
+        <span>↵ open</span>
+      </div>
+    </dialog>
+  )
+}
+
+<style is:global>
+  .skip-link { position: absolute; top: 8px; left: 8px; z-index: 50; transform: translateY(-200%); }
+  .skip-link:focus-visible { transform: none; }
+  @media (max-width: 899.98px) { .lh-nav { grid-template-columns: 1fr auto; } }
+  .lh { position: relative; z-index: 40; border-bottom: 1px solid var(--color-line); background: var(--color-page); }
+  .lh-nav {
+    display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 24px; padding-block: 16px;
+  }
+  .lh .menu-btn {
+    align-items: center; justify-content: center; width: 44px; height: 44px;
+    border: 1px solid var(--color-line-strong); border-radius: var(--radius-pill); background: transparent; color: var(--color-ink); cursor: pointer;
+  }
+  .lh .menu-icon { position: relative; width: 16px; height: 10px; }
+  .lh .menu-icon span { position: absolute; left: 0; width: 100%; height: 1.5px; background: currentColor; transition: transform 200ms var(--ease-out), top 200ms var(--ease-out); }
+  .lh .menu-icon span:first-child { top: 0; }
+  .lh .menu-icon span:last-child { top: calc(100% - 1.5px); }
+  .lh .menu-btn[aria-expanded='true'] .menu-icon span { top: calc(50% - 0.75px); }
+  .lh .menu-btn[aria-expanded='true'] .menu-icon span:first-child { transform: rotate(45deg); }
+  .lh .menu-btn[aria-expanded='true'] .menu-icon span:last-child { transform: rotate(-45deg); }
+  .lh-logo { font-size: 22px; line-height: 1; font-weight: 600; letter-spacing: -0.04em; }
+  .lh-links { display: none; align-items: center; gap: 4px; }
+  .lh-end { justify-self: end; display: flex; align-items: center; gap: 8px; }
+  .lh-link {
+    position: relative; display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px;
+    border-radius: var(--radius-pill); color: var(--color-ink-2); text-decoration: none; font-size: var(--text-body-sm);
+    transition: color 160ms var(--ease-out), transform 160ms var(--ease-out);
+  }
+  .lh-link:active { transform: scale(0.97); color: var(--color-ink); }
+  .lh-num { font-family: var(--font-mono); font-size: var(--text-caption-sm); color: var(--color-muted); transition: color 160ms var(--ease-out); }
+  .lh-theme { display: none; }
+  .lh-menu-btn { display: inline-flex; }
+  @media (min-width: 900px) {
+    .lh-links { display: flex; }
+    .lh-theme { display: inline-flex; }
+    .lh-menu-btn, .lh-menu { display: none !important; }
+  }
+
+  /* ── A · index bar ─────────────────────────── */
+  .lh--a { position: sticky; top: 0; }
+  .lh--a .lh-link { padding: 0 12px; font-family: var(--font-mono); font-size: var(--text-caption); letter-spacing: 0.06em; text-transform: uppercase; }
+  .lh--a .lh-count { color: var(--color-muted); }
+  .lh--a .lh-track { position: absolute; left: 12px; right: 12px; bottom: 4px; height: 1px; background: var(--color-line-strong); overflow: hidden; }
+  .lh--a .lh-fill { position: absolute; inset: 0; background: var(--color-accent); transform-origin: left; transform: scaleX(var(--p, 0)); }
+  .lh--a .lh-link.is-active { color: var(--color-ink); }
+  .lh--a .lh-link.is-active .lh-num { color: var(--color-accent); }
+  @media (hover: hover) and (pointer: fine) {
+    .lh--a .lh-link:hover { color: var(--color-ink); }
+    .lh--a .lh-link:hover .lh-num { color: var(--color-accent); }
+  }
+  .lh-phone-progress { position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; }
+  .lh-phone-progress span { position: absolute; inset: 0; background: var(--color-accent); transform-origin: left; transform: scaleX(var(--p, 0)); }
+  @media (min-width: 900px) { .lh-phone-progress { display: none; } }
+
+  /* ── B · pixel island ──────────────────────── */
+  .lh--b { position: fixed; top: 14px; left: 50%; translate: -50% 0; width: min(100% - 24px, 980px); border: 1px solid var(--color-line-strong); border-radius: 999px; background: color-mix(in srgb, var(--color-page) 88%, transparent); backdrop-filter: blur(10px); transition: width 260ms var(--ease-out), top 260ms var(--ease-out); }
+  .lh--b .lh-nav { padding: 8px 8px 8px 22px; gap: 12px; max-width: none; }
+  .lh--b.is-small { top: 10px; width: min(100% - 24px, 760px); }
+  .lh--b.is-small .lh-logo-full { display: inline-block; max-width: 0.62em; overflow: hidden; vertical-align: bottom; }
+  .lh--b .lh-link { overflow: hidden; isolation: isolate; }
+  .lh--b .lh-label { position: relative; z-index: 1; transition: color 120ms var(--ease-out) 60ms; }
+  .lh--b .lh-cells { position: absolute; inset: 0; z-index: 0; display: grid; grid-template-columns: repeat(12, 1fr); grid-template-rows: repeat(4, 1fr); gap: 0; }
+  .lh--b .lh-cells i { background: var(--color-ink); transform: scale(0); border-radius: 1px; }
+  .lh-spacer { height: 88px; }
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .lh--b .lh-cells i { transition: transform 140ms var(--ease-out); transition-delay: calc((11 - var(--c)) * 12ms); }
+    .lh--b .lh-link:hover .lh-cells i { transform: scale(1.08); transition-delay: calc(var(--c) * 14ms); }
+    .lh--b .lh-link:hover .lh-label { color: var(--color-page); }
+  }
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: reduce) {
+    .lh--b .lh-link:hover { background: var(--color-ink); color: var(--color-page); }
+  }
+  .lh--b .lh-menu { border-top: 1px solid var(--color-line); border-radius: 0 0 28px 28px; }
+
+  /* ── C · command bar ───────────────────────── */
+  .lh-cmd {
+    display: inline-flex; align-items: center; gap: 10px; min-height: 40px; margin-left: 10px; padding: 0 8px 0 14px;
+    border: 1px solid var(--color-line-strong); border-radius: var(--radius-pill); background: transparent;
+    color: var(--color-muted); font-family: var(--font-mono); font-size: var(--text-caption); cursor: pointer;
+    transition: border-color 160ms var(--ease-out), color 160ms var(--ease-out), transform 160ms var(--ease-out);
+  }
+  .lh-cmd:active { transform: scale(0.97); }
+  @media (hover: hover) and (pointer: fine) {
+    .lh--c .lh-link:hover { color: var(--color-ink); background: var(--color-surface-hover); }
+    .lh-cmd:hover { border-color: var(--color-ink); color: var(--color-ink); }
+  }
+  .lh-cmd kbd, .cmd kbd { padding: 2px 6px; border: 1px solid var(--color-line-strong); border-radius: 6px; font-family: var(--font-mono); font-size: 11px; color: var(--color-ink-2); }
+  .cmd {
+    width: min(100% - 32px, 560px); margin: 14vh auto auto; padding: 0; border: 1px solid var(--color-line-strong); border-radius: 14px;
+    background: var(--color-surface); color: var(--color-ink); font-family: var(--font-mono); font-size: var(--text-code);
+    box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.45);
+  }
+  .cmd::backdrop { background: rgba(20, 20, 16, 0.45); }
+  .cmd[open] { animation: cmd-in 180ms var(--ease-out); }
+  @keyframes cmd-in { from { opacity: 0; transform: translateY(-6px) scale(0.98); } }
+  .cmd-top { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--color-line); }
+  .cmd-top input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: inherit; font: inherit; }
+  .cmd-list { max-height: 50vh; overflow: auto; padding: 8px; }
+  .cmd-head { margin: 10px 8px 4px; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-muted); }
+  .cmd-item { display: block; padding: 8px 10px; border-radius: 8px; color: var(--color-ink-2); text-decoration: none; white-space: pre; overflow: hidden; text-overflow: ellipsis; }
+  .cmd-item.is-sel { background: var(--color-ink); color: var(--color-page); }
+  .cmd-empty { margin: 12px 8px; color: var(--color-muted); }
+  .cmd-foot { display: flex; gap: 16px; padding: 10px 16px; border-top: 1px solid var(--color-line); color: var(--color-muted); font-size: 11px; }
+
+  /* ── phone menu (all) ──────────────────────── */
+  .lh-menu { position: absolute; top: 100%; left: 0; right: 0; background: var(--color-page); border-bottom: 1px solid var(--color-line); padding: 0 var(--spacing-gutter, 20px); }
+  .lh-menu ul { margin: 0; padding: 0; list-style: none; }
+  .lh-menu li { border-bottom: 1px solid var(--color-line); }
+  .lh-menu a { display: flex; align-items: baseline; gap: 12px; padding: 16px 0; color: var(--color-ink); text-decoration: none; font-size: 22px; font-weight: 500; letter-spacing: -0.02em; }
+  .lh-menu-theme { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; }
+  @media (prefers-reduced-motion: no-preference) {
+    .lh-menu:not([hidden]) li { animation: lh-in 220ms var(--ease-out) both; animation-delay: calc(var(--i) * 40ms); }
+  }
+  @keyframes lh-in { from { opacity: 0; transform: translateY(-6px); } }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-lh]').forEach((head) => {
+    const v = head.dataset.lh;
+
+    // phone menu (same behaviour as the live header)
+    const btn = head.querySelector<HTMLButtonElement>('[data-menu-btn]')!;
+    const panel = head.querySelector<HTMLElement>('[data-menu]')!;
+    const set = (open: boolean) => {
+      btn.setAttribute('aria-expanded', String(open));
+      btn.setAttribute('aria-label', open ? 'Close menu' : 'Menu');
+      panel.hidden = !open;
+    };
+    btn.addEventListener('click', () => set(panel.hasAttribute('hidden')));
+    panel.addEventListener('click', (e) => (e.target as HTMLElement).closest('a') && set(false));
+    document.addEventListener('keydown', (e) => e.key === 'Escape' && !panel.hidden && (set(false), btn.focus()));
+    document.addEventListener('click', (e) => !panel.hidden && !head.contains(e.target as Node) && set(false));
+
+    // A: each link's line fills while you read its section
+    if (v === 'a') {
+      const items = Array.from(head.querySelectorAll<HTMLElement>('[data-sec]')).map((a) => ({
+        a,
+        sec: document.getElementById(a.dataset.sec!),
+      }));
+      const phone = head.querySelector<HTMLElement>('[data-phone-fill]');
+      let raf = 0;
+      const update = () => {
+        raf = 0;
+        const line = head.offsetHeight + window.innerHeight * 0.25;
+        let phoneP = 0;
+        items.forEach(({ a, sec }) => {
+          if (!sec) return;
+          const r = sec.getBoundingClientRect();
+          const p = Math.min(1, Math.max(0, (line - r.top) / r.height));
+          a.style.setProperty('--p', String(p));
+          const active = p > 0 && p < 1;
+          a.classList.toggle('is-active', active);
+          if (active) phoneP = p;
+        });
+        phone?.style.setProperty('--p', String(phoneP));
+      };
+      addEventListener('scroll', () => (raf ||= requestAnimationFrame(update)), { passive: true });
+      addEventListener('resize', update);
+      update();
+    }
+
+    // B: the island tightens once the hero is behind you
+    if (v === 'b') {
+      const onScroll = () => head.classList.toggle('is-small', scrollY > 120);
+      addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    }
+
+    // C: command palette
+    if (v === 'c') {
+      const dlg = document.querySelector<HTMLDialogElement>('[data-cmd]')!;
+      const input = dlg.querySelector<HTMLInputElement>('[data-cmd-input]')!;
+      const items = Array.from(dlg.querySelectorAll<HTMLAnchorElement>('[data-cmd-item]'));
+      const empty = dlg.querySelector<HTMLElement>('[data-cmd-empty]')!;
+      let sel = 0;
+      const visible = () => items.filter((i) => !i.hidden);
+      const paint = () => visible().forEach((it, k) => it.classList.toggle('is-sel', k === sel));
+      const filter = () => {
+        const q = input.value.trim().toLowerCase();
+        items.forEach((it) => (it.hidden = !!q && !it.textContent!.toLowerCase().includes(q)));
+        dlg.querySelectorAll<HTMLElement>('.cmd-group').forEach((g) => (g.hidden = !g.querySelector('[data-cmd-item]:not([hidden])')));
+        empty.hidden = visible().length > 0;
+        items.forEach((it) => it.classList.remove('is-sel'));
+        sel = 0;
+        paint();
+      };
+      const open = () => {
+        input.value = '';
+        filter();
+        dlg.showModal();
+        input.focus();
+      };
+      head.querySelector('[data-cmd-open]')?.addEventListener('click', open);
+      document.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+          e.preventDefault();
+          dlg.open ? dlg.close() : open();
+        }
+      });
+      input.addEventListener('input', filter);
+      dlg.addEventListener('keydown', (e) => {
+        const vis = visible();
+        if (e.key === 'ArrowDown') { e.preventDefault(); sel = Math.min(vis.length - 1, sel + 1); paint(); vis[sel]?.scrollIntoView({ block: 'nearest' }); }
+        if (e.key === 'ArrowUp') { e.preventDefault(); sel = Math.max(0, sel - 1); paint(); vis[sel]?.scrollIntoView({ block: 'nearest' }); }
+        if (e.key === 'Enter' && vis[sel]) { e.preventDefault(); dlg.close(); vis[sel].click(); }
+      });
+      items.forEach((it) => it.addEventListener('click', () => dlg.close()));
+      dlg.addEventListener('click', (e) => e.target === dlg && dlg.close());
+    }
+  });
+</script>

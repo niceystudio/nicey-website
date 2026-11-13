@@ -1,0 +1,22 @@
+---
+/** LAB only: small fixed switch bottom-right to flip between test versions. */
+interface Props {
+  current: string;
+  items: { id: string; label: string; href: string }[];
+}
+const { current, items } = Astro.props;
+---
+
+<nav class="lab-switch" aria-label="Lab versions">
+  {items.map((it) => <a href={it.href} aria-current={it.id === current ? 'page' : undefined}>{it.label}</a>)}
+</nav>
+
+<style>
+  .lab-switch {
+    position: fixed; right: 16px; bottom: 16px; z-index: 60; display: flex; gap: 2px; padding: 3px;
+    border: 1px solid var(--color-line-strong); border-radius: var(--radius-pill);
+    background: var(--color-page); font-family: var(--font-mono); font-size: 12px;
+  }
+  .lab-switch a { padding: 6px 12px; border-radius: var(--radius-pill); color: var(--color-ink-2); text-decoration: none; }
+  .lab-switch a[aria-current='page'] { background: var(--color-ink); color: var(--color-on-ink); }
+</style>

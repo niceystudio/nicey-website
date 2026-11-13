@@ -92,7 +92,7 @@ export interface CaseStudy {
   /** custom "From the work" visuals instead of image figures */
   workVisual?: 'qbench' | 'qbench-status' | 'everbreed';
   /** an animated before/after above the numbers */
-  proofViz?: 'names' | 'surfaces';
+  proofViz?: 'names' | 'surfaces' | 'aliases';
   steps?: { label: string; inProgress?: boolean }[];
   /** the slides of the Figma case study, one section each */
   chapters?: Chapter[];
@@ -630,9 +630,10 @@ export const caseStudies: CaseStudy[] = [
     who: '',
     heroVisual: 'everbreed',
     workVisual: 'everbreed',
+    proofViz: 'aliases',
     heroContext: 'Every token now carries an ID, a scope and a code name, so code reads it straight from Figma.',
     heads: {
-      proof: { caption: 'Before and after', heading: 'Figma and code hold the same tokens, matched by ID.' },
+      proof: { caption: 'Before and after', heading: 'The config is generated from Figma, not kept by hand.' },
       chapters: { caption: 'What we did', heading: 'Four steps, from drift to agents building screens.' },
       work: { caption: 'What we built', heading: 'The student app, on phone and desktop.' },
     },

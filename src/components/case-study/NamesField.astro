@@ -11,12 +11,15 @@ const BEFORE_TOTAL = 553;
 const AFTER_TOTAL = 554;
 const BEFORE_NAMED = 13;
 
-// 13 cells named in V1, spread through the field (fixed, so the page is static-safe)
+// An illustration, not one cell per variable: 210 cells (same field size as Everbreed),
+// with the V1 share named (13 of 553 ≈ 5 of 210). The figure carries the real numbers.
+const CELLS = 210;
+const NAMED_CELLS = Math.max(1, Math.round((BEFORE_NAMED / BEFORE_TOTAL) * CELLS));
 const namedBefore = new Set<number>();
-for (let k = 0; k < BEFORE_NAMED; k++) namedBefore.add(Math.round(((k + 0.37) * BEFORE_TOTAL) / BEFORE_NAMED) % BEFORE_TOTAL);
-const cells = Array.from({ length: AFTER_TOTAL }, (_, i) => ({
+for (let k = 0; k < NAMED_CELLS; k++) namedBefore.add(Math.round(((k + 0.37) * CELLS) / NAMED_CELLS) % CELLS);
+const cells = Array.from({ length: CELLS + 1 }, (_, i) => ({
   named: namedBefore.has(i),
-  extra: i === AFTER_TOTAL - 1,
+  extra: i === CELLS,
 }));
 
 // real pairs from the QBench V2 library (same as the 03 tab)
@@ -62,7 +65,7 @@ const NOTE_AFTER = 'In V2 every variable carries its web code name, so designers
       <div
         class="nf-grid"
         role="img"
-        aria-label="One square per variable. Before: 13 of 553 named. After: all 554 named."
+        aria-label="Variables with a code name. Before: 13 of 553. After: all 554."
       >
         {cells.map((c) => <i class:list={{ 'is-named': c.named, 'is-extra': c.extra }} />)}
       </div>
@@ -147,15 +150,19 @@ const NOTE_AFTER = 'In V2 every variable carries its web code name, so designers
   .nf-field {
     position: relative;
   }
+  .nf-field-col {
+    container-type: inline-size;
+  }
+  /* same cell size as the Everbreed field (AliasesField); one cell per real variable, so the field is taller */
   .nf-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(11px, 1fr));
-    gap: 3px;
+    grid-template-columns: repeat(auto-fill, minmax(clamp(14px, 3.4cqi, 26px), 1fr));
+    gap: clamp(3px, 0.6cqi, 5px);
   }
   .nf-grid > i {
     display: block;
     aspect-ratio: 1;
-    border-radius: 2px;
+    border-radius: 3px;
     background: var(--color-cell-quiet);
   }
   .nf-grid > i.is-named,
@@ -233,7 +240,6 @@ const NOTE_AFTER = 'In V2 every variable carries its web code name, so designers
     let raf = 0;
     let played = false;
 
-    const named = (i: number) => cells[i].classList.contains('is-named');
 
     function paint(s: 0 | 1) {
       cells.forEach((c) => c.classList.toggle('is-on', s === 1));
@@ -263,7 +269,6 @@ const NOTE_AFTER = 'In V2 every variable carries its web code name, so designers
       const h = grid.offsetHeight;
       const rows = cells.map((c) => c.offsetTop);
       const start = performance.now();
-      let lit = BEFORE_NAMED;
       let next = 0;
       let lastTick = 0;
       scan.classList.add('is-on');
@@ -274,7 +279,6 @@ const NOTE_AFTER = 'In V2 every variable carries its web code name, so designers
         scan.style.transform = `translateY(${top + y}px)`;
         while (next < cells.length && rows[next] - top <= y) {
           const c = cells[next];
-          if (!named(next)) lit++;
           c.classList.add('is-on', 'is-flash');
           window.setTimeout(() => c.classList.remove('is-flash'), 220);
           next++;
@@ -283,7 +287,8 @@ const NOTE_AFTER = 'In V2 every variable carries its web code name, so designers
           lastTick = now;
           ticker.textContent = pairs[Math.floor(now / 420) % pairs.length];
         }
-        count.textContent = String(Math.min(lit, AFTER_TOTAL));
+        // the figure counts the real variables as the line passes the field
+        count.textContent = String(Math.round(BEFORE_NAMED + ((AFTER_TOTAL - BEFORE_NAMED) * next) / cells.length));
         if (t < 1) raf = requestAnimationFrame(step);
         else paint(1);
       };

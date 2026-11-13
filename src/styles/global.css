@@ -244,7 +244,8 @@
   html {
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
-    scroll-padding-top: 24px;
+    /* the header is sticky (80px), so anchors land below it */
+    scroll-padding-top: 104px;
   }
   @media (prefers-reduced-motion: no-preference) {
     html {
