@@ -1,0 +1,1818 @@
+---
+/**
+ * The case study told slide by slide: each slide of the Figma
+ * "Case Study Documentation" file becomes one panel here, as real text
+ * (readable by search engines and screen readers, themed day and night).
+ */
+import type { Chapter } from '../../data/case-studies';
+import SectionHead from '../SectionHead.astro';
+
+interface Props {
+  chapters: Chapter[];
+  /** marker colour class, e.g. 'bg-lavender' */
+  marker: string;
+  /** homepage-style opener; without it the section keeps its small caption */
+  head?: { caption: string; heading: string };
+  /** 'scroll': the homepage Zero Drift layout, a sticky rail on the left and every step stacked on the right */
+  layout?: 'tabs' | 'scroll';
+}
+const { chapters, marker, head, layout: mode = 'tabs' } = Astro.props;
+const scroll = mode === 'scroll';
+
+// 02 · Model: place each status in a column by its distance from the first one
+function layout(edges: { from: string; to: string }[]) {
+  const depth = new Map<string, number>();
+  depth.set(edges[0].from, 0);
+  for (let k = 0; k < edges.length; k++)
+    for (const e of edges) if (depth.has(e.from) && !depth.has(e.to)) depth.set(e.to, depth.get(e.from)! + 1);
+  const cols = new Map<number, string[]>();
+  depth.forEach((d, n) => cols.set(d, [...(cols.get(d) ?? []), n]));
+  const W = 560, H = 200, maxD = Math.max(...depth.values());
+  const pos = new Map<string, { x: number; y: number }>();
+  cols.forEach((names, d) =>
+    names.forEach((n, i) => pos.set(n, { x: 70 + (d * (W - 140)) / Math.max(1, maxD), y: (H * (i + 1)) / (names.length + 1) })),
+  );
+  return { pos, W, H };
+}
+const slug = (k: string) =>
+  'ch-' +
+  k
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+---
+
+<section aria-labelledby="chapters-head" class:list={['container-page ch-wrap', scroll && 'ch-wrap--scroll']}>
+  {scroll ? (
+    <div class="ch-rail">
+      <span class="caption text-ink-2">{head?.caption ?? 'What we did'}</span>
+      <h2 id="chapters-head" class="m-0 text-h2 text-balance">{head?.heading ?? 'What we did, step by step'}</h2>
+      <ol class="ch-rail-list">
+        {chapters.map((c) => {
+          const [num, ...rest] = c.kicker.split(' · ');
+          return (
+            <li>
+              <a href={`#panel-${slug(c.kicker)}`} data-rail={`panel-${slug(c.kicker)}`}>
+                <i aria-hidden="true" class:list={['marker', marker]} />
+                <span class="font-mono text-caption text-ink-2">{num}</span>
+                {rest.join(' · ')}
+              </a>
+            </li>
+          );
+        })}
+      </ol>
+    </div>
+  ) : head ? (
+    <SectionHead id="chapters-head" caption={head.caption} class="mb-6" headingClass="max-w-[18ch]">{head.heading}</SectionHead>
+  ) : (
+    <h2 id="chapters-head" class="caption m-0 text-ink-2">What we did, step by step</h2>
+  )}
+  <div class:list={['panel chs', scroll && 'chs--scroll']} data-chapters data-layout={mode}>
+    {!scroll && <div class="chs-tabs" role="tablist" aria-label="Steps of the work">
+      {
+        chapters.map((c, i) => {
+          const [num, ...rest] = c.kicker.split(' · ');
+          return (
+            <button
+              type="button"
+              role="tab"
+              id={`tab-${slug(c.kicker)}`}
+              aria-controls={`panel-${slug(c.kicker)}`}
+              aria-selected={i === 0 ? 'true' : 'false'}
+              tabindex={i === 0 ? 0 : -1}
+              class="chs-tab"
+            >
+              <span class="flex items-center gap-2 font-mono text-caption text-ink-2">
+                <i aria-hidden="true" class:list={['marker', marker]} />
+                {num}
+              </span>
+              <span class="chs-tab-name">{rest.join(' · ')}</span>
+            </button>
+          );
+        })
+      }
+    </div>}
+  {
+    chapters.map((c, i) => {
+      const id = slug(c.kicker);
+      const twoCol = c.blocks.length === 2;
+      return (
+        <div
+          id={`panel-${id}`}
+          role={scroll ? undefined : 'tabpanel'}
+          aria-labelledby={scroll ? id : `tab-${id}`}
+          tabindex={scroll ? undefined : '0'}
+          hidden={!scroll && i !== 0}
+          class="ch"
+        >
+          <header class="ch-head">
+            <span class="caption flex items-center gap-2 text-ink-2">
+              <i aria-hidden="true" class:list={['marker', marker]} />
+              {c.kicker}
+            </span>
+            <h3 id={id} class="m-0 max-w-[30ch] text-case-h2 text-balance">
+              {c.heading}
+            </h3>
+            <p class="m-0 max-w-[64ch] text-lede text-pretty text-ink-2">{c.lede}</p>
+          </header>
+
+          <div class:list={['ch-body', twoCol && 'ch-body--two']}>
+            {c.blocks.map((b) => (
+              <div class="ch-block">
+                {b.kind === 'stats' && (
+                  <ul class="ch-stats">
+                    {b.items.map((it) => (
+                      <li>
+                        <span class="caption-sm text-ink-2">{it.label}</span>
+                        <span class="ch-fig">{it.value}</span>
+                        {it.seenAt && <span class="caption-sm text-hot">{it.seenAt}</span>}
+                        <span class="text-body text-pretty">{it.caption}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                {b.kind === 'rows' && (
+                  <>
+                    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                    <dl class="ch-rows">
+                      {b.rows.map((r) => (
+                        <div>
+                          <dt class="text-body-lg">{r.label}</dt>
+                          <dd class="m-0 text-body tabular-nums text-ink-2">{r.value}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </>
+                )}
+
+                {b.kind === 'map' && (
+                  <>
+                    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                    <ul class="ch-map">
+                      {b.rows.map((r) => (
+                        <li>
+                          <code class="ch-code">{r.from}</code>
+                          <span aria-hidden="true" class="text-ink-2">
+                            →
+                          </span>
+                          <span class="sr-only">maps to</span>
+                          <code class="ch-code ch-code--accent">{r.to}</code>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+
+                {b.kind === 'ramp' && (
+                  <>
+                    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                    <ol class="ch-ramp">
+                      {b.swatches.map((w) => (
+                        <li class:list={[w.feeds && 'ch-ramp--feeds']} data-step={w.step}>
+                          <span aria-hidden="true" class="ch-swatch" style={`background:#${w.hex}`} />
+                          <span class="text-body-sm tabular-nums">{w.step}</span>
+                          <span class="caption-sm text-ink-2">{w.hex}</span>
+                        </li>
+                      ))}
+                    </ol>
+                    <p class="m-0 text-body text-ink-2">{b.note}</p>
+                  </>
+                )}
+
+                {b.kind === 'chain' && (
+                  <>
+                    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                    <ul class="ch-chain">
+                      {b.links.map((l) => (
+                        <li data-from={l.from.split('/').pop()}>
+                          <code class="ch-code">{l.from}</code>
+                          <span class="flex items-baseline gap-2">
+                            <span aria-hidden="true" class="text-ink-2">
+                              ↳
+                            </span>
+                            <code class="ch-code ch-code--accent">{l.token}</code>
+                          </span>
+                          <span class="caption-sm text-ink-2">{l.state}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+
+                {b.kind === 'docs' && (
+                  <>
+                    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                    <ul class="ch-docs">
+                      {b.items.map((d) => (
+                        <li>
+                          <span class="text-h3-card">{d.name}</span>
+                          <div class="flex flex-col gap-1.5">
+                            <span class="text-body">{d.purpose}</span>
+                            <span class="text-body-sm">
+                              <span class="caption-sm text-ink-2">Use for</span> {d.useFor}
+                            </span>
+                            <span class="text-body-sm">
+                              <span class="caption-sm text-ink-2">Not for</span> {d.notFor}{' '}
+                              <code class="ch-code ch-code--hot">{d.instead}</code>
+                            </span>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+
+                {b.kind === 'flow' && (
+                  <>
+                    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                    <ol class="ch-run">
+                      {b.steps.map((st, k) => (
+                        <li style={`--i:${k}`}>
+                          <span class="ch-run-mark" aria-hidden="true">
+                            {k === b.steps.length - 1 ? '→' : '✓'}
+                          </span>
+                          <span class="ch-run-body">
+                            <span class="ch-run-name">
+                              <span class="ch-run-n">{st.n}</span> {st.name}
+                            </span>
+                            <span class="ch-run-text">{st.text}</span>
+                          </span>
+                        </li>
+                      ))}
+                      <li class="ch-run-cursor" style={`--i:${b.steps.length}`} aria-hidden="true">
+                        <span class="ch-run-mark">_</span>
+                      </li>
+                    </ol>
+                  </>
+                )}
+
+                {b.kind === 'checks' && (
+                  <>
+                    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                    <div class="ch-checks">
+                      <p class="m-0 flex flex-wrap items-center justify-between gap-2">
+                        <span class="text-body-lg">{b.subject}</span>
+                        <span class="ch-pass caption-sm">{b.status}</span>
+                      </p>
+                      <ul>
+                        {b.items.map((it) => (
+                          <li>
+                            <span class="ch-fig-sm">{it.value}</span>
+                            <span class="text-body">{it.label}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </>
+                )}
+
+                {b.kind === 'surfaces' && (
+                  <>
+                    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                    <ul class="ch-surf">
+                      {b.items.map((it, k) => (
+                        <li style={`--i:${k}`}>
+                          <span class="ch-surf-n font-mono text-caption text-ink-2">{String(k + 1).padStart(2, '0')}</span>
+                          <span class="text-body-lg">{it.name}</span>
+                          <span class="ch-surf-how caption-sm">{it.how}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+
+                {b.kind === 'graph' && (() => {
+                  const g = layout(b.edges);
+                  return (
+                    <div class="ch-graph" data-graph>
+                      <div class="flex flex-col gap-3">
+                        <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                        <svg viewBox={`0 0 ${g.W} ${g.H}`} class="ch-graph-svg" aria-hidden="true">
+                          {b.edges.map((e, k) => {
+                            const a = g.pos.get(e.from)!, z = g.pos.get(e.to)!;
+                            return <path data-edge={k} class:list={[k === b.edges.length - 2 && 'is-on']} d={`M${a.x + 58} ${a.y} C ${a.x + 120} ${a.y}, ${z.x - 120} ${z.y}, ${z.x - 58} ${z.y}`} />;
+                          })}
+                          {[...g.pos].map(([n, p]) => (
+                            <g>
+                              <rect x={p.x - 58} y={p.y - 16} width="116" height="32" rx="16" />
+                              <text x={p.x} y={p.y + 4} text-anchor="middle">{n}</text>
+                            </g>
+                          ))}
+                        </svg>
+                      </div>
+                      <div class="flex flex-col gap-2">
+                        <p class="caption-sm m-0 text-ink-2">Pick a move</p>
+                        <div role="group" aria-label="Pick a move" class="ch-pick">
+                          {b.edges.map((e, k) => (
+                            <button type="button" class="press" data-edge-pick={k} data-rules={e.rules.join('|')} aria-pressed={k === b.edges.length - 2 ? 'true' : 'false'}>
+                              {e.from} → {e.to}
+                            </button>
+                          ))}
+                        </div>
+                        <p class="caption-sm m-0 mt-3 text-ink-2">Rules on this move</p>
+                        <ul class="ch-chips" data-graph-rules aria-live="polite">
+                          {b.edges[b.edges.length - 2].rules.map((r) => <li>{r}</li>)}
+                        </ul>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {b.kind === 'order' && (
+                  <div class="ch-order">
+                    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                    <ol class="ch-order-list">
+                      {b.steps.map((st, k) => (
+                        <li style={`--i:${k}`}>
+                          <span class="ch-order-n" aria-hidden="true">{k + 1}</span>
+                          <span class="flex flex-col gap-1">
+                            <span class="text-body-lg">{st.name}</span>
+                            <span class="text-body-sm text-ink-2">{st.text}</span>
+                          </span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
+
+                {b.kind === 'everywhere' && (
+                  <div class="ch-every" data-every>
+                    <div class="flex flex-col gap-2">
+                      <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                      <div role="group" aria-label="Pick where the change starts" class="ch-pick">
+                        {b.surfaces.map((sf, k) => (
+                          <button type="button" class="press" data-every-pick={k} data-note={sf.note} aria-pressed={k === 0 ? 'true' : 'false'}>
+                            {sf.name}
+                          </button>
+                        ))}
+                      </div>
+                      <p class="m-0 mt-2 text-body text-ink-2" data-every-note aria-live="polite">{b.surfaces[0].note}</p>
+                    </div>
+                    <div class="ch-modal" data-every-modal aria-hidden="true">
+                      <span class="ch-modal-t">Complete required actions</span>
+                      <span class="ch-modal-move"><b>In progress</b> → <b>Completed</b></span>
+                      <span class="ch-modal-steps"><i class="is-on">1 · Required fields</i><i>2 · Signature</i></span>
+                      <span class="ch-modal-body"><span>Turnaround *</span><span>Assigned technician *</span></span>
+                      <span class="ch-modal-btn">Next</span>
+                    </div>
+                  </div>
+                )}
+
+                {b.kind === 'bulk' && (
+                  <div class="ch-bulk" data-bulk>
+                    <div class="flex flex-col gap-2">
+                      <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                      <div role="group" aria-label="Pick an outcome" class="ch-pick">
+                        {b.outcomes.map((o, k) => (
+                          <button type="button" class="press" data-bulk-pick={k} aria-pressed={k === 1 ? 'true' : 'false'}>
+                            {o.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div class="ch-bulk-stage">
+                      {b.outcomes.map((o, k) => (
+                        <div class="ch-modal ch-modal--bulk" data-bulk-card={k} hidden={k !== 1}>
+                          <span class="ch-bars" data-o={k} aria-hidden="true"><i /><i /></span>
+                          <span class="ch-modal-t">{o.title}</span>
+                          <span class="text-body-sm">{o.text}</span>
+                          <span class="ch-modal-btn">{o.cta}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {b.kind === 'audit' && (
+                  <div class="ch-audit" data-audit>
+                    <div class="ch-audit-head">
+                      <span class="caption-sm text-ink-2">{b.title}</span>
+                      <span class="ch-audit-count font-mono text-caption">
+                        Scanning <b data-count={b.layers}>{b.layers.toLocaleString('en')}</b> variants
+                      </span>
+                    </div>
+                    <dl class="ch-meters ch-meters--scan">
+                      {b.items.map((m, k) => (
+                        <div style={`--i:${k}`}>
+                          <dt class="text-body">{m.label}</dt>
+                          <dd class="m-0 text-body tabular-nums">{m.value}</dd>
+                          <span aria-hidden="true" class="ch-meter">
+                            <span style={`width:${parseFloat(m.value)}%`} />
+                          </span>
+                        </div>
+                      ))}
+                    </dl>
+                  </div>
+                )}
+
+                {b.kind === 'meters' && (
+                  <>
+                    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                    <dl class="ch-meters">
+                      {b.items.map((m) => (
+                        <div>
+                          <dt class="text-body">{m.label}</dt>
+                          <dd class="m-0 text-body tabular-nums">{m.value}</dd>
+                          <span aria-hidden="true" class="ch-meter">
+                            <span style={`width:${parseFloat(m.value)}%`} />
+                          </span>
+                        </div>
+                      ))}
+                    </dl>
+                  </>
+                )}
+
+                {b.kind === 'states' && (
+                  <div class="ch-live" data-live>
+                    <div class="ch-live-demo" data-live-demo data-state="0" aria-hidden="true">
+                      <span class="ch-live-label">Batch ID</span>
+                      <span class="ch-live-field">BT-2026-0412</span>
+                      <span class="ch-live-err">Batch ID already exists</span>
+                      <span class="ch-live-btn">Create CAPA</span>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                      <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                      <div role="group" aria-label="Pick a state" class="ch-live-list">
+                        {b.rows.map((r, k) => (
+                          <button type="button" class="press" data-live-pick={k} aria-pressed={k === 0 ? 'true' : 'false'}>
+                            <span class="text-body">{r.state}</span>
+                            <code class="ch-code ch-code--accent">{r.token}</code>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {b.kind === 'compare' && (
+                  <table class="ch-table ch-compare">
+                    <thead>
+                      <tr>
+                        <th scope="col" class="caption-sm">
+                          <span class="sr-only">Measure</span>
+                        </th>
+                        <th scope="col" class="caption-sm">
+                          Before
+                        </th>
+                        <th scope="col" class="caption-sm">
+                          After
+                        </th>
+                        <th scope="col" class="caption-sm">
+                          <span class="sr-only">What it counts</span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {b.rows.map((r) => (
+                        <tr>
+                          <th scope="row" class="text-body-lg font-normal">
+                            {r.label}
+                          </th>
+                          <td class="ch-before tabular-nums">{r.before}</td>
+                          <td class="ch-after tabular-nums">{r.after}</td>
+                          <td class="text-body text-ink-2">{r.note}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+
+                {b.kind === 'images' && (
+                  <div class="ch-images">
+                    {b.images.map((im) => (
+                      <img src={im.src} alt={im.alt} width={im.width} height={im.height} loading="lazy" decoding="async" />
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {c.proof && (
+            <ul class="ch-proof" data-stagger>
+              {/* "Seen at …" once, as the row's label; every column is then just number + caption */}
+              {c.proof.find((p) => p.seenAt) && (
+                <li class="ch-proof-label caption-sm text-hot">{c.proof.find((p) => p.seenAt)!.seenAt}</li>
+              )}
+              {c.proof.map((p) => (
+                <li class="ch-proof-item">
+                  <span class="ch-fig">{p.value}</span>
+                  <span class="max-w-[36ch] text-body text-pretty">{p.caption}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      );
+    })
+  }
+    {!scroll && <div class="chs-controls">
+      <button type="button" class="chs-btn" data-prev aria-disabled="true" aria-label="Previous step"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9H4M8 4.5 3.5 9 8 13.5" /></svg></button>
+      <button type="button" class="chs-btn chs-btn--next" data-next aria-label="Next step"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h10M10 4.5 14.5 9 10 13.5" /></svg></button>
+    </div>}
+  </div>
+</section>
+
+<script>
+  function mountChapters(root: HTMLElement) {
+    const isScroll = root.dataset.layout === 'scroll';
+    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
+    const panels = tabs.map((t) => document.getElementById(t.getAttribute('aria-controls') ?? ''));
+    const prev = root.querySelector<HTMLButtonElement>('[data-prev]');
+    const next = root.querySelector<HTMLButtonElement>('[data-next]');
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let current = 0;
+
+    function select(i: number, focus: boolean) {
+      const n = Math.max(0, Math.min(tabs.length - 1, i));
+      if (n !== current) {
+        tabs.forEach((t, k) => {
+          t.setAttribute('aria-selected', String(k === n));
+          t.tabIndex = k === n ? 0 : -1;
+        });
+        panels.forEach((p, k) => {
+          if (p) p.hidden = k !== n;
+        });
+        const panel = panels[n];
+        if (panel && !reduced.matches) {
+          panel.classList.add('is-entering');
+          void panel.offsetWidth;
+          panel.classList.remove('is-entering');
+        }
+        current = n;
+      }
+      tabs[n].scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: reduced.matches ? 'auto' : 'smooth' });
+      if (focus) tabs[n].focus();
+      prev?.setAttribute('aria-disabled', String(n === 0));
+      next?.setAttribute('aria-disabled', String(n === tabs.length - 1));
+    }
+
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => select(i, false));
+      t.addEventListener('keydown', (e) => {
+        let to = -1;
+        if (e.key === 'ArrowRight') to = (i + 1) % tabs.length;
+        else if (e.key === 'ArrowLeft') to = (i - 1 + tabs.length) % tabs.length;
+        else if (e.key === 'Home') to = 0;
+        else if (e.key === 'End') to = tabs.length - 1;
+        if (to < 0) return;
+        e.preventDefault();
+        select(to, true);
+      });
+    });
+    const fromHash = tabs.findIndex((t) => `#${t.id}` === location.hash);
+    if (fromHash > 0) select(fromHash, false);
+
+    // scroll layout: every step is open; the rail marks the one being read
+    if (isScroll) {
+      const links = document.querySelectorAll<HTMLAnchorElement>('[data-rail]');
+      const steps = Array.from(root.querySelectorAll<HTMLElement>('.ch'));
+      const mark = (id: string) => links.forEach((a) => a.toggleAttribute('aria-current', a.dataset.rail === id));
+      const spy = new IntersectionObserver(
+        (es) => es.forEach((e) => e.isIntersecting && mark((e.target as HTMLElement).id)),
+        { rootMargin: '-40% 0px -55% 0px' },
+      );
+      steps.forEach((st) => spy.observe(st));
+      if (steps[0]) mark(steps[0].id);
+    }
+
+    prev?.addEventListener('click', () => {
+      if (prev.getAttribute('aria-disabled') !== 'true') select(current - 1, false);
+    });
+    next?.addEventListener('click', () => {
+      if (next.getAttribute('aria-disabled') !== 'true') select(current + 1, false);
+    });
+
+    // 03 · ramp → chain: pointing at a step lights the button state it feeds
+    root.querySelectorAll<HTMLElement>('.ch').forEach((panel) => {
+      const chain = panel.querySelectorAll<HTMLElement>('[data-from]');
+      if (!chain.length) return;
+      panel.querySelectorAll<HTMLElement>('[data-step]').forEach((sw) => {
+        sw.tabIndex = 0;
+        const on = () => {
+          panel.querySelectorAll('[data-step]').forEach((x) => x.classList.toggle('is-on', x === sw));
+          chain.forEach((c) => c.classList.toggle('is-lit', c.dataset.from === sw.dataset.step));
+        };
+        sw.addEventListener('mouseenter', on);
+        sw.addEventListener('focus', on);
+      });
+    });
+
+    // 04 · states: pick a row, the demo shows it
+    root.querySelectorAll<HTMLElement>('[data-live]').forEach((live) => {
+      const demo = live.querySelector<HTMLElement>('[data-live-demo]');
+      const picks = live.querySelectorAll<HTMLButtonElement>('[data-live-pick]');
+      picks.forEach((b) =>
+        b.addEventListener('click', () => {
+          picks.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+          if (demo) demo.dataset.state = b.dataset.livePick!;
+        }),
+      );
+    });
+
+    // status · 02 graph: pick a move, its path lights and its rules show
+    root.querySelectorAll<HTMLElement>('[data-graph]').forEach((g) => {
+      const picks = g.querySelectorAll<HTMLButtonElement>('[data-edge-pick]');
+      const paths = g.querySelectorAll<SVGPathElement>('[data-edge]');
+      const list = g.querySelector<HTMLElement>('[data-graph-rules]');
+      picks.forEach((b) =>
+        b.addEventListener('click', () => {
+          picks.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+          paths.forEach((p) => p.classList.toggle('is-on', p.dataset.edge === b.dataset.edgePick));
+          if (list) list.innerHTML = (b.dataset.rules ?? '').split('|').map((r) => `<li>${r}</li>`).join('');
+        }),
+      );
+    });
+
+    // status · 04 everywhere: another surface, the same modal opens again
+    root.querySelectorAll<HTMLElement>('[data-every]').forEach((d) => {
+      const picks = d.querySelectorAll<HTMLButtonElement>('[data-every-pick]');
+      const note = d.querySelector<HTMLElement>('[data-every-note]');
+      const modal = d.querySelector<HTMLElement>('[data-every-modal]');
+      picks.forEach((b) =>
+        b.addEventListener('click', () => {
+          picks.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+          if (note) note.textContent = b.dataset.note ?? '';
+          if (modal && !reduced.matches) {
+            modal.classList.remove('is-open');
+            void modal.offsetWidth;
+            modal.classList.add('is-open');
+          }
+        }),
+      );
+    });
+
+    // status · 05 bulk: pick an outcome, its modal shows
+    root.querySelectorAll<HTMLElement>('[data-bulk]').forEach((d) => {
+      const picks = d.querySelectorAll<HTMLButtonElement>('[data-bulk-pick]');
+      const cards = d.querySelectorAll<HTMLElement>('[data-bulk-card]');
+      picks.forEach((b) =>
+        b.addEventListener('click', () => {
+          picks.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+          cards.forEach((c) => (c.hidden = c.dataset.bulkCard !== b.dataset.bulkPick));
+        }),
+      );
+    });
+
+    // 01 · audit: count the components up when the panel opens
+    const countUp = (panel: HTMLElement | null) => {
+      const el = panel?.querySelector<HTMLElement>('[data-count]');
+      if (!el || reduced.matches) return;
+      const to = Number(el.dataset.count);
+      const t0 = performance.now();
+      const tick = (t: number) => {
+        const k = Math.min(1, (t - t0) / 1200);
+        el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))).toLocaleString('en');
+        if (k < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    };
+    tabs.forEach((t, i) => t.addEventListener('click', () => countUp(panels[i])));
+    if (isScroll) {
+      root.querySelectorAll<HTMLElement>('.ch').forEach((panel) => {
+        const once = new IntersectionObserver((es) => {
+          if (es.some((e) => e.isIntersecting)) {
+            countUp(panel);
+            once.disconnect();
+          }
+        });
+        once.observe(panel);
+      });
+    }
+    next?.addEventListener('click', () => countUp(panels[current]));
+    prev?.addEventListener('click', () => countUp(panels[current]));
+    const io = new IntersectionObserver((es) => {
+      if (es.some((e) => e.isIntersecting)) {
+        countUp(panels[current]);
+        io.disconnect();
+      }
+    });
+    io.observe(root);
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-chapters]').forEach(mountChapters);
+</script>
+
+<style>
+  .ch-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-top: var(--spacing-section);
+  }
+  .chs {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* scroll layout: the homepage Zero Drift pattern, sticky rail + stacked steps */
+  .ch-wrap--scroll {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 48px 72px;
+  }
+  .ch-rail {
+    position: sticky;
+    top: 24px;
+    flex: 1 1 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  @media (max-width: 860px) {
+    .ch-rail {
+      position: static;
+    }
+  }
+  .ch-rail-list {
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--color-line-strong);
+  }
+  .ch-rail-list li {
+    border-bottom: 1px solid var(--color-line);
+  }
+  .ch-rail-list a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    color: var(--color-ink-2);
+    font-size: var(--text-body);
+    text-decoration: none;
+    transition: color 200ms var(--ease-out);
+  }
+  .ch-rail-list a[aria-current] {
+    color: var(--color-ink);
+  }
+  .ch-rail-list a[aria-current] .marker {
+    transform: scale(1.4);
+  }
+  .ch-rail-list .marker {
+    transition: transform 200ms var(--ease-out);
+  }
+  /* pressed: ink + the marker settles (same as the Zero Drift rail) */
+  .ch-rail-list a:active {
+    color: var(--color-ink);
+  }
+  .ch-rail-list a:active .marker {
+    transform: scale(1.15);
+    transition-duration: 100ms;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .ch-rail-list a:hover {
+      color: var(--color-ink);
+    }
+  }
+  .chs--scroll {
+    flex: 999 1 560px;
+    min-width: 0;
+  }
+  .chs--scroll > .ch + .ch {
+    border-top: 1px solid var(--color-line-strong);
+  }
+  .chs--scroll > .ch {
+    scroll-margin-top: 24px;
+  }
+  .chs-tabs {
+    display: flex;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
+  .chs-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .chs-tab {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    min-height: 44px;
+    padding: 18px 20px 16px;
+    border: 0;
+    background: transparent;
+    color: var(--color-ink);
+    text-align: left;
+    cursor: pointer;
+    scroll-snap-align: start;
+  }
+  .chs-tab-name {
+    font-size: var(--text-body-sm);
+    line-height: 1.3;
+  }
+  .chs-tab::after {
+    content: '';
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    bottom: 0;
+    height: 2px;
+    background: transparent;
+  }
+  .chs-tab[aria-selected='true'] .chs-tab-name {
+    font-weight: 500;
+  }
+  .chs-tab[aria-selected='true']::after {
+    background: var(--color-ink);
+  }
+  @media (hover: hover) {
+    .chs-tab[aria-selected='false']:hover {
+      background: var(--color-surface-hover);
+    }
+  }
+  @media (max-width: 899px) {
+    .chs-tab {
+      flex: 0 0 auto;
+      min-width: 128px;
+    }
+  }
+  .chs-tab:focus-visible,
+  .ch:focus-visible {
+    outline-offset: -4px;
+  }
+  .ch {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background: var(--color-line);
+  }
+  .ch[hidden] {
+    display: none;
+  }
+  .ch > * {
+    background: var(--color-surface);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .ch {
+      transition: opacity 220ms var(--ease-out), transform 220ms var(--ease-out);
+    }
+  }
+  .ch.is-entering {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  /* arrow buttons: back on the left, forward on the right */
+  .chs-controls {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 16px 44px;
+  }
+  .chs-btn {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--color-ink);
+    cursor: pointer;
+    transition: transform 160ms var(--ease-out), background-color 200ms var(--ease-out);
+  }
+  .chs-btn:active:not([aria-disabled='true']) {
+    transform: scale(0.94);
+  }
+  .chs-btn--next {
+    border-color: var(--color-ink);
+    background: var(--color-ink);
+    color: var(--color-on-ink);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .chs-btn:not(.chs-btn--next):not([aria-disabled='true']):hover {
+      background: var(--color-surface-hover);
+    }
+  }
+  .chs-btn[aria-disabled='true'] {
+    opacity: 0.4;
+    cursor: default;
+  }
+  .ch-head {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 40px 44px 32px;
+  }
+  .ch-body {
+    display: grid;
+    gap: 1px;
+    background: var(--color-line);
+  }
+  .ch-body--two {
+    grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr));
+  }
+  .ch-block {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+    padding: 28px 44px 36px;
+    background: var(--color-surface);
+  }
+
+  .ch-fig {
+    font-size: min(var(--text-case-figure), 14cqi);
+    line-height: var(--text-case-figure--line-height);
+    letter-spacing: var(--text-case-figure--letter-spacing);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .ch-fig-sm {
+    font-size: var(--text-h3-card);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .ch-stats {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+    gap: 28px 40px;
+  }
+  .ch-stats > li {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    container-type: inline-size;
+  }
+
+  .ch-rows {
+    margin: 0;
+  }
+  .ch-rows > div,
+  .ch-meters > div {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .ch-map,
+  .ch-chain,
+  .ch-docs,
+  .ch-flow,
+  .ch-checks ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ch-map > li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .ch-code {
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+    line-height: var(--text-code--line-height);
+    overflow-wrap: anywhere;
+  }
+  .ch-code--accent {
+    color: var(--color-accent);
+  }
+  .ch-code--hot {
+    color: var(--color-hot);
+  }
+
+  .ch-ramp {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+    gap: 8px;
+  }
+  .ch-ramp > li {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .ch-swatch {
+    display: block;
+    aspect-ratio: 1;
+    border-radius: var(--radius-swatch);
+    border: 1px solid var(--color-line);
+  }
+  .ch-ramp--feeds .ch-swatch {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  .ch-chain > li {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .ch-docs > li {
+    display: grid;
+    grid-template-columns: minmax(120px, 0.6fr) minmax(0, 2fr);
+    gap: 8px 24px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--color-line);
+  }
+  @media (max-width: 560px) {
+    .ch-docs > li {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* the PRD → screen run, shown as an agent log that plays line by line */
+  .ch-run {
+    margin: 0;
+    padding: 20px 22px;
+    list-style: none;
+    border-radius: 12px;
+    background: var(--color-band);
+    color: var(--color-on-band);
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+    line-height: 1.5;
+  }
+  .ch-run > li {
+    display: grid;
+    grid-template-columns: 18px minmax(0, 1fr);
+    gap: 10px;
+    padding: 7px 0;
+  }
+  .ch-run-mark {
+    color: var(--color-sage);
+  }
+  .ch-run > li:nth-last-child(2) .ch-run-mark {
+    color: var(--color-on-band-accent);
+  }
+  .ch-run-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .ch-run-n {
+    color: var(--color-on-band-2);
+  }
+  .ch-run-text {
+    color: var(--color-on-band-2);
+  }
+  .ch-run-cursor .ch-run-mark {
+    color: var(--color-on-band);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .ch:not([hidden]) .ch-run > li {
+      animation: ch-run-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-delay: calc(var(--i) * 450ms + 200ms);
+    }
+    .ch:not([hidden]) .ch-run-cursor .ch-run-mark {
+      animation: ch-blink 1s steps(1) infinite;
+      animation-delay: calc(var(--i) * 450ms + 200ms);
+    }
+  }
+  @keyframes ch-run-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+  @keyframes ch-blink {
+    50% {
+      opacity: 0;
+    }
+  }
+  .ch-flow > li {
+    display: grid;
+    grid-template-columns: 32px minmax(110px, 0.7fr) minmax(0, 2fr);
+    align-items: baseline;
+    gap: 6px 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--color-line);
+  }
+  @media (max-width: 560px) {
+    .ch-flow > li {
+      grid-template-columns: 32px 1fr;
+    }
+    .ch-flow > li > :last-child {
+      grid-column: 2;
+    }
+  }
+
+  .ch-checks {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-code);
+  }
+  .ch-checks li {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    padding: 8px 0;
+    border-top: 1px solid var(--color-line);
+  }
+  .ch-pass {
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    background: var(--color-sage);
+    color: var(--color-ink);
+  }
+
+  .ch-meters {
+    margin: 0;
+  }
+  .ch-meters > div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 8px;
+  }
+  .ch-meter {
+    grid-column: 1 / -1;
+    display: block;
+    height: 4px;
+    border-radius: var(--radius-pill);
+    background: var(--color-cell-quiet);
+    overflow: hidden;
+  }
+  .ch-meter > span {
+    display: block;
+    height: 100%;
+    background: var(--color-accent);
+  }
+
+  .ch-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .ch-table th,
+  .ch-table td {
+    padding: 12px 16px 12px 0;
+    text-align: left;
+    vertical-align: baseline;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .ch-table thead th {
+    color: var(--color-ink-2);
+    font-weight: 400;
+  }
+  .ch-before,
+  .ch-after {
+    white-space: nowrap;
+  }
+  .ch-before {
+    font-size: var(--text-h3-card);
+    color: var(--color-ink-2);
+  }
+  .ch-after {
+    font-size: var(--text-h3-card);
+    font-weight: 500;
+  }
+  @media (max-width: 560px) {
+    .ch-states thead {
+      display: none;
+    }
+    .ch-states tr {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--color-line);
+    }
+    .ch-states th,
+    .ch-states td {
+      border: 0;
+      padding: 0;
+    }
+  }
+  @media (max-width: 640px) {
+    .ch-compare thead {
+      display: none;
+    }
+    .ch-compare tr {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px 16px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--color-line);
+    }
+    .ch-compare th,
+    .ch-compare td {
+      border: 0;
+      padding: 0;
+    }
+    .ch-compare th,
+    .ch-compare td:last-child {
+      grid-column: 1 / -1;
+    }
+    .ch-before::before {
+      content: 'Before ';
+      font-family: var(--font-mono);
+      font-size: var(--text-caption-sm);
+      color: var(--color-ink-2);
+    }
+    .ch-after::before {
+      content: 'After ';
+      font-family: var(--font-mono);
+      font-size: var(--text-caption-sm);
+      color: var(--color-ink-2);
+    }
+  }
+
+  .ch-images {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+    gap: 16px;
+  }
+  .ch-images img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-code);
+    border: 1px solid var(--color-line);
+  }
+
+  .ch-proof {
+    margin: 0;
+    padding: 28px 44px 36px;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+    gap: 24px 48px;
+  }
+  /* each figure is a column: number, "Seen at", caption; columns split by a line */
+  .ch-proof-label {
+    grid-column: 1 / -1;
+    margin-bottom: -4px;
+  }
+  /* numbers rise in once when the row scrolls in (CaseStudy's [data-stagger] observer):
+     the label fades in place, the first figure leads, the second follows 90ms later */
+  @media (prefers-reduced-motion: no-preference) {
+    .ch-proof > li {
+      transition: opacity 420ms var(--ease-out), transform 420ms var(--ease-out);
+    }
+    .ch-proof.is-waiting > li {
+      opacity: 0;
+    }
+    .ch-proof.is-waiting > .ch-proof-item {
+      transform: translateY(12px);
+    }
+    .ch-proof > .ch-proof-item:nth-child(2) { transition-delay: 60ms; }
+    .ch-proof > .ch-proof-item:nth-child(3) { transition-delay: 150ms; }
+  }
+  .ch-proof-item {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    container-type: inline-size;
+  }
+  @media (min-width: 768px) {
+    .ch-proof-item + .ch-proof-item {
+      padding-left: 48px;
+      border-left: 1px solid var(--color-line);
+    }
+  }
+  @media (max-width: 767px) {
+    .ch-proof-item + .ch-proof-item {
+      padding-top: 24px;
+      border-top: 1px solid var(--color-line);
+    }
+  }
+
+  @media (max-width: 767px) {
+    .chs-controls {
+      padding-inline: 28px;
+    }
+    .ch-head {
+      padding: 28px 28px 24px;
+    }
+    .ch-block,
+    .ch-proof {
+      padding: 24px 28px 28px;
+    }
+  }
+  @media (max-width: 479px) {
+    .ch-head,
+    .ch-block,
+    .ch-proof {
+      padding-inline: 20px;
+    }
+  }
+
+  /* 01 · audit: the meters fill one after another when the panel opens */
+  .ch-audit {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .ch-audit-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 16px;
+  }
+  .ch-audit-count b {
+    color: var(--color-accent);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .ch-meters--scan {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+    gap: 18px 32px;
+  }
+  .ch-meters--scan .ch-meter > span {
+    background: var(--color-accent);
+  }
+
+  /* 02 · map: each Figma name gets its code name, row by row */
+  /* 03 · ramp: the steps that feed the button, and the chain row they light */
+  .ch-ramp > li[data-step] {
+    cursor: default;
+    border-radius: 6px;
+    outline: none;
+  }
+  .ch-ramp > li.is-on .ch-swatch {
+    transform: translateY(-4px);
+  }
+  .ch-ramp > li:focus-visible .ch-swatch {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+  .ch-swatch {
+    transition: transform 0.2s ease;
+  }
+  .ch-chain > li {
+    transition: background-color 0.2s ease, padding 0.2s ease;
+    border-radius: 6px;
+  }
+  .ch-chain > li.is-lit {
+    padding-inline: 10px;
+    background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  }
+
+  /* 04 · states: a real button and field, switched by the list */
+  .ch-live {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: 24px 40px;
+    align-items: start;
+  }
+  @media (max-width: 767px) {
+    .ch-live {
+      grid-template-columns: 1fr;
+    }
+  }
+  .ch-live-demo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 24px;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-panel);
+    background: #ffffff;
+    color: #1f2937;
+    font-size: 14px;
+    --qb-primary: #244d9e;
+    --qb-critical: #c2341b;
+  }
+  .ch-live-label {
+    font-weight: 500;
+  }
+  .ch-live-field {
+    padding: 9px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    transition: border-color 180ms var(--ease-out), box-shadow 180ms var(--ease-out), opacity 180ms var(--ease-out);
+  }
+  .ch-live-err {
+    min-height: 1.4em;
+    color: var(--qb-critical);
+    font-size: 13px;
+    visibility: hidden;
+  }
+  .ch-live-btn {
+    align-self: flex-end;
+    margin-top: 8px;
+    padding: 9px 16px;
+    border-radius: 6px;
+    background: var(--qb-primary);
+    color: #fff;
+    font-weight: 500;
+    transition: box-shadow 180ms var(--ease-out), opacity 180ms var(--ease-out);
+  }
+  .ch-live-demo[data-state='0'] .ch-live-btn {
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--qb-primary);
+  }
+  .ch-live-demo[data-state='1'] .ch-live-field {
+    border-color: var(--qb-primary);
+    box-shadow: 0 0 0 1px var(--qb-primary);
+  }
+  .ch-live-demo[data-state='2'] .ch-live-field {
+    border-color: var(--qb-critical);
+  }
+  .ch-live-demo[data-state='2'] .ch-live-err {
+    visibility: visible;
+  }
+  .ch-live-demo[data-state='3'] .ch-live-btn,
+  .ch-live-demo[data-state='3'] .ch-live-field {
+    opacity: 0.5;
+  }
+  .ch-live-list {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--color-line);
+  }
+  .ch-live-list button {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 4px 16px;
+    min-height: 48px;
+    padding: 12px 10px;
+    border: 0;
+    border-bottom: 1px solid var(--color-line);
+    background: transparent;
+    color: var(--color-ink);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  .ch-live-list button[aria-pressed='true'] {
+    background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  }
+  @media (hover: hover) {
+    .ch-live-list button:hover {
+      background: var(--color-surface-hover);
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .ch:not([hidden]) .ch-meters--scan .ch-meter > span {
+      animation: ch-fill 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-delay: calc(var(--i) * 90ms + 150ms);
+      transform-origin: left;
+    }
+    @keyframes ch-fill {
+      from {
+        transform: scaleX(0);
+      }
+    }
+    .ch:not([hidden]) .ch-map > li {
+      animation: ch-row 0.5s ease-out both;
+    }
+    .ch:not([hidden]) .ch-map > li:nth-child(2) { animation-delay: 0.12s; }
+    .ch:not([hidden]) .ch-map > li:nth-child(3) { animation-delay: 0.24s; }
+    .ch:not([hidden]) .ch-map > li:nth-child(4) { animation-delay: 0.36s; }
+    .ch:not([hidden]) .ch-map > li:nth-child(5) { animation-delay: 0.48s; }
+    .ch:not([hidden]) .ch-map > li .ch-code--accent {
+      animation: ch-type 0.6s steps(18) both;
+      animation-delay: inherit;
+    }
+    @keyframes ch-row {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+    }
+    @keyframes ch-type {
+      from {
+        clip-path: inset(0 100% 0 0);
+      }
+    }
+  }
+
+  /* ---- status workflows blocks ---- */
+  .ch-surf {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+    gap: 0 32px;
+  }
+  .ch-surf > li {
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .ch-surf-how {
+    padding: 2px 8px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-pill);
+    color: var(--color-ink-2);
+  }
+  .ch-pick {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--color-line);
+  }
+  .ch-pick > button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 48px;
+    padding: 12px 10px;
+    border: 0;
+    border-bottom: 1px solid var(--color-line);
+    background: transparent;
+    color: var(--color-ink);
+    font: inherit;
+    font-size: var(--text-body);
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 200ms var(--ease-out), transform 160ms var(--ease-out);
+  }
+  .ch-pick > button[aria-pressed='true'] {
+    background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .ch-pick > button:hover {
+      background: var(--color-surface-hover);
+    }
+    .ch-pick > button[aria-pressed='true']:hover {
+      background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+    }
+  }
+  .ch-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ch-chips :global(li) {
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    background: var(--color-accent);
+    color: var(--color-on-ink);
+    font-size: var(--text-body-sm);
+  }
+
+  .ch-graph,
+  .ch-rules,
+  .ch-every,
+  .ch-bulk {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 24px 40px;
+    align-items: start;
+  }
+  .ch-rules,
+  .ch-every,
+  .ch-bulk {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  @media (max-width: 767px) {
+    .ch-graph,
+    .ch-rules,
+    .ch-every,
+    .ch-bulk {
+      grid-template-columns: 1fr;
+    }
+  }
+  .ch-graph-svg {
+    width: 100%;
+    height: auto;
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+  .ch-graph-svg rect {
+    fill: var(--color-surface);
+    stroke: var(--color-line-strong);
+  }
+  .ch-graph-svg text {
+    fill: var(--color-ink);
+  }
+  .ch-graph-svg path {
+    fill: none;
+    stroke: var(--color-line-strong);
+    stroke-width: 2;
+    transition: stroke 200ms var(--ease-out), stroke-width 200ms var(--ease-out);
+  }
+  .ch-graph-svg path.is-on {
+    stroke: var(--color-accent);
+    stroke-width: 3;
+  }
+
+  .ch-switch {
+    flex: none;
+    position: relative;
+    width: 34px;
+    height: 20px;
+    border-radius: 10px;
+    background: var(--color-cell-quiet);
+    transition: background-color 200ms var(--ease-out);
+  }
+  .ch-switch::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 200ms var(--ease-out);
+  }
+  .ch-toggle[aria-pressed='true'] .ch-switch {
+    background: var(--color-accent);
+  }
+  .ch-toggle[aria-pressed='true'] .ch-switch::after {
+    transform: translateX(14px);
+  }
+
+  /* a small QBench-style modal, drawn in code (illustration, not a screenshot) */
+  .ch-modal {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 22px;
+    border: 1px solid var(--color-line);
+    border-radius: 12px;
+    background: #ffffff;
+    color: #1f2937;
+    font-size: 14px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+  }
+  .ch-modal[hidden] {
+    display: none;
+  }
+  .ch-modal-t {
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .ch-modal-move {
+    font-size: 13px;
+    color: #6b7280;
+  }
+  .ch-modal-move b {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #e4effc;
+    color: #244d9e;
+    font-weight: 500;
+  }
+  .ch-modal-steps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 13px;
+    color: #9ca3af;
+  }
+  .ch-modal-steps :global(i) {
+    font-style: normal;
+  }
+  .ch-modal-steps :global(i.is-on) {
+    color: #1f2937;
+    font-weight: 500;
+  }
+  .ch-modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 74px;
+  }
+  .ch-modal-body :global(span) {
+    padding: 9px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    color: #4b5563;
+  }
+  .ch-modal-body :global(.ch-modal-none) {
+    border: 0;
+    padding: 9px 0;
+    color: #6b7280;
+  }
+  .ch-modal-btn {
+    align-self: flex-end;
+    padding: 8px 16px;
+    border-radius: 6px;
+    background: #244d9e;
+    color: #fff;
+    font-weight: 500;
+  }
+  .ch-bars {
+    display: flex;
+    gap: 4px;
+    height: 8px;
+  }
+  .ch-bars :global(i) {
+    border-radius: 4px;
+  }
+  .ch-bars[data-o='0'] :global(i:first-child) {
+    flex: 1;
+    background: #16a34a;
+  }
+  .ch-bars[data-o='0'] :global(i:last-child) {
+    display: none;
+  }
+  .ch-bars[data-o='1'] :global(i:first-child) {
+    flex: 6;
+    background: #16a34a;
+  }
+  .ch-bars[data-o='1'] :global(i:last-child) {
+    flex: 2;
+    background: #c2341b;
+  }
+  .ch-bars[data-o='2'] :global(i:first-child) {
+    display: none;
+  }
+  .ch-bars[data-o='2'] :global(i:last-child) {
+    flex: 1;
+    background: #c2341b;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .ch:not([hidden]) .ch-surf > li {
+      animation: ch-row 400ms var(--ease-out) both;
+      animation-delay: calc(var(--i) * 60ms);
+    }
+    .ch-modal.is-open,
+    .ch-modal--bulk:not([hidden]) {
+      animation: ch-pop 240ms var(--ease-out) both;
+    }
+    @keyframes ch-pop {
+      from {
+        opacity: 0;
+        transform: scale(0.97);
+      }
+    }
+  }
+
+  .ch-order-list {
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+  @media (max-width: 767px) {
+    .ch-order-list {
+      grid-template-columns: 1fr;
+    }
+  }
+  .ch-order-list > li {
+    position: relative;
+    display: flex;
+    gap: 14px;
+    padding: 20px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-code);
+    background: var(--color-surface);
+  }
+  .ch-order-n {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    color: var(--color-on-ink);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+  }
+  @media (min-width: 768px) {
+    .ch-order-list > li:not(:last-child)::after {
+      content: '→';
+      position: absolute;
+      right: -11px;
+      top: 50%;
+      translate: 0 -50%;
+      z-index: 1;
+      color: var(--color-ink-2);
+      background: var(--color-surface);
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .ch:not([hidden]) .ch-order-list > li {
+      animation: ch-row 360ms var(--ease-out) both;
+      animation-delay: calc(var(--i) * 120ms + 80ms);
+    }
+  }
+</style>

@@ -1,0 +1,263 @@
+---
+/**
+ * QBench hero visual: one component, as people see it and as an agent reads it.
+ * Flips every few seconds; the Human / Machine buttons take over.
+ * Prop and token names are the real ones from the QBench V2 library.
+ */
+---
+
+<div class="qh" data-qh>
+  <div class="qh-card">
+    <div class="qh-bar">
+      <span class="qh-mono">Button · tone primary</span>
+      <div role="group" aria-label="Who is reading" class="qh-seg">
+        <button type="button" data-view="0" aria-pressed="true">Human</button>
+        <button type="button" data-view="1" aria-pressed="false">Machine</button>
+      </div>
+    </div>
+    <div class="qh-stage">
+      <div class="qh-human" data-face="0">
+        <div class="qs-dialog">
+          <span class="qs-title">Report new CAPA</span>
+          <span class="qs-label">Title *</span>
+          <span class="qs-input">Temperature excursion in cold storage</span>
+          <span class="qs-label">Status</span>
+          <span class="qs-tags">
+            <span class="qs-tag qs-tag--open">Open</span>
+            <span class="qs-tag qs-tag--review">In review</span>
+            <span class="qs-tag qs-tag--closed">Closed</span>
+          </span>
+          <span class="qs-actions">
+            <span class="qs-btn qs-btn--ghost">Cancel</span>
+            <span class="qs-btn qs-btn--focus">Create CAPA</span>
+          </span>
+        </div>
+      </div>
+      <pre class="qh-machine" data-face="1" hidden><code><span class="k">Button</span> {'{'}
+  <span class="p">variant</span>: <span class="s">"solid"</span>,
+  <span class="p">tone</span>: <span class="s">"primary"</span>,
+  <span class="p">size</span>: <span class="s">"md"</span>,
+  <span class="p">label</span>: <span class="s">"Create CAPA"</span>,
+  <span class="p">fill</span>: <span class="t">component/button/surface/solid/primary/default</span>
+        → <span class="t">primitives/primary/800</span>,
+  <span class="p">hover</span>: <span class="t">primitives/primary/900</span>,
+  <span class="p">focus</span>: <span class="t">ring/ring-selected</span>
+{'}'}</code></pre>
+    </div>
+  </div>
+</div>
+
+<style>
+  .qh {
+    width: 100%;
+  }
+  .qh-card {
+    overflow: hidden;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-panel);
+    background: var(--color-surface);
+    color: var(--color-ink);
+  }
+  .qh-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 48px;
+    padding: 8px 10px 8px 18px;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .qh-mono {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption-sm);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-ink-2);
+  }
+  .qh-cap {
+    margin: 10px 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption-sm);
+    color: var(--color-ink-2);
+  }
+  .qh-seg {
+    display: inline-flex;
+    padding: 3px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-pill);
+  }
+  .qh-seg button {
+    min-height: 32px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--color-ink-2);
+    font-size: var(--text-label);
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .qh-seg button[aria-pressed='true'] {
+    background: var(--color-ink);
+    color: var(--color-on-ink);
+  }
+  /* same height as the Everbreed hero card (Emir, 13 Nov): tighter frame, the Machine view no longer floats */
+  .qh-stage {
+    display: grid;
+    min-height: 280px;
+    padding: 14px;
+  }
+  .qh-stage > * {
+    grid-area: 1 / 1;
+  }
+  .qh-stage > [hidden] {
+    display: none;
+  }
+
+  /* the QBench screen, in the product's own light look in both themes */
+  .qs-dialog {
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 16px;
+    border: 1px solid #d6dbe4;
+    border-radius: 10px;
+    background: #fff;
+    color: #1f2a3d;
+    font-size: 12px;
+  }
+  .qs-title {
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .qs-label {
+    margin-top: 4px;
+    font-weight: 600;
+  }
+  .qs-input {
+    padding: 7px 10px;
+    border: 1px solid #d6dbe4;
+    border-radius: 6px;
+  }
+  .qs-tags,
+  .qs-actions {
+    display: flex;
+    gap: 6px;
+  }
+  .qs-tag {
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+  }
+  .qs-tag--open {
+    background: #dbe7fb;
+    color: #1e3a8a;
+  }
+  .qs-tag--review {
+    background: #fbefb0;
+    color: #6b5100;
+  }
+  .qs-tag--closed {
+    background: #cdeadb;
+    color: #14532d;
+  }
+  .qs-actions {
+    justify-content: flex-end;
+    margin-top: 10px;
+    padding-top: 12px;
+    border-top: 1px solid #eef2f6;
+  }
+  .qs-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: #244d9e;
+    color: #fff;
+    font-weight: 600;
+  }
+  .qs-btn--ghost {
+    background: #fff;
+    color: #1f2a3d;
+    border: 1px solid #d6dbe4;
+  }
+  .qs-btn--focus {
+    box-shadow:
+      0 0 0 2px #fff,
+      0 0 0 4px #244d9e;
+  }
+
+  .qh-machine {
+    margin: 0;
+    align-self: center;
+    padding: 18px;
+    border-radius: 10px;
+    background: var(--color-band);
+    color: var(--color-on-band);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .qh-machine .k {
+    color: var(--color-on-band-accent);
+  }
+  .qh-machine .p {
+    color: var(--color-on-band-2);
+  }
+  .qh-machine .s {
+    color: var(--color-sage);
+  }
+  .qh-machine .t {
+    color: var(--color-peach);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .qh-stage > .is-entering {
+      animation: qh-in 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+  }
+  @keyframes qh-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+</style>
+
+<script>
+  function mount(root: HTMLElement) {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const faces = Array.from(root.querySelectorAll<HTMLElement>('[data-face]'));
+    const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-view]'));
+    let auto = 0;
+    let n = 0;
+
+    function show(k: number) {
+      n = k;
+      faces.forEach((f) => {
+        const on = Number(f.dataset.face) === k;
+        f.hidden = !on;
+        if (on && !reduced.matches) {
+          f.classList.remove('is-entering');
+          void f.offsetWidth;
+          f.classList.add('is-entering');
+        }
+      });
+      buttons.forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.view) === k)));
+    }
+
+    buttons.forEach((b) =>
+      b.addEventListener('click', () => {
+        window.clearInterval(auto);
+        show(Number(b.dataset.view));
+      }),
+    );
+
+    if (!reduced.matches) auto = window.setInterval(() => show(1 - n), 3500);
+  }
+  document.querySelectorAll<HTMLElement>('[data-qh]').forEach(mount);
+</script>

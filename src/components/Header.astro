@@ -1,50 +1,94 @@
 ---
 import { links } from '../data/links';
 import ThemeToggle from './ThemeToggle.astro';
+import { caseStudies } from '../data/case-studies';
 
 interface Props {
-  /** 'case': the case study nav from canvas 08.x (← All work, Free audit) */
+  /** 'case': pages other than the homepage, so section links point back to it */
   variant?: 'home' | 'case';
 }
 const { variant = 'home' } = Astro.props;
 
-const nav =
-  variant === 'case'
-    ? [{ href: '/#work', label: '← All work' }]
-    : [
-        { href: '#services', label: 'Design systems' },
-        { href: '#services', label: 'Product design' },
-        { href: '#work', label: 'Work' },
-        { href: '#how', label: 'How we work' },
-      ];
+// one menu on every page (Emir, 11 Nov); on other pages the links go back to the homepage sections
+const base = variant === 'case' ? '/' : '';
+// 'index bar' (Emir picked A, 13 Nov): numbered like the page, in the page's order, and each link's
+// line fills while you read that section. Later, with service pages: Design systems · Product design · Work · About.
+const nav = [
+  { id: 'services', label: 'Services' },
+  // count clients, like the Work list (both QBench studies share one row)
+  { id: 'work', label: 'Work', count: new Set(caseStudies.map((c) => c.name)).size },
+  { id: 'how', label: 'How we work' },
+  { id: 'audit', label: 'Process' },
+  { id: 'faq', label: 'FAQ' },
+].map((n) => ({ ...n, href: `${base}#${n.id}` }));
+const num = (i: number) => String(i + 1).padStart(2, '0');
 const audit = variant === 'case' ? '/#audit' : '#audit';
 ---
 
 <a href="#main" class="skip-link pill pill-ink px-[18px] text-label">Skip to content</a>
-<header class="border-b border-line">
-  <nav
-    aria-label="Main"
-    class="container-page flex flex-wrap items-center justify-between gap-x-6 gap-y-3 py-4"
-  >
+<header class="site-head border-b border-line" data-site-head data-progress={variant === 'home' ? '' : undefined}>
+  <nav aria-label="Main" class="head-nav container-page py-4">
     <a
       href={links.home}
       class="text-[22px] leading-none font-semibold tracking-[-0.04em] text-ink no-underline"
       >nicey<span class="text-accent">.</span></a
     >
-    <div class="flex flex-wrap items-center gap-x-6 gap-y-1 text-body-sm">
+    <!-- desktop: everything on one row -->
+    <!-- desktop: links in the middle, Free audit + theme on the right (Emir, 12 Nov) -->
+    <div class="head-row head-links text-body-sm">
       {
-        nav.map((item) => (
-          <a href={item.href} class="py-3 text-ink no-underline">
+        nav.map((item, i) => (
+          <a href={item.href} class="head-link" data-sec={item.id}>
+            <span class="head-num">{num(i)}</span>
             {item.label}
+            {item.count && <span class="head-count">({item.count})</span>}
+            <span class="head-track" aria-hidden="true">
+              <span class="head-fill" />
+            </span>
           </a>
         ))
       }
-      <div class="flex items-center gap-2">
-        <a href={audit} class="pill pill-ink px-[18px] py-3">Free audit</a>
-        <ThemeToggle />
-      </div>
+    </div>
+    <div class="head-row head-end items-center gap-2 text-body-sm">
+      <a href={audit} class="pill pill-ink px-[18px] py-3">Free audit</a>
+      <ThemeToggle />
+    </div>
+    <!-- phone: Free audit stays visible, the rest sits behind the menu button (Emir, 12 Nov) -->
+    <div class="head-compact items-center justify-end gap-2">
+      <a href={audit} class="pill pill-ink px-[18px] py-3 text-body-sm">Free audit</a>
+      <button
+        type="button"
+        class="menu-btn"
+        aria-expanded="false"
+        aria-controls="site-menu"
+        aria-label="Menu"
+        data-menu-btn
+      >
+        <span class="menu-icon" aria-hidden="true"><span></span><span></span></span>
+      </button>
     </div>
   </nav>
+  {variant === 'home' && <span class="head-progress" aria-hidden="true"><span data-phone-fill /></span>}
+  <div id="site-menu" class="menu-panel" data-menu hidden>
+    <div class="container-page">
+      <ul class="m-0 flex list-none flex-col p-0">
+        {
+          nav.map((item, i) => (
+            <li class="border-b border-line">
+              <a href={item.href} class="menu-link text-ink no-underline">
+                <span class="head-num">{num(i)}</span>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <div class="container-page flex items-center justify-between py-4">
+      <span class="font-mono text-caption text-ink-2">Theme</span>
+      <ThemeToggle />
+    </div>
+  </div>
 </header>
 
 <style>
@@ -58,4 +102,261 @@ const audit = variant === 'case' ? '/#audit' : '#audit';
   .skip-link:focus-visible {
     transform: none;
   }
+  /* stays on top while you scroll, so the index shows where you are */
+  .site-head {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: var(--color-page);
+  }
+  .head-nav {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 24px;
+  }
+  .head-end {
+    justify-self: end;
+  }
+  .head-links {
+    align-items: center;
+    gap: 2px;
+  }
+  .head-num {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption-sm);
+    color: var(--color-muted);
+    transition: color 160ms var(--ease-out);
+  }
+  .head-count {
+    color: var(--color-muted);
+  }
+  /* the line under each link fills with the reading position, no easing: it follows the scroll */
+  .head-track {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 4px;
+    height: 1px;
+    background: var(--color-line-strong);
+    overflow: hidden;
+  }
+  .head-fill {
+    position: absolute;
+    inset: 0;
+    background: var(--color-accent);
+    transform-origin: left;
+    transform: scaleX(var(--p, 0));
+  }
+  .head-link.is-active {
+    color: var(--color-ink);
+  }
+  .head-link.is-active .head-num {
+    color: var(--color-accent);
+  }
+  .head-progress {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 2px;
+  }
+  .head-progress span {
+    position: absolute;
+    inset: 0;
+    background: var(--color-accent);
+    transform-origin: left;
+    transform: scaleX(var(--p, 0));
+  }
+  @media (min-width: 900px) {
+    .head-progress {
+      display: none;
+    }
+  }
+  /* nav links: a soft pill on hover, ink when pressed */
+  .head-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 40px;
+    padding: 0 12px;
+    color: var(--color-ink-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: color 160ms var(--ease-out), transform 160ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .head-link:hover {
+      color: var(--color-ink);
+    }
+    .head-link:hover .head-num {
+      color: var(--color-accent);
+    }
+  }
+  .head-link:active {
+    transform: scale(0.97);
+    color: var(--color-ink);
+  }
+  .head-row {
+    display: none;
+  }
+  .head-compact {
+    grid-column: 2 / 4;
+  }
+  .head-compact {
+    display: flex;
+  }
+  @media (min-width: 900px) {
+    .head-row {
+      display: flex;
+    }
+    .head-compact {
+      display: none;
+    }
+    .menu-panel {
+      display: none !important;
+    }
+  }
+  .menu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--color-ink);
+    cursor: pointer;
+  }
+  .menu-icon {
+    position: relative;
+    width: 16px;
+    height: 10px;
+  }
+  .menu-icon span {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 1.5px;
+    background: currentColor;
+    transition: transform 200ms var(--ease-out), top 200ms var(--ease-out);
+  }
+  .menu-icon span:first-child {
+    top: 0;
+  }
+  .menu-icon span:last-child {
+    top: calc(100% - 1.5px);
+  }
+  /* open: the two lines turn into an x */
+  .menu-btn[aria-expanded='true'] .menu-icon span {
+    top: calc(50% - 0.75px);
+  }
+  .menu-btn[aria-expanded='true'] .menu-icon span:first-child {
+    transform: rotate(45deg);
+  }
+  .menu-btn[aria-expanded='true'] .menu-icon span:last-child {
+    transform: rotate(-45deg);
+  }
+  .menu-panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--color-page);
+    border-bottom: 1px solid var(--color-line);
+  }
+  .menu-panel:not([hidden]) {
+    animation: menu-in 200ms var(--ease-out) both;
+  }
+  @keyframes menu-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .menu-panel:not([hidden]) {
+      animation-name: menu-fade;
+    }
+    @keyframes menu-fade {
+      from {
+        opacity: 0;
+      }
+    }
+    .menu-icon span {
+      transition: none;
+    }
+  }
+  .menu-link {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding-block: 16px;
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
 </style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-site-head]').forEach((head) => {
+    const btn = head.querySelector<HTMLButtonElement>('[data-menu-btn]');
+    const panel = head.querySelector<HTMLElement>('[data-menu]');
+    if (!btn || !panel) return;
+    const set = (open: boolean) => {
+      btn.setAttribute('aria-expanded', String(open));
+      btn.setAttribute('aria-label', open ? 'Close menu' : 'Menu');
+      panel.hidden = !open;
+    };
+    btn.addEventListener('click', () => set(panel.hasAttribute('hidden')));
+    // close on a link, on Esc, on a tap outside, and when the window grows past the phone layout
+    panel.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).closest('a')) set(false);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !panel.hidden) {
+        set(false);
+        btn.focus();
+      }
+    });
+    document.addEventListener('click', (e) => {
+      if (!panel.hidden && !head.contains(e.target as Node)) set(false);
+    });
+    matchMedia('(min-width: 900px)').addEventListener('change', (m) => m.matches && set(false));
+  });
+
+  // homepage: each link's line fills while you read its section; only one link is active at a time
+  document.querySelectorAll<HTMLElement>('[data-site-head][data-progress]').forEach((head) => {
+    const items = Array.from(head.querySelectorAll<HTMLElement>('.head-link[data-sec]'))
+      .map((a) => ({ a, sec: document.getElementById(a.dataset.sec!) }))
+      .filter((x): x is { a: HTMLElement; sec: HTMLElement } => !!x.sec);
+    const phone = head.querySelector<HTMLElement>('[data-phone-fill]');
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      // the reading line sits a third down the screen, under the header
+      const line = head.offsetHeight + (window.innerHeight - head.offsetHeight) / 3;
+      let phoneP = 0;
+      items.forEach(({ a, sec }, i) => {
+        const top = sec.getBoundingClientRect().top;
+        // a section ends where the next one in the menu starts, so the lines hand over one by one
+        const next = items[i + 1]?.sec.getBoundingClientRect().top ?? sec.getBoundingClientRect().bottom;
+        const p = Math.min(1, Math.max(0, (line - top) / Math.max(1, next - top)));
+        a.style.setProperty('--p', String(p));
+        const active = p > 0 && p < 1;
+        a.classList.toggle('is-active', active);
+        if (active) phoneP = p;
+      });
+      phone?.style.setProperty('--p', String(phoneP));
+    };
+    addEventListener('scroll', () => (raf ||= requestAnimationFrame(update)), { passive: true });
+    addEventListener('resize', update);
+    update();
+  });
+</script>

@@ -1,0 +1,145 @@
+---
+/**
+ * The 404 page (Emir picked "drift", 12 Nov; inspired by Figma's editable glyphs and HotDot's dots):
+ * "404" in the footer's brand blocks. They fly in, settle, and get knocked away under the cursor.
+ */
+import Base from '../layouts/Base.astro';
+import Header from './Header.astro';
+
+// 5×7 pixel digits
+const DIGITS: Record<string, string[]> = {
+  '4': ['10001', '10001', '10001', '11111', '00001', '00001', '00001'],
+  '0': ['01110', '10001', '10011', '10101', '11001', '10001', '01110'],
+};
+const cells: { x: number; y: number }[] = [];
+'404'.split('').forEach((d, k) =>
+  DIGITS[d].forEach((row, y) => row.split('').forEach((c, x) => c === '1' && cells.push({ x: x + k * 6, y }))),
+);
+---
+
+<Base title="Page not found · Nicey" description="This page does not exist." noindex>
+  <Header variant="case" />
+  <main id="main" tabindex="-1" class="nf container-page">
+        <section class="nf-a" aria-labelledby="nf-h">
+          <div class="nf-blocks" aria-hidden="true" data-nf-blocks>
+            {cells.map((c) => (
+              <i style={`--x:${c.x};--y:${c.y}`} />
+            ))}
+          </div>
+          <div class="nf-copy">
+            <span class="caption text-ink-2">Error 404 · drift detected</span>
+            <h1 id="nf-h" class="nf-h">This page drifted.</h1>
+            <p class="m-0 max-w-[44ch] text-body-lg text-pretty text-ink-2">
+              It was here in Figma, it's not in the code, and nobody can tell if it was renamed or deleted. We know the
+              feeling. It's most of our work.
+            </p>
+            <div class="flex flex-wrap gap-2.5">
+              <a href="/" class="pill pill-ink pill-lg">Back to the homepage</a>
+              <a href="/#audit" class="pill pill-outline pill-lg">Get a free audit</a>
+            </div>
+            <span class="font-mono text-caption text-ink-2">Psst: the blocks move if you poke them.</span>
+          </div>
+        </section>
+  </main>
+</Base>
+
+<style>
+  .nf {
+    min-height: calc(100svh - 80px);
+    display: flex;
+    align-items: center;
+    padding-block: 72px;
+  }
+  .nf-h {
+    margin: 0;
+    font-size: clamp(40px, 5.4vw, 72px);
+    line-height: 1;
+    letter-spacing: -0.045em;
+    font-weight: 500;
+    text-wrap: balance;
+  }
+  .nf-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 22px;
+  }
+
+
+  .nf-a {
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 48px;
+    align-items: center;
+  }
+  @media (min-width: 1024px) {
+    .nf-a {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+      gap: 64px;
+    }
+  }
+  .nf-blocks {
+    --s: clamp(14px, 2.4vw, 30px);
+    position: relative;
+    width: calc(17 * var(--s));
+    height: calc(7 * var(--s));
+    max-width: 100%;
+    touch-action: none;
+  }
+  .nf-blocks i {
+    position: absolute;
+    left: calc(var(--x) * var(--s));
+    top: calc(var(--y) * var(--s));
+    width: calc(var(--s) - 2px);
+    height: calc(var(--s) - 2px);
+    background: var(--color-ink);
+    transform: translate(var(--dx, 0px), var(--dy, 0px)) rotate(var(--dr, 0deg));
+    transition: transform 700ms var(--ease-out), background-color 400ms var(--ease-out);
+  }
+  .nf-blocks i.is-hit {
+    background: var(--color-accent);
+    transition-duration: 160ms;
+  }
+
+</style>
+
+<script>
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // blocks arrive scattered and settle; under the cursor they get knocked away, then drift back
+  const box = document.querySelector<HTMLElement>('[data-nf-blocks]');
+  if (box) {
+    const blocks = Array.from(box.querySelectorAll<HTMLElement>('i'));
+    const scatter = (b: HTMLElement, f = 1) => {
+      b.style.setProperty('--dx', `${(Math.random() - 0.5) * 260 * f}px`);
+      b.style.setProperty('--dy', `${(Math.random() - 0.5) * 200 * f}px`);
+      b.style.setProperty('--dr', `${(Math.random() - 0.5) * 90 * f}deg`);
+    };
+    const settle = (b: HTMLElement) => ['--dx', '--dy', '--dr'].forEach((p) => b.style.setProperty(p, p === '--dr' ? '0deg' : '0px'));
+    if (!reduced) {
+      blocks.forEach((b) => scatter(b));
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => blocks.forEach((b, i) => setTimeout(() => settle(b), 200 + i * 18))),
+      );
+      box.addEventListener('pointermove', (e) => {
+        blocks.forEach((b) => {
+          const r = b.getBoundingClientRect();
+          const dx = r.left + r.width / 2 - e.clientX, dy = r.top + r.height / 2 - e.clientY;
+          const d = Math.hypot(dx, dy);
+          if (d < r.width * 2.2 && !b.classList.contains('is-hit')) {
+            const k = 60 / Math.max(d, 8);
+            b.style.setProperty('--dx', `${dx * k * 3}px`);
+            b.style.setProperty('--dy', `${dy * k * 3}px`);
+            b.style.setProperty('--dr', `${(Math.random() - 0.5) * 60}deg`);
+            b.classList.add('is-hit');
+            setTimeout(() => {
+              settle(b);
+              b.classList.remove('is-hit');
+            }, 900);
+          }
+        });
+      });
+    }
+  }
+
+</script>

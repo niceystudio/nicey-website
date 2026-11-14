@@ -1,0 +1,280 @@
+---
+/**
+ * "Two people, one workflow": the admin sets the rules on a move (left), and the lab user
+ * meets exactly those steps when they move a test (right). Toggling a rule on the left
+ * changes the modal on the right. Rule names are the ones in the QBench transition panel;
+ * the values are an example.
+ */
+const rules = [
+  { id: 'fields', name: 'Require field pop-up', text: 'Ask for specific field data', on: true },
+  { id: 'reason', name: 'Reason required', text: 'User writes why the status changed', on: false },
+  { id: 'sign', name: 'Require e-signature', text: 'User signs, with a PIN, before the move', on: true },
+];
+---
+
+<div class="ts" data-ts>
+  <div class="ts-side">
+    <span class="caption text-ink-2">Admin · sets up the move</span>
+    <div class="ts-panel">
+      <span class="ts-t">Transition configuration</span>
+      <span class="ts-move"><b>In progress</b> → <b>Completed</b></span>
+      <span class="ts-k">Rules</span>
+      {
+        rules.map((r) => (
+          <button type="button" class="ts-rule" data-ts-rule={r.id} aria-pressed={r.on ? 'true' : 'false'}>
+            <span class="ts-sw" aria-hidden="true" />
+            <span class="flex flex-col gap-0.5 text-left">
+              <span class="ts-rn">{r.name}</span>
+              <span class="ts-rt">{r.text}</span>
+            </span>
+          </button>
+        ))
+      }
+    </div>
+  </div>
+  <div class="ts-link" aria-hidden="true"><span>same move</span></div>
+  <div class="ts-side">
+    <span class="caption text-ink-2">Lab user · moves a test</span>
+    <div class="ts-modal" data-ts-modal aria-live="polite">
+      <span class="ts-t">Complete required actions</span>
+      <span class="ts-move"><b>In progress</b> → <b>Completed</b></span>
+      <span class="ts-pages" data-ts-pages></span>
+      <span class="ts-body" data-ts-body></span>
+      <span class="ts-btn" data-ts-btn>Next</span>
+    </div>
+  </div>
+</div>
+<p class="ts-cap">
+  <span class="ts-cap-k">Fig 01</span>
+  <span>Switch a rule on the left. The admin decides once, and every lab user meets the same steps, in the same order, on any screen.</span>
+</p>
+
+<style>
+  .ts {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: 20px;
+    align-items: stretch;
+    padding: 28px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-panel);
+    background: var(--color-surface);
+  }
+  @media (max-width: 860px) {
+    .ts {
+      grid-template-columns: 1fr;
+    }
+  }
+  .ts-side {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+  }
+  .ts-panel,
+  .ts-modal {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #fff;
+    color: #1f2937;
+    font-size: 13px;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
+  }
+  .ts-t {
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .ts-move {
+    color: #6b7280;
+  }
+  .ts-move b {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #e4effc;
+    color: #244d9e;
+    font-weight: 500;
+  }
+  .ts-k {
+    margin-top: 4px;
+    color: #6b7280;
+    font-weight: 500;
+  }
+  .ts-rule {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #fff;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    transition: transform 160ms var(--ease-out), border-color 200ms var(--ease-out);
+  }
+  .ts-rule:active {
+    transform: scale(0.98);
+  }
+  .ts-rule[aria-pressed='true'] {
+    border-color: #244d9e;
+  }
+  .ts-rn {
+    font-weight: 500;
+  }
+  .ts-rt {
+    color: #6b7280;
+  }
+  .ts-sw {
+    flex: none;
+    position: relative;
+    width: 32px;
+    height: 18px;
+    border-radius: 9px;
+    background: #d1d5db;
+    transition: background-color 200ms var(--ease-out);
+  }
+  .ts-sw::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 200ms var(--ease-out);
+  }
+  .ts-rule[aria-pressed='true'] .ts-sw {
+    background: #244d9e;
+  }
+  .ts-rule[aria-pressed='true'] .ts-sw::after {
+    transform: translateX(14px);
+  }
+  .ts-link {
+    display: grid;
+    place-items: center;
+  }
+  .ts-link span {
+    padding: 6px 10px;
+    border: 1px dashed var(--color-dashed);
+    border-radius: var(--radius-pill);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption-sm);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-ink-2);
+    white-space: nowrap;
+  }
+  .ts-pages {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #9ca3af;
+  }
+  .ts-pages :global(i) {
+    font-style: normal;
+  }
+  .ts-pages :global(i.is-on) {
+    color: #1f2937;
+    font-weight: 500;
+  }
+  .ts-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 84px;
+  }
+  .ts-body :global(span) {
+    padding: 8px 11px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    color: #4b5563;
+  }
+  .ts-body :global(.ts-none) {
+    border: 0;
+    padding: 8px 0;
+    color: #6b7280;
+  }
+  .ts-btn {
+    align-self: flex-end;
+    margin-top: auto;
+    padding: 7px 14px;
+    border-radius: 6px;
+    background: #244d9e;
+    color: #fff;
+    font-weight: 500;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .ts-modal.is-redraw {
+      animation: ts-pop 220ms var(--ease-out);
+    }
+    @keyframes ts-pop {
+      from {
+        opacity: 0.4;
+        transform: scale(0.98);
+      }
+    }
+  }
+  .ts-cap {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin: 14px 0 0;
+    font-size: var(--text-body-sm);
+    line-height: 1.5;
+    color: var(--color-ink-2);
+  }
+  .ts-cap-k {
+    flex: none;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption-sm);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-ts]').forEach((root) => {
+    const rules = root.querySelectorAll<HTMLButtonElement>('[data-ts-rule]');
+    const modal = root.querySelector<HTMLElement>('[data-ts-modal]');
+    const pages = root.querySelector<HTMLElement>('[data-ts-pages]');
+    const body = root.querySelector<HTMLElement>('[data-ts-body]');
+    const btn = root.querySelector<HTMLElement>('[data-ts-btn]');
+    const on = (id: string) => root.querySelector(`[data-ts-rule="${id}"]`)?.getAttribute('aria-pressed') === 'true';
+    const draw = (animate: boolean) => {
+      const list: string[] = [];
+      if (on('fields')) list.push('Required fields');
+      const confirm = [on('sign') && 'Signature + PIN', on('reason') && 'Comment'].filter(Boolean) as string[];
+      if (confirm.length) list.push(confirm.join(' · '));
+      if (pages) pages.innerHTML = list.map((p, i) => `<i class="${i === 0 ? 'is-on' : ''}">${i + 1} · ${p}</i>`).join('');
+      if (body)
+        body.innerHTML = !list.length
+          ? '<span class="ts-none">No rules on this move. The status changes right away.</span>'
+          : on('fields')
+            ? '<span>Turnaround *</span><span>Assigned technician *</span>'
+            : confirm.map((c) => `<span>${c} *</span>`).join('');
+      if (btn) btn.textContent = list.length > 1 ? 'Next' : list.length ? 'Confirm' : 'Done';
+      if (animate && modal) {
+        modal.classList.remove('is-redraw');
+        void modal.offsetWidth;
+        modal.classList.add('is-redraw');
+      }
+    };
+    rules.forEach((r) =>
+      r.addEventListener('click', () => {
+        r.setAttribute('aria-pressed', String(r.getAttribute('aria-pressed') !== 'true'));
+        draw(true);
+      }),
+    );
+    draw(false);
+  });
+</script>

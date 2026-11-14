@@ -29,6 +29,10 @@ import { markerBg } from '../data/zero-drift';
           At QBench, every screen was a developer’s best guess, and each new feature meant relearning
           decisions nobody wrote down.
         </p>
+        <div class="mt-auto flex flex-col gap-2.5">
+          <UnitChart count={11} hot={11} columns={11} cell={14} label="11 cells, one per outside library the components leaned on" />
+          <span class="caption-sm text-muted">11 outside libraries behind the components</span>
+        </div>
       </li>
       <li class="when-cell">
         <span class="when-num"><i aria-hidden="true" class:list={['marker', markerBg.peach]}></i>03</span>
@@ -54,6 +58,10 @@ import { markerBg } from '../data/zero-drift';
           A developer fills the gaps in a Figma file. An agent guesses, and every guess becomes a
           correction pass.
         </p>
+        <div class="mt-auto flex flex-col gap-2.5">
+          <UnitChart count={239} ok columns={22} cell={6} label="239 cells, one per layer an agent built, none flagged" />
+          <span class="caption-sm text-muted">239 agent-built layers · 0 issues</span>
+        </div>
       </li>
     </ul>
   </div>
