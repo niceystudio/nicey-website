@@ -16,17 +16,13 @@ import Faq from './Faq.astro';
 import Footer from './Footer.astro';
 import SiteFooter from './SiteFooter.astro';
 import ReviewSwitch from './ReviewSwitch.astro';
-import LabHeader from './lab/LabHeader.astro';
-import LabSwitch from './lab/LabSwitch.astro';
 import MachineView from './case-study/MachineView.astro';
 import { homeMarkdown } from '../lib/home-markdown';
 
 interface Props {
   zeroDrift: 'static' | 'story';
-  /** LAB only (noindex): try a header direction */
-  navLab?: 'a' | 'b' | 'c';
 }
-const { zeroDrift, navLab } = Astro.props;
+const { zeroDrift } = Astro.props;
 // the machine view shows the whole homepage as text (Emir, 12 Nov), same as /index.md
 const markdown = await homeMarkdown(Astro.site ?? new URL('https://nicey-website.vercel.app'));
 ---
@@ -34,10 +30,10 @@ const markdown = await homeMarkdown(Astro.site ?? new URL('https://nicey-website
 <Base
   title="Nicey · Design systems people and agents read the same way"
   description="We turn years of drifted UI into one system: tokens, components and documentation that a designer, an engineer and a coding agent understand the same way. Product design when you need the screens too."
-  noindex={zeroDrift === 'story' || !!navLab}
+  noindex={zeroDrift === 'story'}
   markdownHref="/index.md"
 >
-  {navLab ? <LabHeader variant={navLab} /> : <Header />}
+  <Header />
   <main id="main" tabindex="-1" data-human>
     <!-- order approved by Emir 13 Nov: problem → what we do → proof → how we work → the offer → FAQ -->
     <Hero />
@@ -51,16 +47,5 @@ const markdown = await homeMarkdown(Astro.site ?? new URL('https://nicey-website
   <Footer />
   <MachineView markdown={markdown} mdHref="/index.md" what="homepage" />
   <SiteFooter mdHref="/index.md" />
-  {!navLab && <ReviewSwitch current={zeroDrift} />}
-  {
-    navLab && (
-      <LabSwitch
-        current={navLab}
-        items={[
-          { id: 'now', label: 'live (A)', href: '/' },
-          { id: 'b', label: 'B draft', href: '/lab/nav-b' },
-        ]}
-      />
-    )
-  }
+  <ReviewSwitch current={zeroDrift} />
 </Base>

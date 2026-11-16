@@ -67,7 +67,7 @@ const slug = (k: string) =>
   ) : (
     <h2 id="chapters-head" class="caption m-0 text-ink-2">What we did, step by step</h2>
   )}
-  <div class:list={['panel chs', scroll && 'chs--scroll']} data-chapters data-layout={mode}>
+  <div class:list={['chs', scroll ? 'chs--scroll' : 'panel']} data-chapters data-layout={mode}>
     {!scroll && <div class="chs-tabs" role="tablist" aria-label="Steps of the work">
       {
         chapters.map((c, i) => {
@@ -771,11 +771,15 @@ const slug = (k: string) =>
     flex: 999 1 560px;
     min-width: 0;
   }
-  .chs--scroll > .ch + .ch {
-    border-top: 1px solid var(--color-line-strong);
+  /* scroll layout = the homepage How we work: each step its own card, air between (Emir, 16 Nov) */
+  .chs--scroll {
+    gap: 24px;
   }
   .chs--scroll > .ch {
     scroll-margin-top: 24px;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-panel);
+    overflow: hidden;
   }
   .chs-tabs {
     display: flex;

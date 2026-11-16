@@ -11,7 +11,20 @@ import { steps } from '../../data/zero-drift';
   class="container-page flex flex-wrap items-start gap-x-[72px] gap-y-12 pb-section"
 >
   <ZeroDriftIntro rail />
-  <ol class="panel flex min-w-0 flex-[999_1_560px] flex-col">
-    {steps.map((s) => <ZeroDriftStep step={s} id={`step-${s.id}`} />)}
+  <!-- each step is its own card with air between them, so the eye can tell them apart (Emir, 16 Nov) -->
+  <ol class="zd-cards m-0 flex min-w-0 flex-[999_1_560px] list-none flex-col p-0">
+    {steps.map((s) => <ZeroDriftStep step={s} id={`step-${s.id}`} class="zd-card" />)}
   </ol>
 </section>
+
+<style>
+  .zd-cards {
+    gap: 24px;
+  }
+  .zd-cards > :global(.zd-card) {
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-panel);
+    min-width: 0;
+  }
+</style>
