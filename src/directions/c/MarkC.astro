@@ -1,0 +1,41 @@
+---
+/**
+ * Direction C footer mark (after Coreline): "nicey." in the grotesk, the letters turning from solid into
+ * scanlines and then outlines, left to right. Drift resolving into a drawing.
+ */
+---
+
+<div class="container-page mc" aria-hidden="true">
+  <p class="mc-word m-0"><span class="mc-a">nic</span><span class="mc-b">e</span><span class="mc-c">y</span><span class="mc-dot">.</span></p>
+</div>
+
+<style>
+  .mc {
+    padding-top: 40px;
+    padding-bottom: 40px;
+    overflow: hidden;
+  }
+  .mc-word {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: clamp(120px, 26vw, 380px);
+    line-height: 0.82;
+    letter-spacing: -0.07em;
+    color: var(--color-ink);
+  }
+  .mc-b,
+  .mc-c {
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  .mc-b {
+    background-image: repeating-linear-gradient(to bottom, var(--color-ink) 0 6px, transparent 6px 10px);
+  }
+  .mc-c {
+    background-image: repeating-linear-gradient(to bottom, var(--color-ink) 0 2px, transparent 2px 10px);
+  }
+  .mc-dot {
+    color: var(--color-accent);
+  }
+</style>

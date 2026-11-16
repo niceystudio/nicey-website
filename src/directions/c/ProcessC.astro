@@ -1,0 +1,275 @@
+---
+/**
+ * Direction C: the free audit as a spec. Left, a line drawing of the three report pages with dimension
+ * marks (Openprest's blueprint header); right, the report as a spec table and the four steps as a ruled
+ * timeline. Then the self-check band as live. Scores, grades and times stay [gaps].
+ */
+import CopyPrompt from '../../components/CopyPrompt.astro';
+import SelfCheckRun from '../../components/SelfCheckRun.astro';
+import { links } from '../../data/links';
+
+const pages = [
+  { p: 'p.1', name: 'Score', holds: 'A grade and a score per pillar.' },
+  { p: 'p.2', name: 'Drift map', holds: 'Where design and code disagree.' },
+  { p: 'p.3', name: 'Fix first', holds: 'Top findings, each sized in days.' },
+];
+const steps = [
+  { n: '01', title: 'Share your Figma file', time: '[time]' },
+  { n: '02', title: 'Get the report', time: '[days]' },
+  { n: '03', title: 'Talk it through', time: '[call length]' },
+  { n: '04', title: 'Build, pilot, roll out', time: 'Set in the proposal' },
+];
+---
+
+<section id="audit" aria-labelledby="start-head" class="c-sec">
+  <div class="container-page">
+    <div class="c-sec-head">
+      <div class="flex flex-col gap-4">
+        <span class="c-kicker"><b>■</b> What working with us looks like</span>
+        <h2 id="start-head" class="c-h2">It starts with a free audit.</h2>
+      </div>
+      <a href={links.startAudit} class="pill pill-ink pill-lg" style="justify-self: end">Get a free audit</a>
+    </div>
+
+    <div class="pc">
+      <figure class="pc-draw m-0" aria-label="The report: three pages">
+        <svg viewBox="0 0 560 420" role="img" aria-hidden="true">
+          <defs>
+            <marker id="pc-ar" viewBox="0 0 8 8" refX="4" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M0 0 L8 4 L0 8 z" fill="currentColor" />
+            </marker>
+          </defs>
+          <g class="pc-guides">
+            <line x1="0" y1="60" x2="560" y2="60" />
+            <line x1="0" y1="380" x2="560" y2="380" />
+            <line x1="60" y1="0" x2="60" y2="420" />
+          </g>
+          {
+            [0, 1, 2].map((i) => {
+              const x = 90 + i * 120;
+              const y = 80 + (i === 1 ? -14 : 0);
+              return (
+                <g class:list={['pc-page', i === 1 && 'is-front']}>
+                  <rect x={x} y={y} width="150" height="212" />
+                  <line x1={x + 14} y1={y + 22} x2={x + 60} y2={y + 22} />
+                  <line x1={x + 14} y1={y + 44} x2={x + 110} y2={y + 44} class="pc-ink" />
+                  {[0, 1, 2, 3, 4].map((k) => (
+                    <line x1={x + 14} y1={y + 70 + k * 18} x2={x + 136 - (k % 2) * 24} y2={y + 70 + k * 18} />
+                  ))}
+                  <line x1={x + 14} y1={y + 190} x2={x + 136} y2={y + 190} class="pc-dash" />
+                  <text x={x + 14} y={y + 234}>{pages[i].p} {pages[i].name.toLowerCase()}</text>
+                </g>
+              );
+            })
+          }
+          <g class="pc-dim">
+            <line x1="90" y1="330" x2="240" y2="330" marker-start="url(#pc-ar)" marker-end="url(#pc-ar)" />
+            <text x="148" y="350">A4</text>
+            <line x1="500" y1="66" x2="500" y2="292" marker-start="url(#pc-ar)" marker-end="url(#pc-ar)" />
+            <text x="508" y="184">3 pp</text>
+            <path d="M60 60 L110 10" />
+            <text x="96" y="30" class="pc-accent">45°</text>
+          </g>
+        </svg>
+        <figcaption>Fig. 03 · the report, three pages · example</figcaption>
+      </figure>
+
+      <div class="pc-spec">
+        <table class="pc-table">
+          <thead>
+            <tr><th>Page</th><th>Holds</th></tr>
+          </thead>
+          <tbody>
+            {
+              pages.map((p) => (
+                <tr>
+                  <td>
+                    {p.p} <b>{p.name}</b>
+                  </td>
+                  <td>{p.holds}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+        <ol class="pc-time">
+          {
+            steps.map((s) => (
+              <li>
+                <span class="pc-time-n">Step {s.n}</span>
+                <span class="pc-time-t">{s.title}</span>
+                <span class="c-hl">{s.time}</span>
+              </li>
+            ))
+          }
+        </ol>
+        <span class="pc-ro">Read-only. Your Figma file, the repo only if you share it. Free.</span>
+      </div>
+    </div>
+
+    <div class="pc-band">
+      <div class="flex flex-col items-start gap-3">
+        <span class="c-kicker"><b>■</b> Or start on your own</span>
+        <p class="pc-band-p m-0">Not ready to share your file? Let your agent run our seven checks, then bring the results to a call.</p>
+        <CopyPrompt />
+      </div>
+      <SelfCheckRun />
+    </div>
+  </div>
+</section>
+
+<style>
+  .pc {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    border: 1px solid var(--c-rule);
+  }
+  @media (max-width: 960px) {
+    .pc {
+      grid-template-columns: 1fr;
+    }
+  }
+  .pc-draw {
+    padding: 24px;
+    border-right: 1px solid var(--c-rule);
+    color: var(--color-ink);
+  }
+  .pc-draw svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+  }
+  .pc-guides line {
+    stroke: var(--c-rule);
+    stroke-dasharray: 2 4;
+  }
+  .pc-page rect {
+    fill: var(--color-page);
+    stroke: currentColor;
+    stroke-width: 1;
+  }
+  .pc-page.is-front rect {
+    stroke: var(--color-accent);
+    stroke-width: 1.5;
+  }
+  .pc-page line {
+    stroke: var(--c-rule);
+    stroke-width: 6;
+  }
+  .pc-page line.pc-ink {
+    stroke: var(--color-ink);
+    stroke-width: 8;
+  }
+  .pc-page.is-front line.pc-ink {
+    stroke: var(--color-accent);
+  }
+  .pc-page line.pc-dash {
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+  }
+  .pc-page text,
+  .pc-dim text {
+    fill: var(--color-muted);
+    text-transform: uppercase;
+  }
+  .pc-dim line,
+  .pc-dim path {
+    stroke: var(--color-muted);
+    fill: none;
+  }
+  .pc-dim .pc-accent {
+    fill: var(--color-accent);
+  }
+  .pc-draw figcaption {
+    margin-top: 10px;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .pc-spec {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    padding: 28px;
+  }
+  .pc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .pc-table th {
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--color-ink);
+    font-weight: 400;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: left;
+    color: var(--color-muted);
+  }
+  .pc-table td {
+    padding: 10px 12px 10px 0;
+    border-bottom: 1px solid var(--c-rule);
+    vertical-align: top;
+  }
+  .pc-table b {
+    font-weight: 500;
+    font-family: var(--font-sans);
+    letter-spacing: -0.02em;
+  }
+  .pc-time {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--color-ink);
+  }
+  .pc-time li {
+    display: grid;
+    grid-template-columns: 70px minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--c-rule);
+  }
+  .pc-time-n {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .pc-time-t {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 18px;
+    letter-spacing: -0.03em;
+  }
+  .pc-ro {
+    font-size: 12px;
+    color: var(--color-muted);
+  }
+  .pc-band {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: 32px 40px;
+    align-items: center;
+    padding: 32px 28px;
+    border: 1px solid var(--c-rule);
+    border-top: 0;
+  }
+  @media (max-width: 900px) {
+    .pc-band {
+      grid-template-columns: 1fr;
+    }
+  }
+  .pc-band-p {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 22px;
+    line-height: 1.25;
+    letter-spacing: -0.03em;
+  }
+</style>
