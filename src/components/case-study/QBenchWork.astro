@@ -10,8 +10,12 @@ interface Props {
   tabs?: boolean;
   /** no own lavender stage: the parent (homepage Services) already draws it */
   bare?: boolean;
+  /** only the reading panel, no input fields (homepage, Emir 16 Nov: we show what we provide, not input UI);
+   *  the panel then walks through Figma → Tokens → Agent on its own */
+  terminal?: boolean;
 }
-const { tabs = false, bare = false } = Astro.props;
+const { tabs: tabsProp = false, bare = false, terminal = false } = Astro.props;
+const tabs = tabsProp || terminal;
 
 const states = [
   {
@@ -79,8 +83,9 @@ const tabList = [
 ];
 ---
 
-<figure class="qw m-0" data-qw data-states={JSON.stringify(states.map((s) => s.read))} data-readers={tabs ? JSON.stringify(readers) : undefined}>
+<figure class:list={['qw m-0', terminal && 'qw--terminal']} data-qw data-states={JSON.stringify(states.map((s) => s.read))} data-readers={tabs ? JSON.stringify(readers) : undefined}>
   <div class:list={['qw-stage', bare ? 'qw-stage--bare' : 'bg-lavender']}>
+    {!terminal && (
     <div class="qw-states" role="group" aria-label="Input states">
       {
         states.map((s, i) => (
@@ -102,19 +107,20 @@ const tabList = [
         ))
       }
     </div>
+    )}
     <div class="qw-agent" aria-live="polite" data-md-skip>
       {
         tabs ? (
           <div class="qw-agent-bar qw-tabs-bar">
             <div class="qw-tabs" role="tablist" aria-label="Who is reading">
               {tabList.map((t, i) => (
-                <button type="button" role="tab" class="qw-tab" data-tab={t.id} aria-selected={i === 2 ? 'true' : 'false'}>
+                <button type="button" role="tab" class="qw-tab" data-tab={t.id} aria-selected={(terminal ? i === 0 : i === 2) ? 'true' : 'false'}>
                   {t.label}
                 </button>
               ))}
             </div>
             <span class="qw-agent-src" data-src>
-              {tabList[2].src}
+              {tabList[terminal ? 0 : 2].src}
             </span>
           </div>
         ) : (
@@ -126,7 +132,7 @@ const tabList = [
           </div>
         )
       }
-      <pre class="qw-agent-out" data-out>{tabs ? readers[0].agent.join('\n') : states[0].read.join('\n')}</pre>
+      <pre class="qw-agent-out" data-out>{tabs ? readers[0][terminal ? 'figma' : 'agent'].join('\n') : states[0].read.join('\n')}</pre>
     </div>
   </div>
   {
@@ -376,7 +382,8 @@ const tabList = [
     const tabEls = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-tab]'));
     const srcEl = root.querySelector<HTMLElement>('[data-src]');
     const SRC: Record<string, string> = { figma: 'Input.fig', tokens: 'tokens.json', agent: 'input.md' };
-    let tab = 'agent';
+    const terminalOnly = root.classList.contains('qw--terminal');
+    let tab = terminalOnly ? 'figma' : 'agent';
     const linesFor = (i: number) => (readers ? readers[i][tab] : plain[i]);
     const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-i]'));
     const out = root.querySelector<HTMLElement>('[data-out]')!;
@@ -403,20 +410,30 @@ const tabList = [
       }, 16);
     }
 
+    const showTab = (id: string) => {
+      tab = id;
+      tabEls.forEach((x) => x.setAttribute('aria-selected', String(x.dataset.tab === id)));
+      if (srcEl) srcEl.textContent = SRC[tab];
+      read(current);
+    };
+
     function startTour() {
       window.clearInterval(tour);
       if (reduced.matches || userTook) return;
+      // no fields to step through: walk the same component through its three readers instead
+      if (terminalOnly) {
+        const order = tabEls.map((t) => t.dataset.tab!);
+        tour = window.setInterval(() => showTab(order[(order.indexOf(tab) + 1) % order.length]), 3400);
+        return;
+      }
       tour = window.setInterval(() => read((current + 1) % plain.length), 2600);
     }
 
     tabEls.forEach((t) => {
       t.addEventListener('click', () => {
-        tab = t.dataset.tab!;
-        tabEls.forEach((x) => x.setAttribute('aria-selected', String(x === t)));
-        if (srcEl) srcEl.textContent = SRC[tab];
         userTook = true;
         window.clearInterval(tour);
-        read(current);
+        showTab(t.dataset.tab!);
       });
     });
 
