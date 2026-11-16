@@ -1,6 +1,6 @@
 ---
 /**
- * Direction D — "Human | Machine". Homepage only, same copy and order as live.
+ * Direction C — "Human | Machine". Homepage only, same copy and order as live.
  * The hero switch (keys H / M) re-reads the whole page: display words flip to the pixel face one after
  * another and every block shows what an agent reads it as. Light and dark bands meet on stepped pixel edges.
  */
@@ -26,7 +26,7 @@ import { homeMarkdown } from '../../lib/home-markdown';
 const markdown = await homeMarkdown(Astro.site ?? new URL('https://nicey-website.vercel.app'));
 ---
 
-<Base title="Nicey · Direction D (review)" description="Design direction D for review: human | machine." noindex markdownHref="/index.md">
+<Base title="Nicey · Direction C (review)" description="Design direction C for review: human | machine." noindex markdownHref="/index.md">
   <div class="dir-d" data-read="human">
     <Header />
     <main id="main" tabindex="-1" data-human>
@@ -48,7 +48,7 @@ const markdown = await homeMarkdown(Astro.site ?? new URL('https://nicey-website
     <SiteFooter mdHref="/index.md" />
     <MarkD />
   </div>
-  <DirectionSwitch current="d" />
+  <DirectionSwitch current="c" />
 </Base>
 
 <script>
