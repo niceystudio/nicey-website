@@ -11,7 +11,7 @@ const dev = import.meta.env.DEV;
 ---
 
 <nav aria-label="Review" class="review" data-review hidden={!dev} data-dev={dev ? 'true' : 'false'}>
-  <span class="caption-sm text-muted">Review</span>
+  <span class="caption text-muted">Review</span>
   <a href="/?review#how" aria-current={current === 'static' ? 'page' : undefined}>static</a>
   <span aria-hidden="true" class="text-muted">|</span>
   <a href="/story?review#how" aria-current={current === 'story' ? 'page' : undefined}>story</a>

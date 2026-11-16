@@ -12,10 +12,10 @@ import { markerBg, steps } from '../../data/zero-drift';
 <section
   id="how"
   aria-labelledby="how-head"
-  class="container-page flex flex-wrap items-start gap-x-[72px] gap-y-12 pb-section"
+  class="container-page flex flex-wrap items-start gap-x-split gap-y-12 pb-section"
 >
   <ZeroDriftIntro />
-  <div class="panel story flex min-w-0 flex-[999_1_560px] flex-col" data-story>
+  <div class="panel story flex min-w-0 col-main flex-col" data-story>
     <div class="story-tabs" role="tablist" aria-label="Zero Drift steps">
       {
         steps.map((s, i) => (
@@ -126,7 +126,7 @@ import { markerBg, steps } from '../../data/zero-drift';
   }
   @media (prefers-reduced-motion: no-preference) {
     .story :global(.story-panel) {
-      transition: opacity 180ms ease;
+      transition: opacity var(--duration-base) var(--ease-out);
     }
   }
   .story :global(.story-panel.is-entering) {
@@ -138,18 +138,6 @@ import { markerBg, steps } from '../../data/zero-drift';
     flex-wrap: wrap;
     gap: 8px;
     padding: 20px var(--spacing-cell);
-  }
-  .story-btn {
-    padding: 0 18px;
-    font-size: var(--text-body-sm);
-    cursor: pointer;
-  }
-  .story-btn--next {
-    padding: 0 22px;
-    border: 0;
-  }
-  .story-btn.pill-outline {
-    background: transparent;
   }
   .story-btn[aria-disabled='true'] {
     opacity: 0.4;

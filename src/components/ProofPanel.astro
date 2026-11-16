@@ -13,13 +13,13 @@ const READOUT_AFTER = '0 outside libraries · 141 components';
     <div class="proof-hero" data-proof>
       <div class="proof-copy">
         <span class="caption flex items-center gap-2 text-hot"
-          ><i aria-hidden="true" class="block size-[7px] rounded-full bg-hot"></i>QBench · Design system</span
+          ><i aria-hidden="true" class="block size-2 rounded-full bg-hot"></i>QBench · Design system</span
         >
         <p class="proof-figure" aria-hidden="true" data-figure>1,071</p>
         <p class="sr-only" aria-live="polite" data-figure-live>1,071</p>
-        <h2 id="proof-label" class="m-0 mt-6 text-title">references to outside libraries</h2>
+        <h2 id="proof-label" class="m-0 mt-6 text-h3">references to outside libraries</h2>
         <p
-          class="proof-note m-0 mt-3 min-h-[3.2em] max-w-[34ch] text-pretty text-ink-2"
+          class="proof-note m-0 mt-3 max-w-copy text-pretty text-ink-2"
           data-note
           data-before={NOTE_BEFORE}
           data-after={NOTE_AFTER}
@@ -64,7 +64,7 @@ const READOUT_AFTER = '0 outside libraries · 141 components';
   .proof-copy {
     flex: 1 1 380px;
     min-width: 0;
-    padding: var(--spacing-cell-lg) var(--spacing-cell-lg) var(--spacing-cell);
+    padding: var(--spacing-cell) var(--spacing-cell) var(--spacing-cell);
     display: flex;
     flex-direction: column;
     container-type: inline-size;
@@ -72,15 +72,19 @@ const READOUT_AFTER = '0 outside libraries · 141 components';
   .proof-figure {
     margin: 32px 0 0 -0.05em;
     /* never wider than the column, even at 320px */
-    font-size: min(var(--text-display-figure), 36cqi);
-    line-height: var(--text-display-figure--line-height);
-    letter-spacing: var(--text-display-figure--letter-spacing);
+    font-size: min(var(--text-figure-xl), 36cqi);
+    line-height: var(--text-figure-xl--line-height);
+    letter-spacing: var(--text-figure-xl--letter-spacing);
     font-weight: 500;
     font-variant-numeric: tabular-nums;
   }
+  /* two lines reserved, so the before/after swap never shifts the layout */
+  .proof-note {
+    min-height: 3.2em;
+  }
   @media (prefers-reduced-motion: no-preference) {
     .proof-note {
-      transition: opacity 0.2s ease;
+      transition: opacity var(--duration-base) var(--ease-out);
     }
   }
 
@@ -98,7 +102,7 @@ const READOUT_AFTER = '0 outside libraries · 141 components';
     border-radius: var(--radius-pill);
     background: transparent;
     color: var(--color-ink-2);
-    font-size: var(--text-label);
+    font-size: var(--text-body-sm);
     font-weight: 500;
     cursor: pointer;
   }
@@ -139,7 +143,7 @@ const READOUT_AFTER = '0 outside libraries · 141 components';
     left: 0;
     bottom: 0;
     font-family: var(--font-mono);
-    font-size: var(--text-caption-sm);
+    font-size: var(--text-caption);
     line-height: 1.5;
     white-space: nowrap;
     color: var(--color-ink-2);
@@ -151,7 +155,7 @@ const READOUT_AFTER = '0 outside libraries · 141 components';
   }
   @media (prefers-reduced-motion: no-preference) {
     .block-label:global(.is-shown) {
-      transition: opacity 0.4s ease;
+      transition: opacity var(--duration-slow) var(--ease-out);
     }
   }
 

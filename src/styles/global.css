@@ -54,120 +54,71 @@
   --font-sans: 'Geist Variable', 'Geist Fallback', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'Geist Mono Variable', 'Geist Mono Fallback', ui-monospace, monospace;
 
-  --text-display-figure: clamp(104px, 13vw, 196px);
-  --text-display-figure--line-height: 0.84;
-  --text-display-figure--letter-spacing: -0.06em;
-  --text-display-figure--font-weight: 500;
+  /* Type: twelve roles, used everywhere. A size belongs to a role, never
+     to a section. Headlines step down display → h2 → h3 → h4; figures are
+     the one exception, because numbers are the proof. */
 
-  --text-h1: clamp(48px, 7.4vw, 108px);
-  --text-h1--line-height: 0.95;
-  --text-h1--letter-spacing: -0.05em;
-  --text-h1--font-weight: 500;
+  /* figures */
+  --text-figure-xl: clamp(104px, 13vw, 196px);
+  --text-figure-xl--line-height: 0.84;
+  --text-figure-xl--letter-spacing: -0.06em;
+  --text-figure-xl--font-weight: 500;
+
+  --text-figure: clamp(48px, 5vw, 72px);
+  --text-figure--line-height: 0.88;
+  --text-figure--letter-spacing: -0.05em;
+  --text-figure--font-weight: 500;
+
+  /* headlines */
+  --text-display: clamp(48px, 7.4vw, 108px);
+  --text-display--line-height: 0.95;
+  --text-display--letter-spacing: -0.05em;
+  --text-display--font-weight: 500;
 
   --text-h2: clamp(36px, 4.2vw, 60px);
   --text-h2--line-height: 1.02;
   --text-h2--letter-spacing: -0.04em;
   --text-h2--font-weight: 500;
 
-  --text-h3-practice: clamp(40px, 4.4vw, 64px);
-  --text-h3-practice--line-height: 0.98;
-  --text-h3-practice--letter-spacing: -0.05em;
-  --text-h3-practice--font-weight: 500;
+  --text-h3: clamp(28px, 2.8vw, 40px);
+  --text-h3--line-height: 1.06;
+  --text-h3--letter-spacing: -0.035em;
+  --text-h3--font-weight: 500;
 
-  --text-h3-alongside: clamp(28px, 2.8vw, 38px);
-  --text-h3-alongside--line-height: 1.04;
-  --text-h3-alongside--letter-spacing: -0.035em;
-  --text-h3-alongside--font-weight: 500;
+  --text-h4: 22px;
+  --text-h4--line-height: 1.2;
+  --text-h4--letter-spacing: -0.02em;
+  --text-h4--font-weight: 500;
 
-  --text-h3-step: clamp(26px, 2.6vw, 36px);
-  --text-h3-step--line-height: 1.1;
-  --text-h3-step--letter-spacing: -0.03em;
-  --text-h3-step--font-weight: 500;
+  /* reading */
+  --text-lead: clamp(18px, 1.5vw, 20px);
+  --text-lead--line-height: 1.5;
+  --text-lead--letter-spacing: -0.015em;
 
-  --text-h3-card: 22px;
-  --text-h3-card--line-height: 1.2;
-  --text-h3-card--letter-spacing: -0.02em;
-  --text-h3-card--font-weight: 500;
-
-  --text-figure-step: clamp(56px, 6vw, 88px);
-  --text-figure-step--line-height: 0.86;
-  --text-figure-step--letter-spacing: -0.055em;
-  --text-figure-step--font-weight: 500;
-
-  --text-stat: clamp(48px, 5vw, 72px);
-  --text-stat--line-height: 0.9;
-  --text-stat--letter-spacing: -0.05em;
-  --text-stat--font-weight: 500;
-
-  --text-work: clamp(32px, 3.6vw, 48px);
-  --text-work--line-height: 1;
-  --text-work--letter-spacing: -0.045em;
-  --text-work--font-weight: 500;
-
-  /* case study pages (canvas 08.x sizes, v3 weights) */
-  --text-case-name: clamp(56px, 9vw, 128px);
-  --text-case-name--line-height: 0.9;
-  --text-case-name--letter-spacing: -0.05em;
-  --text-case-name--font-weight: 500;
-
-  --text-case-h1: clamp(28px, 3.4vw, 46px);
-  --text-case-h1--line-height: 1.08;
-  --text-case-h1--letter-spacing: -0.03em;
-  --text-case-h1--font-weight: 500;
-
-  --text-case-h2: clamp(28px, 3vw, 40px);
-  --text-case-h2--line-height: 1.05;
-  --text-case-h2--letter-spacing: -0.03em;
-  --text-case-h2--font-weight: 500;
-
-  --text-case-cta: clamp(24px, 2.6vw, 34px);
-  --text-case-cta--line-height: 1.1;
-  --text-case-cta--letter-spacing: -0.03em;
-  --text-case-cta--font-weight: 500;
-
-  --text-case-figure: 52px;
-  --text-case-figure--line-height: 1;
-  --text-case-figure--letter-spacing: -0.04em;
-  --text-case-figure--font-weight: 500;
-
-  --text-title: clamp(22px, 2.1vw, 30px);
-  --text-title--line-height: 1.15;
-  --text-title--letter-spacing: -0.02em;
-  --text-title--font-weight: 500;
-
-  --text-quote: clamp(20px, 2vw, 28px);
-  --text-quote--line-height: 1.3;
-  --text-quote--letter-spacing: -0.02em;
-
-  --text-sub: clamp(18px, 2vw, 26px);
-  --text-sub--line-height: 1.35;
-  --text-sub--letter-spacing: -0.02em;
-
-  --text-faq: 19px;
-  --text-faq--line-height: 1.55;
-  --text-faq--letter-spacing: -0.015em;
-  --text-faq--font-weight: 500;
-
-  --text-body-lg: clamp(17px, 1.5vw, 20px);
+  --text-body-lg: 18px;
   --text-body-lg--line-height: 1.5;
-  --text-lede: 18px;
-  --text-lede--line-height: 1.5;
-  --text-cta: 17px;
-  --text-cta--line-height: 1.5;
+  --text-body-lg--letter-spacing: -0.011em;
+
   --text-body: 16px;
   --text-body--line-height: 1.55;
+  --text-body--letter-spacing: -0.011em;
+
   --text-body-sm: 15px;
-  --text-body-sm--line-height: 1.55;
-  --text-label: 14px;
-  --text-label--line-height: 1.45;
+  --text-body-sm--line-height: 1.5;
+  --text-body-sm--letter-spacing: -0.006em;
+
+  /* mono */
   --text-code: 13px;
   --text-code--line-height: 1.6;
   --text-caption: 12px;
   --text-caption--line-height: 1.4;
-  --text-caption-sm: 11px;
-  --text-caption-sm--line-height: 1.4;
-  --text-arrow: 24px;
-  --text-arrow--line-height: 1;
+
+  /* measure: line lengths, named once. ch tracks the text's own size. */
+  --container-title: 12ch;
+  --container-heading: 18ch;
+  --container-subheading: 24ch;
+  --container-copy: 44ch;
+  --container-prose: 62ch;
 
   /* shape */
   --radius-panel: 16px;
@@ -178,13 +129,19 @@
 
   /* space */
   --spacing-section: 128px;
+  --spacing-split: 72px;
   --spacing-gutter: 24px;
+  /* inside panel cells: cell for feature cells, cell-sm for grid cards */
   --spacing-cell: 40px;
-  --spacing-cell-lg: 44px;
+  --spacing-cell-sm: 28px;
   --container-page: 1200px;
 
-  /* motion */
+  /* motion: two curves, three durations */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-resolve: cubic-bezier(0.65, 0, 0.35, 1);
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-slow: 400ms;
 }
 
 /* ------------------------------------------------------------------ *
@@ -255,7 +212,8 @@
     color: var(--color-ink);
     font-family: var(--font-sans);
     font-size: var(--text-body);
-    line-height: 1.55;
+    line-height: var(--text-body--line-height);
+    letter-spacing: var(--text-body--letter-spacing);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-synthesis: none;
@@ -305,16 +263,18 @@
   @media (max-width: 767px) {
     :root {
       --spacing-section: 96px;
+      --spacing-split: 48px;
       --spacing-cell: 28px;
-      --spacing-cell-lg: 28px;
+      --spacing-cell-sm: 24px;
     }
   }
   @media (max-width: 479px) {
     :root {
       --spacing-section: 72px;
+      --spacing-split: 40px;
       --spacing-gutter: 20px;
       --spacing-cell: 24px;
-      --spacing-cell-lg: 24px;
+      --spacing-cell-sm: 20px;
     }
   }
 }
@@ -395,14 +355,6 @@
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
-  .caption-sm {
-    font-family: var(--font-mono);
-    font-size: var(--text-caption-sm);
-    line-height: var(--text-caption-sm--line-height);
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
 
   .marker {
     display: block;
@@ -411,31 +363,68 @@
     height: 8px;
   }
 
+  /* Layout columns: a wide main column and a side column that wraps
+     under it when there isn't room for both. */
+  .col-main {
+    flex: 999 1 560px;
+    min-width: 0;
+  }
+  .col-side {
+    flex: 1 1 300px;
+    min-width: 0;
+  }
+
+  /* The button: one pill shape, two sizes, three fills.
+     The outline is an inset ring, so every fill has the same box. */
   .pill {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     min-height: 44px;
+    padding: 0 20px;
+    border: 0;
     border-radius: var(--radius-pill);
+    background: transparent;
+    font-size: var(--text-body-sm);
+    line-height: 1;
     font-weight: 500;
     text-decoration: none;
     white-space: nowrap;
+    cursor: pointer;
+  }
+  .pill-lg {
+    min-height: 56px;
+    padding: 0 26px;
+    font-size: var(--text-body-lg);
   }
   .pill-ink {
     background: var(--color-ink);
     color: var(--color-on-ink);
   }
   .pill-outline {
-    border: 1px solid var(--color-ink);
+    box-shadow: inset 0 0 0 1px currentColor;
     color: var(--color-ink);
   }
-  .pill-lg {
-    padding: 16px 24px;
-    font-size: var(--text-cta);
-    line-height: 1.5;
+  /* on the dark band */
+  .pill-inverse {
+    background: var(--color-on-band);
+    color: var(--color-band);
   }
-  .pill-lg.pill-outline {
-    padding: 15px 23px;
+  @media (hover: hover) {
+    .pill-ink:hover {
+      background: color-mix(in srgb, var(--color-ink) 86%, var(--color-page));
+    }
+    .pill-inverse:hover {
+      background: color-mix(in srgb, var(--color-on-band) 86%, var(--color-band));
+    }
+    .pill-outline:hover {
+      background: color-mix(in srgb, currentColor 6%, transparent);
+    }
+  }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .pill {
+      transition: background-color var(--duration-fast) var(--ease-out);
+    }
   }
 
   .chip {
@@ -449,6 +438,16 @@
     font-family: var(--font-mono);
     font-size: var(--text-caption);
     color: var(--color-ink);
+  }
+  /* the chip's box with no fill: an overflow count beside real chips */
+  .chip-ghost {
+    background: transparent;
+    border-color: transparent;
+  }
+
+  /* big figures: pull the first digit's side bearing back to the text edge */
+  .figure-nudge {
+    margin-left: -0.04em;
   }
 
   .placeholder {
