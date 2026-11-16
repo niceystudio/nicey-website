@@ -10,8 +10,9 @@ export const links = {
   bookCall: '#',
   /** "Get a free audit" in the "It starts with a free audit" section */
   startAudit: '#',
-  exploreDesignSystems: '#',
-  exploreProductDesign: '#',
+  /** the two practice pages */
+  agenticDesignSystems: '/agentic-design-systems',
+  productDesign: '/product-design',
   /** the case study pages (src/pages/work/[slug].astro) */
   work: {
     qbench: caseHref('qbench-design-system'),

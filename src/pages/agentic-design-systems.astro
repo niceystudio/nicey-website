@@ -1,0 +1,38 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import PageHero from '../components/PageHero.astro';
+import PracticeOffer from '../components/PracticeOffer.astro';
+import WhenToBring from '../components/WhenToBring.astro';
+import ZeroDriftStatic from '../components/zero-drift/ZeroDriftStatic.astro';
+import Process from '../components/Process.astro';
+import Work from '../components/Work.astro';
+import Faq from '../components/Faq.astro';
+import Footer from '../components/Footer.astro';
+import { getPractice } from '../data/practices';
+import { workRows } from '../data/work';
+
+const p = getPractice('systems');
+---
+
+<Base title={`${p.name} · Nicey`} description={`${p.lead} ${p.pitch}`}>
+  <Header />
+  <main id="main" tabindex="-1">
+    <PageHero caption={p.name} lead={p.lead}>
+      {p.headline}
+      <Fragment slot="note">We audit before we quote. The first look at your system is free and read-only.</Fragment>
+    </PageHero>
+    <section aria-label="Video introduction" class="container-page pb-section">
+      <div class="placeholder flex aspect-video items-center justify-center rounded-code p-4 text-center">
+        [Video intro, 60–90 s]
+      </div>
+    </section>
+    <WhenToBring />
+    <PracticeOffer practice={p} />
+    <ZeroDriftStatic />
+    <Process />
+    <Work rows={workRows.systems} caption="Design systems work" heading="Systems we have built" />
+    <Faq />
+  </main>
+  <Footer />
+</Base>

@@ -1,0 +1,102 @@
+---
+/**
+ * The problem each case study solved, as "if this is you" cards. All copy
+ * is the case study's own: the statement, and the "If …" sentence that
+ * closes its lede.
+ */
+import SectionHead from './SectionHead.astro';
+import { caseHref, getCaseStudy } from '../data/case-studies';
+
+interface Props {
+  slugs: string[];
+  id: string;
+  caption: string;
+  heading: string;
+}
+const { slugs, id, caption, heading } = Astro.props;
+
+const bandBg = {
+  lavender: 'bg-lavender',
+  sage: 'bg-sage',
+  peach: 'bg-peach',
+  butter: 'bg-butter',
+  mauve: 'bg-mauve',
+  stone: 'bg-stone',
+} as const;
+
+const cards = slugs.map((slug) => {
+  const s = getCaseStudy(slug);
+  const ifThisIsYou = s.lede.match(/If [^.]*\./g)?.at(-1) ?? '';
+  return { slug, s, ifThisIsYou };
+});
+---
+
+<section aria-labelledby={id} class="container-page flex flex-col gap-12 pb-section">
+  <SectionHead id={id} caption={caption} headingClass="max-w-heading">{heading}</SectionHead>
+  <div class="panel-wrap">
+    <ul class="panel grid-3">
+      {
+        cards.map(({ slug, s, ifThisIsYou }) => (
+          <li>
+            <a href={caseHref(slug)} class="case-card">
+              <span class="caption flex items-center gap-2 text-ink-2">
+                <i aria-hidden="true" class:list={['marker', bandBg[s.band]]} />
+                {s.name}
+              </span>
+              <h3 class="m-0 text-h4">{s.statement}</h3>
+              <p class="m-0 text-body-sm text-pretty text-ink-2">{ifThisIsYou}</p>
+              <span class="case-card-link mt-auto">
+                Read the case study <span aria-hidden="true">→</span>
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .case-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    height: 100%;
+    min-height: 300px;
+    padding: var(--spacing-cell-sm);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+  .case-card-link {
+    display: inline-flex;
+    gap: 0.35em;
+    padding-top: 12px;
+    font-size: var(--text-body-sm);
+    font-weight: 500;
+  }
+  .case-card-link span {
+    display: inline-block;
+  }
+  @media (hover: hover) {
+    .case-card:hover {
+      background: var(--color-surface-hover);
+    }
+  }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .case-card {
+      transition: background-color var(--duration-fast) var(--ease-out);
+    }
+    .case-card-link span {
+      transition: transform var(--duration-fast) var(--ease-out);
+    }
+    .case-card:hover .case-card-link span {
+      transform: translateX(4px);
+    }
+  }
+  @container panel (max-width: 719.98px) {
+    .case-card {
+      min-height: 0;
+    }
+  }
+</style>

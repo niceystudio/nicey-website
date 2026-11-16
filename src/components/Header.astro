@@ -12,15 +12,18 @@ const nav =
   variant === 'case'
     ? [{ href: '/#work', label: '← All work' }]
     : [
-        { href: '#services', label: 'Design systems' },
-        { href: '#services', label: 'Product design' },
-        { href: '#work', label: 'Work' },
-        { href: '#how', label: 'How we work' },
+        { href: '/#work', label: 'Work' },
+        { href: links.productDesign, label: 'Product design' },
+        { href: links.agenticDesignSystems, label: 'Agentic design systems' },
+        { href: '/#how', label: 'How we work' },
       ];
+// a practice page marks its own nav item
+const path = Astro.url.pathname.replace(/\/$/, '');
+const isCurrent = (href: string) => !href.includes('#') && href === path;
 const audit = variant === 'case' ? '/#audit' : '#audit';
 ---
 
-<a href="#main" class="skip-link pill pill-ink px-[18px] text-label">Skip to content</a>
+<a href="#main" class="skip-link pill pill-ink">Skip to content</a>
 <header class="border-b border-line">
   <nav
     aria-label="Main"
@@ -28,19 +31,23 @@ const audit = variant === 'case' ? '/#audit' : '#audit';
   >
     <a
       href={links.home}
-      class="text-[22px] leading-none font-semibold tracking-[-0.04em] text-ink no-underline"
+      class="wordmark text-ink no-underline"
       >nicey<span class="text-accent">.</span></a
     >
-    <div class="flex flex-wrap items-center gap-x-6 gap-y-1 text-body-sm">
+    <div class="flex flex-wrap items-center gap-x-1 gap-y-1 text-body-sm">
       {
         nav.map((item) => (
-          <a href={item.href} class="py-3 text-ink no-underline">
+          <a
+            href={item.href}
+            class="nav-link"
+            aria-current={isCurrent(item.href) ? 'page' : undefined}
+          >
             {item.label}
           </a>
         ))
       }
-      <div class="flex items-center gap-2">
-        <a href={audit} class="pill pill-ink px-[18px] py-3">Free audit</a>
+      <div class="ml-3 flex items-center gap-2">
+        <a href={audit} class="pill pill-ink">Free audit</a>
         <ThemeToggle />
       </div>
     </div>
@@ -48,6 +55,36 @@ const audit = variant === 'case' ? '/#audit' : '#audit';
 </header>
 
 <style>
+  .wordmark {
+    font-size: var(--text-h4);
+    line-height: 1;
+    font-weight: 600;
+    letter-spacing: -0.04em;
+  }
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 12px;
+    border-radius: var(--radius-pill);
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+  /* the page you're on: a quiet filled pill */
+  .nav-link[aria-current='page'] {
+    background: var(--color-surface);
+    box-shadow: inset 0 0 0 1px var(--color-line-strong);
+  }
+  @media (hover: hover) {
+    .nav-link:not([aria-current='page']):hover {
+      background: var(--color-surface-hover);
+    }
+  }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .nav-link {
+      transition: background-color var(--duration-fast) var(--ease-out);
+    }
+  }
   .skip-link {
     position: absolute;
     top: 8px;

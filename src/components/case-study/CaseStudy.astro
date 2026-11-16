@@ -36,14 +36,14 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
     <section aria-labelledby="cs-title" class={band}>
       <div class="container-page cs-hero">
         <span class="caption text-ink-2">{s.kicker}</span>
-        <p class="m-0 text-case-name">{s.name}</p>
-        <h1 id="cs-title" class="m-0 max-w-[24ch] text-case-h1">{s.statement}</h1>
-        <p class="m-0 max-w-[62ch] text-body-lg text-pretty text-ink-2"><Gaps text={s.lede} /></p>
+        <p class="m-0 text-display">{s.name}</p>
+        <h1 id="cs-title" class="m-0 max-w-subheading text-h3">{s.statement}</h1>
+        <p class="m-0 max-w-prose text-lead text-pretty text-ink-2"><Gaps text={s.lede} /></p>
         <dl class="cs-facts">
           {
             s.facts.map((f) => (
               <div>
-                <dt class="caption-sm text-ink-2">{f.term}</dt>
+                <dt class="caption text-ink-2">{f.term}</dt>
                 <dd class="m-0 text-body">
                   <Gaps text={f.detail} />
                 </dd>
@@ -63,13 +63,13 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
       ) : (
         <section aria-labelledby="audit-head" class="container-page cs-lead">
           <div class="cs-audit bg-band text-on-band">
-            <div class="flex max-w-[60ch] flex-col gap-1.5">
-              <h2 id="audit-head" class="m-0 text-h3-card">
+            <div class="flex max-w-prose flex-col gap-1.5">
+              <h2 id="audit-head" class="m-0 text-h4">
                 {s.lead.heading}
               </h2>
               <p class="m-0 text-body text-on-band-2">{s.lead.text}</p>
             </div>
-            <a href="/#audit" class="pill bg-on-band px-[22px] text-body text-band">
+            <a href="/#audit" class="pill pill-inverse">
               {s.lead.cta}
             </a>
           </div>
@@ -117,7 +117,7 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
               <h2 id="note-head" class="caption m-0 text-ink-2">
                 {s.note.heading}
               </h2>
-              <p class="m-0 flex-[1_1_420px] text-cta">{s.note.text}</p>
+              <p class="col-side m-0 text-body-lg">{s.note.text}</p>
             </div>
           </div>
         </section>
@@ -125,13 +125,13 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
     }
 
     <section aria-labelledby="did-head" class="container-page cs-block cs-split">
-      <h2 id="did-head" class="cs-split-head m-0 text-case-h2">What we did</h2>
+      <h2 id="did-head" class="cs-split-head m-0 text-h3">What we did</h2>
       <ol class="cs-split-body cs-did">
         {
           s.did.map((d, i) => (
             <li>
-              <span class="caption-sm pt-[5px] text-ink-2">{String(i + 1).padStart(2, '0')}</span>
-              <span class="text-lede">{d}</span>
+              <span class="caption pt-1 text-ink-2">{String(i + 1).padStart(2, '0')}</span>
+              <span class="text-body-lg">{d}</span>
             </li>
           ))
         }
@@ -144,7 +144,7 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
           <div class="cs-agentic bg-band text-on-band">
             <div class="flex flex-col gap-2.5">
               <span class="caption text-on-band-2">{s.agentic.kicker}</span>
-              <h2 id="agentic-head" class="m-0 max-w-[26ch] text-case-h2">
+              <h2 id="agentic-head" class="m-0 max-w-subheading text-h3">
                 {s.agentic.heading}
               </h2>
             </div>
@@ -152,11 +152,11 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
               {s.agentic.items.map((it) => (
                 <li>
                   <span class="font-mono text-caption text-on-band-accent">{it.label}</span>
-                  <span class="text-cta">{it.text}</span>
+                  <span class="text-body-lg">{it.text}</span>
                 </li>
               ))}
             </ol>
-            <p class="m-0 max-w-[64ch] text-cta text-on-band-2">{s.agentic.footnote}</p>
+            <p class="m-0 max-w-prose text-body-lg text-on-band-2">{s.agentic.footnote}</p>
           </div>
         </section>
       )
@@ -168,15 +168,15 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
         { id: 'changed-head', heading: 'What changed for the team', ...s.changed },
       ].map((b) => (
         <section aria-labelledby={b.id} class="container-page cs-block cs-split">
-          <h2 id={b.id} class="cs-split-head m-0 text-case-h2">
+          <h2 id={b.id} class="cs-split-head m-0 text-h3">
             {b.heading}
           </h2>
           <div class="cs-split-body flex flex-col gap-4">
-            <p class="m-0 text-lede text-pretty">
+            <p class="m-0 text-body-lg text-pretty">
               <Gaps text={b.text} />
             </p>
             <p class="cs-collect">
-              <span class="caption-sm mb-1.5 block text-ink-2">{b.collect.label}</span>
+              <span class="caption mb-1.5 block text-ink-2">{b.collect.label}</span>
               {b.collect.text}
             </p>
           </div>
@@ -185,7 +185,7 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
     }
 
     <section aria-labelledby="work-head" class="container-page cs-block flex flex-col gap-5">
-      <h2 id="work-head" class="m-0 text-case-h2">From the work</h2>
+      <h2 id="work-head" class="m-0 text-h3">From the work</h2>
       <div class="cs-figs">
         {
           s.work.map((w) => (
@@ -201,15 +201,15 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
 
   <footer class="container-page cs-foot">
     <div class:list={['cs-cta', band]}>
-      <div class="flex max-w-[46ch] flex-col gap-2">
-        <p class="m-0 text-case-cta">{s.cta.heading}</p>
-        <p class="m-0 text-cta text-ink-2">{s.cta.text}</p>
+      <div class="flex max-w-copy flex-col gap-2">
+        <p class="m-0 text-h3">{s.cta.heading}</p>
+        <p class="m-0 text-body-lg text-ink-2">{s.cta.text}</p>
       </div>
       <a href={ctaHref} class="pill pill-ink pill-lg">{s.cta.label}</a>
     </div>
     <a href={caseHref(next.slug)} class="cs-next">
-      <span class="caption-sm text-ink-2">Next case study</span>
-      <span class="text-case-cta">{next.linkName} →</span>
+      <span class="caption text-ink-2">Next case study</span>
+      <span class="text-h3">{next.linkName} →</span>
     </a>
   </footer>
 </Base>
@@ -303,9 +303,9 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
   }
   .cs-num-fig {
     /* stays on one line in the narrowest cell: "1,071 → 0", "302 / 302" */
-    font-size: min(var(--text-case-figure), 19cqi);
-    line-height: var(--text-case-figure--line-height);
-    letter-spacing: var(--text-case-figure--letter-spacing);
+    font-size: min(var(--text-figure), 19cqi);
+    line-height: var(--text-figure--line-height);
+    letter-spacing: var(--text-figure--letter-spacing);
     font-weight: 500;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
@@ -329,8 +329,8 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
     border-radius: var(--radius-pill);
     background: var(--color-ink);
     color: var(--color-on-ink);
-    font-size: var(--text-label);
-    line-height: var(--text-label--line-height);
+    font-size: var(--text-body-sm);
+    line-height: var(--text-body-sm--line-height);
   }
   .cs-step--open {
     padding: 7px 13px;
@@ -350,7 +350,7 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
   .cs-split {
     display: flex;
     flex-wrap: wrap;
-    gap: 24px 64px;
+    gap: 24px var(--spacing-split);
   }
   .cs-split-head {
     flex: 1 1 260px;
@@ -433,7 +433,7 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
     text-decoration: none;
   }
   @media (hover: hover) {
-    .cs-next:hover .text-case-cta {
+    .cs-next:hover .text-h3 {
       text-decoration: underline;
       text-decoration-thickness: 2px;
       text-underline-offset: 6px;
