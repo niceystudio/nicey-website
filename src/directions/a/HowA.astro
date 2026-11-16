@@ -1,0 +1,183 @@
+---
+/**
+ * Direction A: Zero Drift as a pipeline. The opener carries an ASCII run of the five steps (each a link);
+ * every step is its own labelled window (after Builders Table's INDEX.HTML / SCAN.RAW frames), with a
+ * connector between them, so the eye always knows where one step ends (Emir, 16 Nov).
+ */
+import ZeroDriftStep from '../../components/zero-drift/ZeroDriftStep.astro';
+import { steps } from '../../data/zero-drift';
+---
+
+<section id="how" aria-labelledby="how-head" class="ho">
+  <div class="container-page ho-head">
+    <div class="ho-intro">
+      <span class="caption a-path text-ink-2">Zero Drift · how we work</span>
+      <h2 id="how-head" class="m-0 text-h2">From drift to a system that holds.</h2>
+      <p class="m-0 max-w-[40ch] text-cta text-pretty text-ink-2">
+        Five steps. Each one starts with a problem you can see in your product and ends with something you can hold.
+      </p>
+    </div>
+    <ol class="ho-pipe" aria-label="The five steps">
+      {
+        steps.map((s, i) => (
+          <li>
+            <a href={`#step-${s.id}`}>
+              <span class="ho-pipe-n">{s.num}</span>
+              <span class="ho-pipe-name">{s.name}</span>
+            </a>
+            {i < steps.length - 1 && <span class="ho-pipe-arrow" aria-hidden="true">──▶</span>}
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+
+  <ol class="container-page ho-list">
+    {
+      steps.map((s, i) => (
+        <li class="ho-item">
+          <article class="ho-win" id={`step-${s.id}`}>
+            <header class="ho-bar">
+              <span class="ho-tag">step_{s.num}</span>
+              <span class="ho-file">{s.name.toLowerCase()}.md</span>
+              <span class="ho-count">
+                {s.num} / {String(steps.length).padStart(2, '0')}
+              </span>
+            </header>
+            <ZeroDriftStep step={s} as="div" class="ho-step" />
+          </article>
+          {i < steps.length - 1 && (
+            <div class="ho-link" aria-hidden="true">
+              <span>│</span>
+              <span>↓ next · {steps[i + 1].name.toLowerCase()}</span>
+            </div>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<style>
+  .ho {
+    padding-bottom: var(--spacing-section);
+  }
+  .ho-head {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    margin-bottom: 56px;
+  }
+  .ho-intro {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .ho-pipe {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 0;
+    margin: 0;
+    padding: 14px 16px;
+    list-style: none;
+    border: 1px solid var(--a-rule);
+    background: var(--color-page);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .ho-pipe li {
+    display: flex;
+    align-items: center;
+  }
+  .ho-pipe a {
+    display: inline-flex;
+    gap: 8px;
+    min-height: 32px;
+    align-items: center;
+    padding: 0 8px;
+    color: var(--color-ink);
+    text-decoration: none;
+    transition: background-color 160ms var(--ease-out), color 160ms var(--ease-out);
+  }
+  .ho-pipe-n {
+    color: var(--color-muted);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .ho-pipe a:hover {
+      background: var(--a-block);
+      color: var(--a-on-block);
+    }
+    .ho-pipe a:hover .ho-pipe-n {
+      color: inherit;
+    }
+  }
+  .ho-pipe-arrow {
+    padding: 0 6px;
+    color: var(--a-dim);
+    letter-spacing: 0;
+  }
+  .ho-list {
+    display: flex;
+    flex-direction: column;
+    margin-block: 0;
+    list-style: none;
+  }
+  .ho-win {
+    border: 1px solid var(--a-rule);
+    background: var(--color-surface);
+    scroll-margin-top: 96px;
+  }
+  .ho-bar {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 14px;
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--a-rule);
+    background: var(--color-page);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .ho-tag {
+    padding: 2px 6px;
+    background: var(--a-block);
+    color: var(--a-on-block);
+  }
+  .ho-file {
+    color: var(--color-ink-2);
+    text-transform: none;
+    letter-spacing: 0.02em;
+  }
+  .ho-count {
+    color: var(--color-muted);
+  }
+  .ho-win :global(.ho-step) {
+    padding: 44px 48px 48px;
+  }
+  @media (max-width: 640px) {
+    .ho-win :global(.ho-step) {
+      padding: 28px 22px 32px;
+    }
+  }
+  .ho-link {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 6px 0 6px 28px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1.4;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .ho-link span:first-child {
+    color: var(--a-dim);
+    letter-spacing: 0;
+  }
+</style>

@@ -1,0 +1,186 @@
+---
+/**
+ * Direction A hero. Same copy as the live hero. The headline is set like the Supabase Select logotype:
+ * pixel capitals printed on blocks, the last line on the accent. The visual is a real product screen
+ * (QBench), dithered and read by a scan line: what the audit does to your file.
+ */
+import { links } from '../../data/links';
+import DitherScan from './DitherScan.astro';
+
+const proof = ['QBench', 'Everbreed', 'Clerky', 'Omnisafe', 'FLYR'].map((name) => ({ name, href: `#work-${name.toLowerCase()}` }));
+---
+
+<section class="ha">
+  <div class="container-page ha-meta">
+    <span class="caption a-path text-ink-2">Free design system audit · read-only</span>
+    <nav class="ha-proof" aria-label="Selected work">
+      <span class="text-muted">Selected work</span>
+      {
+        proof.map((p, i) => (
+          <a href={p.href}>
+            <span class="text-muted">{String(i + 1).padStart(2, '0')}</span>
+            {p.name}
+          </a>
+        ))
+      }
+    </nav>
+  </div>
+
+  <div class="container-page ha-grid">
+    <div class="ha-copy">
+      <h1 class="ha-h m-0">
+        <span class="ha-line">Is your design</span>
+        <span class="ha-line">system ready</span>
+        <span class="ha-line ha-line--accent">for AI agents?</span>
+      </h1>
+      <p class="ha-lede m-0">
+        Send us your Figma file. You get a score per pillar, the top findings and what to fix first. Free, and we never
+        edit your file.
+      </p>
+      <div class="ha-ctas">
+        <a href="#audit" class="pill pill-ink pill-lg" aria-keyshortcuts="a">
+          Get a free audit<span class="a-key" aria-hidden="true">A</span>
+        </a>
+        <a href={links.bookCall} class="pill pill-outline pill-lg" aria-keyshortcuts="b">
+          Book a call<span class="a-key" aria-hidden="true">B</span>
+        </a>
+      </div>
+      <p class="ha-then m-0">
+        <span class="ha-prompt" aria-hidden="true">&gt;</span> Then we build systems people and agents read the same way.
+      </p>
+    </div>
+    <div class="ha-visual">
+      <DitherScan
+        src="/work/qbench/product.jpg"
+        w={976}
+        h={600}
+        tag="audit.scan"
+        file="example · a product screen"
+        cols={210}
+        log={['> reading the screen', '  values ........ listed', '  tokens ........ matched', '  docs .......... checked', '> report ready']}
+      />
+    </div>
+  </div>
+</section>
+
+<style>
+  .ha {
+    padding-top: 28px;
+    padding-bottom: 56px;
+  }
+  .ha-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 32px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--a-rule);
+  }
+  .ha-proof {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 22px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .ha-proof a {
+    display: inline-flex;
+    gap: 8px;
+    color: var(--color-ink);
+    text-decoration: none;
+    transition: color 160ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .ha-proof a:hover {
+      color: var(--color-accent);
+    }
+  }
+  .ha-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 48px 56px;
+    padding-top: 72px;
+  }
+  @media (max-width: 1023px) {
+    .ha-grid {
+      grid-template-columns: 1fr;
+      padding-top: 48px;
+    }
+  }
+  .ha-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 28px;
+  }
+  .ha-h {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    font-family: var(--font-pixel);
+    font-weight: 400;
+    font-size: clamp(30px, 4.15vw, 60px);
+    line-height: 1;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+  .ha-line {
+    display: inline-block;
+    white-space: nowrap;
+    padding: 0.06em 0.14em 0.02em;
+    background: var(--color-ink);
+    color: var(--color-page);
+  }
+  .ha-line--accent {
+    background: var(--a-block);
+    color: var(--a-on-block);
+  }
+  .ha-lede {
+    max-width: 44ch;
+    font-size: var(--text-body-lg);
+    line-height: 1.5;
+    color: var(--color-ink-2);
+    text-wrap: pretty;
+  }
+  .ha-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .ha-then {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--color-ink-2);
+  }
+  .ha-prompt {
+    color: var(--color-accent);
+  }
+  .ha-visual {
+    min-width: 0;
+  }
+  /* the headline prints line by line on first view */
+  @media (prefers-reduced-motion: no-preference) {
+    .ha-line {
+      animation: ha-print 520ms steps(6, end) both;
+    }
+    .ha-line:nth-child(2) {
+      animation-delay: 140ms;
+    }
+    .ha-line:nth-child(3) {
+      animation-delay: 280ms;
+    }
+  }
+  @keyframes ha-print {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+</style>

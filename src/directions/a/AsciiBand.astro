@@ -1,0 +1,181 @@
+---
+/**
+ * Direction A: the ASCII band (after Supabase Select 26). Not decoration: it is the Zero Drift story.
+ * Left, dim: the values a drifted product really carries, flowing in (the "found" names shown on the
+ * homepage). Middle, on the accent block: the token names they collapse into (real QBench V2 tokens,
+ * the same ones the Services terminal reads). Right: what an agent does with them.
+ */
+interface Props {
+  /** which slice of the story to show under the band labels */
+  labels?: [string, string, string];
+  rows?: number;
+}
+const { labels = ['drift', 'system', 'agent'], rows = 8 } = Astro.props;
+
+const drift = ['purple-2', 'purpleLight2', 'brand/purple/30', 'col-7', 'violet-final', '#6b5fbe', '#7266c4', '#665ab8'];
+const tokens = [
+  'color.accent',
+  'border/default',
+  'border/primary/default',
+  'border/critical/default',
+  'text/default',
+  'text/placeholder',
+  'component/input/surface/default',
+  'opacity/disabled',
+];
+const reads = ['input.md', 'tokens.json', 'Input.fig', 'button.md', 'field.md', 'select.md', 'library.json', 'theme.css'];
+
+const B = 36;
+const glyphs = ['→', '→', '→', '·', '·', '↓', '↑', '·'];
+// deterministic, so the server render and the first frame match
+let seed = 7;
+const rnd = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
+const leftRow = (i: number) => {
+  let s = '';
+  while (s.length < 150) {
+    const r = rnd();
+    if (r < 0.16) s += ` ${drift[(i + s.length) % drift.length]} `;
+    else s += glyphs[Math.floor(rnd() * glyphs.length)];
+  }
+  return s;
+};
+const rightRow = (i: number) => {
+  const brackets = ['[[(<{', '{<([[', '(<{[[', '[(<{('];
+  const b = brackets[i % brackets.length];
+  const close = b.split('').reverse().map((c) => ({ '[': ']', '(': ')', '<': '>', '{': '}' })[c]).join('');
+  let s = ` ${b} ${reads[i % reads.length]} ${close} → ok `;
+  while (s.length < 170) s += rnd() < 0.5 ? '→' : rnd() < 0.5 ? '·' : ' ';
+  return s;
+};
+const data = Array.from({ length: rows }, (_, i) => {
+  const t = tokens[i % tokens.length];
+  const num = String(i + 1).padStart(2, '0');
+  const fill = Math.max(1, B - num.length - 2 - t.length - 2);
+  return { left: leftRow(i), block: `${num}  ${t}${' '.padEnd(fill, '·')}■`, right: rightRow(i) };
+});
+---
+
+<div class="ab a-grain" aria-hidden="true" data-ab>
+  <div class="ab-labels">
+    <span>{labels[0]}</span><span>{labels[1]}</span><span>{labels[2]}</span>
+  </div>
+  <div class="ab-rows">
+    {
+      data.map((r, i) => (
+        <div class="ab-row" data-speed={1 + (i % 3)}>
+          <span class="ab-l"><span data-l>{r.left}</span></span>
+          <span class:list={['ab-b', i === 0 && 'is-reading']} data-b>{r.block}</span>
+          <span class="ab-r" data-r>{r.right}</span>
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .ab {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    padding: 20px 0 22px;
+    border-block: 1px solid var(--a-rule);
+    background: color-mix(in srgb, var(--color-page) 70%, transparent);
+    font-family: var(--font-mono);
+    font-size: 15px;
+    line-height: 1.55;
+    white-space: pre;
+    user-select: none;
+  }
+  .ab-labels,
+  .ab-row {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) auto minmax(0, 1.4fr);
+  }
+  .ab-labels {
+    margin-bottom: 10px;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .ab-labels span:first-child {
+    text-align: right;
+    padding-right: 16px;
+  }
+  /* the middle label sits over the block: same 36ch box as the block, in the band's own mono size */
+  .ab-labels span:nth-child(2) {
+    width: calc(36ch * 15 / 11);
+    padding-left: 0.5ch;
+  }
+  .ab-labels span:last-child {
+    padding-left: 16px;
+  }
+  /* the left run hugs the block: it overflows towards the page edge, not into the block */
+  .ab-l {
+    display: flex;
+    justify-content: flex-end;
+    overflow: hidden;
+    color: var(--a-dim);
+  }
+  .ab-l > span {
+    flex: none;
+  }
+  .ab-b {
+    width: 36ch;
+    padding: 0 0.5ch;
+    background: var(--a-block);
+    color: var(--a-on-block);
+    transition: background-color 240ms var(--ease-out), color 240ms var(--ease-out);
+  }
+  .ab-b.is-reading {
+    background: var(--color-ink);
+    color: var(--color-page);
+  }
+  .ab-r {
+    overflow: hidden;
+    color: color-mix(in srgb, var(--color-ink) 62%, transparent);
+  }
+  @media (max-width: 720px) {
+    .ab {
+      font-size: 12px;
+    }
+    .ab-labels span:nth-child(2) {
+      width: calc(36ch * 12 / 11);
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-ab]').forEach((band) => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const rows = Array.from(band.querySelectorAll<HTMLElement>('.ab-row')).map((row) => ({
+      l: row.querySelector<HTMLElement>('[data-l]')!,
+      r: row.querySelector<HTMLElement>('[data-r]')!,
+      b: row.querySelector<HTMLElement>('[data-b]')!,
+      speed: Number(row.dataset.speed) || 1,
+    }));
+    let tick = 0;
+    let reading = 0;
+    let timer = 0;
+    // values flow right, into the block and out the other side as something an agent can read
+    const step = () => {
+      tick++;
+      rows.forEach((x) => {
+        if (tick % x.speed) return;
+        const l = x.l.textContent ?? '';
+        x.l.textContent = l.slice(-1) + l.slice(0, -1);
+        const r = x.r.textContent ?? '';
+        x.r.textContent = r.slice(-1) + r.slice(0, -1);
+      });
+      if (tick % 14 === 0) {
+        rows[reading].b.classList.remove('is-reading');
+        reading = (reading + 1) % rows.length;
+        rows[reading].b.classList.add('is-reading');
+      }
+    };
+    new IntersectionObserver((es) => {
+      window.clearInterval(timer);
+      if (es[0].isIntersecting) timer = window.setInterval(step, 90);
+    }).observe(band);
+  });
+</script>
