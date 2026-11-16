@@ -1,0 +1,71 @@
+---
+/**
+ * Direction B texture (after Monologue's pricing backgrounds): a soft light falling off,
+ * printed as an ordered dither in one brand colour. Sits behind its parent's content.
+ */
+interface Props {
+  /** CSS custom property for the dot colour */
+  color?: string;
+  /** where the light comes from, 0..1 of the box */
+  x?: number;
+  y?: number;
+  /** pixel size of one dither cell */
+  cell?: number;
+  /** strength 0..1 */
+  power?: number;
+}
+const { color = '--color-accent', x = 0.5, y = 1.05, cell = 3, power = 0.85 } = Astro.props;
+---
+
+<canvas class="df" aria-hidden="true" data-df data-color={color} data-x={x} data-y={y} data-cell={cell} data-power={power}
+></canvas>
+
+<style>
+  .df {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+    pointer-events: none;
+  }
+</style>
+
+<script>
+  import { BAYER, cssColor } from '../dither';
+
+  document.querySelectorAll<HTMLCanvasElement>('[data-df]').forEach((cv) => {
+    const ctx = cv.getContext('2d')!;
+    const draw = () => {
+      const box = cv.getBoundingClientRect();
+      const cell = Number(cv.dataset.cell) || 3;
+      const W = Math.max(1, Math.round(box.width / cell));
+      const H = Math.max(1, Math.round(box.height / cell));
+      cv.width = W;
+      cv.height = H;
+      const [r, g, b] = cssColor(cv.dataset.color!);
+      const cx = Number(cv.dataset.x) * W;
+      const cy = Number(cv.dataset.y) * H;
+      const reach = Math.hypot(Math.max(cx, W - cx), Math.max(cy, H - cy));
+      const pow = Number(cv.dataset.power);
+      const img = ctx.createImageData(W, H);
+      for (let y = 0; y < H; y++)
+        for (let x = 0; x < W; x++) {
+          const d = Math.hypot(x - cx, (y - cy) * 1.15) / reach;
+          const v = Math.max(0, 1 - d) ** 1.6 * pow;
+          if (v > BAYER[(y % 8) * 8 + (x % 8)]) {
+            const k = (y * W + x) * 4;
+            img.data[k] = r;
+            img.data[k + 1] = g;
+            img.data[k + 2] = b;
+            img.data[k + 3] = 255;
+          }
+        }
+      ctx.putImageData(img, 0, 0);
+    };
+    draw();
+    new ResizeObserver(draw).observe(cv);
+    new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  });
+</script>

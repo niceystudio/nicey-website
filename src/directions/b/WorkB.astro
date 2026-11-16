@@ -1,0 +1,132 @@
+---
+/**
+ * Direction B: Work as a quiet index (after Otherkind's "Past engagements"): one narrow column,
+ * client names in the serif, the figure pulled to the right edge, the sentence under it.
+ * Same copy and figures as live.
+ */
+import { links } from '../../data/links';
+
+const rows = [
+  { name: 'QBench', meta: 'Design system + product · LIMS', href: links.work.qbench, fig: '1,071 → 0', cap: 'Outside-library references', d: 'Years without a designer, consolidated into one semantic token system. Plus one status model for eight entry points, compliance steps included, shipped as an MVP.' },
+  { name: 'Everbreed', meta: 'Design system + product · Agtech', href: links.work.everbreed, fig: '302', cap: 'Variables made machine-readable', d: 'A mature Figma library made machine-readable, so the code config comes from Figma. And the student app built on it, on phone and desktop.' },
+  { name: 'Clerky', meta: 'Design system · Legal tech', href: links.work.clerky, fig: '0 T1', cap: 'Defects at the pilot gate', d: 'Three-tier tokens, AI-context docs on every component and token, and a zero-T1 defect gate. Validated at pilot scale on the Documents App.' },
+  { name: 'Omnisafe', meta: 'Product design · Insurance', href: links.work.omnisafe, fig: '16', cap: 'Modules tested before build', d: 'Sixteen modules, tested end to end with real employees before engineering began.' },
+  { name: 'FLYR', meta: 'Product design · Hospitality', href: links.work.flyr, fig: null, cap: 'One business result', d: 'Group Quotation MVP shipped, so hotels can see whether a group booking makes money.' },
+];
+---
+
+<section id="work" aria-labelledby="work-head" class="container-page kb">
+  <div class="kb-head">
+    <span class="b-kicker">Work</span>
+    <h2 id="work-head" class="m-0 text-h2">Systems and products <em>we have built</em></h2>
+  </div>
+  <ol class="kb-list">
+    {
+      rows.map((r) => (
+        <li id={`work-${r.name.toLowerCase()}`}>
+          <a href={r.href} class="kb-row">
+            <span class="kb-name">{r.name}</span>
+            <span class="kb-fig">{r.fig ?? <span class="placeholder">[result to collect]</span>}</span>
+            <span class="kb-meta">{r.meta}</span>
+            <span class="kb-cap">{r.cap}</span>
+            <span class="kb-d">{r.d}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<style>
+  .kb {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 56px;
+    padding-bottom: var(--spacing-section);
+  }
+  .kb-head {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    text-align: center;
+  }
+  .kb-list {
+    width: 100%;
+    max-width: 820px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--color-line-strong);
+  }
+  .kb-list li {
+    border-bottom: 1px solid var(--color-line);
+    scroll-margin-top: 96px;
+  }
+  .kb-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 6px 24px;
+    padding: 28px 4px 30px;
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+  .kb-name {
+    font-family: var(--font-serif);
+    font-size: 48px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    transition: font-style 0s, color 200ms var(--ease-out);
+  }
+  .kb-fig {
+    align-self: end;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 40px;
+    line-height: 1;
+    text-align: right;
+    color: var(--color-ink);
+  }
+  .kb-fig .placeholder {
+    font-family: var(--font-mono);
+    font-style: normal;
+    font-size: 12px;
+  }
+  .kb-meta,
+  .kb-cap {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .kb-cap {
+    text-align: right;
+    color: var(--color-hot);
+  }
+  .kb-d {
+    grid-column: 1 / -1;
+    max-width: 62ch;
+    margin-top: 10px;
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--color-ink-2);
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0.85;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .kb-row:hover .kb-name {
+      font-style: italic;
+      color: var(--color-accent);
+    }
+  }
+  @media (max-width: 600px) {
+    .kb-name {
+      font-size: 36px;
+    }
+    .kb-fig {
+      font-size: 28px;
+    }
+  }
+</style>

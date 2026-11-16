@@ -7,6 +7,7 @@ const { current } = Astro.props;
 const items = [
   { id: 'now', label: 'Live', href: '/' },
   { id: 'a', label: 'A · Select', href: '/lab/a' },
+  { id: 'b', label: 'B · Editorial', href: '/lab/b' },
 ];
 ---
 
@@ -47,6 +48,24 @@ const items = [
     padding: 7px 10px;
     color: var(--color-ink-2);
     text-decoration: none;
+  }
+  .dsw a {
+    white-space: nowrap;
+  }
+  @media (max-width: 600px) {
+    .dsw {
+      left: 8px;
+      right: 8px;
+      bottom: 8px;
+      justify-content: center;
+      font-size: 10px;
+    }
+    .dsw-k {
+      display: none;
+    }
+    .dsw a {
+      padding: 7px 7px;
+    }
   }
   .dsw a[aria-current] {
     background: var(--color-ink);
