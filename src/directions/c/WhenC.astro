@@ -1,0 +1,49 @@
+---
+/** Direction C: "When to bring us in" as four spec sheets (Openprest's numbered partner sheets). Same copy and counts as live. */
+const sheets = [
+  { n: '004', title: 'Your design file and your repo have drifted apart', seen: 'Everbreed', body: '53 variables had drifted between Figma and code, and nobody could tell a rename from a delete.', sig: '53 drifted variables' },
+  { n: '003', title: 'The product was built for years without a designer', seen: 'QBench', body: 'Every screen was a developer’s best guess, and each new feature meant relearning decisions nobody wrote down.', sig: '11 outside libraries behind the components' },
+  { n: '002', title: 'The library looks healthy, but a machine can’t use it', seen: 'Everbreed', body: 'All 302 variables had no scope and no code name. Fine for people, unreadable for a pipeline.', sig: '302 variables · 0 scoped' },
+  { n: '001', title: 'Your team is handing design to AI agents', seen: '—', body: 'A developer fills the gaps in a Figma file. An agent guesses, and every guess becomes a correction pass.', sig: '239 agent-built layers · 0 issues' },
+];
+---
+
+<section aria-labelledby="when-head" class="c-sec">
+  <div class="container-page">
+    <div class="c-sec-head">
+      <div class="flex flex-col gap-4">
+        <span class="c-kicker"><b>■</b> When to bring us in</span>
+        <h2 id="when-head" class="c-h2">If one of these sounds like your team, talk to us.</h2>
+      </div>
+    </div>
+    <ol class="c-sheets">
+      {
+        sheets.map((s) => (
+          <li class="c-sheet">
+            <span class="c-sheet-n">{s.n}</span>
+            <dl>
+              <div>
+                <dt>Symptom</dt>
+                <dd class="c-big">{s.title}</dd>
+              </div>
+              <div>
+                <dt>Seen at</dt>
+                <dd>{s.seen}</dd>
+              </div>
+              <div>
+                <dt>Evidence</dt>
+                <dd>{s.body}</dd>
+              </div>
+              <div>
+                <dt>Signal</dt>
+                <dd>
+                  <span class="c-hl">{s.sig}</span>
+                </dd>
+              </div>
+            </dl>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>

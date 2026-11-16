@@ -1,0 +1,218 @@
+---
+/**
+ * Direction C: Zero Drift as a ruled timeline (Rollups "How it works"): a sticky index cell on the left,
+ * the steps as rows of cells on the right, each with its stat cell. Same copy and figures as live.
+ */
+import { steps } from '../../data/zero-drift';
+
+const figs: Record<string, { n: string; seen: string; note: string }> = {
+  drift: { n: '53', seen: 'Seen at Everbreed', note: 'variables drifted between Figma and the repo' },
+  audit: { n: '12 / 52', seen: 'Seen at Clerky', note: 'components had no description an agent could read' },
+  system: { n: '1,071 → 0', seen: 'Seen at QBench', note: 'references to 11 outside libraries, across 141 components' },
+  context: { n: '1 rule', seen: 'Seen at Everbreed', note: '“Report the gap. Don’t invent the value.” in every agent file' },
+  proof: { n: '0 T1', seen: 'Seen at Clerky', note: 'defects at the pilot gate on the Documents App' },
+};
+---
+
+<section id="how" aria-labelledby="how-head" class="c-sec">
+  <div class="container-page">
+    <div class="c-sec-head">
+      <div class="flex flex-col gap-4">
+        <span class="c-kicker"><b>■</b> Zero Drift · how we work</span>
+        <h2 id="how-head" class="c-h2">From drift to a system that holds.</h2>
+      </div>
+      <p>Five steps. Each one starts with a problem you can see in your product and ends with something you can hold.</p>
+    </div>
+    <div class="hcw">
+      <ol class="hcw-index" aria-label="Steps">
+        {
+          steps.map((s) => (
+            <li>
+              <a href={`#step-${s.id}`}>
+                <span>Step {s.num}</span>
+                {s.name}
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+      <ol class="hcw-list">
+        {
+          steps.map((s) => {
+            const f = figs[s.id];
+            return (
+              <li class="hcw-row" id={`step-${s.id}`}>
+                <div class="hcw-main">
+                  <span class="hcw-tag">
+                    {s.num} · {s.name}
+                  </span>
+                  <h3 class="hcw-h m-0">{s.heading}</h3>
+                  <dl class="hcw-dl">
+                    <div>
+                      <dt>You’re seeing</dt>
+                      <dd>{s.seeing}</dd>
+                    </div>
+                    <div>
+                      <dt>We do</dt>
+                      <dd>{s.weDo}</dd>
+                    </div>
+                    <div>
+                      <dt>You get</dt>
+                      <dd>
+                        <span class="c-hl">{s.youGet}</span>
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+                <div class="hcw-stat">
+                  <span class="hcw-seen">{f.seen}</span>
+                  <span class="hcw-n">{f.n}</span>
+                  <span class="hcw-note">{f.note}</span>
+                </div>
+              </li>
+            );
+          })
+        }
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hcw {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    border: 1px solid var(--c-rule);
+  }
+  @media (max-width: 900px) {
+    .hcw {
+      grid-template-columns: 1fr;
+    }
+    .hcw-index {
+      display: none;
+    }
+  }
+  .hcw-index {
+    position: sticky;
+    top: 96px;
+    align-self: start;
+    margin: 0;
+    padding: 20px;
+    list-style: none;
+  }
+  .hcw-index a {
+    display: flex;
+    gap: 12px;
+    padding: 6px 0;
+    color: var(--color-ink);
+    font-size: 13px;
+    text-decoration: none;
+  }
+  .hcw-index a span {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .hcw-index a:hover {
+      color: var(--color-accent);
+    }
+  }
+  .hcw-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-left: 1px solid var(--c-rule);
+  }
+  .hcw-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    scroll-margin-top: 96px;
+  }
+  .hcw-row + .hcw-row {
+    border-top: 1px solid var(--c-rule);
+  }
+  @media (max-width: 1100px) {
+    .hcw-row {
+      grid-template-columns: 1fr;
+    }
+  }
+  .hcw-main {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 32px 28px 34px;
+  }
+  .hcw-tag {
+    align-self: flex-start;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+  .hcw-h {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 28px;
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
+  }
+  .hcw-dl {
+    margin: 0;
+    border-top: 1px solid var(--color-ink);
+  }
+  .hcw-dl div {
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr);
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--c-rule);
+  }
+  .hcw-dl dt {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .hcw-dl dd {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--color-ink-2);
+  }
+  .hcw-stat {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 28px 24px;
+    border-left: 1px solid var(--c-rule);
+    background: var(--color-surface);
+  }
+  @media (max-width: 1100px) {
+    .hcw-stat {
+      border-left: 0;
+      border-top: 1px solid var(--c-rule);
+    }
+  }
+  .hcw-seen {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-hot);
+  }
+  .hcw-n {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 48px;
+    line-height: 1;
+    letter-spacing: -0.05em;
+  }
+  .hcw-note {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--color-ink-2);
+  }
+</style>

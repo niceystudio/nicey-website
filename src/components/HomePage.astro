@@ -16,6 +16,7 @@ import Faq from './Faq.astro';
 import Footer from './Footer.astro';
 import SiteFooter from './SiteFooter.astro';
 import ReviewSwitch from './ReviewSwitch.astro';
+import DirectionSwitch from '../directions/DirectionSwitch.astro';
 import MachineView from './case-study/MachineView.astro';
 import { homeMarkdown } from '../lib/home-markdown';
 
@@ -48,4 +49,6 @@ const markdown = await homeMarkdown(Astro.site ?? new URL('https://nicey-website
   <MachineView markdown={markdown} mdHref="/index.md" what="homepage" />
   <SiteFooter mdHref="/index.md" />
   <ReviewSwitch current={zeroDrift} />
+  {/* review only (design-directions PR): jump to the direction pages */}
+  <DirectionSwitch current="now" side="left" />
 </Base>

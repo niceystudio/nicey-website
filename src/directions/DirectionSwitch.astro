@@ -2,16 +2,19 @@
 /** Review only (lab pages, noindex): jump between the live homepage and the design directions. */
 interface Props {
   current: 'now' | 'a' | 'b' | 'c' | 'd';
+  /** on the live homepage the static | story switch already sits bottom-right */
+  side?: 'left' | 'right';
 }
-const { current } = Astro.props;
+const { current, side = 'right' } = Astro.props;
 const items = [
   { id: 'now', label: 'Live', href: '/' },
   { id: 'a', label: 'A · Select', href: '/lab/a' },
   { id: 'b', label: 'B · Editorial', href: '/lab/b' },
+  { id: 'c', label: 'C · Spec sheet', href: '/lab/c' },
 ];
 ---
 
-<nav class="dsw" aria-label="Design directions">
+<nav class:list={['dsw', side === 'left' && 'dsw--left']} aria-label="Design directions">
   <span class="dsw-k">Direction</span>
   {
     items.map((it) => (
@@ -49,6 +52,10 @@ const items = [
     color: var(--color-ink-2);
     text-decoration: none;
   }
+  .dsw--left {
+    right: auto;
+    left: 16px;
+  }
   .dsw a {
     white-space: nowrap;
   }
@@ -62,6 +69,9 @@ const items = [
     }
     .dsw-k {
       display: none;
+    }
+    .dsw--left {
+      bottom: 64px;
     }
     .dsw a {
       padding: 7px 7px;
