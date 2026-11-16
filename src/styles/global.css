@@ -314,7 +314,7 @@
     min-width: 0;
   }
   /* rows that touch a clipped panel's edge draw their ring inward */
-  .panel :where(.work-row, summary, [role='tab'], [role='tabpanel']):focus-visible {
+  .panel :where(.work-row, .case-card, summary, [role='tab'], [role='tabpanel']):focus-visible {
     outline-offset: -4px;
   }
 

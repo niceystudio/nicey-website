@@ -1,24 +1,11 @@
 ---
-import { links } from '../data/links';
+import PageHero from './PageHero.astro';
 ---
 
-<section class="container-page flex flex-col gap-8 pt-section pb-20 max-md:pb-16">
-  <span class="caption text-ink-2"
-    >A design systems studio · for legacy products and teams scaling with agents</span
-  >
-  <h1 class="m-0 max-w-title text-display">Design systems people and agents read the same way.</h1>
-  <div class="flex flex-wrap items-end justify-between gap-x-16 gap-y-7">
-    <p class="m-0 max-w-copy text-lead text-pretty text-ink-2">
-      We turn years of drifted UI into one system: tokens, components and documentation that a
-      designer, an engineer and a coding agent understand the same way. Product design when you need
-      the screens too.
-    </p>
-    <div class="flex flex-wrap gap-2.5">
-      <a href="#audit" class="pill pill-ink pill-lg">Get a free audit</a>
-      <a href={links.bookCall} class="pill pill-outline pill-lg">Book a call</a>
-    </div>
-  </div>
-  <p class="m-0 font-mono text-code leading-normal text-ink-2">
-    We audit before we quote. The first look at your system is free and read-only.
-  </p>
-</section>
+<PageHero
+  caption="A design systems studio · for legacy products and teams scaling with agents"
+  lead="We turn years of drifted UI into one system: tokens, components and documentation that a designer, an engineer and a coding agent understand the same way. Product design when you need the screens too."
+>
+  Design systems people and agents read the same way.
+  <Fragment slot="note">We audit before we quote. The first look at your system is free and read-only.</Fragment>
+</PageHero>

@@ -1,17 +1,34 @@
 ---
 import { links } from '../data/links';
+
+interface Cta {
+  label: string;
+  href: string;
+}
+interface Props {
+  caption?: string;
+  heading?: string;
+  sub?: string;
+  primary?: Cta;
+  secondary?: Cta;
+}
+const {
+  caption = 'Free audit · read-only',
+  heading = 'Send us the system you have.',
+  sub = 'We will show you the one you should.',
+  primary = { label: 'Get a free audit', href: '#audit' },
+  secondary = { label: 'Book a call', href: links.bookCall },
+} = Astro.props;
 ---
 
 <footer class="closing bg-band text-on-band">
   <div class="container-page flex flex-col items-start gap-6 py-section">
-    <span class="caption text-on-band-2">Free audit · read-only</span>
-    <h2 class="m-0 max-w-title text-display">Send us the system you have.</h2>
-    <p class="m-0 text-lead text-on-band-2">We will show you the one you should.</p>
+    <span class="caption text-on-band-2">{caption}</span>
+    <h2 class="m-0 max-w-title text-display">{heading}</h2>
+    <p class="m-0 text-lead text-on-band-2">{sub}</p>
     <div class="mt-4 flex flex-wrap gap-2.5">
-      <a href="#audit" class="pill pill-lg pill-inverse">Get a free audit</a>
-      <a href={links.bookCall} class="pill pill-lg pill-outline text-on-band"
-        >Book a call</a
-      >
+      <a href={primary.href} class="pill pill-lg pill-inverse">{primary.label}</a>
+      <a href={secondary.href} class="pill pill-lg pill-outline text-on-band">{secondary.label}</a>
     </div>
   </div>
 </footer>

@@ -1,0 +1,41 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import PageHero from '../components/PageHero.astro';
+import CaseCards from '../components/CaseCards.astro';
+import PracticeOffer from '../components/PracticeOffer.astro';
+import Process from '../components/Process.astro';
+import Work from '../components/Work.astro';
+import Footer from '../components/Footer.astro';
+import { getPractice } from '../data/practices';
+import { workRows } from '../data/work';
+import { links } from '../data/links';
+
+const p = getPractice('product');
+---
+
+<Base title={`${p.name} · Nicey`} description={p.lead}>
+  <Header />
+  <main id="main" tabindex="-1">
+    <PageHero caption={`${p.name} · design engineering`} lead={p.lead}>
+      {p.headline}
+    </PageHero>
+    <CaseCards
+      id="cases-head"
+      caption="When to bring us in"
+      heading="If one of these sounds like your product, talk to us."
+      slugs={['qbench-status-workflows', 'omnisafe', 'flyr']}
+    />
+    <PracticeOffer practice={p} />
+    <Process />
+    <Work rows={workRows.product} caption="Product work" heading="Products we have designed" />
+  </main>
+  <!-- closing copy from the QBench status workflows case study CTA -->
+  <Footer
+    caption={p.name}
+    heading="Complex, regulated workflows?"
+    sub="We design them on a system, so every surface behaves the same way."
+    primary={{ label: 'Book a call', href: links.bookCall }}
+    secondary={{ label: 'Get a free audit', href: '#audit' }}
+  />
+</Base>

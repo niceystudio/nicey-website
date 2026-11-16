@@ -1,0 +1,28 @@
+---
+/** A practice page's offer: what we help with, as one numbered panel. */
+import SectionHead from './SectionHead.astro';
+import type { Practice } from '../data/practices';
+
+interface Props {
+  practice: Practice;
+}
+const { practice } = Astro.props;
+---
+
+<section aria-labelledby="offer-head" class="container-page flex flex-col gap-12 pb-section">
+  <SectionHead id="offer-head" caption={practice.name}>
+    What we help with
+  </SectionHead>
+  <div class="panel-wrap">
+    <ol class="panel grid-3">
+      {
+        practice.items.map((item, i) => (
+          <li class="flex min-h-36 flex-col justify-between gap-6 p-cell-sm">
+            <span class="font-mono text-caption text-muted">{String(i + 1).padStart(2, '0')}</span>
+            <span class="text-h4">{item}</span>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>

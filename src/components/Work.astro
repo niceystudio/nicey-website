@@ -1,66 +1,17 @@
 ---
 import SectionHead from './SectionHead.astro';
-import { links } from '../data/links';
+import type { WorkRow } from '../data/work';
 
-interface Row {
-  name: string;
-  meta: string;
-  href: string;
-  /** null keeps the dashed placeholder: the figure isn't collected yet */
-  figure: { value: string; arrow?: boolean } | null;
-  caption: string;
-  description: string;
+interface Props {
+  rows: WorkRow[];
+  caption?: string;
+  heading?: string;
 }
-
-const rows: Row[] = [
-  {
-    name: 'QBench',
-    meta: 'Design system + product · LIMS',
-    href: links.work.qbench,
-    figure: { value: '1,071', arrow: true },
-    caption: 'Outside-library references',
-    description:
-      'Years without a designer, consolidated into one semantic token system. Plus one status model for eight entry points, compliance steps included, shipped as an MVP.',
-  },
-  {
-    name: 'Everbreed',
-    meta: 'Design system · Agtech',
-    href: links.work.everbreed,
-    figure: { value: '302' },
-    caption: 'Variables made machine-readable',
-    description:
-      'A mature Figma library made machine-readable: IDs, scopes and code names on 302 variables, so the code config can come from Figma. In progress.',
-  },
-  {
-    name: 'Clerky',
-    meta: 'Design system · Legal tech',
-    href: links.work.clerky,
-    figure: { value: '0 T1' },
-    caption: 'Defects at the pilot gate',
-    description:
-      'Three-tier tokens, AI-context docs on every component and token, and a zero-T1 defect gate. Validated at pilot scale on the Documents App.',
-  },
-  {
-    name: 'Omnisafe',
-    meta: 'Product design · Insurance',
-    href: links.work.omnisafe,
-    figure: { value: '16' },
-    caption: 'Modules tested before build',
-    description: 'Sixteen modules, tested end to end with real employees before engineering began.',
-  },
-  {
-    name: 'FLYR',
-    meta: 'Product design · Hospitality',
-    href: links.work.flyr,
-    figure: null,
-    caption: 'One business result',
-    description: 'Group Quotation MVP shipped, so hotels can see whether a group booking makes money.',
-  },
-];
+const { rows, caption = 'Work', heading = 'Systems and products we have built' } = Astro.props;
 ---
 
 <section id="work" aria-labelledby="work-head" class="container-page flex flex-col gap-12 pb-section">
-  <SectionHead id="work-head" caption="Work">Systems and products we have built</SectionHead>
+  <SectionHead id="work-head" caption={caption}>{heading}</SectionHead>
   <ul class="panel flex flex-col">
     {
       rows.map((r) => (
@@ -74,10 +25,10 @@ const rows: Row[] = [
               {r.figure ? (
                 <span class="text-h3 whitespace-nowrap tabular-nums">
                   {r.figure.value}
-                  {r.figure.arrow && (
+                  {r.figure.to && (
                     <>
                       {' '}
-                      <span class="text-muted">→</span> 0
+                      <span class="text-muted">→</span> {r.figure.to}
                     </>
                   )}
                 </span>

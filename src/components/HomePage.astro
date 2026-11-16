@@ -15,6 +15,7 @@ import Process from './Process.astro';
 import Work from './Work.astro';
 import Faq from './Faq.astro';
 import Footer from './Footer.astro';
+import { workRows } from '../data/work';
 import ReviewSwitch from './ReviewSwitch.astro';
 
 interface Props {
@@ -36,7 +37,7 @@ const { zeroDrift } = Astro.props;
     {zeroDrift === 'static' ? <ZeroDriftStatic /> : <ZeroDriftStory />}
     <Services />
     <Process />
-    <Work />
+    <Work rows={workRows.home} />
     <Faq />
   </main>
   <Footer />

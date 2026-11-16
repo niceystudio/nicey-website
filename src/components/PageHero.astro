@@ -1,0 +1,35 @@
+---
+/**
+ * The page opener every top-level page shares: caption, display h1,
+ * lead paragraph beside the CTAs, and an optional mono note under them.
+ * The h1 text goes in the default slot; the note in slot="note".
+ */
+import { links } from '../data/links';
+
+interface Props {
+  caption: string;
+  lead: string;
+  /** the main CTA; the second is always "Book a call" */
+  primary?: { label: string; href: string };
+}
+const { caption, lead, primary = { label: 'Get a free audit', href: '#audit' } } = Astro.props;
+---
+
+<section class="container-page flex flex-col gap-8 pt-section pb-20 max-md:pb-16">
+  <span class="caption text-ink-2">{caption}</span>
+  <h1 class="m-0 max-w-title text-display"><slot /></h1>
+  <div class="flex flex-wrap items-end justify-between gap-x-16 gap-y-7">
+    <p class="m-0 max-w-copy text-lead text-pretty text-ink-2">{lead}</p>
+    <div class="flex flex-wrap gap-2.5">
+      <a href={primary.href} class="pill pill-ink pill-lg">{primary.label}</a>
+      <a href={links.bookCall} class="pill pill-outline pill-lg">Book a call</a>
+    </div>
+  </div>
+  {
+    Astro.slots.has('note') && (
+      <p class="m-0 font-mono text-code text-ink-2">
+        <slot name="note" />
+      </p>
+    )
+  }
+</section>
