@@ -185,6 +185,8 @@
 
   /* motion */
   --ease-resolve: cubic-bezier(0.65, 0, 0.35, 1);
+  /* strong ease-out for UI (Emil Kowalski's vocabulary): enter, exit, press */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 /* ------------------------------------------------------------------ *
@@ -242,7 +244,8 @@
   html {
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
-    scroll-padding-top: 24px;
+    /* the header is sticky (80px), so anchors land below it */
+    scroll-padding-top: 104px;
   }
   @media (prefers-reduced-motion: no-preference) {
     html {
@@ -420,6 +423,37 @@
     font-weight: 500;
     text-decoration: none;
     white-space: nowrap;
+    transition: transform 160ms var(--ease-out), background-color 160ms var(--ease-out);
+  }
+  /* press feedback: the button confirms it heard the click */
+  .pill:active,
+  .press:active {
+    transform: scale(0.97);
+  }
+  .press {
+    transition: transform 160ms var(--ease-out);
+  }
+  /* arrow nudge: the arrow in a link moves a little toward where it goes on hover (same 4px as the
+     Work rows; Emir, 12 Nov). Put the arrow in <span class="arr"> (or arr-left / arr-up). */
+  .arr,
+  .arr-left,
+  .arr-up {
+    display: inline-block;
+    transition: transform 150ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    a:hover .arr {
+      transform: translateX(4px);
+    }
+    a:hover .arr-left {
+      transform: translateX(-4px);
+    }
+    a:hover .arr-up {
+      transform: translateY(-3px);
+    }
+  }
+  a:focus-visible .arr {
+    transform: translateX(4px);
   }
   .pill-ink {
     background: var(--color-ink);
@@ -436,6 +470,29 @@
   }
   .pill-lg.pill-outline {
     padding: 15px 23px;
+  }
+
+  /* button states (Emir, 11 Nov). Primary = solid, secondary = outline, on the page and on the dark band.
+     Hover only where a pointer can hover; pressed goes one step further than hover, plus the scale above. */
+  @media (hover: hover) and (pointer: fine) {
+    .pill-ink:hover {
+      background: color-mix(in srgb, var(--color-ink) 84%, var(--color-page));
+    }
+    .pill-outline:hover {
+      background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+    }
+    .pill.border-on-band:hover {
+      background: color-mix(in srgb, var(--color-on-band) 10%, transparent);
+    }
+  }
+  .pill-ink:active {
+    background: color-mix(in srgb, var(--color-ink) 74%, var(--color-page));
+  }
+  .pill-outline:active {
+    background: color-mix(in srgb, var(--color-ink) 12%, transparent);
+  }
+  .pill.border-on-band:active {
+    background: color-mix(in srgb, var(--color-on-band) 18%, transparent);
   }
 
   .chip {
@@ -475,6 +532,10 @@
   .units > i.is-hot {
     background: var(--color-hot);
   }
+  /* checked and clear: every cell in the accent */
+  .units--ok > i {
+    background: var(--color-accent);
+  }
 
   .sr-only {
     position: absolute;
@@ -487,4 +548,15 @@
     white-space: nowrap;
     border: 0;
   }
+}
+
+/* the cream button on the dark band takes its colour from a utility class (bg-on-band),
+   so its states live here, outside the layers, to win over it */
+@media (hover: hover) and (pointer: fine) {
+  .pill.bg-on-band:hover {
+    background: color-mix(in srgb, var(--color-on-band) 86%, var(--color-band));
+  }
+}
+.pill.bg-on-band:active {
+  background: color-mix(in srgb, var(--color-on-band) 76%, var(--color-band));
 }

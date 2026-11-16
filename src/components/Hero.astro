@@ -1,24 +1,113 @@
 ---
+/**
+ * Homepage hero: the audit is the hero (Emir chose variation B, 11 Nov).
+ * The buyer's question, what the free audit gives, and a sample report page (AuditPaper).
+ */
 import { links } from '../data/links';
+import AuditPaper from './AuditPaper.astro';
+// client names right under the hero (13 Nov order); names only, each scrolls to its row in Work (Emir: numbers mean nothing here)
+const proof = ['QBench', 'Everbreed', 'Clerky', 'Omnisafe', 'FLYR'].map((name) => ({ name, href: `#work-${name.toLowerCase()}` }));
+
 ---
 
-<section class="container-page flex flex-col gap-8 pt-[120px] pb-20 max-md:pt-20 max-md:pb-16">
-  <span class="caption text-ink-2"
-    >A design systems studio · for legacy products and teams scaling with agents</span
-  >
-  <h1 class="m-0 max-w-[11ch] text-h1">Design systems people and agents read the same way.</h1>
-  <div class="flex flex-wrap items-end justify-between gap-x-16 gap-y-7">
-    <p class="m-0 max-w-[52ch] text-body-lg text-pretty text-ink-2">
-      We turn years of drifted UI into one system: tokens, components and documentation that a
-      designer, an engineer and a coding agent understand the same way. Product design when you need
-      the screens too.
+<section class="hero container-page">
+  <div class="hero-copy">
+    <span class="caption text-ink-2">Free design system audit · read-only</span>
+    <h1 class="hero-h m-0">Is your design system ready for AI agents?</h1>
+    <p class="m-0 max-w-[46ch] text-body-lg text-pretty text-ink-2">
+      Send us your Figma file. You get a score per pillar, the top findings and what to fix first. Free, and we never
+      edit your file.
     </p>
     <div class="flex flex-wrap gap-2.5">
       <a href="#audit" class="pill pill-ink pill-lg">Get a free audit</a>
       <a href={links.bookCall} class="pill pill-outline pill-lg">Book a call</a>
     </div>
+    <p class="m-0 font-mono text-code leading-normal text-ink-2">
+      Then we build systems people and agents read the same way.
+    </p>
   </div>
-  <p class="m-0 font-mono text-code leading-normal text-ink-2">
-    We audit before we quote. The first look at your system is free and read-only.
-  </p>
+  <div class="hero-visual">
+    <AuditPaper tilt />
+  </div>
+  <nav class="hero-proof" aria-label="Selected work">
+    <span class="caption text-muted">Selected work</span>
+    <ul>
+      {
+        proof.map((p) => (
+          <li>
+            <a href={p.href}>{p.name}</a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
 </section>
+
+<style>
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 48px 64px;
+    padding-top: 104px;
+    padding-bottom: 88px;
+  }
+  @media (max-width: 1023px) {
+    .hero {
+      grid-template-columns: 1fr;
+      padding-top: 72px;
+      padding-bottom: 64px;
+    }
+  }
+  .hero-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+  .hero-h {
+    font-size: clamp(44px, 5.6vw, 80px);
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+    font-weight: 500;
+    text-wrap: balance;
+  }
+  .hero-proof {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 28px;
+    padding-top: 20px;
+    border-top: 1px solid var(--color-line);
+  }
+  .hero-proof ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 28px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .hero-proof a {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
+    color: var(--color-ink);
+    text-decoration: none;
+    font-size: var(--text-body-sm);
+    font-weight: 500;
+    transition: color 160ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .hero-proof a:hover {
+      color: var(--color-accent);
+    }
+  }
+  .hero-visual {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+  }
+</style>

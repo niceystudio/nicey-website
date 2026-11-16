@@ -8,14 +8,33 @@
 import Base from '../../layouts/Base.astro';
 import Header from '../Header.astro';
 import Gaps from './Gaps.astro';
+import Shot from './Shot.astro';
+import NamesField from './NamesField.astro';
+import QBenchHero from './QBenchHero.astro';
+import QBenchWork from './QBenchWork.astro';
+import StatusHero from './StatusHero.astro';
+import EverbreedHero from './EverbreedHero.astro';
+import Faq from '../Faq.astro';
+import AgenticCompare from './AgenticCompare.astro';
+import EverbreedProduct from './EverbreedProduct.astro';
+import SurfacesField from './SurfacesField.astro';
+import AliasesField from './AliasesField.astro';
+import TwoSides from './TwoSides.astro';
+import Decisions from './Decisions.astro';
+import Chapters from './Chapters.astro';
+import SectionHead from '../SectionHead.astro';
+import MachineView from './MachineView.astro';
+import { caseMarkdown } from '../../lib/case-markdown';
+import SiteFooter from '../SiteFooter.astro';
 import { links } from '../../data/links';
-import { caseHref, getCaseStudy, type Band, type CaseStudy } from '../../data/case-studies';
+import { caseHref, caseStudies, getCaseStudy, type Band, type CaseStudy } from '../../data/case-studies';
 
 interface Props {
   study: CaseStudy;
 }
 const { study: s } = Astro.props;
 const next = getCaseStudy(s.next);
+const prev = caseStudies.find((c) => c.next === s.slug);
 
 // literal class names so Tailwind sees them
 const bandBg: Record<Band, string> = {
@@ -27,18 +46,46 @@ const bandBg: Record<Band, string> = {
   stone: 'bg-stone',
 };
 const band = bandBg[s.band];
-const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
+const mdHref = `${caseHref(s.slug)}.md`;
+const pageUrl = new URL(caseHref(s.slug), Astro.site ?? 'https://nicey-website.vercel.app').href;
+const article = {
+  '@type': 'Article',
+  headline: `${s.name}: ${s.statement}`,
+  description: s.lede,
+  url: pageUrl,
+  about: s.kicker.replace('Case study · ', '').split(' · '),
+  author: { '@type': 'Organization', name: 'Nicey Studio', url: new URL('/', pageUrl).href },
+  mainEntityOfPage: pageUrl,
+};
+// only answered questions go into structured data; [placeholders] stay out
+const answered = s.faq?.filter((f) => !/\[[^\]]+\]/.test(f.a)) ?? [];
+const faqLd = answered.length > 0 && {
+  '@type': 'FAQPage',
+  mainEntity: answered.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+const jsonLd = { '@context': 'https://schema.org', '@graph': faqLd ? [article, faqLd] : [article] };
+const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https://nicey-website.vercel.app').href);
 ---
 
-<Base title={`${s.linkName} case study · Nicey`} description={s.lede}>
+<Base title={`${s.linkName} case study · Nicey`} description={s.lede} markdownHref={mdHref} jsonLd={jsonLd}>
   <Header variant="case" />
-  <main id="main" tabindex="-1" class="cs">
+  <main id="main" tabindex="-1" class="cs" data-human>
     <section aria-labelledby="cs-title" class={band}>
       <div class="container-page cs-hero">
-        <span class="caption text-ink-2">{s.kicker}</span>
-        <p class="m-0 text-case-name">{s.name}</p>
-        <h1 id="cs-title" class="m-0 max-w-[24ch] text-case-h1">{s.statement}</h1>
-        <p class="m-0 max-w-[62ch] text-body-lg text-pretty text-ink-2"><Gaps text={s.lede} /></p>
+        <div class:list={['cs-hero-top', s.heroVisual && 'cs-hero-top--visual']}>
+          <div class="cs-hero-copy">
+            <span class="caption text-ink-2">{s.kicker}</span>
+            <p class="m-0 text-case-name">{s.name}</p>
+            <h1 id="cs-title" class="m-0 max-w-[22ch] text-case-h1 text-balance">{s.statement}</h1>
+            <p class="m-0 max-w-[52ch] text-body-lg text-pretty text-ink-2"><Gaps text={s.lede} /></p>
+          </div>
+          {s.heroVisual && (
+            <div class="cs-hero-visual">
+              {s.heroContext && <p class="cs-hero-context">{s.heroContext}</p>}
+              {s.heroVisual === 'qbench-build' ? <QBenchHero /> : s.heroVisual === 'everbreed' ? <EverbreedHero /> : <StatusHero />}
+            </div>
+          )}
+        </div>
         <dl class="cs-facts">
           {
             s.facts.map((f) => (
@@ -51,14 +98,18 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
             ))
           }
         </dl>
-        <p class="m-0 text-body-sm text-ink-2"><Gaps text={s.who} /></p>
+        {s.who && <p class="m-0 text-body-sm text-ink-2"><Gaps text={s.who} /></p>}
       </div>
     </section>
 
     {
-      s.lead.kind === 'image' ? (
+      !s.lead ? null : s.lead.kind === 'image' ? (
         <section aria-label="Project image" class="container-page cs-lead">
-          <div class="placeholder cs-shot cs-shot--wide">{s.lead.placeholder}</div>
+          {s.lead.src ? (
+            <Shot shot={s.lead.src} alt={s.lead.alt ?? ''} wide eager />
+          ) : (
+            <div class="placeholder cs-shot cs-shot--wide">{s.lead.placeholder}</div>
+          )}
         </section>
       ) : (
         <section aria-labelledby="audit-head" class="container-page cs-lead">
@@ -78,9 +129,16 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
     }
 
     <section aria-labelledby="numbers-head" class="container-page cs-block cs-block--md">
-      <h2 id="numbers-head" class="caption m-0 mb-5 text-ink-2">{s.numbersHeading}</h2>
-      <div class="panel-wrap">
-        <ul class:list={['panel', s.numbers.length === 4 ? 'grid-4' : 'grid-3']}>
+      {s.heads?.proof ? (
+        <SectionHead id="numbers-head" caption={s.heads.proof.caption} class="mb-12" headingClass="max-w-[18ch]">{s.heads.proof.heading}</SectionHead>
+      ) : (
+        <h2 id="numbers-head" class:list={['caption m-0 mb-5 text-ink-2', s.proofViz && 'sr-only']}>{s.numbersHeading}</h2>
+      )}
+      <div class:list={['panel-wrap', s.proofViz && 'panel flex flex-col']}>
+        {s.proofViz === 'names' && <NamesField />}
+        {s.proofViz === 'surfaces' && <SurfacesField />}
+        {s.proofViz === 'aliases' && <AliasesField />}
+        {!s.proofViz && <ul class:list={['panel', s.numbers.length === 4 ? 'grid-4' : 'grid-3']}>
           {
             s.numbers.map((n) => (
               <li class="cs-num">
@@ -90,24 +148,9 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
               </li>
             ))
           }
-        </ul>
+        </ul>}
       </div>
     </section>
-
-    {
-      s.steps && (
-        <section aria-labelledby="steps-head" class="container-page cs-block cs-block--md cs-steps">
-          <h2 id="steps-head" class="caption m-0 text-ink-2">
-            Zero Drift steps in this project
-          </h2>
-          <ul class="m-0 flex list-none flex-wrap gap-2 p-0">
-            {s.steps.map((st) => (
-              <li class:list={['cs-step', st.inProgress && 'cs-step--open']}>{st.label}</li>
-            ))}
-          </ul>
-        </section>
-      )
-    }
 
     {
       s.note && (
@@ -124,7 +167,11 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
       )
     }
 
-    <section aria-labelledby="did-head" class="container-page cs-block cs-split">
+    {s.chapters && <Chapters chapters={s.chapters} marker={band} head={s.heads?.chapters} layout={s.chaptersLayout} />}
+
+    {s.decisions && <Decisions heading={s.decisions.heading} head={s.heads?.decisions} items={s.decisions.items} />}
+
+    {!s.chapters && <section aria-labelledby="did-head" class="container-page cs-block cs-split">
       <h2 id="did-head" class="cs-split-head m-0 text-case-h2">What we did</h2>
       <ol class="cs-split-body cs-did">
         {
@@ -136,10 +183,11 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
           ))
         }
       </ol>
-    </section>
+    </section>}
 
+    {s.agentic && s.agenticStyle === 'gate' && <AgenticCompare kicker={s.agentic.kicker} heading={s.agentic.heading} />}
     {
-      s.agentic && (
+      s.agentic && s.agenticStyle !== 'gate' && (
         <section aria-labelledby="agentic-head" class="container-page cs-block">
           <div class="cs-agentic bg-band text-on-band">
             <div class="flex flex-col gap-2.5">
@@ -148,7 +196,7 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
                 {s.agentic.heading}
               </h2>
             </div>
-            <ol class="cs-agentic-list">
+            <ol class="cs-agentic-list" data-stagger>
               {s.agentic.items.map((it) => (
                 <li>
                   <span class="font-mono text-caption text-on-band-accent">{it.label}</span>
@@ -185,57 +233,120 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
     }
 
     <section aria-labelledby="work-head" class="container-page cs-block flex flex-col gap-5">
-      <h2 id="work-head" class="m-0 text-case-h2">From the work</h2>
-      <div class="cs-figs">
-        {
-          s.work.map((w) => (
-            <figure class="m-0 flex flex-col gap-3">
-              <div class="placeholder cs-shot">{w.placeholder}</div>
-              <figcaption class="text-body-sm text-ink-2">{w.caption}</figcaption>
-            </figure>
-          ))
-        }
-      </div>
+      {s.heads?.work ? (
+        <SectionHead id="work-head" caption={s.heads.work.caption} class="mb-7" headingClass="max-w-[18ch]">{s.heads.work.heading}</SectionHead>
+      ) : (
+        <h2 id="work-head" class="m-0 text-case-h2">{s.workHeading ?? 'From the work'}</h2>
+      )}
+      {s.workVisual === 'qbench' ? (
+        <QBenchWork />
+      ) : s.workVisual === 'qbench-status' ? (
+        <TwoSides />
+      ) : s.workVisual === 'everbreed' ? (
+        <EverbreedProduct />
+      ) : (
+      <div class:list={['cs-figs', s.work.length === 2 && 'cs-figs--two']}>
+          {
+            s.work.map((w, i) => (
+              <figure class="m-0 flex flex-col gap-3">
+                {w.src ? (
+                  <Shot shot={w.src} alt={w.alt ?? ''} />
+                ) : (
+                  <div class="placeholder cs-shot">{w.placeholder}</div>
+                )}
+                <figcaption class="flex flex-col gap-1 text-body-sm text-ink-2">
+                  <span class="caption-sm text-muted">Fig 0.{i + 1}</span>
+                  {w.caption}
+                </figcaption>
+              </figure>
+            ))
+          }
+        </div>
+      )}
     </section>
+    {s.faq && (
+      <div class="cs-faq">
+        <Faq items={s.faq} heading="About this project" id="case-faq" />
+      </div>
+    )}
   </main>
 
-  <footer class="container-page cs-foot">
-    <div class:list={['cs-cta', band]}>
-      <div class="flex max-w-[46ch] flex-col gap-2">
-        <p class="m-0 text-case-cta">{s.cta.heading}</p>
-        <p class="m-0 text-cta text-ink-2">{s.cta.text}</p>
+  {/* one CTA on every page: the homepage closing band, only the words change (Emir, 11 Nov) */}
+  <section aria-labelledby="cs-cta-head" class="cs-cta bg-band text-on-band" data-human>
+    <div class="container-page flex flex-col items-start gap-6 py-section">
+      <span class="caption text-on-band-2">{s.cta.action === 'audit' ? 'Free audit · read-only' : 'Work with us'}</span>
+      <h2 id="cs-cta-head" class="m-0 max-w-[16ch] text-h1">{s.cta.heading}</h2>
+      <p class="m-0 max-w-[40ch] text-sub text-on-band-2">{s.cta.text}</p>
+      <div class="mt-4 flex flex-wrap gap-2.5">
+        {s.cta.action === 'audit' ? (
+          <>
+            <a href="/#audit" class="pill pill-lg bg-on-band text-band">Get a free audit</a>
+            <a href={links.bookCall} class="pill pill-lg border border-on-band px-[23px] py-[15px] text-on-band">Book a call</a>
+          </>
+        ) : (
+          <>
+            <a href={links.bookCall} class="pill pill-lg bg-on-band text-band">Book a call</a>
+            <a href="/#audit" class="pill pill-lg border border-on-band px-[23px] py-[15px] text-on-band">Get a free audit</a>
+          </>
+        )}
       </div>
-      <a href={ctaHref} class="pill pill-ink pill-lg">{s.cta.label}</a>
     </div>
+  </section>
+
+  <section aria-label="More case studies" class="container-page cs-foot" data-human>
     <a href={caseHref(next.slug)} class="cs-next">
-      <span class="caption-sm text-ink-2">Next case study</span>
-      <span class="text-case-cta">{next.linkName} →</span>
+      <span class="cs-next-copy">
+        <span class="caption text-ink-2">Next case study</span>
+        <span class="cs-next-name">{next.linkName}</span>
+        <span class="max-w-[48ch] text-body-lg text-pretty text-ink-2">{next.statement}</span>
+      </span>
+      <span class="cs-next-side" aria-hidden="true">
+        <span class="cs-next-arrow">→</span>
+      </span>
     </a>
-  </footer>
+    <nav aria-label="More case studies" class="cs-more">
+      {prev ? (
+        <a href={caseHref(prev.slug)} class="cs-more-link">
+          <span class="arr-left" aria-hidden="true">←</span> Previous: {prev.linkName}
+        </a>
+      ) : <span />}
+      <a href="/#work" class="cs-more-link">All case studies</a>
+    </nav>
+  </section>
+  <MachineView markdown={markdown} mdHref={mdHref} />
+  <SiteFooter mdHref={mdHref} />
 </Base>
 
+<script>
+  // agentic cards: hold them until the list scrolls in, then let the CSS stagger play once
+  const lists = document.querySelectorAll<HTMLElement>('[data-stagger]');
+  if (lists.length && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const io = new IntersectionObserver(
+      (es) =>
+        es.forEach((e) => {
+          if (!e.isIntersecting) return;
+          e.target.classList.remove('is-waiting');
+          io.unobserve(e.target);
+        }),
+      { threshold: 0.25 },
+    );
+    lists.forEach((l) => {
+      if (l.getBoundingClientRect().top < innerHeight) return;
+      l.classList.add('is-waiting');
+      io.observe(l);
+    });
+  }
+</script>
+
 <style>
+  /* same rhythm as the home page: --spacing-section between sections (128 / 96 / 72),
+     48px from a section heading to its container */
   .cs,
   .cs-foot {
-    --cs-lg: 72px;
-    --cs-md: 64px;
+    --cs-lg: var(--spacing-section);
+    --cs-md: var(--spacing-section);
     --cs-sm: 48px;
-  }
-  @media (max-width: 767px) {
-    .cs,
-    .cs-foot {
-      --cs-lg: 56px;
-      --cs-md: 48px;
-      --cs-sm: 40px;
-    }
-  }
-  @media (max-width: 479px) {
-    .cs,
-    .cs-foot {
-      --cs-lg: 48px;
-      --cs-md: 40px;
-      --cs-sm: 32px;
-    }
+    --cs-head: 48px;
   }
 
   .cs-hero {
@@ -243,6 +354,67 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
     flex-direction: column;
     gap: 24px;
     padding-block: var(--cs-lg) 56px;
+  }
+  .cs-hero-top {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+  .cs-hero-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    min-width: 0;
+  }
+  @media (min-width: 1100px) {
+    .cs-hero-top--visual {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: center;
+      gap: 56px;
+    }
+  }
+  .cs-hero-opt {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .cs-hero-opt[hidden] {
+    display: none;
+  }
+  .cs-hero-result {
+    font-size: var(--text-lede);
+    line-height: 1.35;
+    font-weight: 500;
+  }
+  .cs-hero-points {
+    margin: 4px 0 0;
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--color-line-strong);
+  }
+  .cs-hero-points > div {
+    display: grid;
+    grid-template-columns: 112px minmax(0, 1fr);
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .cs-hero-points dt {
+    padding-top: 3px;
+  }
+  @media (max-width: 479px) {
+    .cs-hero-points > div {
+      grid-template-columns: 1fr;
+      gap: 4px;
+    }
+  }
+  .cs-hero-context {
+    margin: 0 0 12px;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    line-height: 1.5;
+    color: var(--color-ink-2);
   }
   .cs-facts {
     margin: 8px 0 0;
@@ -385,7 +557,7 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
     padding: 0;
     list-style: none;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
     gap: 12px;
   }
   .cs-agentic-list > li {
@@ -395,6 +567,20 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
     padding: 22px;
     border-radius: var(--radius-code);
     background: color-mix(in srgb, var(--color-on-band) 8%, transparent);
+  }
+  /* group entrance once, when the cards scroll in: 50ms apart, never blocks reading */
+  @media (prefers-reduced-motion: no-preference) {
+    .cs-agentic-list.is-waiting > li {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    .cs-agentic-list > li {
+      transition: opacity 300ms var(--ease-out), transform 300ms var(--ease-out);
+    }
+    .cs-agentic-list > li:nth-child(2) { transition-delay: 50ms; }
+    .cs-agentic-list > li:nth-child(3) { transition-delay: 100ms; }
+    .cs-agentic-list > li:nth-child(4) { transition-delay: 150ms; }
+    .cs-agentic-list > li:nth-child(5) { transition-delay: 200ms; }
   }
 
   .cs-collect {
@@ -406,6 +592,15 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
     line-height: 1.5;
   }
 
+  .cs-figs.cs-figs--two {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  @media (min-width: 900px) {
+    .cs-figs.cs-figs--two {
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 2fr);
+      align-items: start;
+    }
+  }
   .cs-figs {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
@@ -415,35 +610,116 @@ const ctaHref = s.cta.action === 'audit' ? '/#audit' : links.bookCall;
   .cs-foot {
     padding-block: var(--cs-lg);
   }
-  .cs-cta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-    padding: 40px;
-    border-radius: var(--radius-panel);
+  /* same as the homepage band: the accent ring is under 3:1 on the day band, so it turns cream */
+  .cs-faq {
+    padding-top: var(--spacing-section);
   }
+  .cs-faq :global(#case-faq) {
+    padding-bottom: 0;
+  }
+  .cs-cta {
+    --color-focus: var(--color-on-band);
+    margin-top: var(--spacing-section);
+  }
+  /* the next case study is a second path, not a second card: an open row between two lines */
   .cs-next {
     display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin-top: 40px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px 40px;
+    padding-block: 32px;
+    border-top: 1px solid var(--color-line-strong);
+    border-bottom: 1px solid var(--color-line-strong);
     color: var(--color-ink);
     text-decoration: none;
   }
-  @media (hover: hover) {
-    .cs-next:hover .text-case-cta {
+  .cs-next-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+  }
+  .cs-next-name {
+    width: fit-content;
+    font-size: clamp(32px, 4.4vw, 60px);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    font-weight: 500;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 8px;
+    transition: text-decoration-color 200ms var(--ease-out);
+  }
+  .cs-next-side {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .cs-more {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px 24px;
+    padding-top: 18px;
+  }
+  .cs-more-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    color: var(--color-ink-2);
+    font-size: var(--text-body-sm);
+    text-decoration: none;
+    transition: color 200ms var(--ease-out);
+  }
+  .cs-more-link span {
+    transition: transform 200ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .cs-more-link:hover {
+      color: var(--color-ink);
       text-decoration: underline;
-      text-decoration-thickness: 2px;
-      text-underline-offset: 6px;
+      text-underline-offset: 4px;
+    }
+    .cs-more-link:hover span {
+      transform: translateX(-4px);
+    }
+  }
+  .cs-next-arrow {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 50%;
+    font-size: 20px;
+    transition: transform 200ms var(--ease-out), background-color 200ms var(--ease-out), color 200ms var(--ease-out);
+  }
+  .cs-next:active .cs-next-arrow {
+    transform: scale(0.95);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .cs-next:hover .cs-next-name {
+      text-decoration-color: currentColor;
+    }
+    .cs-next:hover .cs-next-arrow {
+      transform: translateX(6px);
+      background: var(--color-ink);
+      color: var(--color-on-ink);
+    }
+  }
+  @media (max-width: 767px) {
+    .cs-next {
+      flex-direction: column;
+      align-items: flex-start;
     }
   }
 
   @media (max-width: 479px) {
     .cs-audit,
-    .cs-agentic,
-    .cs-cta {
+    .cs-agentic {
       padding: 24px;
     }
     .cs-num {

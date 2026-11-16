@@ -1,0 +1,680 @@
+---
+/**
+ * Product decisions as one stage instead of five repeated rows.
+ * Pick a problem on the left: the UI on the right shows the problem first,
+ * then turns into how it was solved (or flip it with Problem / Solved).
+ * UI pieces are drawn in code in QBench's style, with example values.
+ * Sources: the QBench Status Workflows page in Figma and its review comments.
+ */
+import SectionHead from '../SectionHead.astro';
+
+interface Props {
+  heading: string;
+  head?: { caption: string; heading: string };
+  items: { ui: 'table' | 'toast' | 'move' | 'log' | 'search'; title: string; problem: string; solved: string }[];
+}
+const { heading, head, items } = Astro.props;
+---
+
+<section aria-labelledby="decisions-head" class="container-page dc-wrap">
+  {head ? (
+    <SectionHead id="decisions-head" caption={head.caption} class="mb-6" headingClass="max-w-[18ch]">{head.heading}</SectionHead>
+  ) : (
+    <h2 id="decisions-head" class="m-0 text-case-h2">{heading}</h2>
+  )}
+  <div class="dc panel" data-dc>
+    <div class="dc-list" role="tablist" aria-label="Problems">
+      {
+        items.map((it, i) => (
+          <button
+            type="button"
+            role="tab"
+            class="dc-tab"
+            id={`dc-tab-${i}`}
+            aria-controls="dc-stage"
+            aria-selected={i === 0 ? 'true' : 'false'}
+            tabindex={i === 0 ? 0 : -1}
+            data-dc-pick={i}
+          >
+            <span class="font-mono text-caption text-ink-2">{String(i + 1).padStart(2, '0')}</span>
+            <span class="text-body">{it.title}</span>
+            <i class="dc-prog" aria-hidden="true" />
+          </button>
+        ))
+      }
+    </div>
+    <div class="dc-stage" id="dc-stage" role="tabpanel" aria-labelledby="dc-tab-0" data-state="problem">
+      <div class="dc-top">
+        <div role="group" aria-label="Show" class="dc-seg">
+          <button type="button" data-dc-state="problem" aria-pressed="true">Problem</button>
+          <button type="button" data-dc-state="solved" aria-pressed="false">Solved</button>
+        </div>
+      </div>
+      {
+        items.map((it, i) => (
+          <div class="dc-item" data-dc-item={i} data-off={i !== 0 ? '' : undefined} aria-hidden={i !== 0 ? 'true' : undefined}>
+            <div class="dc-ui" aria-hidden="true">
+              {it.ui === 'table' && (
+                <>
+                  <div class="dc-p qb-stack3">
+                    <div class="qb qb-card qb-mini"><span class="qb-t">T-1042 · Draft → Completed</span><span class="qb-s">Needs: signature</span></div>
+                    <div class="qb qb-card qb-mini"><span class="qb-t">T-1043 · In review → Completed</span><span class="qb-s">Needs: fields + signature</span></div>
+                    <div class="qb qb-card qb-mini"><span class="qb-t">T-1044 · On hold → Completed</span><span class="qb-s">Needs: other fields + signature + PIN</span></div>
+                  </div>
+                  <div class="dc-s qb qb-card">
+                    <span class="qb-t">Required fields · 3 tests · In progress → Completed</span>
+                    <span class="qb-pills"><i class="is-on">1 · Fields</i><i>2 · Signature + PIN</i></span>
+                    <table class="qb-table">
+                      <thead><tr><th>Test</th><th>Turnaround</th><th>Technician</th></tr></thead>
+                      <tbody>
+                        <tr><td>T-1042</td><td><span class="qb-in">2 days</span></td><td><span class="qb-in">Select</span></td></tr>
+                        <tr><td>T-1043</td><td><span class="qb-in">2 days</span></td><td><span class="qb-in">Select</span></td></tr>
+                        <tr><td>T-1044</td><td><span class="qb-in">2 days</span></td><td><span class="qb-in">Select</span></td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              )}
+              {it.ui === 'toast' && (
+                <>
+                  <div class="dc-p qb qb-card">
+                    <span class="qb-t">Signature required</span>
+                    <span class="qb-s">This move needs an e-signature, and you don’t have one.</span>
+                    <span class="qb-row qb-row--end"><span class="qb-btn qb-btn--ghost">Close</span></span>
+                  </div>
+                  <div class="dc-s qb qb-stack">
+                    <span class="qb-field qb-field--card"><span class="qb-lbl">Status</span><span class="qb-in">Completed ▾</span></span>
+                    <span class="qb-toast"><i class="qb-dot" /><span>An e-signature is required. You haven’t set one up yet.</span><b>Set up</b></span>
+                  </div>
+                </>
+              )}
+              {it.ui === 'move' && (
+                <>
+                  <div class="dc-p qb qb-card">
+                    <span class="qb-t">Workflow · Test approval</span>
+                    <span class="qb-flow"><b>Not started</b>→<b class="qb-gone">Draft</b>→<b>In progress</b></span>
+                    <span class="qb-warn qb-warn--bad">12 tests are still in “Draft”</span>
+                  </div>
+                  <div class="dc-s qb qb-card">
+                    <span class="qb-t">Move tests to a new status</span>
+                    <span class="qb-s">You’re about to remove “Draft” from the workflow.</span>
+                    <span class="qb-warn">This will affect 12 tests</span>
+                    <span class="qb-field"><span class="qb-lbl">Move them to</span><span class="qb-in">In progress ▾</span></span>
+                    <span class="qb-row"><u>View affected tests</u><span class="qb-btn">Move and remove</span></span>
+                  </div>
+                </>
+              )}
+              {it.ui === 'log' && (
+                <>
+                  <div class="dc-p qb qb-card">
+                    <span class="qb-t">Automation · when results are in</span>
+                    <span class="qb-field"><span class="qb-lbl">Then set status to</span><span class="qb-in">Completed ▾</span></span>
+                    <span class="qb-warn qb-warn--bad">This move needs a signature. Nobody is there to sign.</span>
+                  </div>
+                  <div class="dc-s qb qb-card">
+                    <span class="qb-t">Automation results</span>
+                    <span class="qb-logrow"><i class="qb-ok" /> Run 41 · Moved 18 tests to In progress</span>
+                    <span class="qb-logrow qb-logrow--fail"><i class="qb-bad" /> Run 42 · Failed: Status transition not allowed by active workflow</span>
+                    <span class="qb-logrow"><i class="qb-ok" /> Run 43 · Moved 6 tests to In progress</span>
+                  </div>
+                </>
+              )}
+              {it.ui === 'search' && (
+                <>
+                  <div class="dc-p qb qb-card">
+                    <span class="qb-t">Required fields</span>
+                    {['Assay', 'Batch', 'Customer', 'Due date', 'Instrument', 'Lot number'].map((f) => (
+                      <span class="qb-swrow"><span>{f}</span><i class="qb-sw" /></span>
+                    ))}
+                    <span class="qb-s">+ 240 more fields</span>
+                  </div>
+                  <div class="dc-s qb qb-card">
+                    <span class="qb-t">Set up required fields</span>
+                    <span class="qb-in qb-in--search">⌕ Search fields…</span>
+                    <span class="qb-drag"><i>⋮⋮</i> Turnaround <em>Required</em></span>
+                    <span class="qb-drag"><i>⋮⋮</i> Assigned technician <em>Required</em></span>
+                    <span class="qb-drag"><i>⋮⋮</i> Estimated complete date <em>Optional</em></span>
+                  </div>
+                </>
+              )}
+            </div>
+            <div class="dc-copy">
+              <p class="dc-p-text m-0">
+                <span class="caption text-ink-2">Problem</span>
+                <span class="text-body-lg text-pretty">{it.problem}</span>
+              </p>
+              <p class="dc-s-text m-0">
+                <span class="caption text-ink-2">Solved</span>
+                <span class="text-body-lg text-pretty">{it.solved}</span>
+              </p>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .dc-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-top: var(--spacing-section);
+  }
+  .dc {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.42fr) minmax(0, 1fr);
+    overflow: hidden;
+  }
+  @media (max-width: 860px) {
+    .dc {
+      grid-template-columns: 1fr;
+    }
+  }
+  .dc-list {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--color-line);
+  }
+  @media (max-width: 860px) {
+    .dc-list {
+      flex-direction: row;
+      overflow-x: auto;
+      border-right: 0;
+      border-bottom: 1px solid var(--color-line);
+      scrollbar-width: none;
+    }
+  }
+  .dc-tab {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 18px 22px;
+    border: 0;
+    border-bottom: 1px solid var(--color-line);
+    background: transparent;
+    color: var(--color-ink-2);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 200ms var(--ease-out), color 200ms var(--ease-out);
+  }
+  /* tabs share the full height of the panel, so no empty gap under the last one */
+  @media (min-width: 861px) {
+    .dc-tab {
+      flex: 1 1 auto;
+      justify-content: center;
+    }
+    .dc-tab:last-child {
+      border-bottom: 0;
+    }
+  }
+  @media (max-width: 860px) {
+    .dc-tab {
+      flex: none;
+      min-width: 170px;
+      border-bottom: 0;
+      border-right: 1px solid var(--color-line);
+    }
+  }
+  .dc-tab[aria-selected='true'] {
+    background: var(--color-surface-hover);
+    color: var(--color-ink);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .dc-tab:hover {
+      color: var(--color-ink);
+    }
+  }
+  /* a thin bar fills while the problem turns into the solution */
+  .dc-prog {
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    height: 2px;
+    width: 100%;
+    background: var(--color-accent);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  .dc-tab[aria-selected='true'] .dc-prog {
+    transform: scaleX(1);
+  }
+  .dc-tab.is-timing .dc-prog {
+    transform: scaleX(0);
+    animation: dc-prog var(--dc-delay, 1600ms) linear forwards;
+  }
+  @keyframes dc-prog {
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  .dc-stage {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    align-content: start;
+    gap: 20px;
+    padding: 24px 28px 32px;
+    min-width: 0;
+  }
+  /* the switch sits on the left, where the eye starts after picking a problem */
+  .dc-top {
+    grid-row: 1;
+    grid-column: 1;
+    display: flex;
+    justify-content: flex-start;
+  }
+  .dc-seg {
+    display: inline-flex;
+    padding: 3px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-pill);
+  }
+  .dc-seg button {
+    min-height: 34px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--color-ink-2);
+    font: inherit;
+    font-size: var(--text-body-sm);
+    cursor: pointer;
+    transition: transform 160ms var(--ease-out);
+  }
+  .dc-seg button:active {
+    transform: scale(0.97);
+  }
+  .dc-seg button[aria-pressed='true'] {
+    background: var(--color-ink);
+    color: var(--color-on-ink);
+  }
+  /* all problems share one cell: the panel keeps the height of the tallest one,
+     so it doesn't jump when you switch */
+  /* data-off, not [hidden]: the base styles force [hidden] out of the layout */
+  .dc-item[data-off] {
+    visibility: hidden;
+  }
+  .dc-item {
+    grid-row: 2;
+    grid-column: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: 24px 36px;
+    align-items: center;
+  }
+  @media (max-width: 1100px) {
+    .dc-item {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* problem and solution share one spot and cross-fade */
+  .dc-ui {
+    display: grid;
+    place-items: center;
+    min-height: 300px;
+    padding: 24px;
+    border-radius: var(--radius-panel);
+    background: var(--color-page);
+  }
+  /* the outgoing state leaves first (160ms), then the incoming one comes in */
+  .dc-ui > * {
+    grid-area: 1 / 1;
+    transition: opacity 280ms var(--ease-out) 170ms, transform 280ms var(--ease-out) 170ms;
+  }
+  .dc-stage[data-state='problem'] .dc-s,
+  .dc-stage[data-state='solved'] .dc-p {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+    pointer-events: none;
+    transition-duration: 160ms;
+    transition-delay: 0ms;
+  }
+  .dc-copy {
+    display: grid;
+  }
+  .dc-copy > p {
+    grid-area: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: opacity 260ms var(--ease-out) 170ms, transform 260ms var(--ease-out) 170ms;
+  }
+  .dc-stage[data-state='problem'] .dc-s-text,
+  .dc-stage[data-state='solved'] .dc-p-text {
+    opacity: 0;
+    transform: translateY(6px);
+    transition-duration: 160ms;
+    transition-delay: 0ms;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .dc-ui > *,
+    .dc-copy > p {
+      transition: opacity 200ms ease;
+      transform: none !important;
+    }
+  }
+
+  /* QBench-style UI pieces (product colours, as in the product) */
+  .qb {
+    width: 100%;
+    max-width: 420px;
+    color: #1f2937;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  .qb-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 18px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.1);
+  }
+  .qb-stack,
+  .qb-stack3 {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 420px;
+  }
+  .qb-mini {
+    gap: 4px;
+    padding: 12px 14px;
+  }
+  /* staggered cards: each one is narrower by the full offset, so the last stays inside the box */
+  .qb-stack3 .qb-mini {
+    width: calc(100% - 36px);
+  }
+  .qb-stack3 .qb-mini:nth-child(2) {
+    margin-left: 18px;
+  }
+  .qb-stack3 .qb-mini:nth-child(3) {
+    margin-left: 36px;
+  }
+  .qb-t {
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .qb-s {
+    color: #4b5563;
+  }
+  .qb-pills {
+    display: flex;
+    gap: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #9ca3af;
+  }
+  .qb-pills i {
+    font-style: normal;
+  }
+  .qb-pills .is-on {
+    color: #1f2937;
+    font-weight: 500;
+  }
+  .qb-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .qb-table th {
+    padding: 0 6px 6px 0;
+    color: #6b7280;
+    font-weight: 500;
+    text-align: left;
+  }
+  .qb-table td {
+    padding: 4px 6px 4px 0;
+    white-space: nowrap;
+  }
+  .qb-in {
+    display: block;
+    padding: 6px 9px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #fff;
+    color: #4b5563;
+  }
+  .qb-in--search {
+    color: #9ca3af;
+  }
+  .qb-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .qb-field--card {
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #fff;
+  }
+  .qb-lbl {
+    font-weight: 500;
+  }
+  .qb-toast {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: #1f2937;
+    color: #f9fafb;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+  }
+  .qb-toast b {
+    margin-left: auto;
+    padding-left: 8px;
+    color: #a5c4f3;
+    font-weight: 600;
+    text-decoration: underline;
+    white-space: nowrap;
+  }
+  .qb-dot {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #f87171;
+  }
+  .qb-warn {
+    padding: 8px 10px;
+    border-radius: 6px;
+    background: #fef3c7;
+    color: #92400e;
+    font-weight: 500;
+  }
+  .qb-warn--bad {
+    background: #fee2e2;
+    color: #b42318;
+  }
+  .qb-flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    color: #9ca3af;
+  }
+  .qb-flow b {
+    padding: 4px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 999px;
+    color: #1f2937;
+    font-weight: 500;
+  }
+  .qb-flow .qb-gone {
+    border-style: dashed;
+    color: #b42318;
+    text-decoration: line-through;
+  }
+  .qb-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 4px;
+  }
+  .qb-row--end {
+    justify-content: flex-end;
+  }
+  .qb-row u {
+    color: #244d9e;
+  }
+  .qb-btn {
+    padding: 7px 12px;
+    border-radius: 6px;
+    background: #244d9e;
+    color: #fff;
+    font-weight: 500;
+  }
+  .qb-btn--ghost {
+    border: 1px solid #d1d5db;
+    background: #fff;
+    color: #1f2937;
+  }
+  .qb-logrow {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 8px 0;
+    border-top: 1px solid #f3f4f6;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: #4b5563;
+  }
+  .qb-logrow--fail {
+    color: #b42318;
+  }
+  .qb-ok,
+  .qb-bad {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #16a34a;
+  }
+  .qb-bad {
+    background: #c2341b;
+  }
+  .qb-swrow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 0;
+    border-bottom: 1px solid #f3f4f6;
+    color: #4b5563;
+  }
+  .qb-sw {
+    position: relative;
+    width: 28px;
+    height: 16px;
+    border-radius: 8px;
+    background: #d1d5db;
+  }
+  .qb-sw::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fff;
+  }
+  .qb-drag {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+  }
+  .qb-drag i {
+    font-style: normal;
+    color: #9ca3af;
+    letter-spacing: -2px;
+  }
+  .qb-drag em {
+    margin-left: auto;
+    font-style: normal;
+    color: #6b7280;
+    font-size: 12px;
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-dc]').forEach((root) => {
+    const tabs = root.querySelectorAll<HTMLButtonElement>('[data-dc-pick]');
+    const items = root.querySelectorAll<HTMLElement>('[data-dc-item]');
+    const stage = root.querySelector<HTMLElement>('.dc-stage');
+    const segs = root.querySelectorAll<HTMLButtonElement>('[data-dc-state]');
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const DELAY = 1600;
+    let timer = 0;
+    let current = 0;
+
+    const setState = (v: 'problem' | 'solved') => {
+      if (stage) stage.dataset.state = v;
+      segs.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.dcState === v)));
+    };
+    const show = (i: number, play: boolean) => {
+      current = i;
+      clearTimeout(timer);
+      tabs.forEach((t, k) => {
+        t.setAttribute('aria-selected', String(k === i));
+        t.tabIndex = k === i ? 0 : -1;
+        t.classList.remove('is-timing');
+      });
+      items.forEach((it, k) => {
+        it.toggleAttribute('data-off', k !== i);
+        it.toggleAttribute('inert', k !== i);
+        if (k !== i) it.setAttribute('aria-hidden', 'true');
+        else it.removeAttribute('aria-hidden');
+      });
+      stage?.setAttribute('aria-labelledby', `dc-tab-${i}`);
+      setState('problem');
+      if (!play || reduced) return;
+      void tabs[i].offsetWidth;
+      tabs[i].style.setProperty('--dc-delay', `${DELAY}ms`);
+      tabs[i].classList.add('is-timing');
+      timer = window.setTimeout(() => setState('solved'), DELAY);
+    };
+
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => show(i, true));
+      t.addEventListener('keydown', (e) => {
+        const to = e.key === 'ArrowDown' || e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowUp' || e.key === 'ArrowLeft' ? i - 1 : -9;
+        if (to === -9) return;
+        e.preventDefault();
+        const n = (to + tabs.length) % tabs.length;
+        show(n, false);
+        tabs[n].focus();
+      });
+    });
+    segs.forEach((b) =>
+      b.addEventListener('click', () => {
+        clearTimeout(timer);
+        tabs[current].classList.remove('is-timing');
+        setState(b.dataset.dcState as 'problem' | 'solved');
+      }),
+    );
+
+    // first time it scrolls in, play the first problem → solved once
+    const io = new IntersectionObserver(
+      (es) => {
+        if (!es.some((e) => e.isIntersecting)) return;
+        io.disconnect();
+        show(current, true);
+      },
+      { threshold: 0.4 },
+    );
+    io.observe(root);
+  });
+</script>

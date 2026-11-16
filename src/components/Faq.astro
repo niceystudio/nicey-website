@@ -1,5 +1,13 @@
 ---
-const faqs = [
+import Gaps from './case-study/Gaps.astro';
+/** The FAQ. Homepage by default; case studies pass their own questions and heading. */
+interface Props {
+  items?: { q: string; a: string }[];
+  caption?: string;
+  heading?: string;
+  id?: string;
+}
+const homeFaqs = [
   {
     q: 'What does the free audit need from us?',
     a: 'Your Figma file. Read access to the repo is optional; with it, we also compare your Figma tokens against the compiled CSS and source code.',
@@ -29,15 +37,17 @@ const faqs = [
     a: 'Your team, with the documentation and review cadence we set up. Or we stay on as your systems partner on a monthly retainer.',
   },
 ];
+const { items = homeFaqs, caption = 'Questions', heading = 'Before you book a call', id = 'faq' } = Astro.props;
+const faqs = items;
 ---
 
-<section
-  aria-labelledby="faq-head"
+<section id={id}
+  aria-labelledby={`${id}-head`}
   class="container-page flex flex-wrap items-start gap-x-[72px] gap-y-10 pb-section"
 >
   <div class="flex flex-[1_1_300px] flex-col gap-3.5">
-    <span class="caption text-ink-2">Questions</span>
-    <h2 id="faq-head" class="m-0 text-h2">Before you book a call</h2>
+    <span class="caption text-ink-2">{caption}</span>
+    <h2 id={`${id}-head`} class="m-0 text-h2">{heading}</h2>
   </div>
   <div class="panel flex min-w-0 flex-[999_1_560px] flex-col">
     {
@@ -50,7 +60,7 @@ const faqs = [
             <span class="flex-1">{f.q}</span>
             <span class="faq-ind" aria-hidden="true" />
           </summary>
-          <p class="m-0 max-w-[60ch] pb-7 pl-9 text-body leading-[1.6] text-pretty text-ink-2">{f.a}</p>
+          <p class="m-0 max-w-[60ch] pb-7 pl-9 text-body leading-[1.6] text-pretty text-ink-2"><Gaps text={f.a} /></p>
         </details>
       ))
     }

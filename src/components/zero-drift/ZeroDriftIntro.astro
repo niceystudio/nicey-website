@@ -17,10 +17,10 @@ const { rail = false } = Astro.props;
   </p>
   {
     rail && (
-      <ol class="mt-2 mb-0 flex list-none flex-col border-t border-line-strong p-0">
+      <ol data-md-skip class="zd-rail mt-2 mb-0 flex list-none flex-col border-t border-line-strong p-0">
         {steps.map((s) => (
           <li class="border-b border-line">
-            <a href={`#step-${s.id}`} class="flex min-h-11 items-center gap-3 text-body text-ink no-underline">
+            <a href={`#step-${s.id}`} data-zd-rail={`step-${s.id}`} class="flex min-h-11 items-center gap-3 text-body no-underline">
               <i aria-hidden="true" class:list={['marker', markerBg[s.marker]]} />
               <span class="font-mono text-caption text-ink-2">{s.num}</span>
               {s.name}
@@ -48,4 +48,48 @@ const { rail = false } = Astro.props;
       position: static;
     }
   }
+  /* same states as the case-study rail (Chapters): grey, hover ink, the step being read = ink + bigger marker,
+     pressed = ink + marker settles (Emir, 12 Nov: consistent on every page) */
+  .zd-rail a {
+    color: var(--color-ink-2);
+    transition: color 200ms var(--ease-out);
+  }
+  .zd-rail a[aria-current] {
+    color: var(--color-ink);
+  }
+  .zd-rail .marker {
+    transition: transform 200ms var(--ease-out);
+  }
+  .zd-rail a[aria-current] .marker {
+    transform: scale(1.4);
+  }
+  .zd-rail a:active {
+    color: var(--color-ink);
+  }
+  .zd-rail a:active .marker {
+    transform: scale(1.15);
+    transition-duration: 100ms;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .zd-rail a:hover {
+      color: var(--color-ink);
+    }
+  }
 </style>
+
+<script>
+  // the rail marks the step being read (same as the case-study rail)
+  const links = document.querySelectorAll<HTMLAnchorElement>('[data-zd-rail]');
+  if (links.length) {
+    const mark = (id: string) => links.forEach((a) => a.toggleAttribute('aria-current', a.dataset.zdRail === id));
+    const steps = Array.from(links)
+      .map((a) => document.getElementById(a.dataset.zdRail!))
+      .filter((el): el is HTMLElement => !!el);
+    const spy = new IntersectionObserver(
+      (es) => es.forEach((e) => e.isIntersecting && mark((e.target as HTMLElement).id)),
+      { rootMargin: '-40% 0px -55% 0px' },
+    );
+    steps.forEach((st) => spy.observe(st));
+    if (steps[0]) mark(steps[0].id);
+  }
+</script>
