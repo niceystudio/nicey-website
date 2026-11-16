@@ -2,13 +2,14 @@
 /**
  * Direction A — "Select" (terminal, ASCII, dither). Homepage only, same copy and order as live.
  * New: hero, ASCII band, When to bring us in (ruled diagnostic rows), How we work (step windows).
- * Reused and restyled by a.css: Services, Work, free audit, FAQ, footer.
+ * Also: Services as one window with file tabs + a tree, Work as a terminal listing.
+ * Reused and restyled by a.css: free audit, FAQ, closing band, footer.
  */
 import './a.css';
 import Base from '../../layouts/Base.astro';
 import Header from '../../components/Header.astro';
-import Services from '../../components/Services.astro';
-import Work from '../../components/Work.astro';
+import ServicesA from './ServicesA.astro';
+import WorkA from './WorkA.astro';
 import Process from '../../components/Process.astro';
 import Faq from '../../components/Faq.astro';
 import Footer from '../../components/Footer.astro';
@@ -36,26 +37,19 @@ const markdown = await homeMarkdown(Astro.site ?? new URL('https://nicey-website
       <HeroA />
       <AsciiBand />
       <WhenA />
-      <Services />
-      <Work />
-      <AsciiBand labels={['your file', 'one system', 'every reader']} rows={5} />
-      <div class="a-gap" aria-hidden="true"></div>
+      <ServicesA />
+      <WorkA />
       <HowA />
       <Process />
       <Faq />
     </main>
+    <AsciiBand labels={['your file', 'one system', 'every reader']} rows={5} />
     <Footer />
     <MachineView markdown={markdown} mdHref="/index.md" what="homepage" />
     <SiteFooter mdHref="/index.md" />
   </div>
   <DirectionSwitch current="a" />
 </Base>
-
-<style>
-  .a-gap {
-    height: var(--spacing-section);
-  }
-</style>
 
 <script>
   // keyboard keys on the hero buttons (A = free audit, B = book a call), never while typing
