@@ -195,3 +195,99 @@
   font-family: var(--font-pixel);
   font-weight: 400;
 }
+
+/* nav as a prompt: ~/nicey $ ./services ./work … with a cursor */
+.dir-a .head-links::before {
+  content: '~/nicey $';
+  margin-right: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-accent);
+}
+.dir-a .head-links::after {
+  content: '▍';
+  margin-left: 4px;
+  font-family: var(--font-mono);
+  color: var(--color-accent);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .dir-a .head-links::after {
+    animation: a-blink 1s steps(1) infinite;
+  }
+}
+@keyframes a-blink {
+  50% {
+    opacity: 0;
+  }
+}
+.dir-a .head-link {
+  min-height: 32px;
+  padding: 0 7px;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  font-size: 13px;
+  transition: background-color 120ms var(--ease-out), color 120ms var(--ease-out);
+}
+.dir-a .head-link::before {
+  content: './';
+  color: var(--color-muted);
+}
+@media (hover: hover) and (pointer: fine) {
+  .dir-a .head-link:hover {
+    background: var(--a-block);
+    color: var(--a-on-block);
+  }
+  .dir-a .head-link:hover::before,
+  .dir-a .head-link:hover .head-count {
+    color: inherit;
+  }
+}
+
+/* headlines printed on blocks, like the hero: the audit opener and the closing band */
+.dir-a #start-head,
+.dir-a .closing h2 {
+  display: inline;
+  padding: 0.04em 0.16em;
+  font-family: var(--font-pixel);
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 1.32;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  background: var(--color-ink);
+  color: var(--color-page);
+}
+.dir-a .closing {
+  background: var(--color-page);
+  color: var(--color-ink);
+  border-top: 1px solid var(--a-rule);
+}
+.dir-a .closing h2 {
+  max-width: none;
+  font-size: clamp(36px, 5.4vw, 76px);
+  background: var(--a-block);
+  color: var(--a-on-block);
+}
+.dir-a .closing .caption,
+.dir-a .closing p {
+  color: var(--color-ink-2);
+}
+.dir-a .closing .pill:first-of-type {
+  background: var(--a-block) !important;
+  color: var(--a-on-block) !important;
+}
+.dir-a .closing .pill + .pill {
+  border-color: var(--color-ink) !important;
+  color: var(--color-ink) !important;
+}
+
+/* the header's own scoped styles win on specificity; these must too */
+.dir-a .head-link {
+  gap: 0 !important;
+  text-transform: none !important;
+}
+.dir-a .site-head .head-nav > a:first-child {
+  font-family: var(--font-pixel) !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+}
