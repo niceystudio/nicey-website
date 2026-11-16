@@ -1,0 +1,194 @@
+---
+/**
+ * Direction D: Work as a project grid (Instantly's "Projects we're pretty proud of"): QBench and
+ * Everbreed as big halftone tiles with a colour square (Reevo), the three others as figure tiles in the
+ * pixel face. Same copy and figures as live.
+ */
+import { links } from '../../data/links';
+import Halftone from './Halftone.astro';
+import Words from './Words.astro';
+
+const big = [
+  { name: 'QBench', meta: 'Design system + product · LIMS', href: links.work.qbench, fig: '1,071 → 0', cap: 'Outside-library references', src: '/work/qbench/product.jpg', sq: [3, 12, 21, 85] as [number, number, number, number], d: 'Years without a designer, consolidated into one semantic token system. Plus one status model for eight entry points, compliance steps included, shipped as an MVP.' },
+  { name: 'Everbreed', meta: 'Design system + product · Agtech', href: links.work.everbreed, fig: '302', cap: 'Variables made machine-readable', src: '/work/everbreed/desktop-care.jpg', sq: [56, 30, 34, 40] as [number, number, number, number], d: 'A mature Figma library made machine-readable, so the code config comes from Figma. And the student app built on it, on phone and desktop.' },
+];
+const small = [
+  { name: 'Clerky', meta: 'Design system · Legal tech', href: links.work.clerky, fig: '0 T1', cap: 'Defects at the pilot gate', d: 'Three-tier tokens, AI-context docs on every component and token, and a zero-T1 defect gate. Validated at pilot scale on the Documents App.' },
+  { name: 'Omnisafe', meta: 'Product design · Insurance', href: links.work.omnisafe, fig: '16', cap: 'Modules tested before build', d: 'Sixteen modules, tested end to end with real employees before engineering began.' },
+  { name: 'FLYR', meta: 'Product design · Hospitality', href: links.work.flyr, fig: '[ ? ]', cap: 'One business result · to collect', d: 'Group Quotation MVP shipped, so hotels can see whether a group booking makes money.' },
+];
+---
+
+<section id="work" aria-labelledby="work-head" class="d-band kd">
+  <div class="container-page">
+    <div class="kd-head">
+      <span class="d-kicker">Work</span>
+      <h2 id="work-head" class="kd-h d-display m-0" data-m="h2 · work · 5 projects">
+        <Words text="Systems and products we have built" />
+        <sup class="kd-count">(05)</sup>
+      </h2>
+    </div>
+    <div class="kd-big">
+      {
+        big.map((b) => (
+          <a href={b.href} class="kd-tile" id={`work-${b.name.toLowerCase()}`} data-m={`a · case study · ${b.name}`}>
+            <div class="kd-img">
+              <Halftone src={b.src} sq={b.sq} />
+              <span class="kd-chip">{b.name}</span>
+            </div>
+            <div class="kd-meta">
+              <div>
+                <p class="kd-name d-display m-0">{b.name}</p>
+                <p class="kd-m m-0">{b.meta}</p>
+              </div>
+              <div class="kd-figwrap">
+                <p class="kd-fig m-0">{b.fig}</p>
+                <p class="kd-cap m-0">{b.cap}</p>
+              </div>
+            </div>
+            <p class="kd-d m-0">{b.d}</p>
+          </a>
+        ))
+      }
+    </div>
+    <div class="kd-small">
+      {
+        small.map((s) => (
+          <a href={s.href} class="kd-stile" id={`work-${s.name.toLowerCase()}`} data-m={`a · case study · ${s.name}`}>
+            <p class="kd-sfig m-0">{s.fig}</p>
+            <p class="kd-cap m-0">{s.cap}</p>
+            <p class="kd-name d-display m-0">{s.name}</p>
+            <p class="kd-m m-0">{s.meta}</p>
+            <p class="kd-d m-0">{s.d}</p>
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .kd {
+    padding-block: var(--spacing-section);
+  }
+  .kd-head {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 64px;
+    text-align: center;
+  }
+  .kd-h {
+    max-width: 14ch;
+    font-size: clamp(48px, 7vw, 108px);
+  }
+  .kd-count {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 400;
+    vertical-align: super;
+  }
+  .kd-big {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .kd-small {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+  }
+  @media (max-width: 900px) {
+    .kd-big,
+    .kd-small {
+      grid-template-columns: 1fr;
+    }
+  }
+  .kd-tile,
+  .kd-stile {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    color: var(--d-on-band);
+    text-decoration: none;
+    scroll-margin-top: 96px;
+  }
+  .kd-img {
+    position: relative;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .kd-chip {
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    padding: 5px 9px;
+    background: var(--d-on-band);
+    color: var(--d-band);
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .kd-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+  }
+  .kd-name {
+    font-size: 44px;
+  }
+  .kd-m,
+  .kd-cap {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--d-on-band-2);
+  }
+  .kd-figwrap {
+    text-align: right;
+  }
+  .kd-fig {
+    font-family: var(--font-pixel);
+    font-size: 40px;
+    line-height: 1;
+  }
+  .kd-cap {
+    color: var(--color-hot);
+  }
+  .kd-d {
+    max-width: 56ch;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--d-on-band-2);
+  }
+  .kd-stile {
+    gap: 8px;
+    padding: 24px;
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--d-on-band) 6%, transparent);
+    box-shadow: inset 0 0 0 1px var(--color-line);
+    transition: background-color 200ms var(--ease-out);
+  }
+  .kd-sfig {
+    font-family: var(--font-pixel);
+    font-size: 84px;
+    line-height: 1;
+    color: var(--color-accent);
+  }
+  .kd-stile .kd-name {
+    margin-top: 24px;
+    font-size: 36px;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .kd-stile:hover {
+      background: color-mix(in srgb, var(--d-on-band) 12%, transparent);
+    }
+    .kd-tile:hover .kd-name,
+    .kd-stile:hover .kd-name {
+      color: var(--color-accent);
+    }
+  }
+</style>

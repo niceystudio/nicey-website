@@ -1,0 +1,25 @@
+---
+/**
+ * Splits a line into words so Machine mode can flip them to the pixel face one after another.
+ * Words listed in `pixel` are always in the pixel face (the words a machine reads, Instantly's mix).
+ */
+interface Props {
+  text: string;
+  pixel?: string[];
+  start?: number;
+}
+const { text, pixel = [], start = 0 } = Astro.props;
+const words = text.split(' ');
+const norm = (w: string) => w.toLowerCase().replace(/[^a-z0-9/.-]/g, '');
+---
+
+{
+  words.map((w, i) => (
+    <>
+      <span class:list={['d-w', pixel.includes(norm(w)) && 'd-m']} style={`--k:${start + i}`}>
+        {w}
+      </span>
+      {i < words.length - 1 ? ' ' : ''}
+    </>
+  ))
+}

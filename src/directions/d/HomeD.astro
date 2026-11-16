@@ -1,0 +1,78 @@
+---
+/**
+ * Direction D — "Human | Machine". Homepage only, same copy and order as live.
+ * The hero switch (keys H / M) re-reads the whole page: display words flip to the pixel face one after
+ * another and every block shows what an agent reads it as. Light and dark bands meet on stepped pixel edges.
+ */
+import './d.css';
+import Base from '../../layouts/Base.astro';
+import Header from '../../components/Header.astro';
+import Faq from '../../components/Faq.astro';
+import Footer from '../../components/Footer.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import MachineView from '../../components/case-study/MachineView.astro';
+import DirectionSwitch from '../DirectionSwitch.astro';
+import HeroD from './HeroD.astro';
+import TickerD from './TickerD.astro';
+import PixelEdge from './PixelEdge.astro';
+import WhenD from './WhenD.astro';
+import ServicesD from './ServicesD.astro';
+import WorkD from './WorkD.astro';
+import HowD from './HowD.astro';
+import ProcessD from './ProcessD.astro';
+import MarkD from './MarkD.astro';
+import { homeMarkdown } from '../../lib/home-markdown';
+
+const markdown = await homeMarkdown(Astro.site ?? new URL('https://nicey-website.vercel.app'));
+---
+
+<Base title="Nicey · Direction D (review)" description="Design direction D for review: human | machine." noindex markdownHref="/index.md">
+  <div class="dir-d" data-read="human">
+    <Header />
+    <main id="main" tabindex="-1" data-human>
+      <HeroD />
+      <TickerD />
+      <PixelEdge />
+      <WhenD />
+      <PixelEdge flip />
+      <ServicesD />
+      <PixelEdge />
+      <WorkD />
+      <PixelEdge flip />
+      <HowD />
+      <ProcessD />
+      <Faq />
+    </main>
+    <Footer />
+    <MachineView markdown={markdown} mdHref="/index.md" what="homepage" />
+    <SiteFooter mdHref="/index.md" />
+    <MarkD />
+  </div>
+  <DirectionSwitch current="d" />
+</Base>
+
+<script>
+  const root = document.querySelector<HTMLElement>('.dir-d')!;
+  const btns = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-read-btn]'));
+  const note = document.querySelector<HTMLElement>('[data-read-note]');
+  const NOTES: Record<string, string> = { human: 'What people see.', machine: 'What an agent reads: every block, by its role.' };
+  const set = (mode: string) => {
+    root.dataset.read = mode;
+    btns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.readBtn === mode)));
+    if (note) note.textContent = NOTES[mode];
+  };
+  btns.forEach((b) => b.addEventListener('click', () => set(b.dataset.readBtn!)));
+  // capture on window, before the footer's own "m" (Markdown view) shortcut: here M means this page's machine mode
+  window.addEventListener(
+    'keydown',
+    (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if ((e.target as HTMLElement).closest('input, textarea, select, [contenteditable="true"]')) return;
+      const k = e.key.toLowerCase();
+      if (k !== 'h' && k !== 'm') return;
+      e.stopPropagation();
+      set(k === 'h' ? 'human' : 'machine');
+    },
+    true,
+  );
+</script>

@@ -1,0 +1,47 @@
+---
+/** Direction D footer mark: half human, half machine. "nic" in the condensed capitals, "ey." in the pixel face. */
+---
+
+<div class="md" aria-hidden="true">
+  <p class="md-word m-0"><span class="md-h">nic</span><span class="md-m">ey</span><span class="md-dot">.</span></p>
+  <div class="md-labels container-page"><span>Human</span><span>Machine</span></div>
+</div>
+
+<style>
+  .md {
+    overflow: hidden;
+    padding: 24px 0 32px;
+  }
+  .md-word {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    line-height: 0.82;
+    white-space: nowrap;
+  }
+  .md-h {
+    font-family: var(--font-cond);
+    font-stretch: 68%;
+    font-weight: 800;
+    font-size: 30vw;
+    letter-spacing: -0.02em;
+  }
+  .md-m,
+  .md-dot {
+    font-family: var(--font-pixel);
+    font-size: 27vw;
+  }
+  .md-dot {
+    color: var(--color-accent);
+  }
+  .md-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+</style>

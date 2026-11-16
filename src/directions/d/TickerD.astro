@@ -1,0 +1,55 @@
+---
+/** Direction D: a ticker of real figures on the accent (after Instantly's blue band). */
+const items = [
+  '1,071 → 0 outside-library references',
+  '302 variables made machine-readable',
+  '0 T1 defects at the pilot gate',
+  '16 modules tested before build',
+  '210 → 0 hand-written aliases',
+  'Free audit · read-only',
+];
+---
+
+<div class="tk" aria-hidden="true">
+  <div class="tk-run">
+    {[0, 1].map(() => items.map((t) => <span>{t}</span>))}
+  </div>
+</div>
+
+<style>
+  .tk {
+    overflow: hidden;
+    background: var(--color-accent);
+    color: var(--color-page);
+    font-family: var(--font-cond);
+    font-stretch: 75%;
+    font-weight: 650;
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+  .tk-run {
+    display: flex;
+    width: max-content;
+  }
+  .tk-run span {
+    padding: 14px 28px;
+    white-space: nowrap;
+  }
+  .tk-run span::after {
+    content: '■';
+    margin-left: 28px;
+    font-size: 8px;
+    vertical-align: 3px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .tk-run {
+      animation: tk 38s linear infinite;
+    }
+  }
+  @keyframes tk {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+</style>

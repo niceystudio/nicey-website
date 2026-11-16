@@ -1,0 +1,166 @@
+---
+/**
+ * Direction D: the free audit as two cards (the "two ways" pattern again, now for how to start): the free
+ * audit with what the report holds and the steps, and "start on your own" with the agent self-check.
+ * Times stay [gaps].
+ */
+import CopyPrompt from '../../components/CopyPrompt.astro';
+import SelfCheckRun from '../../components/SelfCheckRun.astro';
+import { links } from '../../data/links';
+import Words from './Words.astro';
+
+const pages = [
+  { n: 'p.1', name: 'Score', holds: 'A grade and a score per pillar.' },
+  { n: 'p.2', name: 'Drift map', holds: 'Where design and code disagree.' },
+  { n: 'p.3', name: 'Fix first', holds: 'Top findings, each sized in days.' },
+];
+const steps = [
+  { n: '01', title: 'Share your Figma file', time: '[time]' },
+  { n: '02', title: 'Get the report', time: '[days]' },
+  { n: '03', title: 'Talk it through', time: '[call length]' },
+  { n: '04', title: 'Build, pilot, roll out', time: 'Set in the proposal' },
+];
+---
+
+<section id="audit" aria-labelledby="start-head" class="container-page pd">
+  <div class="pd-head">
+    <span class="d-kicker">What working with us looks like</span>
+    <h2 id="start-head" class="pd-h d-display m-0" data-m="h2 · free audit">
+      <Words text="It starts with a free audit." pixel={['audit.']} />
+    </h2>
+  </div>
+  <div class="pd-cards">
+    <article class="pd-card d-band" data-m="article · free audit · read-only">
+      <div class="pd-top"><span>/free-audit</span><span>Read-only · free</span></div>
+      <p class="pd-price d-display m-0">Free <span class="d-m">audit</span></p>
+      <ul class="pd-pages">
+        {
+          pages.map((p) => (
+            <li>
+              <span class="pd-pn">{p.n}</span>
+              <b>{p.name}</b>
+              <span>{p.holds}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <ol class="pd-steps">
+        {
+          steps.map((s) => (
+            <li>
+              <span class="pd-pn">{s.n}</span>
+              <span>{s.title}</span>
+              <span class="pd-time">{s.time}</span>
+            </li>
+          ))
+        }
+      </ol>
+      <a href={links.startAudit} class="d-btn d-btn--light">Get a free audit <i aria-hidden="true">↗</i></a>
+      <p class="pd-ro m-0">Your Figma file, the repo only if you share it.</p>
+    </article>
+    <article class="pd-card" data-m="article · self-check · /ai-ready.md">
+      <div class="pd-top"><span>/ai-ready.md</span><span>Or start on your own</span></div>
+      <p class="pd-price d-display m-0">Self-<span class="d-m">check</span></p>
+      <p class="pd-p m-0">Not ready to share your file? Let your agent run our seven checks, then bring the results to a call.</p>
+      <CopyPrompt />
+      <SelfCheckRun />
+    </article>
+  </div>
+</section>
+
+<style>
+  .pd {
+    padding-block: var(--spacing-section);
+  }
+  .pd-head {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 56px;
+    text-align: center;
+  }
+  .pd-h {
+    max-width: 12ch;
+    font-size: clamp(48px, 7vw, 108px);
+  }
+  .pd-cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+  @media (max-width: 900px) {
+    .pd-cards {
+      grid-template-columns: 1fr;
+    }
+  }
+  .pd-card {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 28px;
+    border-radius: 6px;
+    background: var(--color-surface);
+    box-shadow: inset 0 0 0 1px var(--color-line);
+    min-width: 0;
+  }
+  .pd-top {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-ink-2);
+  }
+  .pd-price {
+    font-size: clamp(56px, 6vw, 92px);
+  }
+  .pd-pages,
+  .pd-steps {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--color-line-strong);
+  }
+  .pd-pages li,
+  .pd-steps li {
+    display: grid;
+    grid-template-columns: 40px auto 1fr;
+    gap: 12px;
+    align-items: baseline;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--color-line);
+    font-size: 14px;
+  }
+  .pd-pages li span:last-child {
+    color: var(--color-ink-2);
+  }
+  .pd-steps li {
+    grid-template-columns: 40px 1fr auto;
+  }
+  .pd-pn {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-ink-2);
+  }
+  .pd-time {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-ink-2);
+  }
+  .pd-card .d-btn--light {
+    align-self: flex-start;
+    background: var(--d-on-band);
+    color: var(--d-band);
+  }
+  .pd-ro {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-ink-2);
+  }
+  .pd-p {
+    max-width: 44ch;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--color-ink-2);
+  }
+</style>
