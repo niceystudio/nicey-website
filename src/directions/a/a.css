@@ -291,3 +291,8 @@
   font-weight: 400 !important;
   letter-spacing: 0 !important;
 }
+
+/* the live pixel-block wordmark is replaced by MarkA (characters settling into blocks) */
+.dir-a .site-foot-markwrap {
+  display: none;
+}

@@ -1,0 +1,152 @@
+---
+/**
+ * Direction A: the audit report as a terminal window with its three pages (p.1 Score, p.2 Drift map,
+ * p.3 Fix first) instead of paper sheets. Marked "example": bars are drawn, scores and days stay [gaps].
+ */
+const pillars = ['Figma inspect', 'Agentic readiness', 'Conventions', 'Component API', 'Zero drift'];
+const bars = [9, 4, 7, 6, 3];
+const bar = (n: number) => '▇'.repeat(n) + '░'.repeat(12 - n);
+const pages = [
+  {
+    id: 'score',
+    tab: 'p.1 score',
+    lines: [
+      ...pillars.map((p, i) => `${p.padEnd(19)} ${bar(bars[i])}  [score]`),
+      ''.padEnd(46, '─'),
+      `${'grade'.padEnd(19)} [grade]`,
+    ],
+  },
+  {
+    id: 'drift',
+    tab: 'p.2 drift map',
+    lines: [
+      `${'figma'.padEnd(24)}   code`,
+      ''.padEnd(46, '─'),
+      `${'color.accent'.padEnd(24, '.')} ≠ purple-2`,
+      `${'border/default'.padEnd(24, '.')} = border/default`,
+      `${'text/default'.padEnd(24, '.')} ≠ col-7`,
+      `${'border/primary/default'.padEnd(24, '.')} = border/primary/default`,
+      `${'opacity/disabled'.padEnd(24, '.')} ≠ violet-final`,
+    ],
+  },
+  {
+    id: 'fix',
+    tab: 'p.3 fix first',
+    lines: pillars.map((p, i) => `${String(i + 1).padStart(2, '0')}  ${p.toLowerCase().padEnd(20, '.')} top finding  [days]`),
+  },
+];
+---
+
+<div class="ra a-grain" data-ra>
+  <div class="ra-bar">
+    <span class="ra-tag">report.txt</span>
+    <div class="ra-tabs" role="tablist" aria-label="Report pages">
+      {
+        pages.map((p, i) => (
+          <button type="button" role="tab" aria-selected={i === 0 ? 'true' : 'false'} data-ra-tab={i}>
+            {p.tab}
+          </button>
+        ))
+      }
+    </div>
+    <span class="ra-ex">example</span>
+  </div>
+  {
+    pages.map((p, i) => (
+      <pre class="ra-page" role="tabpanel" hidden={i !== 0} data-ra-page={i}>{p.lines.join('\n')}</pre>
+    ))
+  }
+</div>
+
+<style>
+  .ra {
+    width: 100%;
+    height: 100%;
+    min-height: 360px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--a-rule);
+    background: var(--color-page);
+  }
+  .ra-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--a-rule);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .ra-tag {
+    padding: 2px 6px;
+    background: var(--a-block);
+    color: var(--a-on-block);
+    text-transform: none;
+    letter-spacing: 0.02em;
+  }
+  .ra-tabs {
+    display: flex;
+    gap: 2px;
+  }
+  .ra-tabs button {
+    padding: 4px 8px;
+    border: 0;
+    background: transparent;
+    color: var(--color-muted);
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    cursor: pointer;
+  }
+  .ra-tabs button[aria-selected='true'] {
+    background: var(--color-ink);
+    color: var(--color-page);
+  }
+  .ra-ex {
+    margin-left: auto;
+    color: var(--color-muted);
+  }
+  .ra-page {
+    flex: 1;
+    margin: 0;
+    padding: 28px 26px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 2;
+    white-space: pre;
+    overflow-x: auto;
+    color: var(--color-ink);
+  }
+  .ra-page[hidden] {
+    display: none;
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-ra]').forEach((root) => {
+    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-ra-tab]'));
+    const pages = Array.from(root.querySelectorAll<HTMLElement>('[data-ra-page]'));
+    let i = 0;
+    let timer = 0;
+    let took = false;
+    const show = (k: number) => {
+      i = k;
+      tabs.forEach((t, n) => t.setAttribute('aria-selected', String(n === k)));
+      pages.forEach((p, n) => (p.hidden = n !== k));
+    };
+    tabs.forEach((t, n) =>
+      t.addEventListener('click', () => {
+        took = true;
+        window.clearInterval(timer);
+        show(n);
+      }),
+    );
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    new IntersectionObserver((es) => {
+      window.clearInterval(timer);
+      if (es[0].isIntersecting && !took) timer = window.setInterval(() => show((i + 1) % pages.length), 3600);
+    }).observe(root);
+  });
+</script>
