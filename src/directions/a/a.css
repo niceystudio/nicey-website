@@ -1,0 +1,197 @@
+/*
+ * Direction A — "Select": terminal, ASCII, dither.
+ * Refs: Supabase Select 26 (mono lettering on blocks, ASCII band, one accent, rigid grid),
+ * Builders Table (labelled windows on a dot grid), MUM (key buttons, terminal cards),
+ * Monologue (grain). Colours stay the brand's; only type, shape, layout and texture change.
+ * Everything is scoped to .dir-a so the live site is untouched.
+ */
+@import '@fontsource/geist-pixel/400.css';
+
+.dir-a {
+  --font-pixel: 'Geist Pixel', var(--font-mono);
+  --radius-panel: 0px;
+  --radius-code: 0px;
+  --radius-chip: 0px;
+  --radius-pill: 0px;
+  --a-grid: color-mix(in srgb, var(--color-ink) 9%, transparent);
+  --a-rule: color-mix(in srgb, var(--color-ink) 16%, transparent);
+  --a-dim: color-mix(in srgb, var(--color-ink) 34%, transparent);
+  --a-block: var(--color-accent);
+  --a-on-block: var(--color-page);
+  min-height: 100vh;
+  background-color: var(--color-page);
+  /* a quiet dot grid under everything, like a canvas */
+  background-image: radial-gradient(var(--a-grid) 1px, transparent 1.4px);
+  background-size: 24px 24px;
+  background-position: -12px -12px;
+}
+
+/* film grain, only where a surface needs some tooth (bands, windows) */
+.dir-a .a-grain {
+  position: relative;
+  isolation: isolate;
+}
+.dir-a .a-grain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.16;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- type ---------- */
+.dir-a .text-h2,
+.dir-a h2.text-h2 {
+  font-family: var(--font-pixel);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.04;
+}
+.dir-a .text-work,
+.dir-a .zd-fig,
+.dir-a .text-h3-step {
+  font-family: var(--font-pixel);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.dir-a .caption {
+  letter-spacing: 0.12em;
+}
+/* every section label reads like a path */
+.dir-a .a-path::before {
+  content: '//\00a0';
+  color: var(--color-accent);
+}
+
+/* ---------- buttons: keys, not pills ---------- */
+.dir-a .pill {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: 0;
+}
+.dir-a .pill-lg {
+  padding: 15px 20px;
+  font-size: 13px;
+}
+.dir-a .pill-ink {
+  background: var(--a-block);
+  color: var(--a-on-block);
+}
+@media (hover: hover) and (pointer: fine) {
+  .dir-a .pill-ink:hover {
+    background: color-mix(in srgb, var(--a-block) 86%, var(--color-ink));
+  }
+}
+.dir-a .a-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  margin-left: 10px;
+  padding: 0 5px;
+  border: 1px solid currentColor;
+  font-size: 11px;
+  line-height: 1;
+  opacity: 0.7;
+}
+
+/* ---------- header ---------- */
+.dir-a .site-head {
+  background: color-mix(in srgb, var(--color-page) 92%, transparent);
+  backdrop-filter: blur(6px);
+}
+.dir-a .site-head .head-nav > a:first-child {
+  font-family: var(--font-pixel);
+  font-weight: 400;
+  font-size: 26px;
+  letter-spacing: 0;
+}
+
+/* ---------- reused sections: square, ruled ---------- */
+.dir-a .panel {
+  border-radius: 0;
+}
+.dir-a .svc-seg,
+.dir-a .svc-seg * {
+  border-radius: 0 !important;
+}
+.dir-a .svc-seg button,
+.dir-a .svc-seg [role='tab'] {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.dir-a .svc-stage {
+  border-radius: 0;
+}
+.dir-a .chip {
+  border-radius: 0;
+}
+.dir-a details,
+.dir-a summary {
+  border-radius: 0;
+}
+
+/* section openers (SectionHead) read as paths too */
+.dir-a .flex.gap-3\.5 > .caption:first-child::before {
+  content: '//\00a0';
+  color: var(--color-accent);
+}
+.dir-a .text-h3-alongside,
+.dir-a .text-h3-practice,
+.dir-a .text-h3-card,
+.dir-a .text-title,
+.dir-a .text-faq {
+  font-family: var(--font-pixel);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+/* the services terminal: square, like every other window in A */
+.dir-a .qw-agent,
+.dir-a .qw-tab,
+.dir-a .qw-stage {
+  border-radius: 0 !important;
+}
+.dir-a .qw-tab[aria-selected='true'] {
+  background: var(--a-block);
+  color: var(--a-on-block);
+}
+.dir-a .svc-stage {
+  position: relative;
+  isolation: isolate;
+}
+.dir-a .svc-stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.22;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.dir-a .svc-phone-frame {
+  border-radius: 28px;
+}
+
+/* the audit sheets: paper corners squared, a hard edge like a printout */
+.dir-a .ap-sheet {
+  border-radius: 0;
+}
+.dir-a .ap-brand {
+  font-family: var(--font-pixel);
+  font-weight: 400;
+}
+/* footer wordmark in the pixel face too */
+.dir-a footer a[href='/']:not(.pill) {
+  font-family: var(--font-pixel);
+  font-weight: 400;
+}
