@@ -1,6 +1,6 @@
 ---
 /**
- * Direction A hero. Same copy as the live hero. The headline is set like the Supabase Select logotype:
+ * Direction A hero (Select layout: headline across, text + keys beside it, a wide scan below). Same copy as live. The headline is set like the Supabase Select logotype:
  * pixel capitals printed on blocks, the last line on the accent. The visual is a real product screen
  * (QBench), dithered and read by a scan line: what the audit does to your file.
  */
@@ -26,13 +26,13 @@ const proof = ['QBench', 'Everbreed', 'Clerky', 'Omnisafe', 'FLYR'].map((name) =
     </nav>
   </div>
 
-  <div class="container-page ha-grid">
-    <div class="ha-copy">
-      <h1 class="ha-h m-0">
-        <span class="ha-line">Is your design</span>
-        <span class="ha-line">system ready</span>
-        <span class="ha-line ha-line--accent">for AI agents?</span>
-      </h1>
+  <div class="container-page ha-top">
+    <h1 class="ha-h m-0">
+      <span class="ha-line">Is your design</span>
+      <span class="ha-line">system ready</span>
+      <span class="ha-line ha-line--accent">for AI agents?</span>
+    </h1>
+    <div class="ha-aside">
       <p class="ha-lede m-0">
         Send us your Figma file. You get a score per pillar, the top findings and what to fix first. Free, and we never
         edit your file.
@@ -49,17 +49,18 @@ const proof = ['QBench', 'Everbreed', 'Clerky', 'Omnisafe', 'FLYR'].map((name) =
         <span class="ha-prompt" aria-hidden="true">&gt;</span> Then we build systems people and agents read the same way.
       </p>
     </div>
-    <div class="ha-visual">
-      <DitherScan
-        src="/work/qbench/product.jpg"
-        w={976}
-        h={600}
-        tag="audit.scan"
-        file="example · a product screen"
-        cols={210}
-        log={['> reading the screen', '  values ........ listed', '  tokens ........ matched', '  docs .......... checked', '> report ready']}
-      />
-    </div>
+  </div>
+  <div class="container-page ha-wide">
+    <DitherScan
+      src="/work/qbench/product.jpg"
+      w={976}
+      h={400}
+      tag="audit.scan"
+      file="example · a product screen"
+      cols={300}
+      side
+      log={['> reading the screen', '  values ........ listed', '  tokens ........ matched', '  docs .......... checked', '> report ready']}
+    />
   </div>
 </section>
 
@@ -98,24 +99,31 @@ const proof = ['QBench', 'Everbreed', 'Clerky', 'Omnisafe', 'FLYR'].map((name) =
       color: var(--color-accent);
     }
   }
-  .ha-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
-    align-items: start;
-    gap: 48px 56px;
-    padding-top: 72px;
-  }
-  @media (max-width: 1023px) {
-    .ha-grid {
-      grid-template-columns: 1fr;
-      padding-top: 48px;
-    }
-  }
-  .ha-copy {
+  /* Select's top: the headline across, then one row of three — text, keys, the line after */
+  .ha-top {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 28px;
+    gap: 44px;
+    padding-top: 64px;
+  }
+  .ha-aside {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 24px 48px;
+    padding-top: 22px;
+    border-top: 1px solid var(--a-rule);
+  }
+  @media (max-width: 1023px) {
+    .ha-top {
+      padding-top: 40px;
+    }
+    .ha-aside {
+      grid-template-columns: 1fr;
+    }
+  }
+  .ha-wide {
+    margin-top: 56px;
   }
   .ha-h {
     display: flex;
@@ -124,7 +132,7 @@ const proof = ['QBench', 'Everbreed', 'Clerky', 'Omnisafe', 'FLYR'].map((name) =
     gap: 6px;
     font-family: var(--font-pixel);
     font-weight: 400;
-    font-size: clamp(30px, 4.15vw, 60px);
+    font-size: clamp(32px, 7.6vw, 108px);
     line-height: 1;
     letter-spacing: 0;
     text-transform: uppercase;
@@ -141,8 +149,8 @@ const proof = ['QBench', 'Everbreed', 'Clerky', 'Omnisafe', 'FLYR'].map((name) =
     color: var(--a-on-block);
   }
   .ha-lede {
-    max-width: 44ch;
-    font-size: var(--text-body-lg);
+    max-width: 40ch;
+    font-size: var(--text-body);
     line-height: 1.5;
     color: var(--color-ink-2);
     text-wrap: pretty;
@@ -159,9 +167,6 @@ const proof = ['QBench', 'Everbreed', 'Clerky', 'Omnisafe', 'FLYR'].map((name) =
   }
   .ha-prompt {
     color: var(--color-accent);
-  }
-  .ha-visual {
-    min-width: 0;
   }
   /* the headline prints line by line on first view */
   @media (prefers-reduced-motion: no-preference) {

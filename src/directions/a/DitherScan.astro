@@ -14,15 +14,18 @@ interface Props {
   /** pixel columns of the dither; fewer = chunkier */
   cols?: number;
   log?: string[];
+  /** log beside the screen instead of under it (wide hero) */
+  side?: boolean;
 }
-const { src, w, h, tag, file, cols = 240, log = [] } = Astro.props;
+const { src, w, h, tag, file, cols = 240, log = [], side = false } = Astro.props;
 ---
 
-<figure class="ds m-0" data-ds data-src={src} data-cols={cols} style={`--ar: ${w} / ${h}`}>
+<figure class:list={['ds m-0', side && 'ds--side']} data-ds data-src={src} data-cols={cols} data-ar={w / h} style={`--ar: ${w} / ${h}`}>
   <div class="ds-bar">
     <span class="ds-tag">{tag}</span>
     <span class="ds-file">{file}</span>
   </div>
+  <div class="ds-body">
   <div class="ds-stage a-grain">
     <canvas class="ds-canvas" aria-hidden="true"></canvas>
     <i class="ds-h ds-h--tl" aria-hidden="true"></i><i class="ds-h ds-h--tr" aria-hidden="true"></i><i
@@ -38,6 +41,7 @@ const { src, w, h, tag, file, cols = 240, log = [] } = Astro.props;
       </ol>
     )
   }
+  </div>
   <figcaption class="sr-only">An example product screen being read line by line.</figcaption>
 </figure>
 
@@ -103,6 +107,25 @@ const { src, w, h, tag, file, cols = 240, log = [] } = Astro.props;
     white-space: pre;
     color: var(--color-muted);
   }
+  .ds--side .ds-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 260px;
+  }
+  .ds--side .ds-log {
+    border-top: 0;
+    border-left: 1px solid var(--a-rule);
+    padding: 18px 18px;
+    align-self: stretch;
+  }
+  @media (max-width: 860px) {
+    .ds--side .ds-body {
+      grid-template-columns: 1fr;
+    }
+    .ds--side .ds-log {
+      border-left: 0;
+      border-top: 1px solid var(--a-rule);
+    }
+  }
   .ds-log li {
     transition: color 200ms var(--ease-out);
   }
@@ -151,13 +174,16 @@ const { src, w, h, tag, file, cols = 240, log = [] } = Astro.props;
     };
 
     const build = () => {
+      // the frame's aspect can be wider than the screen: crop from the top, full width
+      const ar = Number(fig.dataset.ar) || img.naturalWidth / img.naturalHeight;
       W = cols;
-      H = Math.round((cols * img.naturalHeight) / img.naturalWidth);
+      H = Math.round(cols / ar);
+      const srcH = Math.min(img.naturalHeight, img.naturalWidth / ar);
       const off = document.createElement('canvas');
       off.width = W;
       off.height = H;
       const o = off.getContext('2d', { willReadFrequently: true })!;
-      o.drawImage(img, 0, 0, W, H);
+      o.drawImage(img, 0, 0, img.naturalWidth, srcH, 0, 0, W, H);
       const px = o.getImageData(0, 0, W, H).data;
       // product screens are light UIs: the "on" pixels are their dark marks (text, borders, icons),
       // so the screen reads as a line drawing in either theme

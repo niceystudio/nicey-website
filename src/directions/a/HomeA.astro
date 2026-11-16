@@ -10,7 +10,7 @@ import Base from '../../layouts/Base.astro';
 import Header from '../../components/Header.astro';
 import ServicesA from './ServicesA.astro';
 import WorkA from './WorkA.astro';
-import Process from '../../components/Process.astro';
+import ProcessA from './ProcessA.astro';
 import Faq from '../../components/Faq.astro';
 import Footer from '../../components/Footer.astro';
 import SiteFooter from '../../components/SiteFooter.astro';
@@ -20,6 +20,7 @@ import HeroA from './HeroA.astro';
 import AsciiBand from './AsciiBand.astro';
 import WhenA from './WhenA.astro';
 import HowA from './HowA.astro';
+import MarkA from './MarkA.astro';
 import { homeMarkdown } from '../../lib/home-markdown';
 
 const markdown = await homeMarkdown(Astro.site ?? new URL('https://nicey-website.vercel.app'));
@@ -40,13 +41,14 @@ const markdown = await homeMarkdown(Astro.site ?? new URL('https://nicey-website
       <ServicesA />
       <WorkA />
       <HowA />
-      <Process />
+      <ProcessA />
       <Faq />
     </main>
     <AsciiBand labels={['your file', 'one system', 'every reader']} rows={5} />
     <Footer />
     <MachineView markdown={markdown} mdHref="/index.md" what="homepage" />
     <SiteFooter mdHref="/index.md" />
+    <MarkA />
   </div>
   <DirectionSwitch current="a" />
 </Base>
