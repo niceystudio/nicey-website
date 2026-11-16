@@ -1,0 +1,220 @@
+---
+/**
+ * Direction B: Zero Drift as a zig-zag feature run (after Antimetal): each step is text on one side and
+ * a framed plate on the other, alternating. The plate carries the step's real figure on a dithered
+ * light, so every step is its own spread. Same copy and figures as live.
+ */
+import DitherField from './DitherField.astro';
+import { steps } from '../../data/zero-drift';
+
+const figs: Record<string, { n: string; small?: string; seen: string; note: string }> = {
+  drift: { n: '53', seen: 'Seen at Everbreed', note: 'variables had drifted between the Figma file and the repo, with no IDs to tell a rename from a delete.' },
+  audit: { n: '12', small: 'of 52', seen: 'Seen at Clerky', note: 'components had no description an agent could read. All 315 semantic and component tokens already did.' },
+  system: { n: '1,071 → 0', seen: 'Seen at QBench', note: 'references to 11 outside libraries, brought down to zero across 141 components.' },
+  context: { n: '“Report the gap. Don’t invent the value.”', seen: 'Seen at Everbreed · the one rule in every agent file', note: '' },
+  proof: { n: '0', seen: 'Seen at Clerky', note: 'T1 defects: the gate for the pilot on the Documents App, and the model held at pilot scale.' },
+};
+const lights = ['--color-accent', '--color-hot', '--color-accent', '--color-hot', '--color-accent'];
+---
+
+<section id="how" aria-labelledby="how-head" class="container-page hw">
+  <div class="hw-head">
+    <span class="b-kicker">Zero Drift · how we work</span>
+    <h2 id="how-head" class="m-0 text-h2">From drift to a system <em>that holds.</em></h2>
+    <p class="hw-lede m-0">
+      Five steps. Each one starts with a problem you can see in your product and ends with something you can hold.
+    </p>
+  </div>
+  <ol class="hw-list">
+    {
+      steps.map((s, i) => {
+        const f = figs[s.id];
+        return (
+          <li class:list={['hw-row', i % 2 === 1 && 'hw-row--flip']} id={`step-${s.id}`}>
+            <div class="hw-text">
+              <span class="hw-k">
+                {s.num} · {s.name}
+              </span>
+              <h3 class="hw-h m-0">{s.heading}</h3>
+              <dl class="hw-dl">
+                <div>
+                  <dt>You’re seeing</dt>
+                  <dd>{s.seeing}</dd>
+                </div>
+                <div>
+                  <dt>We do</dt>
+                  <dd>{s.weDo}</dd>
+                </div>
+                <div>
+                  <dt>You get</dt>
+                  <dd class="hw-get">{s.youGet}</dd>
+                </div>
+              </dl>
+            </div>
+            <figure class="hw-plate m-0">
+              <DitherField color={lights[i]} x={i % 2 ? 0.1 : 0.9} y={0.05} cell={3} power={0.75} />
+              <div class="hw-card">
+                <span class="hw-card-seen">{f.seen}</span>
+                <p class:list={['hw-card-n m-0', s.id === 'context' && 'hw-card-n--quote']}>
+                  {f.n}
+                  {f.small && <span>{f.small}</span>}
+                </p>
+                {f.note && <p class="hw-card-note m-0">{f.note}</p>}
+              </div>
+            </figure>
+          </li>
+        );
+      })
+    }
+  </ol>
+</section>
+
+<style>
+  .hw {
+    padding-bottom: var(--spacing-section);
+  }
+  .hw-head {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 96px;
+    text-align: center;
+  }
+  .hw-head .text-h2 {
+    max-width: 16ch;
+  }
+  .hw-lede {
+    max-width: 44ch;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--color-ink-2);
+  }
+  .hw-list {
+    display: flex;
+    flex-direction: column;
+    gap: 120px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .hw-row {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    align-items: center;
+    gap: 40px 80px;
+    scroll-margin-top: 96px;
+  }
+  .hw-row--flip .hw-text {
+    order: 2;
+  }
+  @media (max-width: 900px) {
+    .hw-row {
+      grid-template-columns: 1fr;
+    }
+    .hw-row--flip .hw-text {
+      order: 0;
+    }
+    .hw-list {
+      gap: 80px;
+    }
+  }
+  .hw-text {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .hw-k {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+  .hw-h {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: clamp(32px, 3.4vw, 46px);
+    line-height: 1.04;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+  .hw-dl {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin: 6px 0 0;
+  }
+  .hw-dl div {
+    display: grid;
+    grid-template-columns: 110px minmax(0, 1fr);
+    gap: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--color-line);
+  }
+  .hw-dl dt {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    padding-top: 3px;
+  }
+  .hw-dl dd {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--color-ink-2);
+  }
+  .hw-dl .hw-get {
+    color: var(--color-ink);
+  }
+  .hw-plate {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 5 / 4;
+    border-radius: 20px;
+    background: var(--color-surface);
+    box-shadow: inset 0 0 0 1px var(--color-line);
+  }
+  .hw-card {
+    position: absolute;
+    inset: 12% 12%;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 14px;
+    padding: 32px;
+    border-radius: 12px;
+    background: var(--color-page);
+    box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.55), inset 0 0 0 1px var(--color-line);
+  }
+  .hw-card-seen {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-hot);
+  }
+  .hw-card-n {
+    font-family: var(--font-serif);
+    font-size: clamp(56px, 7vw, 104px);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+  }
+  .hw-card-n span {
+    margin-left: 0.2em;
+    font-size: 0.3em;
+    font-style: italic;
+    color: var(--color-muted);
+  }
+  .hw-card-n--quote {
+    font-style: italic;
+    font-size: clamp(30px, 3vw, 42px);
+    line-height: 1.1;
+  }
+  .hw-card-note {
+    max-width: 40ch;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--color-ink-2);
+  }
+</style>

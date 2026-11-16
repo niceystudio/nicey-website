@@ -1,0 +1,181 @@
+---
+/**
+ * Direction B hero plate: one real product screen, two readers. Left, what people see: the screen as a
+ * dithered print that develops in. Right, what an agent reads: the same pixels as characters.
+ * The whole studio pitch in one figure (people and agents read the same thing). Image: QBench.
+ */
+interface Props {
+  src: string;
+  w: number;
+  h: number;
+}
+const { src, w, h } = Astro.props;
+---
+
+<figure class="tr m-0" data-tr data-src={src} style={`--ar: ${w} / ${h}`}>
+  <div class="tr-plates">
+    <div class="tr-plate">
+      <span class="tr-label">What people see</span>
+      <div class="tr-frame tr-grain"><canvas aria-hidden="true" data-tr-canvas></canvas></div>
+    </div>
+    <div class="tr-plate">
+      <span class="tr-label">What an agent reads</span>
+      <div class="tr-frame tr-frame--text tr-grain"><pre aria-hidden="true" data-tr-ascii></pre></div>
+    </div>
+  </div>
+  <figcaption class="tr-cap">
+    <span class="tr-cap-k">Fig. 01</span>
+    <span>The same screen, two readers. A system is ready when both get the same answer.</span>
+  </figcaption>
+</figure>
+
+<style>
+  .tr-plates {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+  @media (max-width: 760px) {
+    .tr-plates {
+      grid-template-columns: 1fr;
+    }
+  }
+  .tr-plate {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .tr-label {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .tr-frame {
+    position: relative;
+    aspect-ratio: var(--ar);
+    overflow: hidden;
+    border-radius: 14px;
+    background: var(--color-surface);
+    box-shadow: inset 0 0 0 1px var(--color-line);
+  }
+  .tr-frame canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+  }
+  .tr-frame--text pre {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    padding: 2.5% 2%;
+    font-family: var(--font-mono);
+    line-height: 1;
+    letter-spacing: 0;
+    white-space: pre;
+    color: var(--color-ink-2);
+    overflow: hidden;
+  }
+  .tr-grain::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.18;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .tr-cap {
+    display: flex;
+    gap: 14px;
+    align-items: baseline;
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--color-ink-2);
+  }
+  .tr-cap-k {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 17px;
+    color: var(--color-ink);
+  }
+</style>
+
+<script>
+  import { BAYER, cssColor, inkMap, asciiLines, loadImage } from '../dither';
+
+  document.querySelectorAll<HTMLElement>('[data-tr]').forEach(async (fig) => {
+    const canvas = fig.querySelector<HTMLCanvasElement>('[data-tr-canvas]')!;
+    const pre = fig.querySelector<HTMLElement>('[data-tr-ascii]')!;
+    const ctx = canvas.getContext('2d')!;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const img = await loadImage(fig.dataset.src!);
+    const COLS = 200;
+    const ACOLS = 110;
+    const { ink, W, H } = inkMap(img, COLS);
+    const ar = img.naturalHeight / img.naturalWidth;
+    // characters are about twice as tall as wide
+    const aRows = Math.round(ACOLS * ar * 0.55);
+    const am = inkMap(img, ACOLS, aRows, 2.6);
+    const lines = asciiLines(am.ink, am.W, am.H);
+    canvas.width = W;
+    canvas.height = H;
+    const data = ctx.createImageData(W, H);
+
+    const fit = () => {
+      const r = pre.getBoundingClientRect();
+      const fs = Math.min((r.width * 0.96) / (ACOLS * 0.6), (r.height * 0.95) / aRows);
+      pre.style.fontSize = `${fs}px`;
+    };
+
+    // develop: the threshold rises like a print in a tray; t = 0..1
+    const paint = (t: number) => {
+      const [r, g, b] = cssColor('--color-ink');
+      const d = data.data;
+      for (let y = 0; y < H; y++)
+        for (let x = 0; x < W; x++) {
+          const i = y * W + x;
+          const on = ink[i] * t > BAYER[(y % 8) * 8 + (x % 8)];
+          d[i * 4] = r;
+          d[i * 4 + 1] = g;
+          d[i * 4 + 2] = b;
+          d[i * 4 + 3] = on ? 235 : 0;
+        }
+      ctx.putImageData(data, 0, 0);
+    };
+    const type = (n: number) => {
+      pre.textContent = lines.slice(0, n).join('\n');
+    };
+
+    fit();
+    addEventListener('resize', fit);
+    let played = false;
+    const play = () => {
+      if (played) return;
+      played = true;
+      if (reduced) {
+        paint(1);
+        type(lines.length);
+        return;
+      }
+      const start = performance.now();
+      const DUR = 1800;
+      const tick = (now: number) => {
+        const p = Math.min(1, (now - start) / DUR);
+        const e = 1 - Math.pow(1 - p, 3);
+        paint(e);
+        type(Math.ceil(e * lines.length));
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    };
+    paint(reduced ? 1 : 0);
+    type(reduced ? lines.length : 0);
+    new IntersectionObserver((es) => es[0].isIntersecting && play(), { threshold: 0.3 }).observe(fig);
+    new MutationObserver(() => played && paint(1)).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+  });
+</script>

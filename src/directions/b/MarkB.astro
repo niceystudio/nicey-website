@@ -1,0 +1,32 @@
+---
+/** Direction B footer mark: "nicey." as a giant serif (after Otherkind's wordmark) on a dithered light. */
+import DitherField from './DitherField.astro';
+---
+
+<div class="mb" aria-hidden="true">
+  <DitherField color="--color-accent" x={0.5} y={1.25} cell={4} power={0.9} />
+  <p class="mb-word m-0">nicey<span>.</span></p>
+</div>
+
+<style>
+  .mb {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    padding: 48px 16px 40px;
+  }
+  .mb-word {
+    position: relative;
+    z-index: 1;
+    font-family: var(--font-serif);
+    font-size: clamp(120px, 27vw, 420px);
+    line-height: 0.8;
+    letter-spacing: -0.04em;
+    color: var(--color-ink);
+  }
+  .mb-word span {
+    font-style: italic;
+    color: var(--color-accent);
+  }
+</style>

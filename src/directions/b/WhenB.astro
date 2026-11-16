@@ -1,0 +1,137 @@
+---
+/**
+ * Direction B: "When to bring us in" as an editorial spread. No cards, no meters: four signs set as
+ * short essays with a roman numeral, the real figure pulled out in the serif. Same copy and counts as live.
+ */
+const signs = [
+  {
+    n: 'i',
+    title: 'Your design file and your repo have drifted apart',
+    body: 'At Everbreed, 53 variables had drifted between Figma and code, and nobody could tell a rename from a delete.',
+    fig: '53',
+    figCap: 'drifted variables',
+  },
+  {
+    n: 'ii',
+    title: 'The product was built for years without a designer',
+    body: 'At QBench, every screen was a developer’s best guess, and each new feature meant relearning decisions nobody wrote down.',
+    fig: '11',
+    figCap: 'outside libraries behind the components',
+  },
+  {
+    n: 'iii',
+    title: 'The library looks healthy, but a machine can’t use it',
+    body: 'At Everbreed, all 302 variables had no scope and no code name. Fine for people, unreadable for a pipeline.',
+    fig: '302 · 0',
+    figCap: 'variables · scoped',
+  },
+  {
+    n: 'iv',
+    title: 'Your team is handing design to AI agents',
+    body: 'A developer fills the gaps in a Figma file. An agent guesses, and every guess becomes a correction pass.',
+    fig: '239 · 0',
+    figCap: 'agent-built layers · issues',
+  },
+];
+---
+
+<section aria-labelledby="when-head" class="container-page wb">
+  <div class="wb-head">
+    <span class="b-kicker">When to bring us in</span>
+    <h2 id="when-head" class="m-0 text-h2">If one of these sounds like your team, <em>talk to us.</em></h2>
+  </div>
+  <ol class="wb-grid">
+    {
+      signs.map((s) => (
+        <li class="wb-item">
+          <span class="wb-n" aria-hidden="true">{s.n}.</span>
+          <h3 class="wb-t m-0">{s.title}</h3>
+          <p class="wb-p m-0">{s.body}</p>
+          <p class="wb-fig m-0">
+            <span class="wb-fig-n">{s.fig}</span>
+            <span class="wb-fig-c">{s.figCap}</span>
+          </p>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<style>
+  .wb {
+    display: flex;
+    flex-direction: column;
+    gap: 64px;
+    padding-top: var(--spacing-section);
+    padding-bottom: var(--spacing-section);
+  }
+  .wb-head {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    max-width: none;
+  }
+  .wb-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 72px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (max-width: 860px) {
+    .wb-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .wb-item {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr);
+    gap: 14px 8px;
+    padding: 36px 0 44px;
+    border-top: 1px solid var(--color-line-strong);
+  }
+  .wb-n {
+    grid-row: span 3;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 30px;
+    line-height: 1;
+    color: var(--color-accent);
+  }
+  .wb-t {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: 34px;
+    line-height: 1.06;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  .wb-p {
+    max-width: 46ch;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--color-ink-2);
+  }
+  .wb-fig {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-top: 6px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--color-line-strong);
+  }
+  .wb-fig-n {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 40px;
+    line-height: 1;
+    color: var(--color-hot);
+  }
+  .wb-fig-c {
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+</style>

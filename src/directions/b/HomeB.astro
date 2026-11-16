@@ -1,0 +1,51 @@
+---
+/**
+ * Direction B — "Dither editorial". Homepage only, same copy and order as live.
+ * New: hero (cover + two readers plate), When to bring us in (spread), Services (contents page),
+ * Work (quiet index), How we work (zig-zag plates), free audit (printed report), footer mark.
+ * Restyled by b.css: header, FAQ, closing band, footer links.
+ */
+import './b.css';
+import Base from '../../layouts/Base.astro';
+import Header from '../../components/Header.astro';
+import Faq from '../../components/Faq.astro';
+import Footer from '../../components/Footer.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import MachineView from '../../components/case-study/MachineView.astro';
+import DirectionSwitch from '../DirectionSwitch.astro';
+import HeroB from './HeroB.astro';
+import WhenB from './WhenB.astro';
+import ServicesB from './ServicesB.astro';
+import WorkB from './WorkB.astro';
+import HowB from './HowB.astro';
+import ProcessB from './ProcessB.astro';
+import MarkB from './MarkB.astro';
+import { homeMarkdown } from '../../lib/home-markdown';
+
+const markdown = await homeMarkdown(Astro.site ?? new URL('https://nicey-website.vercel.app'));
+---
+
+<Base
+  title="Nicey · Direction B (review)"
+  description="Design direction B for review: dither editorial."
+  noindex
+  markdownHref="/index.md"
+>
+  <div class="dir-b">
+    <Header />
+    <main id="main" tabindex="-1" data-human>
+      <HeroB />
+      <WhenB />
+      <ServicesB />
+      <WorkB />
+      <HowB />
+      <ProcessB />
+      <Faq />
+    </main>
+    <Footer />
+    <MachineView markdown={markdown} mdHref="/index.md" what="homepage" />
+    <SiteFooter mdHref="/index.md" />
+    <MarkB />
+  </div>
+  <DirectionSwitch current="b" />
+</Base>

@@ -1,0 +1,165 @@
+---
+/**
+ * Direction B hero: an editorial cover. Serif headline with the question in italics, the lede in mono,
+ * then the plate: one real screen as people see it and as an agent reads it. Same copy as live.
+ */
+import { links } from '../../data/links';
+import TwoReaders from './TwoReaders.astro';
+
+const proof = ['QBench', 'Everbreed', 'Clerky', 'Omnisafe', 'FLYR'].map((name) => ({ name, href: `#work-${name.toLowerCase()}` }));
+---
+
+<section class="hb">
+  <div class="container-page hb-cover">
+    <span class="hb-kicker"><i aria-hidden="true"></i>Free design system audit · read-only</span>
+    <h1 class="hb-h m-0">Is your design system <em>ready for AI agents?</em></h1>
+    <p class="hb-lede m-0">
+      Send us your Figma file. You get a score per pillar, the top findings and what to fix first. Free, and we never
+      edit your file.
+    </p>
+    <div class="hb-ctas">
+      <a href="#audit" class="pill pill-ink pill-lg">Get a free audit</a>
+      <a href={links.bookCall} class="pill pill-outline pill-lg">Book a call</a>
+    </div>
+    <p class="hb-then m-0">Then we build systems people and agents read the same way.</p>
+  </div>
+  <div class="container-page hb-plate">
+    <TwoReaders src="/work/qbench/product.jpg" w={976} h={600} />
+  </div>
+  <nav class="container-page hb-proof" aria-label="Selected work">
+    <span class="hb-proof-k">Selected work</span>
+    <p class="m-0">
+      {
+        proof.map((p, i) => (
+          <>
+            <a href={p.href}>{p.name}</a>
+            {i < proof.length - 2 ? ', ' : i === proof.length - 2 ? ' and ' : '.'}
+          </>
+        ))
+      }
+    </p>
+  </nav>
+</section>
+
+<style>
+  .hb {
+    padding-top: 96px;
+  }
+  .hb-cover {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    text-align: center;
+  }
+  .hb-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1px var(--color-line-strong);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: var(--color-ink-2);
+  }
+  .hb-kicker i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-accent);
+  }
+  .hb-h {
+    max-width: 13ch;
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: clamp(52px, 8vw, 124px);
+    line-height: 0.92;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+  .hb-h em {
+    font-style: italic;
+    color: var(--color-accent);
+  }
+  .hb-lede {
+    max-width: 52ch;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--color-ink-2);
+    text-wrap: pretty;
+  }
+  .hb-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+  .hb-then {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 20px;
+    color: var(--color-ink-2);
+  }
+  .hb-plate {
+    margin-top: 80px;
+  }
+  .hb-proof {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    gap: 6px 18px;
+    margin-top: 72px;
+    padding-block: 28px;
+    border-block: 1px solid var(--color-line);
+    text-align: center;
+  }
+  .hb-proof-k {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .hb-proof p {
+    font-family: var(--font-serif);
+    font-size: 30px;
+    line-height: 1.2;
+    color: var(--color-ink-2);
+  }
+  .hb-proof a {
+    color: var(--color-ink);
+    text-decoration: none;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 92%;
+    background-repeat: no-repeat;
+    transition: background-size 240ms var(--ease-out), color 160ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .hb-proof a:hover {
+      color: var(--color-accent);
+      background-size: 100% 1px;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .hb-cover > * {
+      animation: hb-rise 700ms var(--ease-out) both;
+    }
+    .hb-cover > :nth-child(2) {
+      animation-delay: 80ms;
+    }
+    .hb-cover > :nth-child(3) {
+      animation-delay: 160ms;
+    }
+    .hb-cover > :nth-child(n + 4) {
+      animation-delay: 240ms;
+    }
+  }
+  @keyframes hb-rise {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  }
+</style>
