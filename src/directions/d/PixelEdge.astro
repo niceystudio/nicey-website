@@ -1,0 +1,43 @@
+---
+/**
+ * Stepped pixel edge between a light and a dark band (after Reevo): solid squares, checkered squares
+ * and gaps, deterministic. `flip` puts the dark band on top.
+ */
+interface Props {
+  flip?: boolean;
+  cols?: number;
+}
+const { flip = false, cols = 48 } = Astro.props;
+let seed = 11;
+const rnd = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
+// three rows: the row nearest the dark band is mostly solid, the far row mostly empty
+const rows = [0.82, 0.45, 0.16].map((p) =>
+  Array.from({ length: cols }, () => {
+    const r = rnd();
+    return r < p ? 'on' : r < p + 0.18 ? 'half' : 'off';
+  }),
+);
+const order = flip ? rows : [...rows].reverse();
+---
+
+<div class:list={['pe', flip && 'pe--flip']} aria-hidden="true" style={`--cols:${cols}`}>
+  {order.map((row) => row.map((c) => <i class={`pe-${c}`} />))}
+</div>
+
+<style>
+  .pe {
+    display: grid;
+    grid-template-columns: repeat(var(--cols), 1fr);
+    width: 100%;
+    background: var(--color-page);
+  }
+  .pe i {
+    aspect-ratio: 1;
+  }
+  .pe-on {
+    background: var(--d-band);
+  }
+  .pe-half {
+    background: repeating-conic-gradient(var(--d-band) 0 25%, transparent 0 50%) 0 0 / 6px 6px;
+  }
+</style>

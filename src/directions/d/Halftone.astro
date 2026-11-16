@@ -1,0 +1,89 @@
+---
+/**
+ * Direction D: a real product screen printed as a halftone (ordered dither) with one flat colour square
+ * laid over it (after Reevo's photos). The square marks the part a system governs.
+ */
+interface Props {
+  src: string;
+  /** square: left, top, width, height in % of the frame */
+  sq?: [number, number, number, number];
+  color?: string;
+  ar?: string;
+}
+const { src, sq = [58, 20, 26, 34], color = '--color-accent', ar = '16 / 10' } = Astro.props;
+---
+
+<div class="ht" data-ht data-src={src} style={`aspect-ratio:${ar}`}>
+  <canvas aria-hidden="true"></canvas>
+  <i class="ht-sq" style={`left:${sq[0]}%;top:${sq[1]}%;width:${sq[2]}%;height:${sq[3]}%;background:var(${color})`}></i>
+</div>
+
+<style>
+  .ht {
+    position: relative;
+    overflow: hidden;
+    background: var(--color-surface);
+  }
+  .ht canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+  }
+  .ht-sq {
+    position: absolute;
+    mix-blend-mode: multiply;
+    opacity: 0.9;
+  }
+  :global([data-theme='dark']) .ht-sq {
+    mix-blend-mode: screen;
+    opacity: 0.75;
+  }
+</style>
+
+<script>
+  import { BAYER, hex, inkMap, loadImage } from '../dither';
+
+  document.querySelectorAll<HTMLElement>('[data-ht]').forEach(async (box) => {
+    const cv = box.querySelector('canvas')!;
+    const ctx = cv.getContext('2d')!;
+    const img = await loadImage(box.dataset.src!);
+    const draw = () => {
+      const r = box.getBoundingClientRect();
+      const W = Math.max(1, Math.round(r.width / 2.5));
+      const H = Math.max(1, Math.round(r.height / 2.5));
+      // cover-crop from the top of the screen
+      const c = document.createElement('canvas');
+      const scale = Math.max(W / img.naturalWidth, H / img.naturalHeight);
+      const sw = W / scale;
+      const sh = H / scale;
+      c.width = Math.round(sw);
+      c.height = Math.round(sh);
+      c.getContext('2d')!.drawImage(img, (img.naturalWidth - sw) / 2, 0, sw, sh, 0, 0, sw, sh);
+      const tmp = new Image();
+      tmp.onload = () => {
+        const { ink } = inkMap(tmp, W, H, 2.2);
+        cv.width = W;
+        cv.height = H;
+        // the band can flip colours by theme: read the ink where the tile sits, not at the root
+        const [ir, ig, ib] = hex(getComputedStyle(box).getPropertyValue('--color-ink'));
+        const d = ctx.createImageData(W, H);
+        for (let y = 0; y < H; y++)
+          for (let x = 0; x < W; x++) {
+            const i = y * W + x;
+            if (ink[i] > BAYER[(y % 8) * 8 + (x % 8)]) {
+              d.data[i * 4] = ir;
+              d.data[i * 4 + 1] = ig;
+              d.data[i * 4 + 2] = ib;
+              d.data[i * 4 + 3] = 220;
+            }
+          }
+        ctx.putImageData(d, 0, 0);
+      };
+      tmp.src = c.toDataURL();
+    };
+    draw();
+    new ResizeObserver(draw).observe(box);
+    new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  });
+</script>
