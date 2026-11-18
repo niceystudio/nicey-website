@@ -1,18 +1,15 @@
 ---
 /**
- * Direction A hero (Select layout: headline across, text + keys beside it, a wide scan below). Same copy as live. The headline is set like the Supabase Select logotype:
- * pixel capitals printed on blocks, the last line on the accent. The visual is a real product screen
- * (QBench), dithered and read by a scan line: what the audit does to your file.
+ * Direction A hero (Select layout: headline across, text + CTAs beside it). The headline is set like the Supabase Select logotype:
+ * pixel capitals printed on blocks, the last line on the accent. The audit scan visual was removed (Emir 18 Nov: too much noise).
  */
 import { links } from '../../data/links';
-import DitherScan from './DitherScan.astro';
 
 const proof = ['QBench', 'Everbreed', 'Clerky', 'Omnisafe', 'FLYR'].map((name) => ({ name, href: `#work-${name.toLowerCase()}` }));
 ---
 
 <section class="ha">
   <div class="container-page ha-meta">
-    <span class="caption a-path text-ink-2">Free design system audit · read-only</span>
     <nav class="ha-proof" aria-label="Selected work">
       <span class="text-muted">Selected work</span>
       {
@@ -45,22 +42,7 @@ const proof = ['QBench', 'Everbreed', 'Clerky', 'Omnisafe', 'FLYR'].map((name) =
           Book a call<span class="a-key" aria-hidden="true">B</span>
         </a>
       </div>
-      <p class="ha-then m-0">
-        <span class="ha-prompt" aria-hidden="true">&gt;</span> Then we build systems people and agents read the same way.
-      </p>
     </div>
-  </div>
-  <div class="container-page ha-wide">
-    <DitherScan
-      src="/work/qbench/product.jpg"
-      w={976}
-      h={400}
-      tag="audit.scan"
-      file="example · a product screen"
-      cols={300}
-      side
-      log={['> reading the screen', '  values ........ listed', '  tokens ........ matched', '  docs .......... checked', '> report ready']}
-    />
   </div>
 </section>
 
@@ -122,9 +104,6 @@ const proof = ['QBench', 'Everbreed', 'Clerky', 'Omnisafe', 'FLYR'].map((name) =
       grid-template-columns: 1fr;
     }
   }
-  .ha-wide {
-    margin-top: 56px;
-  }
   .ha-h {
     display: flex;
     flex-direction: column;
@@ -159,14 +138,6 @@ const proof = ['QBench', 'Everbreed', 'Clerky', 'Omnisafe', 'FLYR'].map((name) =
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-  }
-  .ha-then {
-    font-family: var(--font-mono);
-    font-size: 13px;
-    color: var(--color-ink-2);
-  }
-  .ha-prompt {
-    color: var(--color-accent);
   }
   /* the headline prints line by line on first view */
   @media (prefers-reduced-motion: no-preference) {

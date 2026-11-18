@@ -1,0 +1,334 @@
+---
+/**
+ * Direction D — "Clean" (review only, noindex). Layout and feel taken from halaska.com
+ * (framed light page, centred hero, proof strip, stat row, two feature cards + service columns,
+ * work tiles, step cards, closing CTA, bottom bar). Nicey's own copy, brand colours and work only;
+ * none of Halaska's text, logos or images. Sections we don't have (pricing, comparison, quotes) are left out.
+ */
+import './d.css';
+import Base from '../../layouts/Base.astro';
+import Faq from '../../components/Faq.astro';
+import DirectionSwitch from '../DirectionSwitch.astro';
+import { links } from '../../data/links';
+import { steps } from '../../data/zero-drift';
+
+const nav = [
+  { label: 'Services', href: '#services' },
+  { label: 'Work', href: '#work' },
+  { label: 'How we work', href: '#how' },
+  { label: 'FAQ', href: '#faq' },
+];
+const proof = ['QBench', 'Everbreed', 'Clerky', 'Omnisafe', 'FLYR'];
+const stats = [
+  { value: '10+', label: 'Years designing products' },
+  { value: '50+', label: "Teams we've worked with" },
+  { value: '$10M+', label: "Raised by teams we've worked with" },
+];
+const services = [
+  {
+    title: 'Design systems',
+    lede: 'For products with years of drift, and teams that want their coding agents to build on-system.',
+    href: links.exploreDesignSystems,
+    visual: 'tokens',
+  },
+  {
+    title: 'Product design',
+    lede: 'Complex workflows designed on the system we build, so new screens ship consistent from day one.',
+    href: links.exploreProductDesign,
+    visual: 'product',
+  },
+];
+const columns = [
+  {
+    head: 'Design systems',
+    items: ['Audit and consolidation', 'Token architecture and theming', 'Component library, Figma to code', 'AI-ready documentation', 'Systems partner, monthly'],
+  },
+  { head: 'Product design', items: ['Product and UX design', 'Design engineering', 'AI workflows in delivery'] },
+  { head: 'Start here', items: ['Free audit, read-only', 'Book a call'] },
+];
+const work = [
+  { name: 'QBench', meta: 'Design system + product · LIMS', href: links.work.qbench, figure: '1,071 → 0', caption: 'Outside-library references', img: '/work/qbench/product.jpg' },
+  { name: 'Everbreed', meta: 'Design system + product · Agtech', href: links.work.everbreed, figure: '302', caption: 'Variables made machine-readable', img: '/work/everbreed/desktop-care.jpg' },
+  { name: 'Clerky', meta: 'Design system · Legal tech', href: links.work.clerky, figure: '0 T1', caption: 'Defects at the pilot gate' },
+  { name: 'Omnisafe', meta: 'Product design · Insurance', href: links.work.omnisafe, figure: '16', caption: 'Modules tested before build' },
+  { name: 'FLYR', meta: 'Product design · Hospitality', href: links.work.flyr, figure: null, caption: 'Group Quotation MVP shipped' },
+];
+const featured = [
+  { kind: 'video', src: '/work/everbreed/mobile-care.webm', poster: '/work/everbreed/mobile-care.jpg', label: 'Everbreed · Care plan' },
+  { kind: 'video', src: '/work/everbreed/mobile-dailycare.webm', poster: '/work/everbreed/mobile-dailycare.jpg', label: 'Everbreed · Daily care' },
+  { kind: 'wide', src: '/work/qbench/product.jpg', label: 'QBench · Status workflows' },
+  { kind: 'video', src: '/work/everbreed/mobile-logweight.webm', poster: '/work/everbreed/mobile-logweight.jpg', label: 'Everbreed · Log weight' },
+  { kind: 'wide', src: '/work/everbreed/desktop-care.jpg', label: 'Everbreed · Desktop' },
+  { kind: 'video', src: '/work/everbreed/mobile-milestone.webm', poster: '/work/everbreed/mobile-milestone.jpg', label: 'Everbreed · Milestones' },
+];
+/* Generated line art for tiles without a product image (demo only): flowing lines, seeded per name. */
+function lineArt(seed: string) {
+  let h = 0;
+  for (const ch of seed) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  const rnd = () => ((h = (h * 1664525 + 1013904223) >>> 0) / 4294967296);
+  const lines: string[] = [];
+  const n = 14;
+  const amp = 18 + rnd() * 30;
+  const freq = 1 + rnd() * 2.2;
+  const phase = rnd() * Math.PI * 2;
+  for (let i = 0; i < n; i++) {
+    const y0 = 40 + i * (220 / n);
+    let d = '';
+    for (let x = 0; x <= 400; x += 10) {
+      const y = y0 + Math.sin((x / 400) * Math.PI * freq + phase + i * 0.35) * amp * (0.4 + (i / n) * 0.8);
+      d += (x === 0 ? 'M' : 'L') + x + ' ' + y.toFixed(1) + ' ';
+    }
+    lines.push(d.trim());
+  }
+  return lines;
+}
+const footCols = [
+  { head: 'Nicey', items: [{ label: 'Work', href: '#work' }, { label: 'How we work', href: '#how' }, { label: 'FAQ', href: '#faq' }, { label: 'Story', href: '/story' }] },
+  { head: 'Services', items: [{ label: 'Design systems', href: links.exploreDesignSystems }, { label: 'Product design', href: links.exploreProductDesign }, { label: 'Free audit', href: links.startAudit }] },
+  { head: 'Work', items: [{ label: 'QBench', href: links.work.qbench }, { label: 'Everbreed', href: links.work.everbreed }, { label: 'Clerky', href: links.work.clerky }, { label: 'Omnisafe', href: links.work.omnisafe }, { label: 'FLYR', href: links.work.flyr }] },
+  { head: 'Contact', items: [{ label: 'Book a call', href: links.bookCall }, { label: 'Email', href: links.email }] },
+  { head: 'Elsewhere', items: [{ label: 'LinkedIn', href: links.linkedin }, { label: 'GitHub', href: links.github }] },
+];
+/* example only — real client quotes come later */
+const quotes = [
+  { text: 'Our coding agent finally builds screens that look like ours. The tokens and the docs did that, not more prompts.', name: '[Name]', role: 'Founder', company: '[Company]', initials: 'AB' },
+  { text: 'They read our Figma file, our CSS and our repo, and showed us exactly where design and code disagreed.', name: '[Name]', role: 'Head of Product', company: '[Company]', initials: 'CD' },
+  { text: 'One status model instead of eight. Our engineers stopped asking which button to use.', name: '[Name]', role: 'CTO', company: '[Company]', initials: 'EF' },
+];
+---
+
+<Base title="Nicey · Direction D (review)" description="Design direction D for review: clean, framed, light." noindex markdownHref="/index.md">
+  <div class="dir-d">
+    <header class="d-bar">
+      <a href="/" class="d-logo">nicey<span>.</span></a>
+      <nav class="d-nav" aria-label="Main">
+        {nav.map((n) => <a href={n.href}>{n.label}</a>)}
+      </nav>
+      <a href={links.bookCall} class="d-btn d-btn--dark">Book a call <span aria-hidden="true">→</span></a>
+    </header>
+
+    <main id="main" tabindex="-1" class="d-page">
+      <section class="d-hero">
+        <h1>Is your design system ready for AI agents?</h1>
+        <p class="d-lede">
+          Send us your Figma file. You get a score per pillar, the top findings and what to fix first. Free, and we never edit your file.
+        </p>
+        <div class="d-ctas">
+          <a href="#audit" class="d-btn d-btn--dark">Get a free audit <span aria-hidden="true">→</span></a>
+          <a href={links.bookCall} class="d-btn d-btn--soft">Book a call</a>
+        </div>
+        <ul class="d-proof" aria-label="Selected work">
+          {proof.map((p) => <li><a href={`#work-${p.toLowerCase()}`}>{p}</a></li>)}
+        </ul>
+        <div class="d-stats">
+          {stats.map((s) => (
+            <div>
+              <strong>{s.value}</strong>
+              <span>{s.label}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section id="services" class="d-sec">
+        <p class="d-eyebrow">What we help with</p>
+        <h2>Design systems first. Product design alongside.</h2>
+        <div class="d-cards">
+          {services.map((s) => (
+            <a href={s.href} class="d-card">
+              <div class="d-card-img">
+                {s.visual === 'tokens' ? (
+                  <div class="d-code" aria-hidden="true">
+                    <div class="d-code-tabs"><span>Figma</span><span class="is-on">tokens.json</span><span>Agent</span></div>
+                    <pre><code><span class="k">"surface/default"</span>: <span class="v">"#ffffff"</span>,
+<span class="k">"text/primary"</span>: <span class="v">"#26251f"</span>,
+<span class="k">"border/default"</span>: <span class="v">"#e4e0d6"</span>,
+<span class="k">"radius/xl"</span>: <span class="v">12</span>,
+<span class="c">// Button · variant=solid, tone=primary</span>
+<span class="k">"use"</span>: <span class="v">"one main action per area"</span></code></pre>
+                    <div class="d-code-foot"><span class="dot"></span>Agent reads the same names as Figma</div>
+                  </div>
+                ) : (
+                  <div class="d-ui" aria-hidden="true"><img src="/work/qbench/product.jpg" alt="" loading="lazy" /></div>
+                )}
+              </div>
+              <h3>{s.title}</h3>
+              <p>{s.lede}</p>
+              <span class="d-more">Learn more <span aria-hidden="true">→</span></span>
+            </a>
+          ))}
+        </div>
+        <div class="d-cols">
+          {columns.map((c) => (
+            <div>
+              <p class="d-col-head">{c.head}</p>
+              <ul>{c.items.map((i) => <li>{i}</li>)}</ul>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section class="d-feat" data-feat>
+        <div class="d-feat-sticky">
+          <div class="d-feat-head">
+            <p class="d-eyebrow">Featured work</p>
+            <h2>Screens built on the systems we made.</h2>
+          </div>
+          <div class="d-feat-viewport">
+            <div class="d-feat-track" data-feat-track>
+              {featured.map((f) => (
+                <figure class:list={['d-feat-item', f.kind === 'wide' ? 'd-feat-item--wide' : 'd-feat-item--phone']}>
+                  <div class="d-feat-stage">
+                    {f.kind === 'video' ? (
+                      <video src={f.src} poster={f.poster} muted loop playsinline autoplay preload="metadata" />
+                    ) : (
+                      <img src={f.src} alt="" loading="lazy" />
+                    )}
+                  </div>
+                  <figcaption>{f.label}</figcaption>
+                </figure>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="work" class="d-sec">
+        <p class="d-eyebrow">Work</p>
+        <h2>Systems and products we have built.</h2>
+        <div class="d-work">
+          {work.map((w, i) => (
+            <a href={w.href} id={`work-${w.name.toLowerCase()}`} class:list={['d-tile', i < 2 && 'd-tile--big']}>
+              <div class:list={['d-tile-img', !w.img && 'd-tile-img--figure']}>
+                {w.img ? (
+                  <img src={w.img} alt="" loading="lazy" />
+                ) : (
+                  <>
+                    <svg class="d-lines" viewBox="0 0 400 300" preserveAspectRatio="none" aria-hidden="true">
+                      {lineArt(w.name).map((d, li) => <path d={d} style={`opacity:${(0.25 + (li / 14) * 0.6).toFixed(2)}`} />)}
+                    </svg>
+                    <span>{w.figure ?? w.name}</span>
+                  </>
+                )}
+              </div>
+              <div class="d-tile-meta">
+                <div>
+                  <h3>{w.name}</h3>
+                  <p>{w.meta}</p>
+                </div>
+                <p class="d-tile-fig">
+                  {w.figure && <strong>{w.figure}</strong>}
+                  <span>{w.caption}</span>
+                </p>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section id="how" class="d-sec">
+        <p class="d-eyebrow">How we work</p>
+        <h2>From drift to a system that holds.</h2>
+        <ol class="d-steps">
+          {steps.map((s) => (
+            <li>
+              <span class="d-step-num">{s.num}</span>
+              <h3>{s.name}</h3>
+              <p>{s.heading}</p>
+              <p class="d-step-get"><span>You get</span>{s.youGet}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section class="d-sec">
+        <p class="d-eyebrow">What clients say <span class="d-tag">example</span></p>
+        <h2>Teams that build on what we leave behind.</h2>
+        <div class="d-quotes">
+          {quotes.map((q) => (
+            <figure class="d-quote">
+              <blockquote>“{q.text}”</blockquote>
+              <figcaption>
+                <span class="d-avatar" aria-hidden="true">{q.initials}</span>
+                <span><strong>{q.name}</strong>{q.role}, {q.company}</span>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </section>
+
+      <section id="faq" class="d-sec d-faq">
+        <Faq />
+      </section>
+
+      <section id="audit" class="d-close">
+        <h2>Working on a design system your agents should read?</h2>
+        <p class="d-lede">Start with a free, read-only audit of your Figma file. You get a score per pillar and what to fix first.</p>
+        <div class="d-ctas">
+          <a href={links.startAudit} class="d-btn d-btn--dark">Get a free audit <span aria-hidden="true">→</span></a>
+          <a href={links.bookCall} class="d-btn d-btn--soft">Book a call</a>
+        </div>
+      </section>
+
+      <footer class="d-dir">
+        <div class="d-dir-brand">
+          <a href="/" class="d-logo">nicey<span>.</span></a>
+          <p>Design systems people and agents read the same way.</p>
+        </div>
+        <div class="d-dir-cols">
+          {footCols.map((c) => (
+            <div>
+              <p class="d-col-head">{c.head}</p>
+              <ul>{c.items.map((i) => <li><a href={i.href}>{i.label}</a></li>)}</ul>
+            </div>
+          ))}
+        </div>
+        <div class="d-dir-legal">
+          <span>© {new Date().getFullYear()} Nicey Studio</span>
+          <span><a href="#">Privacy</a> · <a href="#">Cookies</a></span>
+        </div>
+      </footer>
+    </main>
+
+    <div class="d-foot">
+      <span>Design systems for teams building with AI</span>
+      <button type="button" class="d-mail" data-copy="[hello@ email]">[hello@ email] <span aria-hidden="true">⧉</span><span class="d-mail-ok" data-copied>Copied</span></button>
+      <span>[Based in ], working worldwide</span>
+    </div>
+  </div>
+  <DirectionSwitch current="d" />
+</Base>
+
+<script>
+  // Featured work: the section is tall, its inner block sticks, and vertical scroll moves the track sideways.
+  const feat = document.querySelector<HTMLElement>('[data-feat]');
+  const track = document.querySelector<HTMLElement>('[data-feat-track]');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (feat && track && !reduce) {
+    const size = () => {
+      const extra = Math.max(0, track.scrollWidth - track.parentElement!.clientWidth);
+      feat.style.setProperty('--feat-extra', extra + 'px');
+      return extra;
+    };
+    let extra = size();
+    const onScroll = () => {
+      const r = feat.getBoundingClientRect();
+      const span = feat.offsetHeight - window.innerHeight;
+      const p = span > 0 ? Math.min(1, Math.max(0, -r.top / span)) : 0;
+      track.style.transform = `translate3d(${-p * extra}px,0,0)`;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', () => { extra = size(); onScroll(); });
+    onScroll();
+  } else if (feat) {
+    feat.classList.add('d-feat--static');
+  }
+  // bottom bar: click the address to copy it
+  document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((b) => {
+    b.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(b.dataset.copy || ''); } catch {}
+      b.classList.add('is-copied');
+      setTimeout(() => b.classList.remove('is-copied'), 1400);
+    });
+  });
+</script>

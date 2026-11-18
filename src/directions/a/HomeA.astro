@@ -1,7 +1,7 @@
 ---
 /**
  * Direction A — "Select" (terminal, ASCII, dither). Homepage only, same copy and order as live.
- * New: hero, ASCII band, When to bring us in (ruled diagnostic rows), How we work (step windows).
+ * New: hero (headline + CTAs), ASCII band, How we work (step windows).
  * Also: Services as one window with file tabs + a tree, Work as a terminal listing.
  * Reused and restyled by a.css: free audit, FAQ, closing band, footer.
  */
@@ -18,7 +18,6 @@ import MachineView from '../../components/case-study/MachineView.astro';
 import DirectionSwitch from '../DirectionSwitch.astro';
 import HeroA from './HeroA.astro';
 import AsciiBand from './AsciiBand.astro';
-import WhenA from './WhenA.astro';
 import HowA from './HowA.astro';
 import MarkA from './MarkA.astro';
 import { homeMarkdown } from '../../lib/home-markdown';
@@ -37,7 +36,6 @@ const markdown = await homeMarkdown(Astro.site ?? new URL('https://nicey-website
     <main id="main" tabindex="-1" data-human>
       <HeroA />
       <AsciiBand />
-      <WhenA />
       <ServicesA />
       <WorkA />
       <HowA />
