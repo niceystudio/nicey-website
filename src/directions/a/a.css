@@ -196,30 +196,7 @@
   font-weight: 400;
 }
 
-/* nav as a prompt: ~/nicey $ ./services ./work … with a cursor */
-.dir-a .head-links::before {
-  content: '~/nicey $';
-  margin-right: 6px;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--color-accent);
-}
-.dir-a .head-links::after {
-  content: '▍';
-  margin-left: 4px;
-  font-family: var(--font-mono);
-  color: var(--color-accent);
-}
-@media (prefers-reduced-motion: no-preference) {
-  .dir-a .head-links::after {
-    animation: a-blink 1s steps(1) infinite;
-  }
-}
-@keyframes a-blink {
-  50% {
-    opacity: 0;
-  }
-}
+/* nav: plain links, no prompt / cursor / ./ prefixes (Emir 18 Nov: less "code") */
 .dir-a .head-link {
   min-height: 32px;
   padding: 0 7px;
@@ -228,16 +205,11 @@
   font-size: 13px;
   transition: background-color 120ms var(--ease-out), color 120ms var(--ease-out);
 }
-.dir-a .head-link::before {
-  content: './';
-  color: var(--color-muted);
-}
 @media (hover: hover) and (pointer: fine) {
   .dir-a .head-link:hover {
     background: var(--a-block);
     color: var(--a-on-block);
   }
-  .dir-a .head-link:hover::before,
   .dir-a .head-link:hover .head-count {
     color: inherit;
   }
@@ -295,4 +267,9 @@
 /* the live pixel-block wordmark is replaced by MarkA (characters settling into blocks) */
 .dir-a .site-foot-markwrap {
   display: none;
+}
+
+/* nav count "(5)" hidden in A — reads like code (Emir 18 Nov) */
+.dir-a .head-count {
+  display: none !important;
 }

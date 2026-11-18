@@ -1,0 +1,817 @@
+/* Direction D — clean, framed, light (layout after halaska.com; Nicey brand colours). Review only. */
+.dir-d {
+  --d-frame: #e0ebf0; /* greyish frame around the page (Halaska palette, Emir 18 Nov) */
+  --d-page: #f6fcff;
+  --d-soft: #eef7fd; /* light blue cards */
+  --d-soft-2: #ebf3f7;
+  --d-ink: #051a24;
+  --d-ink-2: #425761;
+  --d-muted: #79878f;
+  --d-line: #dce9f2;
+  --d-accent: #6b5fbe;
+  min-height: 100vh;
+  padding: 8px;
+  background: var(--d-frame);
+  color: var(--d-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+.dir-d a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ---------- top bar ---------- */
+.d-bar {
+  position: sticky;
+  top: 8px;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 24px;
+  margin-bottom: 8px;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--d-page) 94%, transparent);
+  backdrop-filter: blur(8px);
+}
+.d-logo {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+.d-logo span {
+  color: var(--d-accent);
+}
+.d-nav {
+  display: flex;
+  gap: 28px;
+  font-size: 15px;
+  color: var(--d-ink-2);
+}
+.d-bar > .d-btn {
+  justify-self: end;
+}
+@media (hover: hover) and (pointer: fine) {
+  .d-nav a:hover {
+    color: var(--d-ink);
+  }
+}
+
+/* ---------- buttons ---------- */
+.d-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 22px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 500;
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1), background-color 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.d-btn:active {
+  transform: scale(0.97);
+}
+.d-btn--dark {
+  background: var(--d-ink);
+  color: var(--d-page) !important;
+}
+.d-btn--soft {
+  background: var(--d-soft-2);
+  color: var(--d-ink);
+}
+@media (hover: hover) and (pointer: fine) {
+  .d-btn--dark:hover {
+    background: var(--d-accent);
+  }
+  .d-btn--soft:hover {
+    background: var(--d-line);
+  }
+}
+
+/* ---------- page card ---------- */
+.d-page {
+  border-radius: 16px;
+  background: var(--d-page);
+  padding: 0 clamp(20px, 8vw, 132px) 24px;
+}
+.d-sec {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 112px 0 0;
+  text-align: center;
+}
+.dir-d h1,
+.dir-d h2 {
+  margin: 0 auto;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+.dir-d h2 {
+  max-width: 22ch;
+  font-size: clamp(32px, 4vw, 48px);
+  line-height: 1.08;
+}
+.d-eyebrow {
+  margin: 0 0 14px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--d-muted);
+}
+.d-lede {
+  max-width: 52ch;
+  margin: 24px auto 0;
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--d-ink-2);
+  text-wrap: pretty;
+}
+.d-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 36px;
+}
+
+/* ---------- hero ---------- */
+.d-hero {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 120px 0 0;
+  text-align: center;
+}
+.d-hero h1 {
+  max-width: 15ch;
+  font-size: clamp(42px, 6vw, 72px);
+  line-height: 1.02;
+}
+.d-proof {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 16px 32px;
+  margin: 80px 0 0;
+  padding: 0 0 40px;
+  list-style: none;
+  border-bottom: 1px solid var(--d-line);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--d-muted);
+}
+@media (hover: hover) and (pointer: fine) {
+  .d-proof a:hover {
+    color: var(--d-ink);
+  }
+}
+.d-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  padding: 56px 0;
+  border-bottom: 1px solid var(--d-line);
+}
+.d-stats strong {
+  display: block;
+  font-size: clamp(32px, 3.4vw, 44px);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+.d-stats span {
+  display: block;
+  margin-top: 10px;
+  font-size: 15px;
+  color: var(--d-ink-2);
+}
+
+/* ---------- services ---------- */
+.d-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 56px;
+  text-align: left;
+}
+.d-card {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  border-radius: 16px;
+  background: var(--d-soft);
+}
+.d-card-img {
+  aspect-ratio: 16 / 10;
+  margin-bottom: 24px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: var(--d-page);
+}
+.d-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top left;
+}
+.d-card h3,
+.d-tile h3,
+.d-steps h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.d-card p {
+  margin: 8px 0 20px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--d-ink-2);
+}
+.d-more {
+  margin-top: auto;
+  font-size: 15px;
+  font-weight: 500;
+}
+.d-cols {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  margin-top: 32px;
+  padding-top: 40px;
+  border-top: 1px solid var(--d-line);
+  text-align: left;
+}
+.d-col-head {
+  margin: 0 0 16px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--d-muted);
+}
+.d-cols ul {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 17px;
+}
+
+/* ---------- work ---------- */
+.d-work {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  margin-top: 56px;
+  text-align: left;
+}
+.d-tile {
+  grid-column: span 2;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 8px 20px;
+  border-radius: 16px;
+  background: var(--d-soft-2);
+  transition: transform 200ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.d-tile--big {
+  grid-column: span 3;
+}
+@media (hover: hover) and (pointer: fine) {
+  .d-tile:hover {
+    transform: translateY(-2px);
+  }
+}
+.d-tile-img {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 10px;
+  background: var(--d-soft);
+}
+.d-tile-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top left;
+}
+.d-tile-img--phone img {
+  width: auto;
+  height: 88%;
+  object-fit: contain;
+  border-radius: 18px;
+}
+.d-tile-img--figure span {
+  font-size: clamp(40px, 5vw, 64px);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: var(--d-accent);
+}
+.d-tile-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 12px 0;
+}
+.d-tile-meta p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: var(--d-muted);
+}
+.d-tile-fig {
+  text-align: right;
+}
+.d-tile-fig strong {
+  display: block;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--d-ink);
+}
+
+/* ---------- how we work ---------- */
+.d-steps {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin: 56px 0 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+.d-steps li {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 24px;
+  border-radius: 16px;
+  background: var(--d-soft-2);
+}
+.d-step-num {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--d-accent);
+}
+.d-steps p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--d-ink-2);
+}
+.d-step-get {
+  margin-top: auto !important;
+  padding-top: 14px;
+  border-top: 1px solid var(--d-line);
+}
+.d-step-get span {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--d-muted);
+}
+
+/* ---------- FAQ (shared component, quieted) ---------- */
+.d-faq {
+  text-align: left;
+}
+.d-faq .container-page {
+  max-width: none;
+  padding: 0;
+}
+
+/* ---------- closing ---------- */
+.d-close {
+  max-width: 1160px;
+  margin: 112px auto 0;
+  padding: 96px 24px;
+  border-radius: 16px;
+  background: var(--d-soft);
+  text-align: center;
+}
+
+/* ---------- bottom bar ---------- */
+.d-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 24px;
+  margin-top: 8px;
+  padding: 16px 24px;
+  border-radius: 16px;
+  background: var(--d-page);
+  font-size: 14px;
+  color: var(--d-ink-2);
+}
+
+/* ---------- small screens ---------- */
+@media (max-width: 900px) {
+  .d-nav {
+    display: none;
+  }
+  .d-bar {
+    grid-template-columns: 1fr auto;
+  }
+  .d-stats,
+  .d-cards,
+  .d-cols {
+    grid-template-columns: 1fr;
+  }
+  .d-work {
+    grid-template-columns: 1fr;
+  }
+  .d-tile,
+  .d-tile--big {
+    grid-column: auto;
+  }
+  .d-steps {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* D is always light: pin the shared tokens so reused components (FAQ) render light too */
+.dir-d {
+  --color-page: #f6fcff;
+  --color-surface: #ebf3f7;
+  --color-surface-hover: #e0ebf0;
+  --color-ink: #051a24;
+  --color-ink-2: #425761;
+  --color-muted: #79878f;
+  --color-on-ink: #ffffff;
+  --color-line: #dce9f2;
+  --color-line-strong: #c8d5db;
+  color-scheme: light;
+}
+.d-faq .panel {
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--d-soft-2);
+  color: var(--d-ink);
+}
+.d-faq h2 {
+  margin: 0;
+  text-align: left;
+}
+/* figure-only work tiles: the big figure is enough */
+.d-tile-img--figure + .d-tile-meta .d-tile-fig strong {
+  display: none;
+}
+
+/* ---------- service visuals ---------- */
+.d-card-img {
+  display: grid;
+  place-items: stretch;
+}
+.d-code {
+  display: flex;
+  flex-direction: column;
+  margin: 24px;
+  border: 1px solid var(--d-line);
+  border-radius: 12px;
+  background: var(--d-page);
+  box-shadow: 0 1px 2px rgba(38, 37, 31, 0.04), 0 8px 24px rgba(38, 37, 31, 0.06);
+  overflow: hidden;
+}
+.d-code-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 8px;
+  border-bottom: 1px solid var(--d-line);
+  font-size: 13px;
+  color: var(--d-muted);
+}
+.d-code-tabs span {
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+.d-code-tabs .is-on {
+  background: var(--d-soft);
+  color: var(--d-accent);
+}
+.d-code pre {
+  flex: 1;
+  margin: 0;
+  padding: 16px 18px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  color: var(--d-ink-2);
+}
+.d-code .k {
+  color: var(--d-ink);
+}
+.d-code .v {
+  color: var(--d-accent);
+}
+.d-code .c {
+  color: var(--d-muted);
+}
+.d-code-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--d-line);
+  font-size: 13px;
+  color: var(--d-ink-2);
+}
+.d-code-foot .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #3f9b6b;
+}
+.d-ui {
+  margin: 24px 24px 0;
+  overflow: hidden;
+  border: 1px solid var(--d-line);
+  border-bottom: 0;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 8px 24px rgba(38, 37, 31, 0.08);
+}
+.d-ui img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ---------- featured work: sticky, scrolls sideways ---------- */
+.d-feat {
+  position: relative;
+  max-width: 1160px;
+  margin: 112px auto 0;
+  height: calc(100vh + var(--feat-extra, 1200px));
+}
+.d-feat-sticky {
+  position: sticky;
+  top: 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  height: calc(100vh - 120px);
+}
+.d-feat-head {
+  text-align: center;
+}
+.d-feat-viewport {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--d-soft);
+}
+.d-feat-track {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  height: 100%;
+  padding: 0 48px;
+  width: max-content;
+  will-change: transform;
+}
+.d-feat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  height: 84%;
+  margin: 0;
+}
+.d-feat-stage {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--d-page);
+  box-shadow: 0 2px 6px rgba(38, 37, 31, 0.06), 0 18px 40px rgba(38, 37, 31, 0.1);
+}
+.d-feat-item--phone .d-feat-stage {
+  aspect-ratio: 9 / 19.5;
+  border: 6px solid var(--d-ink);
+  border-radius: 36px;
+}
+.d-feat-item--wide .d-feat-stage {
+  aspect-ratio: 16 / 10;
+  border-radius: 12px;
+}
+.d-feat-stage video,
+.d-feat-stage img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top left;
+}
+.d-feat-item figcaption {
+  font-size: 14px;
+  color: var(--d-ink-2);
+}
+.d-feat--static {
+  height: auto;
+}
+.d-feat--static .d-feat-sticky {
+  position: static;
+  height: auto;
+}
+.d-feat--static .d-feat-viewport {
+  height: 560px;
+  overflow-x: auto;
+}
+
+/* ---------- quotes (example) ---------- */
+.d-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--d-soft);
+  font-size: 12px;
+  color: var(--d-accent);
+  vertical-align: 1px;
+}
+.d-quotes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 56px;
+  text-align: left;
+}
+.d-quote {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 32px;
+  margin: 0;
+  padding: 28px;
+  border-radius: 16px;
+  background: var(--d-soft-2);
+}
+.d-quote blockquote {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.4;
+  letter-spacing: -0.015em;
+  text-wrap: pretty;
+}
+.d-quote figcaption {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--d-ink-2);
+}
+.d-quote strong {
+  display: block;
+  font-weight: 600;
+  color: var(--d-ink);
+}
+.d-avatar {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--color-lavender, #d9d2ef);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--d-accent);
+}
+@media (max-width: 900px) {
+  .d-quotes {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* generated line art behind figure tiles */
+.d-tile-img--figure {
+  position: relative;
+}
+.d-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.d-lines path {
+  fill: none;
+  stroke: var(--d-accent);
+  stroke-width: 1.2;
+  vector-effect: non-scaling-stroke;
+}
+.d-tile-img--figure span {
+  position: relative;
+  padding: 4px 14px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--d-soft) 85%, transparent);
+}
+
+/* ---------- closing CTA (Halaska-style: big, centred, on the page) ---------- */
+.d-close {
+  background: transparent;
+  padding: 128px 24px 112px;
+  border-top: 1px solid var(--d-line);
+  border-radius: 0;
+}
+.d-close h2 {
+  max-width: 18ch;
+  font-size: clamp(36px, 5vw, 60px);
+  line-height: 1.04;
+}
+
+/* ---------- footer directory ---------- */
+.d-dir {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 56px 0 8px;
+  border-top: 1px solid var(--d-line);
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  gap: 40px 48px;
+}
+.d-dir-brand p {
+  max-width: 24ch;
+  margin: 12px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--d-ink-2);
+}
+.d-dir-cols {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 24px;
+}
+.d-dir-cols ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 15px;
+  color: var(--d-ink-2);
+}
+@media (hover: hover) and (pointer: fine) {
+  .d-dir-cols a:hover,
+  .d-dir-legal a:hover {
+    color: var(--d-ink);
+  }
+}
+.d-dir-legal {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 24px;
+  border-top: 1px solid var(--d-line);
+  font-size: 14px;
+  color: var(--d-muted);
+}
+
+/* ---------- bottom bar: tagline · copyable email · location ---------- */
+.d-foot {
+  align-items: center;
+}
+.d-mail {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--d-soft-2);
+  font: inherit;
+  color: var(--d-ink);
+  cursor: pointer;
+}
+.d-mail-ok {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 6px);
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--d-ink);
+  color: var(--d-page);
+  font-size: 12px;
+  opacity: 0;
+  transform: translate(-50%, 4px);
+  transition: opacity 160ms cubic-bezier(0.23, 1, 0.32, 1), transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+  pointer-events: none;
+}
+.d-mail.is-copied .d-mail-ok {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+@media (max-width: 900px) {
+  .d-dir {
+    grid-template-columns: 1fr;
+  }
+  .d-dir-cols {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
