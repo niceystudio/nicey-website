@@ -1,7 +1,8 @@
 ---
 /**
  * Direction A: the audit report as a terminal window with its three pages (p.1 Score, p.2 Drift map,
- * p.3 Fix first) instead of paper sheets. Marked "example": bars are drawn, scores and days stay [gaps].
+ * p.3 Fix first) instead of paper sheets. 19 Nov (Emir: more terminal, less capitals): each page opens with the
+ * command and a # comment saying what the page holds; tabs and bar in sentence case. Marked "example": bars are drawn, scores and days stay [gaps].
  */
 const pillars = ['Figma inspect', 'Agentic readiness', 'Conventions', 'Component API', 'Zero drift'];
 const bars = [9, 4, 7, 6, 3];
@@ -9,7 +10,9 @@ const bar = (n: number) => '▇'.repeat(n) + '░'.repeat(12 - n);
 const pages = [
   {
     id: 'score',
-    tab: 'p.1 score',
+    tab: 'score',
+    cmd: 'nicey audit your-file.fig --page score',
+    note: 'A grade and a score per pillar.',
     lines: [
       ...pillars.map((p, i) => `${p.padEnd(19)} ${bar(bars[i])}  [score]`),
       ''.padEnd(46, '─'),
@@ -18,7 +21,9 @@ const pages = [
   },
   {
     id: 'drift',
-    tab: 'p.2 drift map',
+    tab: 'drift map',
+    cmd: 'nicey audit your-file.fig --page drift',
+    note: 'Where design and code disagree.',
     lines: [
       `${'figma'.padEnd(24)}   code`,
       ''.padEnd(46, '─'),
@@ -31,7 +36,9 @@ const pages = [
   },
   {
     id: 'fix',
-    tab: 'p.3 fix first',
+    tab: 'fix first',
+    cmd: 'nicey audit your-file.fig --page fix',
+    note: 'Top findings, each sized in days.',
     lines: pillars.map((p, i) => `${String(i + 1).padStart(2, '0')}  ${p.toLowerCase().padEnd(20, '.')} top finding  [days]`),
   },
 ];
@@ -39,7 +46,7 @@ const pages = [
 
 <div class="ra a-grain" data-ra>
   <div class="ra-bar">
-    <span class="ra-tag">report.txt</span>
+    <span class="ra-tag">audit</span>
     <div class="ra-tabs" role="tablist" aria-label="Report pages">
       {
         pages.map((p, i) => (
@@ -53,7 +60,7 @@ const pages = [
   </div>
   {
     pages.map((p, i) => (
-      <pre class="ra-page" role="tabpanel" hidden={i !== 0} data-ra-page={i}>{p.lines.join('\n')}</pre>
+      <pre class="ra-page" role="tabpanel" hidden={i !== 0} data-ra-page={i}><span class="ra-cmd"><span class="ra-ps">$</span> {p.cmd}</span>{'\n'}<span class="ra-note"># {p.note}</span>{'\n\n'}{p.lines.join('\n')}</pre>
     ))
   }
 </div>
@@ -75,9 +82,8 @@ const pages = [
     padding: 8px 10px;
     border-bottom: 1px solid var(--a-rule);
     font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.02em;
   }
   .ra-tag {
     padding: 2px 6px;
@@ -118,6 +124,15 @@ const pages = [
     white-space: pre;
     overflow-x: auto;
     color: var(--color-ink);
+  }
+  .ra-cmd {
+    color: var(--color-ink);
+  }
+  .ra-ps {
+    color: var(--color-accent);
+  }
+  .ra-note {
+    color: var(--color-muted);
   }
   .ra-page[hidden] {
     display: none;

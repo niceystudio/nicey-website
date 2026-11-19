@@ -1,23 +1,18 @@
 ---
 /**
- * Direction A: the free-audit section with the report as a terminal window (ReportA) instead of the
- * paper sheets. Everything else as live.
- * Live notes: The free-audit section (Emir picked "report first", 12 Nov: less text, show don't explain).
- * Top: the three report pages, fanned, with one line each, and the four steps with a time on each.
- * Bottom: a dark band for visitors not ready to share their file: copy the prompt, and an example
- * run of the self-check plays in a terminal (SelfCheckRun). Times are [gaps] for Goran.
+ * Direction A: "It starts with a free audit" (Emir 19 Nov, second pass). Reading order inside one .panel:
+ *   1. the four steps (the earlier content: step + time, no extra lines) beside the report as a terminal (ReportA)
+ *   2. the action, last: Get a free audit — people read the process first, then click; next to it the quieter
+ *      path for visitors not ready to share their file (copy the prompt).
+ * Typography: capitals only in the small section caption; everything else sentence case.
+ * Removed: the CTA beside the headline, the "Free · read-only…" note, the legend that repeated the report tabs,
+ * the auto-playing example run. Times stay [gaps] for Goran.
  */
 import SectionHead from '../../components/SectionHead.astro';
 import CopyPrompt from '../../components/CopyPrompt.astro';
-import SelfCheckRun from '../../components/SelfCheckRun.astro';
 import ReportA from './ReportA.astro';
 import { links } from '../../data/links';
 
-const pages = [
-  { n: 'p. 1', name: 'Score', holds: 'A grade and a score per pillar.' },
-  { n: 'p. 2', name: 'Drift map', holds: 'Where design and code disagree.' },
-  { n: 'p. 3', name: 'Fix first', holds: 'Top findings, each sized in days.' },
-];
 const steps = [
   { n: '01', title: 'Share your Figma file', time: '[time]' },
   { n: '02', title: 'Get the report', time: '[days]' },
@@ -27,205 +22,136 @@ const steps = [
 ---
 
 <section id="audit" aria-labelledby="start-head" class="container-page flex flex-col gap-12 pb-section">
-  <div class="flex flex-wrap items-end justify-between gap-6">
-    <SectionHead id="start-head" caption="What working with us looks like" headingClass="max-w-[16ch]">
-      It starts with a free audit.
-    </SectionHead>
-    <a href={links.startAudit} class="pill pill-ink pill-lg">Get a free audit</a>
-  </div>
+  <SectionHead id="start-head" caption="What working with us looks like" headingClass="max-w-[16ch]">
+    It starts with a free audit.
+  </SectionHead>
 
-  <div class="panel ad">
-    <div class="ad-top">
-      <div class="ad-stage ad-stage--a">
-        <ReportA />
-      </div>
-      <div class="ad-text">
-        <ul class="ad-legend" aria-label="What the report holds">
-          {
-            pages.map((p) => (
-              <li>
-                <b>{p.name}</b> {p.holds}
-              </li>
-            ))
-          }
-        </ul>
-        <ol class="ad-steps">
+  <div class="panel pa-box">
+    <div class="pa-body">
+      <div class="pa-left">
+        <p class="pa-k m-0">How it goes</p>
+        <ol class="pa-steps">
           {
             steps.map((s) => (
               <li>
-                <span class="font-mono text-caption text-ink-2">{s.n}</span>
-                <span>{s.title}</span>
-                <span class="ad-time">{s.time}</span>
+                <span class="pa-n">{s.n}</span>
+                <span class="pa-title">{s.title}</span>
+                <span class="pa-time">{s.time}</span>
               </li>
             ))
           }
         </ol>
-        <span class="font-mono text-caption text-ink-2">Read-only. Your Figma file, the repo only if you share it. Free.</span>
+      </div>
+      <div class="pa-right">
+        <p class="pa-k m-0">What you get</p>
+        <ReportA />
       </div>
     </div>
-    <div class="ad-band">
-      <div class="flex flex-col items-start gap-3">
-        <span class="ad-band-k font-mono text-caption">Or start on your own</span>
-        <p class="ad-band-p m-0 text-cta text-pretty">
+
+    <div class="pa-act">
+      <a href={links.startAudit} class="pill pill-ink pill-lg">Get a free audit</a>
+      <div class="pa-own">
+        <p class="m-0 pa-own-p">
           Not ready to share your file? Let your agent run our seven checks, then bring the results to a call.
         </p>
         <CopyPrompt />
       </div>
-      <SelfCheckRun />
     </div>
   </div>
 </section>
 
 <style>
-  .ad {
+  .pa-box {
     display: flex;
     flex-direction: column;
   }
-  .ad-top {
+  .pa-body {
     display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 36px;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 48px;
     padding: var(--spacing-cell-lg);
   }
-  @media (min-width: 1024px) {
-    .ad-top {
-      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-      gap: 48px;
-      align-items: center;
+  @media (max-width: 1023px) {
+    .pa-body {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 40px;
     }
   }
-  @media (max-width: 639px) {
-    .ad-top {
-      padding: 24px;
-    }
-  }
-  .ad-stage--a {
-    padding: 0 !important;
-    background: transparent !important;
-  }
-  .ad-stage {
-    min-width: 0;
-    min-height: 380px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 36px 28px;
-    border-radius: var(--radius-panel);
-    overflow: hidden;
-  }
-  @media (max-width: 639px) {
-    .ad-stage {
-      min-height: 280px;
-    }
-  }
-  /* the three pages, fanned: p. 2 in front; on hover the outer two open a little more */
-  .ad-fan {
-    position: relative;
-    width: min(230px, 44%);
-    aspect-ratio: 210 / 297;
-  }
-  .ad-card {
-    position: absolute;
-    inset: 0;
-    z-index: calc(3 - var(--i));
-    transform: translateX(calc((var(--i) - 1) * 58%)) rotate(calc((var(--i) - 1) * 6deg));
-    transition: transform 320ms var(--ease-out);
-  }
-  .ad-card:nth-child(2) {
-    z-index: 4;
-    transform: translateY(-8px);
-  }
-  .ad-card :global(.aud-sheet) {
-    max-width: none;
-    height: 100%;
-  }
-  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-    .ad-fan:hover .ad-card:nth-child(1) {
-      transform: translateX(-66%) rotate(-8deg);
-    }
-    .ad-fan:hover .ad-card:nth-child(3) {
-      transform: translateX(66%) rotate(8deg);
-    }
-  }
-  .ad-text {
+  .pa-left,
+  .pa-right {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 24px;
+    gap: 16px;
     min-width: 0;
   }
-  .ad-legend {
+  /* small labels: sentence case, mono, muted — no capitals */
+  .pa-k {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--color-muted);
+  }
+  .pa-steps {
     margin: 0;
     padding: 0;
     list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    font-size: var(--text-body-sm);
-    color: var(--color-ink-2);
+    border-top: 1px solid var(--a-rule);
   }
-  .ad-legend b {
-    font-weight: 600;
-    color: var(--color-ink);
-  }
-  .ad-steps {
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    border-top: 1px solid var(--color-line);
-  }
-  .ad-steps li {
+  .pa-steps li {
     display: grid;
-    grid-template-columns: 28px minmax(0, 1fr) auto;
+    grid-template-columns: 32px minmax(0, 1fr) auto;
     align-items: baseline;
     gap: 12px;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--color-line);
+    padding: 18px 0;
+    border-bottom: 1px solid var(--a-rule);
   }
-  .ad-time {
+  .pa-n {
     font-family: var(--font-mono);
-    font-size: var(--text-caption);
+    font-size: 13px;
+    color: var(--color-accent);
+  }
+  .pa-title {
+    font-size: var(--text-cta);
+    line-height: 1.3;
     color: var(--color-ink);
   }
-  /* the dark band: same in day and night */
-  .panel > .ad-band {
-    background: #26251f;
+  .pa-time {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--color-ink-2);
+    white-space: nowrap;
   }
-  .ad-band {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 28px;
+  /* the action comes last, after the process */
+  .pa-act {
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    padding: 36px var(--spacing-cell-lg);
+    gap: 20px 40px;
+    padding: 28px var(--spacing-cell-lg);
   }
-  @media (min-width: 1024px) {
-    .ad-band {
-      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  .pa-own {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 20px;
+    flex: 1 1 420px;
+    padding-left: 40px;
+    border-left: 1px solid var(--a-rule);
+  }
+  .pa-own-p {
+    flex: 1 1 320px;
+    font-size: 15px;
+    line-height: 1.45;
+    color: var(--color-ink-2);
+    text-wrap: pretty;
+  }
+  @media (max-width: 767px) {
+    .pa-body,
+    .pa-act {
+      padding: 24px;
     }
-  }
-  @media (max-width: 639px) {
-    .ad-band {
-      padding: 28px 24px;
+    .pa-own {
+      padding-left: 0;
+      border-left: 0;
     }
-  }
-  .ad-band-k {
-    color: #b6b1a3;
-  }
-  .ad-band-p {
-    color: #f3f0e9;
-  }
-  .ad-band :global(.cp-btn) {
-    color: #f3f0e9;
-    border-color: rgba(243, 240, 233, 0.35);
-  }
-  .ad-band :global(.cp-btn:hover) {
-    background: rgba(243, 240, 233, 0.08);
-  }
-  .ad-band :global(.cp-btn.is-done) {
-    border-color: #f3f0e9;
-  }
-  .ad-band :global(.cp-file) {
-    color: #b6b1a3;
   }
 </style>

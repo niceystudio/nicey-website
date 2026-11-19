@@ -1,6 +1,7 @@
 ---
 /** Direction A: Work as a terminal listing (ls work/): column heads, row index, one accent bar on hover.
- *  Copy, figures and the hover preview are the live component's. */
+ *  Copy and the hover preview are the live component's. The "signal" figures column and the `ls work/` line were
+ *  removed (Emir 19 Nov): the list now reads like an agency index — big name, what we did, preview on hover. */
 import SectionHead from '../../components/SectionHead.astro';
 import { links } from '../../data/links';
 
@@ -73,8 +74,7 @@ const rows: Row[] = [
 
 <section id="work" aria-labelledby="work-head" class="container-page flex flex-col pb-section wka">
   <SectionHead id="work-head" caption="Work" class="mb-12">Systems and products we have built</SectionHead>
-  <div class="wka-cmd" aria-hidden="true"><span>~/nicey $</span> ls work/ <span class="wka-cmd-n">{rows.length} entries</span></div>
-  <div class="wka-head" aria-hidden="true"><span>#</span><span>client</span><span>signal</span><span>what we did</span><span></span></div>
+  <div class="wka-head" aria-hidden="true"><span>#</span><span>client</span><span>what we did</span><span></span></div>
   <ul class="panel flex flex-col wka-list">
     {
       rows.map((r, i) => (
@@ -84,22 +84,6 @@ const rows: Row[] = [
             <span class="flex flex-[1_1_220px] flex-col gap-2.5">
               <span class="text-work">{r.name}</span>
               <span class="caption-sm text-ink-2">{r.meta}</span>
-            </span>
-            <span class="flex flex-[0_1_220px] flex-col gap-2">
-              {r.figure ? (
-                <span class="text-work whitespace-nowrap tabular-nums">
-                  {r.figure.value}
-                  {r.figure.arrow && (
-                    <>
-                      {' '}
-                      <span class="text-muted">→</span> 0
-                    </>
-                  )}
-                </span>
-              ) : (
-                <span class="placeholder self-start px-3 py-2">[result to collect]</span>
-              )}
-              <span class:list={['caption-sm', r.figure ? 'text-hot' : 'text-muted']}>{r.caption}</span>
             </span>
             <span class="max-w-[44ch] flex-[1_1_300px] text-body text-pretty text-ink-2">{r.description}</span>
             <span class="work-arr" aria-hidden="true">→</span>
@@ -333,23 +317,11 @@ const rows: Row[] = [
 </script>
 
 <style>
-  .wka-cmd {
-    padding: 12px 0;
-    font-family: var(--font-mono);
-    font-size: 13px;
-    color: var(--color-ink);
-  }
-  .wka-cmd > span:first-child {
-    color: var(--color-accent);
-  }
-  .wka-cmd-n {
-    margin-left: 12px;
-    color: var(--color-muted);
-  }
   .wka-head,
   .wka :global(.work-row) {
     display: grid !important;
-    grid-template-columns: 48px minmax(0, 1.05fr) minmax(0, 0.95fr) minmax(0, 1.6fr) 32px;
+    grid-template-columns: 48px minmax(0, 1.2fr) minmax(0, 1.4fr) 32px;
+    align-items: center !important;
     gap: 12px 32px;
     align-items: start;
   }
@@ -381,8 +353,12 @@ const rows: Row[] = [
     flex: none !important;
     max-width: none !important;
   }
+  /* bigger names now that the signal column is gone (Emir 19 Nov) */
+  .wka :global(.text-work) {
+    font-size: clamp(36px, 4.2vw, 60px);
+    line-height: 1;
+  }
   .wka-i {
-    padding-top: 10px;
     font-family: var(--font-mono);
     font-size: 13px;
     color: var(--color-muted);
@@ -417,8 +393,7 @@ const rows: Row[] = [
       grid-template-columns: 36px minmax(0, 1fr) 24px;
       padding: 24px 12px !important;
     }
-    .wka :global(.work-row) > :global(span:nth-child(3)),
-    .wka :global(.work-row) > :global(span:nth-child(4)) {
+    .wka :global(.work-row) > :global(span:nth-child(3)) {
       grid-column: 2;
     }
   }
