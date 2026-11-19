@@ -6,6 +6,14 @@
  * stays in the Markdown twin for agents. Cells sit in the shared .panel container (same as FAQ).
  */
 import { steps } from '../../data/zero-drift';
+
+/* A only (Emir 19 Nov): shorter "You get" lines so every step reads in two lines; the full text stays in the data
+   and on the live page */
+const shortGet: Record<string, string> = {
+  drift: 'A drift map: where design and code disagree.',
+  audit: 'A score per pillar and a roadmap in days.',
+  context: 'Docs people and agents read the same way.',
+};
 ---
 
 <section id="how" aria-labelledby="how-head" class="ho">
@@ -23,7 +31,7 @@ import { steps } from '../../data/zero-drift';
             <p class="ho-line m-0">{s.heading}</p>
             <p class="ho-get m-0">
               <span>You get</span>
-              {s.youGet}
+              {shortGet[s.id] ?? s.youGet}
             </p>
           </li>
         ))
@@ -93,6 +101,8 @@ import { steps } from '../../data/zero-drift';
     min-height: calc(1.45em * 3);
   }
   .ho-get {
+    /* "You get" + two lines reserved, so every step ends on the same line */
+    min-height: calc(14px + 6px + 1.45em * 2 + 14px);
     padding-top: 14px;
     border-top: 1px solid var(--a-rule);
     font-size: 14px;

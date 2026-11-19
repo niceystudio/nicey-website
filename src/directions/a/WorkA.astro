@@ -79,7 +79,7 @@ const rows: Row[] = [
     {
       rows.map((r, i) => (
         <li id={`work-${r.name.toLowerCase()}`}>
-          <a href={r.href} class="work-row" data-wp={JSON.stringify(r.preview)}>
+          <a href={r.href} class="work-row" data-wp={JSON.stringify({ ...r.preview, name: r.name })}>
             <span class="wka-i" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
             <span class="flex flex-[1_1_220px] flex-col gap-2.5">
               <span class="text-work">{r.name}</span>
@@ -206,71 +206,49 @@ const rows: Row[] = [
 </style>
 
 <script>
-  import { LIGHT_PALETTE, DARK_PALETTE } from '../../lib/pixel-field';
-  // Work hover: pastel blocks scattered around the cursor gather into a small frame,
-  // then the project's preview fades in on top of them (Emir, 11 Nov).
+  // Work hover, in A's own language (Emir 19 Nov: the flying pastel blocks don't belong to this direction):
+  // a square window follows the cursor; inside it an ASCII field flickers for a moment, then the project's preview
+  // prints in from the top in steps — the same "print" as the hero headline — and the glyphs fade under it.
   const box = document.querySelector<HTMLElement>('[data-wp-box]');
   const canvas = document.querySelector<HTMLCanvasElement>('[data-wp-canvas]');
   const frame = document.querySelector<HTMLElement>('[data-wp-frame]');
   const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (box && canvas && frame && fine && !reduced) {
+  if (box && canvas && frame && fine) {
     const ctx = canvas.getContext('2d')!;
-    const BW = 600, BH = 640, CELL = 12;
+    const BW = 600, BH = 640, CW = 9, CH = 14;
+    const GLYPHS = '·:-=+*#%@/\\|<>[]{}01';
     const dpr = Math.min(2, devicePixelRatio || 1);
     canvas.width = BW * dpr; canvas.height = BH * dpr;
-    type Bk = { tx: number; ty: number; sx: number; sy: number; c: number[]; d: number };
-    let blocks: Bk[] = [], t0 = 0, raf = 0, mode: 'in' | 'out' = 'in';
-    let x = 0, y = 0, tx = 0, ty = 0, active = false;
-    const dark = () =>
-      document.documentElement.dataset.theme === 'dark' ||
-      (!document.documentElement.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
-    const tints = () => (dark() ? DARK_PALETTE : LIGHT_PALETTE).stops.slice(1).map((s) => (dark() ? [s[0] * 1.6, s[1] * 1.6, s[2] * 1.6] : [s[0] - 24, s[1] - 24, s[2] - 24]));
-    const build = (w: number, h: number) => {
-      const t = tints();
-      const cols = Math.floor(w / CELL), rows = Math.floor(h / CELL);
-      const ox = (BW - cols * CELL) / 2, oy = (BH - rows * CELL) / 2;
-      blocks = [];
-      for (let r = 0; r < rows; r++)
-        for (let c = 0; c < cols; c++) {
-          if (Math.random() < 0.45) continue; // a cloud, not a solid sheet
-          const a = Math.random() * Math.PI * 2, rad = 60 + Math.random() * 190;
-          blocks.push({
-            tx: ox + c * CELL, ty: oy + r * CELL,
-            sx: BW / 2 + Math.cos(a) * rad, sy: BH / 2 + Math.sin(a) * rad,
-            c: t[Math.floor(Math.random() * t.length)],
-            d: Math.random() * 160,
-          });
-        }
-    };
-    const ease = (k: number) => 1 - Math.pow(1 - k, 3);
+    let rect = { x: 0, y: 0, w: 0, h: 0 }, t0 = 0, raf = 0, mode: 'in' | 'out' = 'in';
+    let x = 0, y = 0, tx = 0, ty = 0, active = false, lastSwap = 0;
+    let cells: string[] = [];
+    const css = (n: string) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+    const fill = () => { cells = cells.map(() => GLYPHS[(Math.random() * GLYPHS.length) | 0]); };
     const draw = (now: number) => {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, BW, BH);
       const el = now - t0;
-      let busy = false;
-      for (const b of blocks) {
-        let k = Math.min(1, Math.max(0, (el - (mode === 'in' ? b.d : 0)) / (mode === 'in' ? 380 : 220)));
-        if (k < 1) busy = true;
-        const e = ease(k);
-        // in: fly from the scatter to the frame, then fade under the preview; out: scatter and fade
-        const p = mode === 'in' ? e : 1 - e;
-        const px = b.sx + (b.tx - b.sx) * p, py = b.sy + (b.ty - b.sy) * p;
-        const alpha = mode === 'in' ? Math.min(1, k * 2) * (el > 520 ? Math.max(0, 1 - (el - 520) / 220) : 1) : 1 - e;
-        if (alpha <= 0) continue;
-        if (mode === 'in' && el < 760) busy = true;
-        ctx.globalAlpha = alpha;
-        ctx.fillStyle = `rgb(${b.c[0]},${b.c[1]},${b.c[2]})`;
-        ctx.fillRect(px, py, CELL - 2, CELL - 2);
-      }
+      // in: glyphs on at once, hold, then fade as the image prints over them; out: quick fade
+      const alpha = mode === 'in' ? (el < 380 ? 1 : Math.max(0, 1 - (el - 380) / 260)) : Math.max(0, 1 - el / 160);
+      if (alpha <= 0) return mode === 'in' && el < 700;
+      if (now - lastSwap > 55) { fill(); lastSwap = now; }
+      const cols = Math.floor(rect.w / CW), ink = css('--color-ink-2'), acc = css('--color-accent');
+      ctx.font = '12px "Geist Mono Variable", ui-monospace, monospace';
+      ctx.textBaseline = 'top';
+      cells.forEach((g, i) => {
+        const cx = rect.x + (i % cols) * CW, cy = rect.y + Math.floor(i / cols) * CH;
+        ctx.globalAlpha = alpha * (i % 7 === 0 ? 1 : 0.55);
+        ctx.fillStyle = i % 11 === 0 ? acc : ink;
+        ctx.fillText(g, cx, cy);
+      });
       ctx.globalAlpha = 1;
-      return busy;
+      return true;
     };
     const loop = (now: number) => {
-      // the frame follows the cursor with a little lag
       x += (tx - x) * 0.18; y += (ty - y) * 0.18;
       box.style.transform = `translate(${x}px, ${y}px)`;
-      const busy = draw(now);
+      const busy = reduced ? false : draw(now);
       if (active || busy || Math.abs(tx - x) > 0.5 || Math.abs(ty - y) > 0.5) raf = requestAnimationFrame(loop);
       else { raf = 0; box.classList.remove('is-on'); }
     };
@@ -279,16 +257,18 @@ const rows: Row[] = [
     const open = (data: any) => {
       frame.className = 'wp-frame' + (data.kind === 'video' ? ' wp-frame--phone' : '');
       frame.style.width = data.w + 'px';
-      frame.style.height = data.h + 'px';
-      frame.innerHTML =
+      const media =
         data.kind === 'img' ? `<img src="${data.src}" alt="">`
         : data.kind === 'video' ? `<video src="${data.src}" poster="${data.poster}" muted playsinline autoplay loop></video>`
         : `<div class="wp-card" style="background: var(--color-${data.band})">${data.text}</div>`;
-      build(data.w, data.h);
+      frame.innerHTML = `<div class="wpa-bar"><span>${String(data.name).toLowerCase()}</span><span>preview</span></div><div class="wpa-media" style="height:${data.h}px">${media}</div>`;
+      rect = { w: data.w, h: data.h + 26, x: (BW - data.w) / 2, y: (BH - (data.h + 26)) / 2 };
+      const n = Math.floor(rect.w / CW) * Math.floor(rect.h / CH);
+      cells = new Array(n).fill('·'); fill();
       mode = 'in'; t0 = performance.now(); active = true;
       box.classList.add('is-on');
       clearTimeout(showTimer);
-      showTimer = window.setTimeout(() => frame.classList.add('is-shown'), 420);
+      showTimer = window.setTimeout(() => frame.classList.add('is-shown'), reduced ? 0 : 260);
       kick();
     };
     const close = () => {
@@ -311,10 +291,60 @@ const rows: Row[] = [
       row.addEventListener('pointermove', (e) => { [tx, ty] = place(e.clientX, e.clientY); });
       row.addEventListener('pointerleave', close);
     });
-    // preload the media so the preview is ready when the blocks land
     ['/work/qbench/product.jpg', '/work/everbreed/mobile-care.jpg'].forEach((src) => { const i = new Image(); i.src = src; });
   }
 </script>
+
+<style is:global>
+  /* A's preview window: square, 1px rule, a title bar; the media prints in from the top in steps */
+  .dir-a .wp-frame {
+    border-radius: 0 !important;
+    border: 1px solid var(--color-ink);
+    background: var(--color-page);
+    transition: opacity 120ms linear !important;
+    transform: translate(-50%, -50%) !important;
+    box-shadow: 6px 6px 0 color-mix(in srgb, var(--color-accent) 70%, transparent) !important;
+  }
+  .dir-a .wpa-bar {
+    display: flex;
+    justify-content: space-between;
+    height: 26px;
+    padding: 0 10px;
+    align-items: center;
+    border-bottom: 1px solid var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-ink-2);
+  }
+  .dir-a .wpa-bar span:first-child {
+    color: var(--color-ink);
+  }
+  .dir-a .wpa-media {
+    overflow: hidden;
+  }
+  .dir-a .wpa-media img,
+  .dir-a .wpa-media video,
+  .dir-a .wpa-media .wp-card {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0 !important;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .dir-a .wp-frame.is-shown .wpa-media {
+      animation: wpa-print 420ms steps(8, end) both;
+    }
+  }
+  @keyframes wpa-print {
+    from {
+      clip-path: inset(0 0 100% 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+</style>
 
 <style>
   .wka-head,
@@ -396,5 +426,16 @@ const rows: Row[] = [
     .wka :global(.work-row) > :global(span:nth-child(3)) {
       grid-column: 2;
     }
+  }
+</style>
+<style is:global>
+  .dir-a .wp-frame--phone {
+    border: 1px solid var(--color-ink) !important;
+  }
+  .dir-a .wpa-media .wp-card {
+    display: grid;
+    place-items: center;
+    font-family: var(--font-pixel);
+    font-weight: 400;
   }
 </style>
