@@ -827,3 +827,320 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* ---------- company logos: slow marquee under the hero shot (19 Nov) ---------- */
+.e-logos {
+  max-width: 1200px;
+  margin: 40px auto 0;
+  text-align: center;
+}
+.e-logos-k {
+  margin-bottom: 20px !important;
+  font-size: 14px;
+  color: var(--e-ink-2);
+}
+.e-marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+}
+.e-marquee-track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  margin: 0;
+  padding: 8px 0;
+  list-style: none;
+}
+.e-marquee-track img {
+  display: block;
+  width: auto;
+  filter: grayscale(1) brightness(0.25);
+  opacity: 0.62;
+  transition: filter 200ms var(--e-ease), opacity 200ms var(--e-ease);
+}
+@media (hover: hover) and (pointer: fine) {
+  .e-marquee-track li:hover img {
+    filter: none;
+    opacity: 1;
+  }
+  .e-marquee:hover .e-marquee-track {
+    animation-play-state: paused;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .e-marquee-track {
+    animation: e-marquee 38s linear infinite;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .e-marquee-track {
+    flex-wrap: wrap;
+    justify-content: center;
+    width: auto;
+    gap: 28px 48px;
+  }
+  .e-marquee-track li[aria-hidden='true'] {
+    display: none;
+  }
+}
+/* every logo sits in the same 40px slot with its spacing inside it, so the second copy starts exactly at 50% */
+.e-marquee-track li {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  padding-right: 72px;
+}
+@keyframes e-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ---------- what clients say: card carousel ---------- */
+.e-head--row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  max-width: none;
+}
+.e-q-nav {
+  display: flex;
+  gap: 10px;
+}
+.e-q-btn {
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--e-line);
+  border-radius: 12px;
+  background: var(--e-card);
+  font-size: 18px;
+  color: var(--e-ink);
+  cursor: pointer;
+  transition: transform 160ms var(--e-ease), background-color 160ms var(--e-ease);
+}
+.e-q-btn:active {
+  transform: scale(0.95);
+}
+@media (hover: hover) and (pointer: fine) {
+  .e-q-btn:hover {
+    background: #fff;
+  }
+}
+.e-q-track {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+.e-q-track::-webkit-scrollbar {
+  display: none;
+}
+.e-q {
+  flex: 0 0 min(860px, 88%);
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 420px;
+  margin: 0;
+  padding: clamp(28px, 4vw, 56px);
+  border-radius: 28px;
+  background-size: 480px 480px;
+  color: #fbfaf6;
+}
+.e-q blockquote {
+  margin: 0;
+  max-width: 26ch;
+  font-family: var(--e-serif);
+  font-size: clamp(30px, 3.4vw, 46px);
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+}
+.e-q figcaption {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.e-q figcaption img {
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  image-rendering: pixelated;
+  box-shadow: 0 0 0 3px rgba(251, 250, 246, 0.85);
+}
+.e-q figcaption span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 15px;
+  opacity: 0.9;
+}
+.e-q figcaption b {
+  font-size: 17px;
+  font-weight: 600;
+  opacity: 1;
+}
+.e-q-ph {
+  margin-left: auto;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(251, 250, 246, 0.2);
+  font-size: 12px;
+  font-style: normal;
+}
+.e-q-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 24px;
+}
+.e-q-dots span {
+  width: 36px;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--e-line);
+  transition: background-color 200ms var(--e-ease);
+}
+.e-q-dots span.is-on {
+  background: var(--e-ink);
+}
+
+/* ---------- who you work with: inside the dark band ---------- */
+.e-founder {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: 64px;
+  align-items: center;
+  margin-top: 120px;
+  padding-top: 72px;
+  border-top: 1px solid rgba(243, 240, 233, 0.14);
+}
+.e-founder-pics {
+  position: relative;
+  padding-bottom: 56px;
+}
+.e-founder-main {
+  display: block;
+  width: 100%;
+  max-width: 460px;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 24px;
+  transform: rotate(-2deg);
+  box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.7);
+}
+.e-founder-note {
+  position: absolute;
+  top: 28px;
+  right: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px 8px 8px;
+  border-radius: 999px;
+  background: var(--e-yellow);
+  color: var(--e-ink);
+  font-size: 14px;
+  font-weight: 600;
+  transform: rotate(4deg);
+  box-shadow: 0 14px 28px -16px rgba(0, 0, 0, 0.6);
+}
+.e-founder-mark {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 8px;
+  background: var(--e-page);
+  line-height: 0;
+}
+.e-founder-team {
+  position: absolute;
+  left: 24px;
+  bottom: 0;
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.e-founder-team li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-right: -10px;
+}
+.e-founder-team img {
+  width: 76px;
+  height: 76px;
+  border-radius: 18px;
+  object-fit: cover;
+  border: 3px solid var(--e-dark);
+}
+.e-founder-team span {
+  font-size: 12px;
+  color: rgba(243, 240, 233, 0.7);
+}
+.e-founder-who {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px !important;
+  font-size: 15px;
+  color: rgba(243, 240, 233, 0.75);
+}
+.e-tag {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(243, 240, 233, 0.14);
+  font-size: 12px;
+}
+.e-founder-q {
+  margin: 0;
+}
+.e-founder-q blockquote {
+  margin: 0;
+  font-size: clamp(30px, 3.4vw, 48px);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+@media (max-width: 900px) {
+  .e-founder {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px;
+  }
+}
+
+/* the quote sits on a light card inside the soft texture, like the agent card (Emir 19 Nov: text must read) */
+.e-q-box {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  padding: clamp(24px, 3vw, 40px);
+  border-radius: 20px;
+  background: var(--e-card);
+  color: var(--e-ink);
+  box-shadow: 0 24px 48px -30px rgba(31, 30, 25, 0.5);
+}
+.e-q-box blockquote {
+  max-width: 30ch;
+  font-size: clamp(26px, 2.8vw, 38px);
+}
+.e-q-box figcaption img {
+  width: 56px;
+  height: 56px;
+  box-shadow: none;
+}
+.e-q-box .e-q-ph {
+  background: rgba(31, 30, 25, 0.08);
+  color: var(--e-ink-2);
+}
+.e-q-box figcaption span {
+  color: var(--e-ink-2);
+}
+.e-q-box figcaption b {
+  color: var(--e-ink);
+}

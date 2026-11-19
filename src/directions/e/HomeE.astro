@@ -15,7 +15,7 @@ import CopyPrompt from '../../components/CopyPrompt.astro';
 import DirectionSwitch from '../DirectionSwitch.astro';
 import { links } from '../../data/links';
 import { steps } from '../../data/zero-drift';
-import { pixelWaves, pixelMark } from './pixel';
+import { pixelWaves, pixelMark, pixelPortrait } from './pixel';
 
 /* the Nicey pastels, saturated (base / lighter tone for the texture) */
 const C = {
@@ -31,6 +31,11 @@ const tex = {
   yellow: pixelWaves(C.yellow[0], C.yellow[1], { seed: 3 }),
   green: pixelWaves(C.green[0], C.green[1], { seed: 4 }),
 };
+/* a softer second texture (Emir 19 Nov): tones close together, bigger pixels — for surfaces that carry text */
+const soft = {
+  green: pixelWaves('#2e7656', '#33805e', { seed: 5, cell: 12 }),
+  violet: pixelWaves('#7466e0', '#7c6fe6', { seed: 6, cell: 12 }),
+};
 const mark = {
   bloomO: pixelMark('bloom', C.orange[0], '#26251f'),
   bloomV: pixelMark('bloom', C.violet[0], '#f3f0e9'),
@@ -45,7 +50,39 @@ const nav = [
   { label: 'How we work', href: '#how' },
   { label: 'FAQ', href: '#faq' },
 ];
-const proof = ['QBench', 'Everbreed', 'Clerky', 'Omnisafe', 'FLYR'];
+/* companies we have worked with — the logos from nicey.studio (our own site), copied as SVG into /public/lab/e/logos */
+const logos = [
+  { name: 'Rakuten', src: '/lab/e/logos/rakuten.svg', h: 26 },
+  { name: 'Colgate', src: '/lab/e/logos/colgate.svg', h: 22 },
+  { name: 'Samsung Food', src: '/lab/e/logos/samsung-food.svg', h: 22 },
+  { name: 'UNIDO', src: '/lab/e/logos/unido.svg', h: 30 },
+  { name: 'Omnisafe', src: '/lab/e/logos/omnisafe.svg', h: 20 },
+  { name: 'FLYR', src: '/lab/e/logos/flyr.svg', h: 18 },
+  { name: 'Geonode', src: '/lab/e/logos/geonode.svg', h: 24 },
+  { name: 'Repocket', src: '/lab/e/logos/repocket.svg', h: 24 },
+];
+/* client quotes from nicey.studio; portraits are generated placeholders until we have photos */
+const quotes = [
+  {
+    text: 'Highly recommend to work with Nicey. Goran and Predrag took a lot of attention and care in understanding our business and executed with attention to detail. Looking forward to work with Nicey again!',
+    name: 'Christopher Eller',
+    role: 'Director, ISMS',
+    img: pixelPortrait('#2e7656', '#3c8d68', '#f3f0e9'),
+    tone: 'green',
+  },
+  {
+    text: 'Working with Nicey was seamless. Their communication was always clear, they set the right expectations from the start, and consistently delivered everything on time, from our marketing website to the ebooks.',
+    name: 'Sarah Smith',
+    role: 'Director of Marketing, Rakuten',
+    img: pixelPortrait('#7466e0', '#9184ee', '#f3f0e9'),
+    tone: 'violet',
+  },
+];
+const team = [
+  { name: 'Natasa', src: '/lab/e/team/natasa.png' },
+  { name: 'Dejan', src: '/lab/e/team/dejan.png' },
+  { name: 'Predrag', src: '/lab/e/team/predrag.jpg' },
+];
 
 const panels = [
   {
@@ -134,9 +171,18 @@ const footCols = [
             <img src="/work/qbench/product.jpg" alt="QBench product screen, built on the design system we made" width="1280" height="788" />
           </figure>
         </div>
-        <ul class="e-proof" aria-label="Selected work">
-          {proof.map((p) => <li><a href={`#work-${p.toLowerCase()}`}>{p}</a></li>)}
-        </ul>
+        <div class="e-logos" aria-label="Companies we have worked with">
+          <p class="e-logos-k">Teams we have worked with</p>
+          <div class="e-marquee">
+            <ul class="e-marquee-track">
+              {[...logos, ...logos].map((l, i) => (
+                <li aria-hidden={i >= logos.length ? 'true' : undefined}>
+                  <img src={l.src} alt={i < logos.length ? l.name : ''} style={`height:${l.h}px`} />
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </section>
 
       <!-- services + audit: big colour panels that stack while you scroll -->
@@ -222,7 +268,7 @@ const footCols = [
             work.map((w) => (
               <a href={w.href} class:list={['e-tile', w.img ? 'e-tile--img' : 'e-tile--tex']} id={`work-${w.name.toLowerCase()}`}>
                 <div class="e-tile-art" style={w.tex ? `background-image:${w.tex}` : undefined}>
-                  {w.img ? <img src={w.img} alt="" loading="lazy" /> : <span class="e-tile-big">{w.name}</span>}
+                  {w.img && <img src={w.img} alt="" loading="lazy" />}
                 </div>
                 <div class="e-tile-text">
                   <h3>{w.name}</h3>
@@ -233,6 +279,34 @@ const footCols = [
             ))
           }
         </div>
+      </section>
+
+      <!-- what clients say: one card at a time, arrows + progress (dessn's quote carousel) -->
+      <section class="e-sec e-quotes" aria-roledescription="carousel" aria-label="What clients say" data-q>
+        <div class="e-head e-head--row">
+          <h2>What clients <em>say.</em></h2>
+          <div class="e-q-nav">
+            <button type="button" class="e-q-btn" data-q-prev aria-label="Previous quote">←</button>
+            <button type="button" class="e-q-btn" data-q-next aria-label="Next quote">→</button>
+          </div>
+        </div>
+        <div class="e-q-track" data-q-track>
+          {
+            quotes.map((q, i) => (
+              <figure class={`e-q e-q--${q.tone}`} style={`background-image:${q.tone === 'green' ? soft.green : soft.violet}`} aria-roledescription="slide" aria-label={`${i + 1} of ${quotes.length}`} data-q-slide>
+                <div class="e-q-box">
+                  <blockquote>“{q.text}”</blockquote>
+                  <figcaption>
+                    <img src={q.img} alt="" width="56" height="56" />
+                    <span><b>{q.name}</b>{q.role}</span>
+                    <i class="e-q-ph">placeholder photo</i>
+                  </figcaption>
+                </div>
+              </figure>
+            ))
+          }
+        </div>
+        <div class="e-q-dots" aria-hidden="true">{quotes.map((_, i) => <span class={i === 0 ? 'is-on' : undefined} data-q-dot />)}</div>
       </section>
 
       <!-- how we work: the dark band -->
@@ -254,6 +328,20 @@ const footCols = [
               ))
             }
           </ol>
+
+          <!-- who you work with: Goran large, the team small (dessn's head-of-product video, as photos) -->
+          <div class="e-founder">
+            <div class="e-founder-pics">
+              <img class="e-founder-main" src="/lab/e/team/goran.jpg" alt="Goran, co-founder of Nicey" width="400" height="400" loading="lazy" />
+              <ul class="e-founder-team" aria-label="The team">
+                {team.map((t) => <li><img src={t.src} alt={t.name} loading="lazy" /><span>{t.name}</span></li>)}
+              </ul>
+            </div>
+            <figure class="e-founder-q">
+              <p class="e-founder-who">Goran · Co-founder, Nicey <span class="e-tag">draft</span></p>
+              <blockquote>“Most teams don't need a new design system. They need the one they have to finally <em>agree with their code</em>, so people and agents can build on it without guessing.”</blockquote>
+            </figure>
+          </div>
         </div>
       </section>
 
@@ -292,3 +380,23 @@ const footCols = [
   </div>
   <DirectionSwitch current="e" />
 </Base>
+
+<script>
+  // quote carousel: arrows move one card; the dots follow; swipe/scroll also works (scroll-snap)
+  document.querySelectorAll<HTMLElement>('[data-q]').forEach((root) => {
+    const track = root.querySelector<HTMLElement>('[data-q-track]')!;
+    const slides = Array.from(root.querySelectorAll<HTMLElement>('[data-q-slide]'));
+    const dots = Array.from(root.querySelectorAll<HTMLElement>('[data-q-dot]'));
+    const go = (dir: number) => {
+      const w = slides[0].getBoundingClientRect().width + 20;
+      track.scrollBy({ left: dir * w, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    };
+    root.querySelector('[data-q-prev]')?.addEventListener('click', () => go(-1));
+    root.querySelector('[data-q-next]')?.addEventListener('click', () => go(1));
+    track.addEventListener('scroll', () => {
+      const w = slides[0].getBoundingClientRect().width + 20;
+      const i = Math.round(track.scrollLeft / w);
+      dots.forEach((d, k) => d.classList.toggle('is-on', k === i));
+    }, { passive: true });
+  });
+</script>
