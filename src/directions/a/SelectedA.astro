@@ -1,0 +1,113 @@
+---
+/**
+ * Direction A: "Selected work" as its own band right after the ASCII band (Emir 19 Nov: it was too quiet as a
+ * small line above the hero). Five tiles in one ruled row, names in the pixel face; each jumps to its row in Work.
+ * Names and meta only, no numbers (rules: the proof strip is names only). Cells sit in the shared .panel container
+ * (surface cells on 1px lines, same as FAQ) — Emir 19 Nov: consistent white containers.
+ */
+const work = [
+  { name: 'QBench', meta: 'Design system + product' },
+  { name: 'Everbreed', meta: 'Design system + product' },
+  { name: 'Clerky', meta: 'Design system' },
+  { name: 'Omnisafe', meta: 'Product design' },
+  { name: 'FLYR', meta: 'Product design' },
+];
+---
+
+<section class="sa" aria-labelledby="sa-head">
+  <div class="container-page">
+    <div class="sa-top">
+      <h2 id="sa-head" class="caption a-path m-0 text-ink-2">Selected work</h2>
+      <a href="#work" class="caption sa-all">All work ↓</a>
+    </div>
+    <ul class="panel sa-row">
+      {
+        work.map((w, i) => (
+          <li>
+            <a href={`#work-${w.name.toLowerCase()}`} class="sa-tile">
+              <span class="sa-n" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              <span class="sa-name">{w.name}</span>
+              <span class="sa-meta">{w.meta}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .sa {
+    padding: 64px 0 88px;
+  }
+  .sa-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .sa-all {
+    color: var(--color-ink-2);
+    text-decoration: none;
+  }
+  .sa-row {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+  .sa-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 168px;
+    padding: 20px 22px 22px;
+    color: var(--color-ink);
+    text-decoration: none;
+    transition:
+      background-color 160ms var(--ease-out),
+      color 160ms var(--ease-out);
+  }
+  .sa-n {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--color-accent);
+  }
+  .sa-name {
+    margin-top: auto;
+    font-family: var(--font-pixel);
+    font-size: clamp(26px, 2.6vw, 40px);
+    line-height: 1;
+  }
+  .sa-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-ink-2);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .sa-tile:hover {
+      background: var(--a-block);
+      color: var(--a-on-block);
+    }
+    .sa-tile:hover .sa-n,
+    .sa-tile:hover .sa-meta {
+      color: inherit;
+    }
+    .sa-all:hover {
+      color: var(--color-accent);
+    }
+  }
+  .sa-tile:active {
+    transform: scale(0.98);
+  }
+  @media (max-width: 1023px) {
+    .sa-row {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .sa-tile {
+      min-height: 128px;
+    }
+  }
+</style>
