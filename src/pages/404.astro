@@ -4,3 +4,7 @@ import NotFound from '../components/NotFound.astro';
 ---
 
 <NotFound />
+<script is:inline>
+  // review only: a missing page under /lab/a/ shows direction A's 404
+  if (location.pathname.startsWith('/lab/a/') && location.pathname !== '/lab/a/404') location.replace('/lab/a/404');
+</script>

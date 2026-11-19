@@ -10,6 +10,7 @@ import Header from '../Header.astro';
 import Gaps from './Gaps.astro';
 import Shot from './Shot.astro';
 import NamesField from './NamesField.astro';
+import NamesDiff from './NamesDiff.astro';
 import QBenchHero from './QBenchHero.astro';
 import QBenchWork from './QBenchWork.astro';
 import StatusHero from './StatusHero.astro';
@@ -31,8 +32,20 @@ import { caseHref, caseStudies, getCaseStudy, type Band, type CaseStudy } from '
 
 interface Props {
   study: CaseStudy;
+  /** review only: render the page inside a design direction (e.g. 'a' → .dir-a, noindex). The page that passes it
+   *  also imports that direction's CSS. Live pages never pass it. */
+  direction?: 'a';
+  /** review only: drop the facts row (Company, Team, Stack…) from the hero — Emir 19 Nov; the facts stay in the
+   *  Markdown twin */
+  noFacts?: boolean;
+  /** review only (direction A test, Emir 19 Nov): the before/after as a terminal list instead of the cell field, and
+   *  the closing CTA styled like the direction's homepage closing band */
+  namesLook?: 'diff';
+  ctaLook?: 'closing';
 }
-const { study: s } = Astro.props;
+const { study: s, direction, noFacts = false, namesLook, ctaLook } = Astro.props;
+/** the homepage these links go back to: the site, or the direction's review homepage */
+const home = direction ? `/lab/${direction}` : '/';
 const next = getCaseStudy(s.next);
 const prev = caseStudies.find((c) => c.next === s.slug);
 
@@ -67,8 +80,9 @@ const jsonLd = { '@context': 'https://schema.org', '@graph': faqLd ? [article, f
 const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https://nicey-website.vercel.app').href);
 ---
 
-<Base title={`${s.linkName} case study · Nicey`} description={s.lede} markdownHref={mdHref} jsonLd={jsonLd}>
-  <Header variant="case" />
+<Base title={`${s.linkName} case study · Nicey`} description={s.lede} markdownHref={mdHref} jsonLd={jsonLd} noindex={!!direction}>
+  <div class:list={[direction && `dir-${direction}`]}>
+  <Header variant="case" home={home} />
   <main id="main" tabindex="-1" class="cs" data-human>
     <section aria-labelledby="cs-title" class={band}>
       <div class="container-page cs-hero">
@@ -86,7 +100,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
             </div>
           )}
         </div>
-        <dl class="cs-facts">
+        {!noFacts && <dl class="cs-facts">
           {
             s.facts.map((f) => (
               <div>
@@ -97,7 +111,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
               </div>
             ))
           }
-        </dl>
+        </dl>}
         {s.who && <p class="m-0 text-body-sm text-ink-2"><Gaps text={s.who} /></p>}
       </div>
     </section>
@@ -120,7 +134,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
               </h2>
               <p class="m-0 text-body text-on-band-2">{s.lead.text}</p>
             </div>
-            <a href="/#audit" class="pill bg-on-band px-[22px] text-body text-band">
+            <a href={`${home}#audit`} class="pill bg-on-band px-[22px] text-body text-band">
               {s.lead.cta}
             </a>
           </div>
@@ -135,7 +149,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
         <h2 id="numbers-head" class:list={['caption m-0 mb-5 text-ink-2', s.proofViz && 'sr-only']}>{s.numbersHeading}</h2>
       )}
       <div class:list={['panel-wrap', s.proofViz && 'panel flex flex-col']}>
-        {s.proofViz === 'names' && <NamesField />}
+        {s.proofViz === 'names' && (namesLook === 'diff' ? <NamesDiff /> : <NamesField />)}
         {s.proofViz === 'surfaces' && <SurfacesField />}
         {s.proofViz === 'aliases' && <AliasesField />}
         {!s.proofViz && <ul class:list={['panel', s.numbers.length === 4 ? 'grid-4' : 'grid-3']}>
@@ -272,7 +286,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
   </main>
 
   {/* one CTA on every page: the homepage closing band, only the words change (Emir, 11 Nov) */}
-  <section aria-labelledby="cs-cta-head" class="cs-cta bg-band text-on-band" data-human>
+  <section aria-labelledby="cs-cta-head" class:list={['cs-cta bg-band text-on-band', ctaLook === 'closing' && 'closing']} data-human>
     <div class="container-page flex flex-col items-start gap-6 py-section">
       <span class="caption text-on-band-2">{s.cta.action === 'audit' ? 'Free audit · read-only' : 'Work with us'}</span>
       <h2 id="cs-cta-head" class="m-0 max-w-[16ch] text-h1">{s.cta.heading}</h2>
@@ -280,13 +294,13 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
       <div class="mt-4 flex flex-wrap gap-2.5">
         {s.cta.action === 'audit' ? (
           <>
-            <a href="/#audit" class="pill pill-lg bg-on-band text-band">Get a free audit</a>
+            <a href={`${home}#audit`} class="pill pill-lg bg-on-band text-band">Get a free audit</a>
             <a href={links.bookCall} class="pill pill-lg border border-on-band px-[23px] py-[15px] text-on-band">Book a call</a>
           </>
         ) : (
           <>
             <a href={links.bookCall} class="pill pill-lg bg-on-band text-band">Book a call</a>
-            <a href="/#audit" class="pill pill-lg border border-on-band px-[23px] py-[15px] text-on-band">Get a free audit</a>
+            <a href={`${home}#audit`} class="pill pill-lg border border-on-band px-[23px] py-[15px] text-on-band">Get a free audit</a>
           </>
         )}
       </div>
@@ -310,11 +324,12 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
           <span class="arr-left" aria-hidden="true">←</span> Previous: {prev.linkName}
         </a>
       ) : <span />}
-      <a href="/#work" class="cs-more-link">All case studies</a>
+      <a href={`${home}#work`} class="cs-more-link">All case studies</a>
     </nav>
   </section>
   <MachineView markdown={markdown} mdHref={mdHref} />
   <SiteFooter mdHref={mdHref} />
+  </div>
 </Base>
 
 <script>

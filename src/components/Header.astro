@@ -6,11 +6,13 @@ import { caseStudies } from '../data/case-studies';
 interface Props {
   /** 'case': pages other than the homepage, so section links point back to it */
   variant?: 'home' | 'case';
+  /** where "home" is: '/' on the site; a review homepage (e.g. '/lab/a') when a case study is shown in a direction */
+  home?: string;
 }
-const { variant = 'home' } = Astro.props;
+const { variant = 'home', home = '/' } = Astro.props;
 
 // one menu on every page (Emir, 11 Nov); on other pages the links go back to the homepage sections
-const base = variant === 'case' ? '/' : '';
+const base = variant === 'case' ? home : '';
 // nav A (Emir, 13 Nov), plain since 16 Nov: no numbers, no reading line (it didn't work on the case pages).
 // Later, with service pages: Design systems · Product design · Work · About.
 const nav = [
@@ -21,14 +23,14 @@ const nav = [
   { id: 'audit', label: 'Process' },
   { id: 'faq', label: 'FAQ' },
 ].map((n) => ({ ...n, href: `${base}#${n.id}` }));
-const audit = variant === 'case' ? '/#audit' : '#audit';
+const audit = variant === 'case' ? `${home}#audit` : '#audit';
 ---
 
 <a href="#main" class="skip-link pill pill-ink px-[18px] text-label">Skip to content</a>
 <header class="site-head border-b border-line" data-site-head>
   <nav aria-label="Main" class="head-nav container-page py-4">
     <a
-      href={links.home}
+      href={home === '/' ? links.home : home}
       class="text-[22px] leading-none font-semibold tracking-[-0.04em] text-ink no-underline"
       >nicey<span class="text-accent">.</span></a
     >
