@@ -51,3 +51,22 @@ export function pixelMark(kind: keyof typeof MARKS, outer: string, centre: strin
   );
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7 7" width="${size}" height="${size}" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;
 }
+
+/**
+ * Placeholder portrait (Emir 19 Nov: generate an image for now, real photos later): a head-and-shoulders silhouette
+ * in pixels on a two-tone dithered ground. Clearly a stand-in, on-brand, no fake person.
+ */
+export function pixelPortrait(bg: string, light: string, figure: string, size = 24) {
+  let r = '';
+  const cx = size / 2;
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const head = (x - cx + 0.5) ** 2 / 20 + (y - size * 0.4) ** 2 / 26 < 1;
+      const body = y > size * 0.68 && Math.abs(x - cx + 0.5) < (y - size * 0.5) * 0.95;
+      if (head || body) r += `<rect x="${x}" y="${y}" width="1" height="1" fill="${figure}"/>`;
+      else if ((x + y) % 2 === 0 && y < size * 0.55) r += `<rect x="${x}" y="${y}" width="1" height="1" fill="${light}"/>`;
+    }
+  }
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" shape-rendering="crispEdges"><rect width="100%" height="100%" fill="${bg}"/>${r}</svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}
