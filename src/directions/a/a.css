@@ -66,7 +66,7 @@
   color: var(--color-accent);
 }
 
-/* ---------- buttons: keys, not pills ---------- */
+/* ---------- buttons: square, mono (the A/B key badges were removed, Emir 19 Nov) ---------- */
 .dir-a .pill {
   font-family: var(--font-mono);
   font-size: 13px;
@@ -86,19 +86,6 @@
   .dir-a .pill-ink:hover {
     background: color-mix(in srgb, var(--a-block) 86%, var(--color-ink));
   }
-}
-.dir-a .a-key {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 20px;
-  height: 20px;
-  margin-left: 10px;
-  padding: 0 5px;
-  border: 1px solid currentColor;
-  font-size: 11px;
-  line-height: 1;
-  opacity: 0.7;
 }
 
 /* ---------- header ---------- */
@@ -206,9 +193,10 @@
   transition: background-color 120ms var(--ease-out), color 120ms var(--ease-out);
 }
 @media (hover: hover) and (pointer: fine) {
+  /* white text on a purple that holds it in both themes (Emir 19 Nov: the text must be white) */
   .dir-a .head-link:hover {
-    background: var(--a-block);
-    color: var(--a-on-block);
+    background: #6b5fbe;
+    color: #fff !important;
   }
   .dir-a .head-link:hover .head-count {
     color: inherit;
@@ -249,7 +237,7 @@
   color: var(--a-on-block) !important;
 }
 .dir-a .closing .pill + .pill {
-  border-color: var(--color-ink) !important;
+  border-color: var(--color-line-strong) !important;
   color: var(--color-ink) !important;
 }
 
@@ -277,4 +265,16 @@
 /* Human | Machine switch removed in A (Emir 19 Nov: not needed here; the .md twin stays linked) */
 .dir-a .view-switch {
   display: none !important;
+}
+
+/* secondary buttons share one border with the nav's theme button (Emir 19 Nov): line-strong, ink on hover */
+.dir-a .pill-outline {
+  border-color: var(--color-line-strong);
+  transition: border-color 160ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .dir-a .pill-outline:hover,
+  .dir-a .closing .pill + .pill:hover {
+    border-color: var(--color-ink) !important;
+  }
 }

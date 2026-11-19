@@ -44,15 +44,3 @@ import SelectedA from './SelectedA.astro';
     <SiteFooter mdHref="/index.md" />
   </div>
 </Base>
-
-<script>
-  // keyboard keys on the hero buttons (A = free audit, B = book a call), never while typing
-  document.addEventListener('keydown', (e) => {
-    if (e.metaKey || e.ctrlKey || e.altKey) return;
-    const t = e.target as HTMLElement;
-    if (t.closest('input, textarea, select, [contenteditable="true"]')) return;
-    const k = e.key.toLowerCase();
-    const a = document.querySelector<HTMLAnchorElement>(`[aria-keyshortcuts="${k}"]`);
-    if (a) a.click();
-  });
-</script>
