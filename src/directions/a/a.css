@@ -273,3 +273,8 @@
 .dir-a .head-count {
   display: none !important;
 }
+
+/* Human | Machine switch removed in A (Emir 19 Nov: not needed here; the .md twin stays linked) */
+.dir-a .view-switch {
+  display: none !important;
+}

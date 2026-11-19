@@ -1,17 +1,18 @@
 ---
 /** Review only (lab pages, noindex): jump between the live homepage and the design directions. */
 interface Props {
-  current: 'now' | 'a' | 'b' | 'c' | 'd';
+  current: 'now' | 'a' | 'b' | 'c' | 'd' | 'e';
   /** on the live homepage the static | story switch already sits bottom-right */
   side?: 'left' | 'right';
 }
 const { current, side = 'right' } = Astro.props;
 const items = [
-  { id: 'now', label: 'Live', href: '/' },
+  { id: 'now', label: 'Refined home', href: '/' },
   { id: 'a', label: 'A · Select', href: '/lab/a' },
   { id: 'b', label: 'B · Editorial', href: '/lab/b' },
   { id: 'c', label: 'C · Human | Machine', href: '/lab/c' },
   { id: 'd', label: 'D · Clean', href: '/lab/d' },
+  { id: 'e', label: 'E · Colour', href: '/lab/e' },
 ];
 ---
 

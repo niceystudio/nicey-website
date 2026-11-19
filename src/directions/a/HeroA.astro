@@ -1,29 +1,15 @@
 ---
 /**
- * Direction A hero (Select layout: headline across, text + CTAs beside it). The headline is set like the Supabase Select logotype:
- * pixel capitals printed on blocks, the last line on the accent. The audit scan visual was removed (Emir 18 Nov: too much noise).
+ * Direction A hero (Select layout). The headline is set like the Supabase Select logotype: pixel capitals printed on
+ * blocks, the last line on the accent. Below it one ruled row: the lede on the headline's left edge, the two keys
+ * flush with the container's right edge, both sitting on the same bottom line (Emir 19 Nov: text and buttons were
+ * not aligned). The "Selected work" strip moved out of the hero into its own band (SelectedA) after the ASCII band.
  */
 import { links } from '../../data/links';
-
-const proof = ['QBench', 'Everbreed', 'Clerky', 'Omnisafe', 'FLYR'].map((name) => ({ name, href: `#work-${name.toLowerCase()}` }));
 ---
 
 <section class="ha">
-  <div class="container-page ha-meta">
-    <nav class="ha-proof" aria-label="Selected work">
-      <span class="text-muted">Selected work</span>
-      {
-        proof.map((p, i) => (
-          <a href={p.href}>
-            <span class="text-muted">{String(i + 1).padStart(2, '0')}</span>
-            {p.name}
-          </a>
-        ))
-      }
-    </nav>
-  </div>
-
-  <div class="container-page ha-top">
+  <div class="container-page ha-in">
     <h1 class="ha-h m-0">
       <span class="ha-line">Is your design</span>
       <span class="ha-line">system ready</span>
@@ -48,60 +34,30 @@ const proof = ['QBench', 'Everbreed', 'Clerky', 'Omnisafe', 'FLYR'].map((name) =
 
 <style>
   .ha {
-    padding-top: 28px;
-    padding-bottom: 56px;
+    padding-top: 96px;
+    padding-bottom: 64px;
   }
-  .ha-meta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px 32px;
-    padding-bottom: 18px;
-    border-bottom: 1px solid var(--a-rule);
-  }
-  .ha-proof {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px 22px;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-  .ha-proof a {
-    display: inline-flex;
-    gap: 8px;
-    color: var(--color-ink);
-    text-decoration: none;
-    transition: color 160ms var(--ease-out);
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .ha-proof a:hover {
-      color: var(--color-accent);
-    }
-  }
-  /* Select's top: the headline across, then one row of three — text, keys, the line after */
-  .ha-top {
+  .ha-in {
     display: flex;
     flex-direction: column;
-    gap: 44px;
-    padding-top: 64px;
+    gap: 56px;
   }
+  /* one row under the headline: lede left, keys right, same bottom line */
   .ha-aside {
-    display: grid;
-    grid-template-columns: minmax(0, 1.2fr) auto minmax(0, 1fr);
-    align-items: center;
-    gap: 24px 48px;
-    padding-top: 22px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 28px 48px;
+    padding-top: 28px;
     border-top: 1px solid var(--a-rule);
   }
   @media (max-width: 1023px) {
-    .ha-top {
-      padding-top: 40px;
+    .ha {
+      padding-top: 56px;
     }
-    .ha-aside {
-      grid-template-columns: 1fr;
+    .ha-in {
+      gap: 40px;
     }
   }
   .ha-h {
@@ -111,7 +67,7 @@ const proof = ['QBench', 'Everbreed', 'Clerky', 'Omnisafe', 'FLYR'].map((name) =
     gap: 6px;
     font-family: var(--font-pixel);
     font-weight: 400;
-    font-size: clamp(32px, 7.6vw, 108px);
+    font-size: clamp(32px, 7.6vw, 112px);
     line-height: 1;
     letter-spacing: 0;
     text-transform: uppercase;
@@ -128,15 +84,16 @@ const proof = ['QBench', 'Everbreed', 'Clerky', 'Omnisafe', 'FLYR'].map((name) =
     color: var(--a-on-block);
   }
   .ha-lede {
-    max-width: 40ch;
-    font-size: var(--text-body);
-    line-height: 1.5;
+    max-width: 44ch;
+    font-size: var(--text-cta);
+    line-height: 1.45;
     color: var(--color-ink-2);
     text-wrap: pretty;
   }
   .ha-ctas {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: 10px;
   }
   /* the headline prints line by line on first view */

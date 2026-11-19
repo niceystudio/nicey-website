@@ -4,6 +4,8 @@
  * New: hero (headline + CTAs), ASCII band, How we work (step windows).
  * Also: Services as one window with file tabs + a tree, Work as a terminal listing.
  * Reused and restyled by a.css: free audit, FAQ, closing band, footer.
+ * 19 Nov (Emir): Selected work = its own band after the ASCII band; removed the ASCII band above the footer,
+ * the big animated wordmark (MarkA) and the Human | Machine view (the page's .md link stays in the footer).
  */
 import './a.css';
 import Base from '../../layouts/Base.astro';
@@ -14,15 +16,11 @@ import ProcessA from './ProcessA.astro';
 import Faq from '../../components/Faq.astro';
 import Footer from '../../components/Footer.astro';
 import SiteFooter from '../../components/SiteFooter.astro';
-import MachineView from '../../components/case-study/MachineView.astro';
 import DirectionSwitch from '../DirectionSwitch.astro';
 import HeroA from './HeroA.astro';
 import AsciiBand from './AsciiBand.astro';
 import HowA from './HowA.astro';
-import MarkA from './MarkA.astro';
-import { homeMarkdown } from '../../lib/home-markdown';
-
-const markdown = await homeMarkdown(Astro.site ?? new URL('https://nicey-website.vercel.app'));
+import SelectedA from './SelectedA.astro';
 ---
 
 <Base
@@ -36,17 +34,15 @@ const markdown = await homeMarkdown(Astro.site ?? new URL('https://nicey-website
     <main id="main" tabindex="-1" data-human>
       <HeroA />
       <AsciiBand />
+      <SelectedA />
       <ServicesA />
       <WorkA />
       <HowA />
       <ProcessA />
       <Faq />
     </main>
-    <AsciiBand labels={['your file', 'one system', 'every reader']} rows={5} />
     <Footer />
-    <MachineView markdown={markdown} mdHref="/index.md" what="homepage" />
     <SiteFooter mdHref="/index.md" />
-    <MarkA />
   </div>
   <DirectionSwitch current="a" />
 </Base>
