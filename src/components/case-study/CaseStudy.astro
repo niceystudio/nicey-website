@@ -29,6 +29,7 @@ import { caseMarkdown } from '../../lib/case-markdown';
 import SiteFooter from '../SiteFooter.astro';
 import { links } from '../../data/links';
 import { caseHref, caseStudies, getCaseStudy, type Band, type CaseStudy } from '../../data/case-studies';
+import { qbenchChaptersA } from '../../data/case-studies-a';
 
 interface Props {
   study: CaseStudy;
@@ -42,10 +43,16 @@ interface Props {
    *  the closing CTA styled like the direction's homepage closing band */
   namesLook?: 'diff';
   ctaLook?: 'closing';
+  /** review only: direction A's content changes for the steps (data/case-studies-a.ts) */
+  chaptersA?: boolean;
 }
-const { study: s, direction, noFacts = false, namesLook, ctaLook } = Astro.props;
+const { study: s, direction, noFacts = false, namesLook, ctaLook, chaptersA = false } = Astro.props;
+const chapters = chaptersA && s.chapters && s.slug === 'qbench-design-system' ? qbenchChaptersA(s.chapters) : s.chapters;
 /** the homepage these links go back to: the site, or the direction's review homepage */
 const home = direction ? `/lab/${direction}` : '/';
+/** case studies that already have a page in the direction (review); the rest link to the live pages */
+const dirSlugs = ['qbench-design-system', 'qbench-status-workflows'];
+const caseLink = (slug: string) => (direction && dirSlugs.includes(slug) ? `/lab/${direction}/${slug}` : caseHref(slug));
 const next = getCaseStudy(s.next);
 const prev = caseStudies.find((c) => c.next === s.slug);
 
@@ -181,7 +188,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
       )
     }
 
-    {s.chapters && <Chapters chapters={s.chapters} marker={band} head={s.heads?.chapters} layout={s.chaptersLayout} />}
+    {chapters && <Chapters chapters={chapters} marker={band} head={s.heads?.chapters} layout={s.chaptersLayout} />}
 
     {s.decisions && <Decisions heading={s.decisions.heading} head={s.heads?.decisions} items={s.decisions.items} />}
 
@@ -308,7 +315,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
   </section>
 
   <section aria-label="More case studies" class="container-page cs-foot" data-human>
-    <a href={caseHref(next.slug)} class="cs-next">
+    <a href={caseLink(next.slug)} class="cs-next">
       <span class="cs-next-copy">
         <span class="caption text-ink-2">Next case study</span>
         <span class="cs-next-name">{next.linkName}</span>
@@ -320,7 +327,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     </a>
     <nav aria-label="More case studies" class="cs-more">
       {prev ? (
-        <a href={caseHref(prev.slug)} class="cs-more-link">
+        <a href={caseLink(prev.slug)} class="cs-more-link">
           <span class="arr-left" aria-hidden="true">←</span> Previous: {prev.linkName}
         </a>
       ) : <span />}
