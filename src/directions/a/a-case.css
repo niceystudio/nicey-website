@@ -1,0 +1,110 @@
+/*
+ * Direction A on the case-study pages (review: /lab/a/<slug>). Same page and copy as the live case study; only the
+ * direction changes: pixel face for names, headings and figures, the client name printed on a block like the hero,
+ * square corners, `//` captions, sentence-case small labels. Scoped to .dir-a, loaded only by the lab page.
+ */
+
+/* the client name, printed on a block (like the homepage hero) */
+.dir-a .text-case-name {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 0.06em 0.14em 0.02em;
+  font-family: var(--font-pixel);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1;
+  text-transform: uppercase;
+  background: var(--color-ink);
+  color: var(--color-page);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .dir-a .text-case-name {
+    animation: a-case-print 520ms steps(6, end) both;
+  }
+}
+@keyframes a-case-print {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* headings and figures in the pixel face */
+.dir-a .text-case-h1,
+.dir-a .text-case-h2,
+.dir-a .cs-num-fig {
+  font-family: var(--font-pixel);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+/* captions read as paths, like the homepage */
+.dir-a .cs .caption:not(.caption-sm)::before {
+  content: '//\00a0';
+  color: var(--color-accent);
+}
+
+/* square everything that the shared radius tokens don't reach */
+.dir-a .cs :where(.rounded, [class*='rounded-'], .cs-audit, .cs-shot, .panel, .chip, img, video) {
+  border-radius: 0 !important;
+}
+
+/* ---------- hero, pass 1 (Emir 19 Nov, test) ---------- */
+/* 1 · no filled colour band: the page and its dot grid, like the homepage hero; the colour lives on the name block */
+.dir-a .cs > section:first-child {
+  background: transparent !important;
+}
+.dir-a .text-case-name {
+  background: var(--a-block);
+  color: var(--a-on-block);
+}
+/* 5 · the statement steps down so the name block is the one main element */
+.dir-a .cs-hero .text-case-h1 {
+  font-size: clamp(24px, 2.6vw, 36px);
+  line-height: 1.12;
+}
+/* 4 · copy and window end on the same bottom line */
+@media (min-width: 1100px) {
+  .dir-a .cs-hero-top--visual {
+    align-items: end;
+  }
+}
+/* 2 · the window: no caption that narrates it; A's window chrome and tabs */
+.dir-a .cs-hero-context {
+  display: none;
+}
+.dir-a .qh-card {
+  border-color: var(--color-ink);
+  box-shadow: 6px 6px 0 color-mix(in srgb, var(--color-accent) 70%, transparent);
+}
+.dir-a .qh-bar {
+  border-bottom: 1px solid var(--color-ink);
+}
+.dir-a .qh-mono {
+  text-transform: none !important;
+  letter-spacing: 0.02em !important;
+  color: var(--color-ink) !important;
+}
+.dir-a .qh-seg {
+  padding: 0;
+  gap: 0;
+  border-radius: 0 !important;
+}
+.dir-a .qh-seg button {
+  border-radius: 0 !important;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
+.dir-a .qh-seg button[aria-pressed='true'] {
+  background: var(--a-block) !important;
+  color: var(--a-on-block) !important;
+}
+/* 3 · the facts row (Company, Team, Stack…) is not rendered in A (CaseStudy noFacts) — Emir 19 Nov */
+
+/* the closing CTA uses the homepage closing look (shared .closing rules in a.css); a rule above it like the homepage */
+.dir-a .cs-cta.closing {
+  border-top: 1px solid var(--a-rule);
+}

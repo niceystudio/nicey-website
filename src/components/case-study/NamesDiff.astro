@@ -1,0 +1,218 @@
+---
+/**
+ * QBench before/after for direction A (Emir 19 Nov: no blocks — present it in the direction's own language).
+ * A terminal window lists real variables from the QBench V2 library. V1: no code name (only 13 of 553 had one).
+ * V2: every variable carries its web code name (554 of 554). Same copy and numbers as NamesField; only the
+ * presentation changes. The switch reprints the list line by line.
+ */
+const BEFORE_TOTAL = 553;
+const AFTER_TOTAL = 554;
+const BEFORE_NAMED = 13;
+// real pairs from the QBench V2 library (same list NamesField reads)
+const pairs: [string, string][] = [
+  ['text/default', 'var(--text-default)'],
+  ['surface/default', 'var(--surface-default)'],
+  ['primitives/primary/600', 'var(--primary-600)'],
+  ['spacing/4', 'var(--spacing-4)'],
+  ['radius/md', 'var(--radius-md)'],
+];
+const NOTE_BEFORE = 'V1 had 553 variables. Only 13 had a name a developer could type in CSS. The rest showed a raw value.';
+const NOTE_AFTER = 'In V2 every variable carries its web code name, so designers, developers and agents use the same word.';
+const pad = Math.max(...pairs.map(([n]) => n.length)) + 4;
+const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+// one string so no template whitespace ends up inside the <pre>
+const body =
+  `<span class="nd-ps">$</span> list variables --with-code-name\n\n` +
+  pairs
+    .map(
+      ([n, v]) =>
+        `<span class="nd-line" data-nd-line><span class="nd-name">${esc(n.padEnd(pad, '.'))}</span><span class="nd-val" data-before="no code name" data-after="${esc(v)}">no code name</span></span>`,
+    )
+    .join('') +
+  `\n<span class="nd-more" data-nd-more data-before="+ ${BEFORE_TOTAL - pairs.length} more · ${BEFORE_NAMED} named" data-after="+ ${AFTER_TOTAL - pairs.length} more · all named">+ ${BEFORE_TOTAL - pairs.length} more · ${BEFORE_NAMED} named</span>`;
+---
+
+<div class="nd" data-nd>
+  <div class="nd-copy">
+    <span class="caption nd-cap">QBench · variables</span>
+    <p class="nd-figure" aria-hidden="true">
+      <span data-nd-count>{BEFORE_NAMED}</span><span class="nd-of"> / <span data-nd-total>{BEFORE_TOTAL}</span></span>
+    </p>
+    <p class="sr-only" aria-live="polite" data-nd-live>{BEFORE_NAMED} of {BEFORE_TOTAL} variables named</p>
+    <h3 class="m-0 nd-title">variables with a name developers can type in CSS</h3>
+    <p class="m-0 nd-note" data-nd-note data-before={NOTE_BEFORE} data-after={NOTE_AFTER}>{NOTE_BEFORE}</p>
+  </div>
+  <div class="nd-win">
+    <div class="nd-bar">
+      <span>variables.css</span>
+      <div role="group" aria-label="Show state" class="nd-tabs">
+        <button type="button" data-nd-state="0" aria-pressed="true">V1 · before</button>
+        <button type="button" data-nd-state="1" aria-pressed="false">V2 · after</button>
+      </div>
+    </div>
+    <pre class="nd-body" data-nd-body set:html={body} />
+  </div>
+</div>
+
+<style>
+  .nd {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 1px;
+    background: var(--color-line);
+  }
+  .nd > * {
+    background: var(--color-surface);
+  }
+  .nd-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: var(--spacing-cell);
+  }
+  .nd-figure {
+    margin: 12px 0 0;
+    font-family: var(--font-pixel);
+    font-size: clamp(64px, 7vw, 112px);
+    line-height: 0.9;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .nd-of {
+    font-size: 0.42em;
+    color: var(--color-muted);
+  }
+  .nd-title {
+    font-family: var(--font-pixel);
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 1.15;
+  }
+  .nd-note {
+    max-width: 40ch;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--color-ink-2);
+    text-wrap: pretty;
+  }
+  .nd-win {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .nd-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 10px 8px 18px;
+    border-bottom: 1px solid var(--color-line);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-ink);
+  }
+  .nd-tabs {
+    display: inline-flex;
+    border: 1px solid var(--color-line-strong);
+  }
+  .nd-tabs button {
+    min-height: 32px;
+    padding: 0 12px;
+    border: 0;
+    background: transparent;
+    color: var(--color-ink-2);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .nd-tabs button[aria-pressed='true'] {
+    background: var(--a-block, var(--color-accent));
+    color: var(--a-on-block, var(--color-page));
+  }
+  .nd-body {
+    flex: 1;
+    margin: 0;
+    padding: 28px 26px;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 2;
+    white-space: pre;
+    overflow-x: auto;
+    color: var(--color-ink);
+  }
+  .nd-body :global(.nd-line) {
+    display: block;
+  }
+  .nd-body :global(.nd-ps) {
+    color: var(--color-accent);
+  }
+  .nd-body :global(.nd-name) {
+    color: var(--color-ink-2);
+  }
+  .nd-body :global(.nd-val) {
+    color: var(--color-muted);
+  }
+  [data-state='1'] .nd-body :global(.nd-val) {
+    color: var(--color-accent);
+  }
+  .nd-body :global(.nd-more) {
+    color: var(--color-muted);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .nd-body :global(.nd-line.is-print) {
+      animation: nd-print 260ms steps(5, end) both;
+    }
+  }
+  @keyframes nd-print {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+  .nd-line {
+    display: block;
+  }
+  @media (max-width: 899px) {
+    .nd {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-nd]').forEach((root) => {
+    const count = root.querySelector<HTMLElement>('[data-nd-count]')!;
+    const total = root.querySelector<HTMLElement>('[data-nd-total]')!;
+    const live = root.querySelector<HTMLElement>('[data-nd-live]')!;
+    const note = root.querySelector<HTMLElement>('[data-nd-note]')!;
+    const more = root.querySelector<HTMLElement>('[data-nd-more]')!;
+    const lines = Array.from(root.querySelectorAll<HTMLElement>('[data-nd-line]'));
+    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-nd-state]'));
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const set = (after: boolean) => {
+      root.dataset.state = after ? '1' : '0';
+      tabs.forEach((t) => t.setAttribute('aria-pressed', String((t.dataset.ndState === '1') === after)));
+      const k = after ? 'after' : 'before';
+      count.textContent = after ? '554' : '13';
+      total.textContent = after ? '554' : '553';
+      live.textContent = after ? '554 of 554 variables named' : '13 of 553 variables named';
+      note.textContent = note.dataset[k]!;
+      more.textContent = more.dataset[k]!;
+      lines.forEach((l, i) => {
+        const v = l.querySelector<HTMLElement>('.nd-val')!;
+        l.classList.remove('is-print');
+        const apply = () => {
+          v.textContent = v.dataset[k]!;
+          if (!reduce) {
+            void l.offsetWidth;
+            l.classList.add('is-print');
+          }
+        };
+        reduce ? apply() : window.setTimeout(apply, i * 90);
+      });
+    };
+    tabs.forEach((t) => t.addEventListener('click', () => set(t.dataset.ndState === '1')));
+  });
+</script>

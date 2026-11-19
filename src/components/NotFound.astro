@@ -6,6 +6,13 @@
 import Base from '../layouts/Base.astro';
 import Header from './Header.astro';
 
+interface Props {
+  /** review only: the 404 in a design direction ('a' → .dir-a, links back to /lab/a). Emir 19 Nov. */
+  direction?: 'a';
+}
+const { direction } = Astro.props;
+const home = direction ? `/lab/${direction}` : '/';
+
 // 5×7 pixel digits
 const DIGITS: Record<string, string[]> = {
   '4': ['10001', '10001', '10001', '11111', '00001', '00001', '00001'],
@@ -18,14 +25,20 @@ const cells: { x: number; y: number }[] = [];
 ---
 
 <Base title="Page not found · Nicey" description="This page does not exist." noindex>
-  <Header variant="case" />
+  <div class:list={[direction && `dir-${direction}`]}>
+  <Header variant="case" home={home} />
   <main id="main" tabindex="-1" class="nf container-page">
         <section class="nf-a" aria-labelledby="nf-h">
-          <div class="nf-blocks" aria-hidden="true" data-nf-blocks>
-            {cells.map((c) => (
-              <i style={`--x:${c.x};--y:${c.y}`} />
-            ))}
-          </div>
+          {direction ? (
+            /* A: no blocks — "404" printed on the accent block, decoding from random characters */
+            <p class="nf-code" aria-hidden="true" data-nf-code>404</p>
+          ) : (
+            <div class="nf-blocks" aria-hidden="true" data-nf-blocks>
+              {cells.map((c) => (
+                <i style={`--x:${c.x};--y:${c.y}`} />
+              ))}
+            </div>
+          )}
           <div class="nf-copy">
             <span class="caption text-ink-2">Error 404 · drift detected</span>
             <h1 id="nf-h" class="nf-h">This page drifted.</h1>
@@ -34,13 +47,14 @@ const cells: { x: number; y: number }[] = [];
               feeling. It's most of our work.
             </p>
             <div class="flex flex-wrap gap-2.5">
-              <a href="/" class="pill pill-ink pill-lg">Back to the homepage</a>
-              <a href="/#audit" class="pill pill-outline pill-lg">Get a free audit</a>
+              <a href={home} class="pill pill-ink pill-lg">Back to the homepage</a>
+              <a href={`${home}#audit`} class="pill pill-outline pill-lg">Get a free audit</a>
             </div>
-            <span class="font-mono text-caption text-ink-2">Psst: the blocks move if you poke them.</span>
+            {!direction && <span class="font-mono text-caption text-ink-2">Psst: the blocks move if you poke them.</span>}
           </div>
         </section>
   </main>
+  </div>
 </Base>
 
 <style>
@@ -106,6 +120,20 @@ const cells: { x: number; y: number }[] = [];
 
 <script>
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // A: "404" decodes from random characters, then holds (like the ASCII band); reduced motion = plain
+  const code = document.querySelector<HTMLElement>('[data-nf-code]');
+  if (code && !reduced) {
+    const target = '404', glyphs = '#%@*+=/\\<>[]{}01';
+    let n = 0;
+    const tick = window.setInterval(() => {
+      n++;
+      code.textContent = target
+        .split('')
+        .map((ch, i) => (n > 8 + i * 4 ? ch : glyphs[(Math.random() * glyphs.length) | 0]))
+        .join('');
+      if (n > 8 + target.length * 4) window.clearInterval(tick);
+    }, 55);
+  }
   // blocks arrive scattered and settle; under the cursor they get knocked away, then drift back
   const box = document.querySelector<HTMLElement>('[data-nf-blocks]');
   if (box) {
