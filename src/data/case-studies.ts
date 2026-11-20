@@ -772,11 +772,11 @@ export const caseStudies: CaseStudy[] = [
       kicker: 'Two platforms',
       heading: 'One source of truth, adapted for each platform, not copied.',
       items: [
-        { label: 'Source', text: 'Figma: DS Desktop and DS Mobile.' },
-        { label: 'Contract', text: 'Token JSON with $figmaId, $property and $codeSyntax.' },
+        { label: 'Source', text: 'Figma: two libraries, DS Desktop for the web and DS Mobile for the apps.' },
+        { label: 'Contract', text: 'Token JSON: every token carries $figmaId, $property and $codeSyntax.' },
         { label: 'Web', text: 'A generated utility config and Vue components. Shipped first.' },
-        { label: 'Mobile', text: 'A typed React Native export for iOS and Android.' },
-        { label: 'Verified', text: 'Button and Input in a create and edit flow, checked on iOS and Android, including enlarged text.' },
+        { label: 'Mobile', text: 'A typed React Native export for iOS and Android, same tokens.' },
+        { label: 'Verified', text: 'Button and Input in one flow, checked on iOS and Android, enlarged text too.' },
       ],
       footnote:
         'Native differences are written down instead of guessed: elevation, text scaling, touch targets, keyboard and safe areas.',

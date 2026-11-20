@@ -484,3 +484,49 @@
   z-index: 1;
   transition: opacity 220ms var(--ease-out);
 }
+
+/* ---------- Everbreed hero in A (Emir, 20 Nov — test page /lab/a/everbreed-test) ----------
+ * 1. The name block fits its column: a long name (EVERBREED, 9 letters) ran into the window. The size comes from the
+ *    column width and the letter count (pixel face ≈ 0.55em a letter + 1em of block padding); QBench stays ~128px.
+ * 2. The Figma ↔ code window in A's chrome, like QBench's: ink rule, accent offset shadow, square cells, sentence-case
+ *    mono labels. */
+.dir-a .cs-hero-copy {
+  container-type: inline-size;
+}
+.dir-a .text-case-name {
+  font-size: min(var(--text-case-name), calc(100cqi / (var(--name-len, 6) * 0.55 + 1.02)));
+}
+.dir-a [data-eh] .eh-card {
+  border-color: var(--color-ink);
+  border-radius: 0;
+  box-shadow: 6px 6px 0 color-mix(in srgb, var(--color-accent) 70%, transparent);
+}
+.dir-a [data-eh] .eh-bar {
+  border-bottom: 1px solid var(--color-ink);
+}
+.dir-a [data-eh] .eh-mono {
+  text-transform: none;
+  letter-spacing: 0.02em;
+  color: var(--color-ink);
+}
+.dir-a [data-eh] .eh-b-cell,
+.dir-a [data-eh] .eh-b-link em {
+  border-radius: 0;
+}
+
+/* ---------- What we did in A, from the Everbreed pass (Emir, 20 Nov) — every A case page ----------
+ * The dark "from spec to screen" run was still rounded (12px) on Everbreed and QBench: square, like every A window.
+ * Row labels that are code ($figmaId, $property, $codeSyntax) read in mono, like QBench's variable → code-name list. */
+.dir-a [data-chapters] .ch-run {
+  border-radius: 0 !important;
+}
+.dir-a [data-chapters] .ch-rows-code {
+  font-family: var(--font-mono);
+  font-size: 15px;
+}
+
+/* ---------- Everbreed · What we built in A (Emir, 20 Nov) ----------
+ * A squares every img/video; the phone keeps its real screen corners so they don't poke past the rounded frame. */
+.dir-a .cs .ep-video {
+  border-radius: 42px !important;
+}

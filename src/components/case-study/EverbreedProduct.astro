@@ -119,7 +119,10 @@ const clip = (id: string) => ({ src: `${base}/mobile-${id}.webm`, poster: `${bas
 
 <style>
   .ep {
-    --phone-w: 300px;
+    /* the pinned phone fits the screen under the sticky header (Emir, 20 Nov: on a MacBook Air it hit the header).
+       Height = width × 852/393, so the width comes from the free height: viewport − header − 2 × 32px. */
+    --head: 80px;
+    --phone-w: clamp(220px, (100svh - var(--head) - 64px) * 393 / 852, 300px);
     position: relative;
     display: flex;
     flex-direction: column;
@@ -158,7 +161,7 @@ const clip = (id: string) => ({ src: `${base}/mobile-${id}.webm`, poster: `${bas
   }
   .ep-stage {
     position: sticky;
-    top: calc(50vh - (var(--phone-w) * 852 / 393 + 24px) / 2);
+    top: calc(var(--head) + (100svh - var(--head) - var(--phone-w) * 852 / 393) / 2);
     align-self: start;
     display: flex;
     justify-content: center;
@@ -274,18 +277,18 @@ const clip = (id: string) => ({ src: `${base}/mobile-${id}.webm`, poster: `${bas
   /* once, when the screens scroll in: the back one tilts into place, the front one lands after it */
   @media (prefers-reduced-motion: no-preference) {
     .ep-browser {
-      transition: opacity 600ms var(--ease-out), transform 600ms var(--ease-out);
+      transition: opacity 400ms var(--ease-out), transform 400ms var(--ease-out); /* was 600ms / 40px (20 Nov review) */
     }
     .ep-browser--front {
       transition-delay: 120ms;
     }
     .ep-desk-stack.is-waiting .ep-browser--back {
       opacity: 0;
-      transform: rotate(0deg) translateY(24px);
+      transform: rotate(0deg) translateY(12px);
     }
     .ep-desk-stack.is-waiting .ep-browser--front {
       opacity: 0;
-      transform: translateY(40px);
+      transform: translateY(16px);
     }
   }
 
@@ -373,16 +376,21 @@ const clip = (id: string) => ({ src: `${base}/mobile-${id}.webm`, poster: `${bas
     steps.forEach((s) => spy.observe(s));
 
     // phone width: each inline phone loops while it is on screen
+    const onScreen = new Set<HTMLVideoElement>();
+    const playInline = (v: HTMLVideoElement) => {
+      v.preload = 'auto';
+      v.loop = true;
+      v.play().catch(() => {});
+    };
     const seen = new IntersectionObserver(
       (es) =>
         es.forEach((e) => {
           const v = e.target as HTMLVideoElement;
+          if (e.isIntersecting) onScreen.add(v);
+          else onScreen.delete(v);
           if (wide.matches) return;
-          if (e.isIntersecting && !paused) {
-            v.preload = 'auto';
-            v.loop = true;
-            v.play().catch(() => {});
-          } else v.pause();
+          if (e.isIntersecting && !paused) playInline(v);
+          else v.pause();
         }),
       { threshold: 0.5 },
     );
@@ -393,6 +401,8 @@ const clip = (id: string) => ({ src: `${base}/mobile-${id}.webm`, poster: `${bas
       setBtn();
       if (paused) [...clips, ...inline].forEach((v) => v.pause());
       else if (wide.matches) clips[current] && playFromStart(clips[current]);
+      // phone width: Play starts the phone(s) on screen (it did nothing here before — 20 Nov motion review)
+      else onScreen.forEach(playInline);
     });
     show(0);
   });

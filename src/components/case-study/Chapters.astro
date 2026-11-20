@@ -138,7 +138,7 @@ const slug = (k: string) =>
                     <dl class="ch-rows">
                       {b.rows.map((r) => (
                         <div>
-                          <dt class="text-body-lg">{r.label}</dt>
+                          <dt class:list={['text-body-lg', r.label.startsWith('$') && 'ch-rows-code']}>{r.label}</dt>
                           <dd class="m-0 text-body tabular-nums text-ink-2">{r.value}</dd>
                         </div>
                       ))}
@@ -537,7 +537,8 @@ const slug = (k: string) =>
           if (p) p.hidden = k !== n;
         });
         const panel = panels[n];
-        if (panel && !reduced.matches) {
+        // no entrance on arrow / Home / End keys: keyboard switching is instant (20 Nov motion review)
+        if (panel && !reduced.matches && !focus) {
           panel.classList.add('is-entering');
           void panel.offsetWidth;
           panel.classList.remove('is-entering');

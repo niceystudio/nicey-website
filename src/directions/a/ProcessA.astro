@@ -13,7 +13,7 @@ import CopyPrompt from '../../components/CopyPrompt.astro';
 import ReportA from './ReportA.astro';
 import { links } from '../../data/links';
 
-// time placeholders removed in A (Emir, 20 Nov: we don't need them). 20 Nov audit: caption = nav label "Process";
+// time placeholders removed in A (Emir, 20 Nov: we don't need them). 20 Nov: caption "Free audit" (same as the header button; "Process" left the nav);
 // steps marked with → (How we work above is the only numbered process); the list fills the column beside the report
 const steps = [
   { n: '01', title: 'Share your Figma file' },
@@ -24,7 +24,7 @@ const steps = [
 ---
 
 <section id="audit" aria-labelledby="start-head" class="container-page flex flex-col gap-12 pb-section">
-  <SectionHead id="start-head" caption="Process" headingClass="max-w-[16ch]">
+  <SectionHead id="start-head" caption="Free audit" headingClass="max-w-[16ch]">
     It starts with a free audit.
   </SectionHead>
 
