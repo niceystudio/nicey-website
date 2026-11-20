@@ -530,3 +530,15 @@
 .dir-a .cs .ep-video {
   border-radius: 42px !important;
 }
+
+/* ---------- Status workflows: the What we did rail ([data-rail-a]) — approved (Emir, 20 Nov) ----------
+ * The heading broke into 6 lines in the narrow sticky column and pushed the step list down: a wider column, a
+ * smaller heading (3–4 lines), and the rail sticks below the header (it went under it at top: 24px). */
+.dir-a[data-rail-a] .ch-rail {
+  flex-basis: 360px;
+  top: 104px;
+}
+.dir-a[data-rail-a] .ch-rail h2 {
+  font-size: clamp(30px, 2.8vw, 40px);
+  line-height: 1.1;
+}

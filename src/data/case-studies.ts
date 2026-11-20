@@ -574,17 +574,17 @@ export const caseStudies: CaseStudy[] = [
         'The workflow is the same idea as a design system, applied to behaviour: one definition, used on every surface, so nothing drifts.',
     },
     together: {
-      text: 'Inside the product team, with a product lead and developers. Flows were reviewed in design syncs, and feedback rounds with technical account managers shaped the MVP and what was held for the next version.',
+      text: 'Inside the product team, with a product lead and developers. Design syncs and feedback from technical account managers shaped the MVP.',
       collect: {
         label: 'To collect · client quote',
         text: '“[A sentence from a QBench product lead or a lab user on the new status flow.]”',
       },
     },
     changed: {
-      text: 'One status model shipped as an MVP, with compliance built into the flow instead of left to each screen.',
+      text: 'One status model shipped as an MVP, with compliance built into the flow instead of left to each screen, the same on every surface.',
       collect: {
         label: 'To collect · business result',
-        text: '[One result since launch: adoption of bulk update, fewer compliance errors, or fewer support tickets about status changes.]',
+        text: '[One result since launch: bulk update adoption, fewer compliance errors or fewer status tickets.]',
       },
     },
     work: [],
