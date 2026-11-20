@@ -12,16 +12,13 @@ import Shot from './Shot.astro';
 import NamesField from './NamesField.astro';
 import NamesDiff from './NamesDiff.astro';
 import QBenchHero from './QBenchHero.astro';
-import QBenchWork from './QBenchWork.astro';
 import StatusHero from './StatusHero.astro';
 import EverbreedHero from './EverbreedHero.astro';
 import Faq from '../Faq.astro';
 import AgenticCompare from './AgenticCompare.astro';
-import EverbreedProduct from './EverbreedProduct.astro';
 import SurfacesField from './SurfacesField.astro';
 import AliasesField from './AliasesField.astro';
-import TwoSides from './TwoSides.astro';
-import StatusScreensA from '../../directions/a/StatusScreensA.astro';
+import CaseWork from './CaseWork.astro';
 import ScreensBandA from '../../directions/a/ScreensBandA.astro';
 import TogetherA from '../../directions/a/TogetherA.astro';
 import Decisions from './Decisions.astro';
@@ -51,8 +48,14 @@ interface Props {
   /** review only (Emir, 20 Nov): screens band after the hero, See it work right after the agentic layer, and
    *  Working together + What changed in one band (TogetherA). QBench design system in A. */
   layoutA?: boolean;
+  /** review only (Emir, 20 Nov, status workflows in A): See it work right after the hero, Working together + What
+   *  changed in one band (TogetherA), and a wider What we did rail with a smaller heading (data-rail-a) */
+  workFirst?: boolean;
+  togetherA?: boolean;
+  railA?: boolean;
 }
-const { study: s, direction, noFacts = false, namesLook, ctaLook, chaptersA = false, layoutA = false } = Astro.props;
+const { study: s, direction, noFacts = false, namesLook, ctaLook, chaptersA = false, layoutA = false, workFirst = false, togetherA = false, railA = false } = Astro.props;
+const together = layoutA || togetherA;
 const chapters = chaptersA && s.chapters && s.slug === 'qbench-design-system' ? qbenchChaptersA(s.chapters) : s.chapters;
 /** the homepage these links go back to: the site, or the direction's review homepage */
 const home = direction ? `/lab/${direction}` : '/';
@@ -94,7 +97,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
 ---
 
 <Base title={`${s.linkName} case study · Nicey`} description={s.lede} markdownHref={mdHref} jsonLd={jsonLd} noindex={!!direction}>
-  <div class:list={[direction && `dir-${direction}`]}>
+  <div class:list={[direction && `dir-${direction}`]} data-rail-a={railA ? '' : undefined}>
   <Header variant="case" home={home} />
   <main id="main" tabindex="-1" class="cs" data-human>
     <section aria-labelledby="cs-title" class={band}>
@@ -130,6 +133,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     </section>
 
     {layoutA && <ScreensBandA name={s.name} />}
+    {workFirst && <CaseWork study={s} direction={direction} />}
 
     {
       !s.lead ? null : s.lead.kind === 'image' ? (
@@ -240,7 +244,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     }
 
     {
-      !layoutA && [
+      !together && [
         { id: 'together-head', heading: 'Working together', ...s.together },
         { id: 'changed-head', heading: 'What changed for the team', ...s.changed },
       ].map((b) => (
@@ -261,41 +265,8 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
       ))
     }
 
-    <section aria-labelledby="work-head" class="container-page cs-block flex flex-col gap-5">
-      {s.heads?.work ? (
-        <SectionHead id="work-head" caption={s.heads.work.caption} class="mb-7" headingClass="max-w-[18ch]">{s.heads.work.heading}</SectionHead>
-      ) : (
-        <h2 id="work-head" class="m-0 text-case-h2">{s.workHeading ?? 'From the work'}</h2>
-      )}
-      {s.workVisual === 'qbench' ? (
-        <QBenchWork />
-      ) : s.workVisual === 'qbench-status' && direction === 'a' ? (
-        <StatusScreensA />
-      ) : s.workVisual === 'qbench-status' ? (
-        <TwoSides />
-      ) : s.workVisual === 'everbreed' ? (
-        <EverbreedProduct />
-      ) : (
-      <div class:list={['cs-figs', s.work.length === 2 && 'cs-figs--two']}>
-          {
-            s.work.map((w, i) => (
-              <figure class="m-0 flex flex-col gap-3">
-                {w.src ? (
-                  <Shot shot={w.src} alt={w.alt ?? ''} />
-                ) : (
-                  <div class="placeholder cs-shot">{w.placeholder}</div>
-                )}
-                <figcaption class="flex flex-col gap-1 text-body-sm text-ink-2">
-                  <span class="caption-sm text-muted">Fig 0.{i + 1}</span>
-                  {w.caption}
-                </figcaption>
-              </figure>
-            ))
-          }
-        </div>
-      )}
-    </section>
-    {layoutA && s.together && s.changed && <TogetherA together={s.together} changed={s.changed} />}
+    {!workFirst && <CaseWork study={s} direction={direction} />}
+    {together && s.together && s.changed && <TogetherA together={s.together} changed={s.changed} />}
 
     {s.faq && (
       <div class="cs-faq">
@@ -467,15 +438,16 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
   .cs-lead {
     padding-top: var(--cs-sm);
   }
-  .cs-block {
+  /* :global inside .cs — also used by CaseWork.astro (the See it work section, its own component since 20 Nov) */
+  .cs :global(.cs-block) {
     padding-top: var(--cs-lg);
   }
-  .cs-block--md {
+  .cs :global(.cs-block--md) {
     padding-top: var(--cs-md);
   }
 
   /* dashed = not collected yet */
-  .cs-shot {
+  .cs :global(.cs-shot) {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -484,7 +456,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     border-radius: var(--radius-panel);
     text-align: center;
   }
-  .cs-shot--wide {
+  .cs :global(.cs-shot--wide) {
     aspect-ratio: 16 / 8;
   }
 
@@ -626,16 +598,16 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     line-height: 1.5;
   }
 
-  .cs-figs.cs-figs--two {
+  .cs :global(.cs-figs.cs-figs--two) {
     grid-template-columns: minmax(0, 1fr);
   }
   @media (min-width: 900px) {
-    .cs-figs.cs-figs--two {
+    .cs :global(.cs-figs.cs-figs--two) {
       grid-template-columns: minmax(0, 0.9fr) minmax(0, 2fr);
       align-items: start;
     }
   }
-  .cs-figs {
+  .cs :global(.cs-figs) {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
     gap: 16px;

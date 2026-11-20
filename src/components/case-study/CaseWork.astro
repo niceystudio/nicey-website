@@ -1,0 +1,54 @@
+---
+/**
+ * A case study's "See it work" / "What we built" section, on its own so a page can place it (direction A: status
+ * workflows shows its screens right after the hero — Emir, 20 Nov). Markup moved unchanged from CaseStudy.astro.
+ */
+import SectionHead from '../SectionHead.astro';
+import QBenchWork from './QBenchWork.astro';
+import TwoSides from './TwoSides.astro';
+import EverbreedProduct from './EverbreedProduct.astro';
+import StatusScreensA from '../../directions/a/StatusScreensA.astro';
+import Shot from './Shot.astro';
+import type { CaseStudy } from '../../data/case-studies';
+
+interface Props {
+  study: CaseStudy;
+  direction?: 'a';
+}
+const { study: s, direction } = Astro.props;
+---
+
+<section aria-labelledby="work-head" class="container-page cs-block flex flex-col gap-5">
+  {s.heads?.work ? (
+    <SectionHead id="work-head" caption={s.heads.work.caption} class="mb-7" headingClass="max-w-[18ch]">{s.heads.work.heading}</SectionHead>
+  ) : (
+    <h2 id="work-head" class="m-0 text-case-h2">{s.workHeading ?? 'From the work'}</h2>
+  )}
+  {s.workVisual === 'qbench' ? (
+    <QBenchWork />
+  ) : s.workVisual === 'qbench-status' && direction === 'a' ? (
+    <StatusScreensA />
+  ) : s.workVisual === 'qbench-status' ? (
+    <TwoSides />
+  ) : s.workVisual === 'everbreed' ? (
+    <EverbreedProduct />
+  ) : (
+  <div class:list={['cs-figs', s.work.length === 2 && 'cs-figs--two']}>
+      {
+        s.work.map((w, i) => (
+          <figure class="m-0 flex flex-col gap-3">
+            {w.src ? (
+              <Shot shot={w.src} alt={w.alt ?? ''} />
+            ) : (
+              <div class="placeholder cs-shot">{w.placeholder}</div>
+            )}
+            <figcaption class="flex flex-col gap-1 text-body-sm text-ink-2">
+              <span class="caption-sm text-muted">Fig 0.{i + 1}</span>
+              {w.caption}
+            </figcaption>
+          </figure>
+        ))
+      }
+    </div>
+  )}
+</section>
