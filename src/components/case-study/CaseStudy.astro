@@ -734,6 +734,18 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
       background: var(--color-ink);
       color: var(--color-on-ink);
     }
+    /* pressing while hovered keeps the nudge (it jumped back 6px) */
+    .cs-next:active .cs-next-arrow {
+      transform: translateX(6px) scale(0.97);
+    }
+  }
+  /* reduced motion: no sideways nudge on hover; colour and underline still show it (20 Nov review) */
+  @media (prefers-reduced-motion: reduce) {
+    .cs-next:hover .cs-next-arrow,
+    .cs-next:active .cs-next-arrow,
+    .cs-more-link:hover span {
+      transform: none;
+    }
   }
   @media (max-width: 767px) {
     .cs-next {

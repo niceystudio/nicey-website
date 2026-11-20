@@ -16,7 +16,7 @@
   --color-surface-hover: #f6f3ec;
   --color-ink: #26251f;
   --color-ink-2: #4d4a40;
-  --color-muted: #716e63;
+  --color-muted: #6f6c61; /* 4.6:1 on the page (was #716e63, 4.49:1 — 20 Nov review) */
   --color-on-ink: #ffffff;
   --color-line: rgba(38, 37, 31, 0.1);
   --color-line-strong: rgba(38, 37, 31, 0.2);
@@ -42,6 +42,9 @@
   --color-on-band-2: #b6b1a3;
   /* labels on the band (case study agentic layer): canvas lavender, both themes */
   --color-on-band-accent: #d9d2ef;
+  /* code values on the band: the light sage/peach, both themes (the fill tokens go dark in dark mode — 20 Nov review) */
+  --color-on-band-sage: #cbdac4;
+  --color-on-band-peach: #f6d9c4;
 
   /* the purples found in step 01: content, identical in both themes */
   --color-found-1: #6b5fbe;

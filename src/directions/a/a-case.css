@@ -338,6 +338,10 @@
   background: transparent !important;
   color: var(--color-accent) !important;
 }
+/* the picked card keeps an ink outline in both themes (the fixed #26251f vanished on A's dark stage — 20 Nov review) */
+.dir-a [data-qw] .qw-state[aria-pressed='true'] .qw-field {
+  outline-color: var(--color-ink);
+}
 /* the five state cards: warm grey like the page, so they stand out from the white stage; the fields stay white
    (Emir, 20 Nov). :where() keeps the field rule weaker than the hover/focus/disabled/error states. */
 .dir-a [data-qw] .qw-field {
@@ -435,4 +439,48 @@
 .dir-a [data-sf] .sf-model {
   rx: 0;
   ry: 0;
+}
+
+/* ---------- 20 Nov review, group B — approved (Emir; the Work preview change was not) ----------
+ * 10. The last rounded / sans details in A: Next case title in the pixel face, a square arrow, a square Machine pane.
+ * 12. What we did: a panel's entrance plays once (.is-seen after you leave it); the row staggers at 60ms, not 120ms.
+ * 13. Status See it work: the new screen fades in over the old one (no see-through mid-swap). */
+.dir-a .cs-next-name {
+  font-family: var(--font-pixel);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.dir-a .cs-next-arrow,
+.dir-a .qh-machine {
+  border-radius: 0 !important;
+}
+.dir-a .ch.is-seen .ch-run > li,
+.dir-a .ch.is-seen .ch-meters--scan .ch-meter > span,
+.dir-a .ch.is-seen .ch-map > li,
+.dir-a .ch.is-seen .ch-map > li .ch-code--accent,
+.dir-a .ch.is-seen .ch-surf > li,
+.dir-a .ch.is-seen .ch-order-list > li {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .dir-a .ch:not([hidden]) .ch-map > li {
+    animation-duration: 400ms !important;
+    animation-timing-function: var(--ease-out) !important;
+  }
+  .dir-a .ch:not([hidden]) .ch-map > li:nth-child(2) { animation-delay: 60ms !important; }
+  .dir-a .ch:not([hidden]) .ch-map > li:nth-child(3) { animation-delay: 120ms !important; }
+  .dir-a .ch:not([hidden]) .ch-map > li:nth-child(4) { animation-delay: 180ms !important; }
+  .dir-a .ch:not([hidden]) .ch-map > li:nth-child(5) { animation-delay: 240ms !important; }
+  .dir-a .ch:not([hidden]) .ch-order-list > li {
+    animation-delay: calc(var(--i) * 60ms + 80ms) !important;
+  }
+}
+/* the outgoing screen stays fully visible until the new one has faded in on top of it */
+.dir-a [data-ss] .ss-screen {
+  background: var(--color-surface);
+  transition: opacity 0s linear 220ms;
+}
+.dir-a [data-ss] .ss-screen.is-on {
+  z-index: 1;
+  transition: opacity 220ms var(--ease-out);
 }

@@ -62,7 +62,7 @@ const pages = [
     </div>
     {
       pages.map((p, i) => (
-        <pre class="ra-page" role="tabpanel" hidden={i !== 0} data-ra-page={i}><span class="ra-cmd"><span class="ra-ps">$</span> {p.cmd}</span>{'\n'}<span class="ra-note"># {p.note}</span>{'\n\n'}{p.lines.join('\n')}</pre>
+        <pre class="ra-page" role="tabpanel" tabindex="0" aria-label={`audit report: ${p.tab}`} hidden={i !== 0} data-ra-page={i}><span class="ra-cmd"><span class="ra-ps">$</span> {p.cmd}</span>{'\n'}<span class="ra-note"># {p.note}</span>{'\n\n'}{p.lines.join('\n')}</pre>
       ))
     }
   </div>
@@ -104,6 +104,7 @@ const pages = [
   }
   .ra-tabs {
     display: flex;
+    flex-wrap: wrap; /* 320: "fix first" was clipped (20 Nov review) */
     gap: 2px;
   }
   .ra-tabs button {
@@ -114,6 +115,7 @@ const pages = [
     color: #b6b1a3;
     font: inherit;
     letter-spacing: inherit;
+    white-space: nowrap;
     cursor: pointer;
     transition: background-color 160ms var(--ease-out), color 160ms var(--ease-out), transform 160ms var(--ease-out);
   }
@@ -171,6 +173,11 @@ const pages = [
       padding: 20px;
     }
   }
+  @media (max-width: 480px) {
+    .ra-stage {
+      padding: 8px;
+    }
+  }
 </style>
 
 <script>
@@ -193,9 +200,22 @@ const pages = [
       }),
     );
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    new IntersectionObserver((es) => {
+    // turns pages only while on screen and not under the pointer or focus (20 Nov review)
+    let seen = false;
+    let held = false;
+    const run = () => {
       window.clearInterval(timer);
-      if (es[0].isIntersecting && !took) timer = window.setInterval(() => show((i + 1) % pages.length), 3600);
+      if (seen && !held && !took) timer = window.setInterval(() => show((i + 1) % pages.length), 3600);
+    };
+    root.addEventListener('pointerenter', () => ((held = true), run()));
+    root.addEventListener('pointerleave', () => ((held = false), run()));
+    root.addEventListener('focusin', () => ((held = true), run()));
+    root.addEventListener('focusout', (e) => {
+      if (!root.contains(e.relatedTarget as Node)) (held = false), run();
+    });
+    new IntersectionObserver((es) => {
+      seen = es[0].isIntersecting;
+      run();
     }).observe(root);
   });
 </script>

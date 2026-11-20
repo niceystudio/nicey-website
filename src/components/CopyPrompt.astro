@@ -20,7 +20,8 @@ const prompt = aiReadyPrompt(Astro.site ?? new URL('https://nicey-website.vercel
     >
     <span data-copy-label>Copy prompt for your agent</span>
   </button>
-  {showFile && <a href="/ai-ready.md" class="cp-file">/ai-ready.md</a>}
+  {/* hidden in A, but it comes back if copying fails: the way to recover (20 Nov review) */}
+  <a href="/ai-ready.md" class="cp-file" hidden={!showFile} data-copy-file>/ai-ready.md</a>
   <span class="sr-only" aria-live="polite" data-copy-live></span>
 </div>
 
@@ -78,10 +79,15 @@ const prompt = aiReadyPrompt(Astro.site ?? new URL('https://nicey-website.vercel
       } catch {
         ok = false;
       }
-      label.textContent = ok ? 'Copied. Paste it into your agent' : 'Copy failed';
+      label.textContent = ok ? 'Copied. Paste it into your agent' : "Couldn't copy. Open the prompt file instead";
       if (live) live.textContent = label.textContent;
       btn.classList.toggle('is-done', ok);
       clearTimeout(t);
+      // failure: show the file link and keep the message until the next click
+      if (!ok) {
+        btn.parentElement?.querySelector<HTMLElement>('[data-copy-file]')?.removeAttribute('hidden');
+        return;
+      }
       t = window.setTimeout(() => {
         label.textContent = 'Copy prompt for your agent';
         btn.classList.remove('is-done');

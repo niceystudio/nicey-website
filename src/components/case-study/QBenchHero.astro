@@ -210,10 +210,10 @@
     color: var(--color-on-band-2);
   }
   .qh-machine .s {
-    color: var(--color-sage);
+    color: var(--color-on-band-sage);
   }
   .qh-machine .t {
-    color: var(--color-peach);
+    color: var(--color-on-band-peach);
   }
   @media (prefers-reduced-motion: no-preference) {
     .qh-stage > .is-entering {
@@ -250,14 +250,36 @@
       buttons.forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.view) === k)));
     }
 
+    let took = false;
+    let seen = false;
+    let held = false;
     buttons.forEach((b) =>
       b.addEventListener('click', () => {
+        took = true;
         window.clearInterval(auto);
         show(Number(b.dataset.view));
       }),
     );
 
-    if (!reduced.matches) auto = window.setInterval(() => show(1 - n), 3500);
+    // flips only while on screen and not under the pointer or focus; a click stops it for good (20 Nov review)
+    const run = () => {
+      window.clearInterval(auto);
+      if (!reduced.matches && !took && seen && !held) auto = window.setInterval(() => show(1 - n), 3500);
+    };
+    const hold = (v: boolean) => {
+      held = v;
+      run();
+    };
+    root.addEventListener('pointerenter', () => hold(true));
+    root.addEventListener('pointerleave', () => hold(false));
+    root.addEventListener('focusin', () => hold(true));
+    root.addEventListener('focusout', (e) => {
+      if (!root.contains(e.relatedTarget as Node)) hold(false);
+    });
+    new IntersectionObserver((es) => {
+      seen = es[0].isIntersecting;
+      run();
+    }).observe(root);
   }
   document.querySelectorAll<HTMLElement>('[data-qh]').forEach(mount);
 </script>

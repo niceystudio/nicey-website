@@ -190,13 +190,35 @@ const steps = [
       chips.forEach((c, k) => c.setAttribute('aria-pressed', String(k === i)));
       run();
     };
+    let took = false;
+    let seen = false;
+    let held = false;
     chips.forEach((c, i) =>
       c.addEventListener('click', () => {
+        took = true;
         clearInterval(cycle);
         pick(i);
       }),
     );
     pick(0);
-    if (!reduced) cycle = window.setInterval(() => pick((current + 1) % chips.length), 3200);
+    // cycles only while on screen and not under the pointer or focus; a click stops it for good (20 Nov review)
+    const loop = () => {
+      clearInterval(cycle);
+      if (!reduced && !took && seen && !held) cycle = window.setInterval(() => pick((current + 1) % chips.length), 3200);
+    };
+    const hold = (v: boolean) => {
+      held = v;
+      loop();
+    };
+    root.addEventListener('pointerenter', () => hold(true));
+    root.addEventListener('pointerleave', () => hold(false));
+    root.addEventListener('focusin', () => hold(true));
+    root.addEventListener('focusout', (e) => {
+      if (!root.contains(e.relatedTarget as Node)) hold(false);
+    });
+    new IntersectionObserver((es) => {
+      seen = es[0].isIntersecting;
+      loop();
+    }).observe(root);
   });
 </script>

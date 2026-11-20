@@ -184,13 +184,17 @@
 }
 
 /* nav: plain links, no prompt / cursor / ./ prefixes (Emir 18 Nov: less "code") */
-.dir-a .head-link {
+.dir-a .site-head .head-link {
   min-height: 32px;
   padding: 0 7px;
   text-transform: none;
   letter-spacing: 0.02em;
   font-size: 13px;
-  transition: background-color 120ms var(--ease-out), color 120ms var(--ease-out);
+  /* background and white text ease together (20 Nov review: Header's own rule won, the purple came in alone) */
+  transition:
+    background-color 120ms var(--ease-out),
+    color 120ms var(--ease-out),
+    transform 160ms var(--ease-out);
 }
 @media (hover: hover) and (pointer: fine) {
   /* white text on a purple that holds it in both themes (Emir 19 Nov: the text must be white) */
@@ -270,7 +274,11 @@
 /* secondary buttons share one border with the nav's theme button (Emir 19 Nov): line-strong, ink on hover */
 .dir-a .pill-outline {
   border-color: var(--color-line-strong);
-  transition: border-color 160ms var(--ease-out);
+  /* keep the press and background easing the global .pill has (20 Nov review: this rule had dropped them) */
+  transition:
+    border-color 160ms var(--ease-out),
+    background-color 160ms var(--ease-out),
+    transform 160ms var(--ease-out);
 }
 @media (hover: hover) and (pointer: fine) {
   .dir-a .pill-outline:hover,

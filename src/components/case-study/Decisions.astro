@@ -169,7 +169,7 @@ const { heading, head, items } = Astro.props;
   }
   @media (max-width: 860px) {
     .dc {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr); /* 1fr let the mockup widen the track past the panel at 320 (20 Nov review) */
     }
   }
   .dc-list {
@@ -177,13 +177,11 @@ const { heading, head, items } = Astro.props;
     flex-direction: column;
     border-right: 1px solid var(--color-line);
   }
+  /* narrow: the tabs stay a vertical list (a hidden-scrollbar row hid tabs 02–05 past the edge — 20 Nov review) */
   @media (max-width: 860px) {
     .dc-list {
-      flex-direction: row;
-      overflow-x: auto;
       border-right: 0;
       border-bottom: 1px solid var(--color-line);
-      scrollbar-width: none;
     }
   }
   .dc-tab {
@@ -209,14 +207,6 @@ const { heading, head, items } = Astro.props;
     }
     .dc-tab:last-child {
       border-bottom: 0;
-    }
-  }
-  @media (max-width: 860px) {
-    .dc-tab {
-      flex: none;
-      min-width: 170px;
-      border-bottom: 0;
-      border-right: 1px solid var(--color-line);
     }
   }
   .dc-tab[aria-selected='true'] {
@@ -318,6 +308,7 @@ const { heading, head, items } = Astro.props;
     place-items: center;
     min-height: 300px;
     padding: 24px;
+    overflow-x: auto;
     border-radius: var(--radius-panel);
     background: var(--color-page);
   }
