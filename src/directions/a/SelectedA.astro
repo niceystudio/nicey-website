@@ -5,16 +5,17 @@
  * /public/logos). Logos are one colour (ink; inverted in the dark theme) and show their own colours on hover.
  * Not links: the case studies live in Work.
  */
+// w = h × the SVG's aspect ratio, so the browser reserves the space (Lighthouse: unsized images).
 // heights are optical (Emir, 20 Nov audit): Colgate and UNIDO read smaller than the rest at the same height
 const logos = [
-  { name: 'Rakuten', src: '/logos/rakuten.svg', h: 30 },
-  { name: 'Colgate-Palmolive', src: '/logos/colgate.svg', h: 28 },
-  { name: 'Samsung Food', src: '/logos/samsung-food.svg', h: 24 },
-  { name: 'UNIDO', src: '/logos/unido.svg', h: 44 },
-  { name: 'Omnisafe', src: '/logos/omnisafe.svg', h: 22 },
-  { name: 'FLYR', src: '/logos/flyr.svg', h: 20 },
-  { name: 'Geonode', src: '/logos/geonode.svg', h: 26 },
-  { name: 'Repocket', src: '/logos/repocket.svg', h: 26 },
+  { name: 'Rakuten', src: '/logos/rakuten.svg', h: 30, w: 101 },
+  { name: 'Colgate-Palmolive', src: '/logos/colgate.svg', h: 28, w: 214 },
+  { name: 'Samsung Food', src: '/logos/samsung-food.svg', h: 24, w: 176 },
+  { name: 'UNIDO', src: '/logos/unido.svg', h: 44, w: 248 },
+  { name: 'Omnisafe', src: '/logos/omnisafe.svg', h: 22, w: 125 },
+  { name: 'FLYR', src: '/logos/flyr.svg', h: 20, w: 85 },
+  { name: 'Geonode', src: '/logos/geonode.svg', h: 26, w: 129 },
+  { name: 'Repocket', src: '/logos/repocket.svg', h: 26, w: 110 },
 ];
 ---
 
@@ -28,7 +29,7 @@ const logos = [
         logos.map((l, i) => (
           <li class="sa-tile">
             <span class="sa-n" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-            <img src={l.src} alt={l.name} style={`height:${l.h}px`} />
+            <img src={l.src} alt={l.name} width={l.w} height={l.h} style={`height:${l.h}px`} />
           </li>
         ))
       }

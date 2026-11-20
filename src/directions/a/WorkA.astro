@@ -27,7 +27,7 @@ const rows: Row[] = [
     href: '/lab/a/qbench-design-system', // the QBench case study in direction A (review)
     figure: { value: '1,071', arrow: true },
     caption: 'Outside-library references',
-    preview: { kind: 'img', src: '/work/qbench/product.jpg', w: 320, h: 197 },
+    preview: { kind: 'img', src: '/work/qbench/product.webp', w: 320, h: 197 },
     description:
       'Years without a designer, consolidated into one semantic token system. Plus one status model for eight entry points, compliance steps included, shipped as an MVP.',
   },
@@ -37,7 +37,7 @@ const rows: Row[] = [
     href: links.work.everbreed,
     figure: { value: '302' },
     caption: 'Variables made machine-readable',
-    preview: { kind: 'video', src: '/work/everbreed/mobile-care.webm', poster: '/work/everbreed/mobile-care.jpg', w: 150, h: 325 },
+    preview: { kind: 'video', src: '/work/everbreed/mobile-care.webm', poster: '/work/everbreed/mobile-care.webp', w: 150, h: 325 },
     description:
       'A mature Figma library made machine-readable, so the code config comes from Figma. And the student app built on it, on phone and desktop.',
   },
@@ -291,7 +291,7 @@ const rows: Row[] = [
       row.addEventListener('pointermove', (e) => { [tx, ty] = place(e.clientX, e.clientY); });
       row.addEventListener('pointerleave', close);
     });
-    ['/work/qbench/product.jpg', '/work/everbreed/mobile-care.jpg'].forEach((src) => { const i = new Image(); i.src = src; });
+    ['/work/qbench/product.webp', '/work/everbreed/mobile-care.webp'].forEach((src) => { const i = new Image(); i.src = src; });
   }
 </script>
 

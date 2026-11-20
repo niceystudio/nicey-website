@@ -417,3 +417,22 @@
 .dir-a .cs-cta.closing {
   border-bottom: 1px solid var(--a-rule);
 }
+
+/* ---------- Status workflows · Before / after diagram in A (Emir, 20 Nov audit: fix directly, no test) ----------
+ * It was the last part of the page still in the live site's rounded look: pill chips, rounded model box, sans figure.
+ * Now A's language: square chips and model box, square end markers, the figure in the pixel face. */
+.dir-a [data-sf] .sf-figure {
+  font-family: var(--font-pixel);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.dir-a [data-sf] .sf-of {
+  margin-left: 0.15em;
+  font-family: var(--font-sans);
+}
+.dir-a [data-sf] .sf-src rect,
+.dir-a [data-sf] .sf-before rect,
+.dir-a [data-sf] .sf-model {
+  rx: 0;
+  ry: 0;
+}
