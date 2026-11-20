@@ -152,6 +152,15 @@ const slug = (k: string) =>
                     <ul class="ch-map">
                       {b.rows.map((r) => (
                         <li>
+                          {r.swatch && (
+                            <span
+                              aria-hidden="true"
+                              class:list={['ch-sw', `ch-sw--${r.swatch.kind}`]}
+                              style={r.swatch.hex ? `--sw:#${r.swatch.hex}` : undefined}
+                            >
+                              {r.swatch.kind === 'text' ? 'Aa' : null}
+                            </span>
+                          )}
                           <code class="ch-code">{r.from}</code>
                           <span aria-hidden="true" class="text-ink-2">
                             →
@@ -186,7 +195,10 @@ const slug = (k: string) =>
                     <ul class="ch-chain">
                       {b.links.map((l) => (
                         <li data-from={l.from.split('/').pop()}>
-                          <code class="ch-code">{l.from}</code>
+                          <span class="flex items-center gap-2.5">
+                            {l.hex && <span aria-hidden="true" class="ch-sw ch-sw--color" style={`--sw:#${l.hex}`} />}
+                            <code class="ch-code">{l.from}</code>
+                          </span>
                           <span class="flex items-baseline gap-2">
                             <span aria-hidden="true" class="text-ink-2">
                               ↳
@@ -197,6 +209,38 @@ const slug = (k: string) =>
                         </li>
                       ))}
                     </ul>
+                  </>
+                )}
+
+                {b.kind === 'sync' && (
+                  <>
+                    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+                    <div class="ch-sync">
+                      {(['before', 'after'] as const).map((side) => (
+                        <div class:list={['ch-sync-pane', `is-${side}`]}>
+                          <p class="ch-sync-k m-0">
+                            {side === 'before' ? 'Before · Figma ≠ code' : 'After · Figma = code'}
+                          </p>
+                          <div class="ch-sync-head" aria-hidden="true">
+                            <span>Figma</span>
+                            <span />
+                            <span>Code</span>
+                          </div>
+                          <ul>
+                            {b.rows.map((r) => (
+                              <li>
+                                <code>{r.figma}</code>
+                                <span aria-hidden="true" class="ch-sync-mark">
+                                  {side === 'before' ? '✕' : '='}
+                                </span>
+                                <span class="sr-only">{side === 'before' ? 'in code:' : 'reads in code as'}</span>
+                                <code class="ch-sync-code">{side === 'before' ? r.before : r.after}</code>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
                   </>
                 )}
 
@@ -984,6 +1028,115 @@ const slug = (k: string) =>
     gap: 6px 12px;
     padding: 10px 0;
     border-bottom: 1px solid var(--color-line);
+  }
+  /* token previews (20 Nov): a colour chip, a text colour, a spacing step, a corner */
+  .ch-sw {
+    flex: none;
+    display: inline-grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    align-self: center;
+    border: 1px solid var(--color-line-strong);
+    background: var(--sw, transparent);
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+  }
+  .ch-sw--text {
+    background: var(--color-surface);
+    color: var(--sw);
+  }
+  .ch-sw--space {
+    border-style: dashed;
+    background: linear-gradient(var(--color-accent), var(--color-accent)) center / 8px 100% no-repeat;
+    opacity: 0.7;
+  }
+  .ch-sw--radius {
+    border: 0;
+    border-top: 2px solid var(--color-ink-2);
+    border-left: 2px solid var(--color-ink-2);
+    border-top-left-radius: 9px;
+  }
+  /* Figma vs code, two panes (20 Nov) */
+  .ch-sync {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .ch-sync-pane {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 18px 20px 20px;
+    border: 1px solid var(--color-line-strong);
+    background: var(--color-page);
+  }
+  .ch-sync-pane.is-after {
+    border-color: var(--color-ink);
+  }
+  .ch-sync-k {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-ink);
+  }
+  .is-before .ch-sync-k {
+    color: var(--color-hot);
+  }
+  .is-after .ch-sync-k {
+    color: var(--color-accent);
+  }
+  .ch-sync-head,
+  .ch-sync li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 22px minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+  }
+  .ch-sync-head {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-ink-2);
+  }
+  .ch-sync ul {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ch-sync code {
+    min-width: 0;
+    padding: 7px 9px;
+    border: 1px solid var(--color-line-strong);
+    background: var(--color-surface);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    overflow-wrap: anywhere;
+  }
+  .ch-sync-mark {
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 13px;
+  }
+  .is-before .ch-sync-mark,
+  .is-before .ch-sync-code {
+    color: var(--color-hot);
+  }
+  .is-before .ch-sync-code {
+    border-style: dashed;
+    border-color: color-mix(in srgb, var(--color-hot) 60%, transparent);
+  }
+  .is-after .ch-sync-mark,
+  .is-after .ch-sync-code {
+    color: var(--color-accent);
+  }
+  @media (max-width: 760px) {
+    .ch-sync {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
   .ch-code {
     font-family: var(--font-mono);

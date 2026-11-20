@@ -1,0 +1,97 @@
+---
+/**
+ * Direction A · case study: real product screens right after the hero (Goran via Emir, 20 Nov: case studies are about
+ * the screens and the layout). PLACEHOLDERS only for now — the screens come from Figma later; no content work yet.
+ * One large screen + two smaller ones, all at the product's 16:10, each in A's window (a title bar, 1px rule) — the
+ * screens of what we built, no before/after (Emir, 20 Nov).
+ */
+interface Props {
+  name: string;
+  slots?: string[];
+}
+const { name, slots = ['Screen 01 · the product', 'Screen 02 · a flow', 'Screen 03 · the Figma library'] } = Astro.props;
+const slug = name.toLowerCase();
+---
+
+<section aria-labelledby="screens-head" class="container-page sb">
+  <h2 id="screens-head" class="sr-only">{name} screens</h2>
+  <div class="sb-grid">
+    {
+      slots.map((t, i) => (
+        <figure class:list={['sb-fig', i === 0 && 'sb-fig--main']}>
+          <div class="sb-win">
+            <div class="sb-bar" aria-hidden="true">
+              <span>{slug} · {(t.split(' · ')[1] ?? t).toLowerCase()}</span>
+              <span>{String(i + 1).padStart(2, '0')}</span>
+            </div>
+            <div class="placeholder sb-ph">[{t}]</div>
+          </div>
+        </figure>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .sb {
+    padding-top: 48px; /* sits close under the hero: the screens belong to it */
+  }
+  .sb-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    gap: 24px;
+  }
+  .sb-fig {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+  }
+  .sb-fig--main {
+    grid-row: span 2;
+  }
+  .sb-win {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    border: 1px solid var(--a-rule, var(--color-line-strong));
+    background: var(--color-surface);
+  }
+  .sb-fig--main .sb-win {
+    border-color: var(--color-ink);
+  }
+  .sb-bar {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--a-rule, var(--color-line));
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    color: var(--color-ink-2);
+  }
+  .sb-fig--main .sb-bar {
+    border-bottom-color: var(--color-ink);
+    color: var(--color-ink);
+  }
+  .sb-ph {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    aspect-ratio: 16 / 10;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+  }
+  @media (max-width: 860px) {
+    .sb-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .sb-fig--main {
+      grid-row: auto;
+    }
+  }
+</style>

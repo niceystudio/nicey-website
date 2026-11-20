@@ -1,19 +1,27 @@
 /**
- * Direction A content changes for the QBench case study (Emir 19 Nov), applied only when the page is shown in A.
+ * Direction A content changes for the case studies (Emir 19–20 Nov), applied only when a page is shown in A.
  * The shared data (case-studies.ts) and the live page are untouched.
- *  - 01 Audit shows what the audit found (the problems), not the results.
- *  - 02 is about Figma carrying what the code carries, so Figma can be the source of truth; "one file" isn't the point.
- *    The coverage meters and the results (1,071 → 0, 99.5%) move here.
+ *  - QBench What we did: see qbenchChaptersA below (20 Nov second pass).
+ *  - Everbreed before/after: everbreedAliasesDiff.
  * All numbers are the case study's own; new sentences are drafts for Emir/Goran.
  */
 import type { CaseStudy } from './case-studies';
 
 type Chapters = NonNullable<CaseStudy['chapters']>;
 
+/**
+ * What we did in A (Emir, 20 Nov — approved from the test). The story per step, with fewer results:
+ *  01 Audit — the issues (unchanged).
+ *  02 Source of truth — what it means and what was wrong: Figma and the code had drifted apart. A before/after table
+ *     shows it as Figma vs code, before and after; the variable map and the coverage meters go; "Seen at QBench" stays.
+ *  03 Tokens — the variable → CSS-name map moves here with a preview per token (colour chips, text colour, spacing,
+ *     radius) and the alias chain with its two colours; the colour ramp goes.
+ *  04 States, 05 Agents build — unchanged.
+ * Copy is a draft from the case study's own facts; Goran + Predrag polish it.
+ */
 export function qbenchChaptersA(chapters: Chapters): Chapters {
-  const [audit, oneFile, ...rest] = chapters;
-  const coverage = audit.blocks.find((b) => b.kind === 'audit');
-  const map = oneFile.blocks.find((b) => b.kind === 'map');
+  const [audit, oneFile, tokens, ...rest] = chapters;
+  const chain = tokens.blocks.find((b) => b.kind === 'chain');
   return [
     {
       ...audit,
@@ -35,10 +43,48 @@ export function qbenchChaptersA(chapters: Chapters): Chapters {
     {
       ...oneFile,
       kicker: '02 · Source of truth',
-      heading: 'Figma carries what the code carries.',
-      lede: 'Every variable got the name developers type in CSS and every value is bound to a token, so Figma and the codebase describe the same system, and Figma can be the source of truth.',
-      blocks: [map, coverage].filter(Boolean) as Chapters[number]['blocks'],
+      heading: 'Figma and the code had drifted apart.',
+      lede: 'A source of truth is the one place both sides read from. Figma said one thing and the code another, so neither could be trusted. We made Figma carry what the code carries, so Figma can be that place.',
+      blocks: [
+        {
+          kind: 'sync',
+          title: 'Example · four variables, Figma and code',
+          rows: [
+            { figma: 'text/default', before: 'raw value', after: 'var(--text-default)' },
+            { figma: 'surface/default', before: 'outside library', after: 'var(--surface-default)' },
+            { figma: 'primitives/primary/600', before: 'no code name', after: 'var(--primary-600)' },
+            { figma: 'spacing/4', before: 'raw value', after: 'var(--spacing-4)' },
+          ],
+        },
+      ] as Chapters[number]['blocks'],
       proof: audit.proof,
+    },
+    {
+      ...tokens,
+      heading: 'Every token got the name developers type.',
+      lede: 'Text, colour, spacing and radius tokens carry their CSS name, and component tokens alias down to the primitives.',
+      // the same map and chain, with a preview per token: colour chips, the text colour, a spacing step, a corner.
+      // Hexes: primary 600/800/900 are the ramp's own; text/default is the QBench UI text colour used in the mockups.
+      blocks: [
+        {
+          kind: 'map',
+          title: 'Figma variable → web code name',
+          rows: [
+            { from: 'text/default', to: 'var(--text-default)', swatch: { kind: 'text', hex: '1F2A3D' } },
+            { from: 'surface/default', to: 'var(--surface-default)', swatch: { kind: 'color', hex: 'FFFFFF' } },
+            { from: 'primitives/primary/600', to: 'var(--primary-600)', swatch: { kind: 'color', hex: '4074C7' } },
+            { from: 'spacing/4', to: 'var(--spacing-4)', swatch: { kind: 'space' } },
+            { from: 'radius/md', to: 'var(--radius-md)', swatch: { kind: 'radius' } },
+          ],
+        },
+        chain && {
+          ...chain,
+          links: (chain as Extract<Chapters[number]['blocks'][number], { kind: 'chain' }>).links.map((l) => ({
+            ...l,
+            hex: l.from.endsWith('/800') ? '244D9E' : l.from.endsWith('/900') ? '23437B' : undefined,
+          })),
+        },
+      ].filter(Boolean) as Chapters[number]['blocks'],
     },
     ...rest,
   ];

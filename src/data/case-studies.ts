@@ -15,9 +15,16 @@ export interface Collect {
 export type ChapterBlock =
   | { kind: 'stats'; items: { value: string; label: string; caption: string; seenAt?: string }[] }
   | { kind: 'rows'; title: string; rows: { label: string; value: string }[] }
-  | { kind: 'map'; title: string; rows: { from: string; to: string }[] }
+  | {
+      kind: 'map';
+      title: string;
+      /** swatch: an optional preview of the token (direction A, 20 Nov) — a colour, text colour, spacing or radius */
+      rows: { from: string; to: string; swatch?: { kind: 'color' | 'text' | 'space' | 'radius'; hex?: string } }[];
+    }
   | { kind: 'ramp'; title: string; swatches: { step: string; hex: string; feeds?: boolean }[]; note: string }
-  | { kind: 'chain'; title: string; root: string; links: { token: string; from: string; state: string }[] }
+  | { kind: 'chain'; title: string; root: string; links: { token: string; from: string; state: string; hex?: string }[] }
+  /** Figma vs code, before and after, side by side (direction A, 20 Nov: Source of truth as a picture, not a table) */
+  | { kind: 'sync'; title: string; rows: { figma: string; before: string; after: string }[] }
   | {
       kind: 'docs';
       title: string;
@@ -320,7 +327,7 @@ export const caseStudies: CaseStudy[] = [
         'Why it matters: a colour class with no token behind it renders nothing, the element inherits, and the screen still passes review. Only a gate catches that every time.',
     },
     together: {
-      text: 'Embedded in the product team, with the design system and the product redesign moving in parallel. The migration was piloted on one area first, so engineers could check the token model against real screens before the rollout.',
+      text: 'Embedded in the product team, with the system and the redesign in parallel. A pilot area let engineers check the token model on real screens first.',
       collect: {
         label: 'To collect · client quote',
         text: '“[A sentence from a QBench engineer or product lead on what changed for them.]”',
