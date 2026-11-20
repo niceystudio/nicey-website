@@ -17,6 +17,8 @@ function block(b: ChapterBlock): string {
       return `**${b.title}**\n\n${table(['Figma', 'Code'], b.rows.map((r) => [`\`${r.from}\``, `\`${r.to}\``]))}`;
     case 'ramp':
       return `**${b.title}**\n\n${b.swatches.map((w) => `\`${w.step}\` #${w.hex}${w.feeds ? ' ←' : ''}`).join(' · ')}\n\n${b.note}`;
+    case 'sync':
+      return `**${b.title}**\n\n${table(['Figma', 'Code before', 'Code after'], b.rows.map((r) => [`\`${r.figma}\``, r.before, `\`${r.after}\``]))}`;
     case 'chain':
       return `**${b.title}**\n\n${b.links.map((l) => `- \`${l.from}\` → \`${l.token}\` (${l.state})`).join('\n')}`;
     case 'docs':

@@ -22,6 +22,8 @@ import SurfacesField from './SurfacesField.astro';
 import AliasesField from './AliasesField.astro';
 import TwoSides from './TwoSides.astro';
 import StatusScreensA from '../../directions/a/StatusScreensA.astro';
+import ScreensBandA from '../../directions/a/ScreensBandA.astro';
+import TogetherA from '../../directions/a/TogetherA.astro';
 import Decisions from './Decisions.astro';
 import Chapters from './Chapters.astro';
 import SectionHead from '../SectionHead.astro';
@@ -46,8 +48,11 @@ interface Props {
   ctaLook?: 'closing';
   /** review only: direction A's content changes for the steps (data/case-studies-a.ts) */
   chaptersA?: boolean;
+  /** review only (Emir, 20 Nov): screens band after the hero, See it work right after the agentic layer, and
+   *  Working together + What changed in one band (TogetherA). QBench design system in A. */
+  layoutA?: boolean;
 }
-const { study: s, direction, noFacts = false, namesLook, ctaLook, chaptersA = false } = Astro.props;
+const { study: s, direction, noFacts = false, namesLook, ctaLook, chaptersA = false, layoutA = false } = Astro.props;
 const chapters = chaptersA && s.chapters && s.slug === 'qbench-design-system' ? qbenchChaptersA(s.chapters) : s.chapters;
 /** the homepage these links go back to: the site, or the direction's review homepage */
 const home = direction ? `/lab/${direction}` : '/';
@@ -123,6 +128,8 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
         {s.who && <p class="m-0 text-body-sm text-ink-2"><Gaps text={s.who} /></p>}
       </div>
     </section>
+
+    {layoutA && <ScreensBandA name={s.name} />}
 
     {
       !s.lead ? null : s.lead.kind === 'image' ? (
@@ -233,7 +240,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     }
 
     {
-      [
+      !layoutA && [
         { id: 'together-head', heading: 'Working together', ...s.together },
         { id: 'changed-head', heading: 'What changed for the team', ...s.changed },
       ].map((b) => (
@@ -288,6 +295,8 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
         </div>
       )}
     </section>
+    {layoutA && s.together && s.changed && <TogetherA together={s.together} changed={s.changed} />}
+
     {s.faq && (
       <div class="cs-faq">
         <Faq items={s.faq} heading="About this project" id="case-faq" />
