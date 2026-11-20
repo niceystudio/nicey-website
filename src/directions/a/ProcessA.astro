@@ -1,7 +1,7 @@
 ---
 /**
  * Direction A: "It starts with a free audit" (Emir 19 Nov, second pass). Reading order inside one .panel:
- *   1. the four steps (the earlier content: step + time, no extra lines) beside the report as a terminal (ReportA)
+ *   1. the four steps (step titles only — time placeholders removed 20 Nov) beside the report as a terminal (ReportA)
  *   2. the action, last: Get a free audit — people read the process first, then click; next to it the quieter
  *      path for visitors not ready to share their file (copy the prompt).
  * Typography: capitals only in the small section caption; everything else sentence case.
@@ -13,16 +13,18 @@ import CopyPrompt from '../../components/CopyPrompt.astro';
 import ReportA from './ReportA.astro';
 import { links } from '../../data/links';
 
+// time placeholders removed in A (Emir, 20 Nov: we don't need them). 20 Nov audit: caption = nav label "Process";
+// steps marked with → (How we work above is the only numbered process); the list fills the column beside the report
 const steps = [
-  { n: '01', title: 'Share your Figma file', time: '[time]' },
-  { n: '02', title: 'Get the report', time: '[days]' },
-  { n: '03', title: 'Talk it through', time: '[call length]' },
-  { n: '04', title: 'Build, pilot, roll out', time: 'Set in the proposal' },
+  { n: '01', title: 'Share your Figma file' },
+  { n: '02', title: 'Get the report' },
+  { n: '03', title: 'Talk it through' },
+  { n: '04', title: 'Build, pilot, roll out' },
 ];
 ---
 
 <section id="audit" aria-labelledby="start-head" class="container-page flex flex-col gap-12 pb-section">
-  <SectionHead id="start-head" caption="What working with us looks like" headingClass="max-w-[16ch]">
+  <SectionHead id="start-head" caption="Process" headingClass="max-w-[16ch]">
     It starts with a free audit.
   </SectionHead>
 
@@ -34,9 +36,8 @@ const steps = [
           {
             steps.map((s) => (
               <li>
-                <span class="pa-n">{s.n}</span>
+                <span class="pa-n" aria-hidden="true">→</span>
                 <span class="pa-title">{s.title}</span>
-                <span class="pa-time">{s.time}</span>
               </li>
             ))
           }
@@ -54,7 +55,7 @@ const steps = [
         <p class="m-0 pa-own-p">
           Not ready to share your file? Let your agent run our seven checks, then bring the results to a call.
         </p>
-        <CopyPrompt />
+        <CopyPrompt showFile={false} />
       </div>
     </div>
   </div>
@@ -98,7 +99,7 @@ const steps = [
   }
   .pa-steps li {
     display: grid;
-    grid-template-columns: 32px minmax(0, 1fr) auto;
+    grid-template-columns: 32px minmax(0, 1fr);
     align-items: baseline;
     gap: 12px;
     padding: 18px 0;
@@ -107,18 +108,24 @@ const steps = [
   .pa-n {
     font-family: var(--font-mono);
     font-size: 13px;
-    color: var(--color-accent);
+    color: var(--color-ink-2);
   }
   .pa-title {
     font-size: var(--text-cta);
     line-height: 1.3;
     color: var(--color-ink);
   }
-  .pa-time {
-    font-family: var(--font-mono);
-    font-size: 13px;
-    color: var(--color-ink-2);
-    white-space: nowrap;
+  /* the steps column fills the report's height (the rows share it), so no empty block sits beside the report */
+  @media (min-width: 1024px) {
+    .pa-steps {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+    }
+    .pa-steps li {
+      flex: 1;
+      align-items: center;
+    }
   }
   /* the action comes last, after the process */
   .pa-act {

@@ -199,7 +199,6 @@
   border: 1px solid var(--color-ink) !important;
   background: var(--color-ink) !important;
   gap: 0 !important;
-  box-shadow: 6px 6px 0 color-mix(in srgb, var(--color-accent) 70%, transparent);
 }
 .dir-a .agc-panel > * {
   background: var(--color-surface);
@@ -339,11 +338,18 @@
   background: transparent !important;
   color: var(--color-accent) !important;
 }
+/* the five state cards: warm grey like the page, so they stand out from the white stage; the fields stay white
+   (Emir, 20 Nov). :where() keeps the field rule weaker than the hover/focus/disabled/error states. */
+.dir-a [data-qw] .qw-field {
+  background: #f3f0e9 !important;
+}
+.dir-a [data-qw] :where(.qw-input) {
+  background: #fff;
+}
 /* the agent terminal: A's window */
 .dir-a [data-qw] .qw-agent {
   border-radius: 0 !important;
   border: 1px solid var(--color-ink);
-  box-shadow: 6px 6px 0 color-mix(in srgb, var(--color-accent) 70%, transparent);
 }
 .dir-a [data-qw] .qw-agent-bar {
   border-bottom: 1px solid var(--color-ink);
@@ -398,4 +404,16 @@
 .dir-a [data-sh] .sh-steps > li.is-on .sh-dot {
   background: var(--a-block) !important;
   border-color: var(--a-block) !important;
+}
+
+/* ---------- 20 Nov audit — approved (Emir), on every A case page ----------
+ * 1. What we did: the tabs are the navigation; the prev/next arrows under the steps are hidden.
+ * 2. The closing CTA has no band in A: a full-width line closes it like the one that opens it, then the usual gap
+ *    before Next case study.
+ * 3. The purple offset shadow stays on the hero cards only — removed from the gate panel and the agent terminal above. */
+.dir-a [data-chapters] .chs-controls {
+  display: none;
+}
+.dir-a .cs-cta.closing {
+  border-bottom: 1px solid var(--a-rule);
 }

@@ -3,6 +3,8 @@
  * Direction A: the audit report as a terminal window with its three pages (p.1 Score, p.2 Drift map,
  * p.3 Fix first) instead of paper sheets. 19 Nov (Emir: more terminal, less capitals): each page opens with the
  * command and a # comment saying what the page holds; tabs and bar in sentence case. Marked "example": bars are drawn, scores and days stay [gaps].
+ * 20 Nov (Emir: consistent with the design-systems.md terminal in "What we help with"): the same coloured stage with the
+ * same dark window inside — soft-filled tabs, file name on the right, mono reading, blinking cursor (QBenchWork values).
  */
 const pillars = ['Figma inspect', 'Agentic readiness', 'Conventions', 'Component API', 'Zero drift'];
 const bars = [9, 4, 7, 6, 3];
@@ -44,98 +46,130 @@ const pages = [
 ];
 ---
 
-<div class="ra a-grain" data-ra>
-  <div class="ra-bar">
-    <span class="ra-tag">audit</span>
-    <div class="ra-tabs" role="tablist" aria-label="Report pages">
-      {
-        pages.map((p, i) => (
-          <button type="button" role="tab" aria-selected={i === 0 ? 'true' : 'false'} data-ra-tab={i}>
-            {p.tab}
-          </button>
-        ))
-      }
+<div class="ra-stage a-grain bg-lavender">
+  <div class="ra" data-ra>
+    <div class="ra-bar">
+      <div class="ra-tabs" role="tablist" aria-label="Report pages">
+        {
+          pages.map((p, i) => (
+            <button type="button" role="tab" aria-selected={i === 0 ? 'true' : 'false'} data-ra-tab={i}>
+              {p.tab}
+            </button>
+          ))
+        }
+      </div>
+      <span class="ra-src">audit-report.md · example</span>
     </div>
-    <span class="ra-ex">example</span>
+    {
+      pages.map((p, i) => (
+        <pre class="ra-page" role="tabpanel" hidden={i !== 0} data-ra-page={i}><span class="ra-cmd"><span class="ra-ps">$</span> {p.cmd}</span>{'\n'}<span class="ra-note"># {p.note}</span>{'\n\n'}{p.lines.join('\n')}</pre>
+      ))
+    }
   </div>
-  {
-    pages.map((p, i) => (
-      <pre class="ra-page" role="tabpanel" hidden={i !== 0} data-ra-page={i}><span class="ra-cmd"><span class="ra-ps">$</span> {p.cmd}</span>{'\n'}<span class="ra-note"># {p.note}</span>{'\n\n'}{p.lines.join('\n')}</pre>
-    ))
-  }
 </div>
 
 <style>
-  .ra {
+  /* the stage: same as the design-systems.md pane in "What we help with" */
+  .ra-stage {
     width: 100%;
     height: 100%;
-    min-height: 360px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    position: relative;
+    isolation: isolate;
+  }
+  /* the window: same values as QBenchWork's terminal */
+  .ra {
+    width: 100%;
+    min-height: 340px;
     display: flex;
     flex-direction: column;
-    border: 1px solid var(--a-rule);
-    background: var(--color-page);
+    background: #26251f;
+    color: #f3f0e9;
+    overflow: hidden;
   }
   .ra-bar {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 12px;
-    padding: 8px 10px;
-    border-bottom: 1px solid var(--a-rule);
+    gap: 6px 12px;
+    padding: 6px 18px;
+    border-bottom: 1px solid rgba(243, 240, 233, 0.12);
     font-family: var(--font-mono);
     font-size: 12px;
     letter-spacing: 0.02em;
-  }
-  .ra-tag {
-    padding: 2px 6px;
-    background: var(--a-block);
-    color: var(--a-on-block);
-    text-transform: none;
-    letter-spacing: 0.02em;
+    color: #b6b1a3;
   }
   .ra-tabs {
     display: flex;
     gap: 2px;
   }
   .ra-tabs button {
-    padding: 4px 8px;
+    min-height: 32px;
+    padding: 0 12px;
     border: 0;
     background: transparent;
-    color: var(--color-muted);
+    color: #b6b1a3;
     font: inherit;
     letter-spacing: inherit;
-    text-transform: inherit;
     cursor: pointer;
+    transition: background-color 160ms var(--ease-out), color 160ms var(--ease-out), transform 160ms var(--ease-out);
+  }
+  .ra-tabs button:active {
+    transform: scale(0.97);
   }
   .ra-tabs button[aria-selected='true'] {
-    background: var(--color-ink);
-    color: var(--color-page);
+    background: rgba(243, 240, 233, 0.12);
+    color: #f3f0e9;
   }
-  .ra-ex {
+  @media (hover: hover) and (pointer: fine) {
+    .ra-tabs button:hover {
+      color: #f3f0e9;
+    }
+  }
+  .ra-src {
     margin-left: auto;
-    color: var(--color-muted);
   }
   .ra-page {
     flex: 1;
     margin: 0;
-    padding: 28px 26px;
+    padding: 16px 18px;
     font-family: var(--font-mono);
     font-size: 13px;
-    line-height: 2;
+    line-height: 1.7;
     white-space: pre;
     overflow-x: auto;
-    color: var(--color-ink);
+    color: #f3f0e9;
   }
-  .ra-cmd {
-    color: var(--color-ink);
+  .ra-page::after {
+    content: '▍';
+    color: #cbdac4;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .ra-page::after {
+      animation: ra-blink 1s steps(1) infinite;
+    }
+  }
+  @keyframes ra-blink {
+    50% {
+      opacity: 0;
+    }
   }
   .ra-ps {
-    color: var(--color-accent);
+    color: #d9d2ef;
   }
   .ra-note {
-    color: var(--color-muted);
+    color: #b6b1a3;
   }
   .ra-page[hidden] {
     display: none;
+  }
+  @media (max-width: 900px) {
+    .ra-stage {
+      padding: 20px;
+    }
   }
 </style>
 
