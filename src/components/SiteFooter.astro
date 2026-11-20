@@ -9,16 +9,22 @@ import { caseStudies, caseHref } from '../data/case-studies';
 interface Props {
   /** the page's Markdown twin; when set, the base line shows the Human / Machine switch (no gesture, no animation — Emir, 12 Nov) */
   mdHref?: string;
+  /** direction A pages (Emir, 20 Nov audit): one services link instead of two, and no extra audit button here */
+  directionA?: boolean;
 }
-const { mdHref } = Astro.props;
+const { mdHref, directionA = false } = Astro.props;
 const year = new Date().getFullYear();
 const cols = [
   {
     head: 'Services',
     items: [
       { href: '/#audit', label: 'Free design system audit' },
-      { href: '/#services', label: 'Design systems for AI agents' },
-      { href: '/#services', label: 'Product design' },
+      ...(directionA
+        ? [{ href: '/#services', label: 'What we help with' }]
+        : [
+            { href: '/#services', label: 'Design systems for AI agents' },
+            { href: '/#services', label: 'Product design' },
+          ]),
       { href: '/#how', label: 'How we work' },
       { href: '/#faq', label: 'FAQ' },
     ],
@@ -50,10 +56,12 @@ const contact = [
         into one system of tokens, components and documentation that designers, engineers and coding agents read the
         same way.
       </p>
-      <div class="flex flex-col items-start gap-2">
-        <a href="/#audit" class="pill pill-ink px-[18px] text-body-sm">Get a free audit</a>
-        <span class="font-mono text-caption text-ink-2">Free and read-only. Only your Figma file.</span>
-      </div>
+      {!directionA && (
+        <div class="flex flex-col items-start gap-2">
+          <a href="/#audit" class="pill pill-ink px-[18px] text-body-sm">Get a free audit</a>
+          <span class="font-mono text-caption text-ink-2">Free and read-only. Only your Figma file.</span>
+        </div>
+      )}
     </div>
     <nav aria-label="Footer" class="site-foot-cols">
       {

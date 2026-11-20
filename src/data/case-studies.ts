@@ -559,7 +559,7 @@ export const caseStudies: CaseStudy[] = [
       heading: 'Designed in the new system, built in the old one.',
       items: [
         { label: 'New system', text: 'The screens were designed with the new QBench design system.' },
-        { label: 'Old UI', text: 'The MVP was built with the existing QBench UI, with no new parts where old ones worked.' },
+        { label: 'Old UI', text: 'The MVP was built in the existing QBench UI, reusing what already worked.' },
         { label: 'One modal', text: 'The required-actions modal became one component, the same on every screen.' },
         { label: 'One notice', text: 'Inline notifications used across the flow became a component too.' },
       ],

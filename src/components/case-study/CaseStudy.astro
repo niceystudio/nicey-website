@@ -21,6 +21,7 @@ import EverbreedProduct from './EverbreedProduct.astro';
 import SurfacesField from './SurfacesField.astro';
 import AliasesField from './AliasesField.astro';
 import TwoSides from './TwoSides.astro';
+import StatusScreensA from '../../directions/a/StatusScreensA.astro';
 import Decisions from './Decisions.astro';
 import Chapters from './Chapters.astro';
 import SectionHead from '../SectionHead.astro';
@@ -261,6 +262,8 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
       )}
       {s.workVisual === 'qbench' ? (
         <QBenchWork />
+      ) : s.workVisual === 'qbench-status' && direction === 'a' ? (
+        <StatusScreensA />
       ) : s.workVisual === 'qbench-status' ? (
         <TwoSides />
       ) : s.workVisual === 'everbreed' ? (
@@ -335,7 +338,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     </nav>
   </section>
   <MachineView markdown={markdown} mdHref={mdHref} />
-  <SiteFooter mdHref={mdHref} />
+  <SiteFooter mdHref={mdHref} directionA={direction === 'a'} />
   </div>
 </Base>
 
