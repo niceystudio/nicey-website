@@ -108,7 +108,9 @@ const tabList = [
       }
     </div>
     )}
-    <div class="qw-agent" aria-live="polite" data-md-skip>
+    <!-- no aria-live here: it types every 16 ms and tours on its own; a picked state is announced in [data-qw-live] (20 Nov review) -->
+    <p class="sr-only" aria-live="polite" data-qw-live></p>
+    <div class="qw-agent" data-md-skip>
       {
         tabs ? (
           <div class="qw-agent-bar qw-tabs-bar">
@@ -391,12 +393,15 @@ const tabList = [
     let typing = 0;
     let tour = 0;
     let userTook = false;
+    const live = root.querySelector<HTMLElement>('[data-qw-live]');
 
     function read(i: number) {
       current = i;
       buttons.forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.i) === i)));
       window.clearInterval(typing);
       const text = linesFor(i).join('\n');
+      // announce only what the reader picked, as one final text — never the typing or the tour
+      if (live && userTook) live.textContent = text;
       if (reduced.matches) {
         out.textContent = text;
         return;
@@ -449,6 +454,14 @@ const tabList = [
       b.addEventListener('pointerenter', (e) => {
         if (e.pointerType === 'mouse') take();
       });
+    });
+
+    // pointer over / focus inside the figure pauses the tour; it resumes on leave unless the reader took over
+    root.addEventListener('pointerenter', () => window.clearInterval(tour));
+    root.addEventListener('pointerleave', () => startTour());
+    root.addEventListener('focusin', () => window.clearInterval(tour));
+    root.addEventListener('focusout', (e) => {
+      if (!root.contains(e.relatedTarget as Node)) startTour();
     });
 
     // the tour runs only while the figure is on screen

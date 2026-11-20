@@ -135,6 +135,19 @@ const services: {
     overflow-x: auto;
     scrollbar-width: none;
   }
+  /* 320: tab 02 sat past the edge with no cue — stack the two tabs (20 Nov review) */
+  @media (max-width: 480px) {
+    .sa-tabs {
+      flex-direction: column;
+    }
+    .sa-tabs button {
+      border-right: 0 !important;
+      border-bottom: 1px solid var(--a-rule) !important; /* this block sits above the base button rule */
+    }
+    .sa-tabs button:last-child {
+      border-bottom: 0 !important;
+    }
+  }
   .sa-tabs button {
     display: inline-flex;
     align-items: center;

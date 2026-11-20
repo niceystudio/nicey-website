@@ -522,6 +522,7 @@ const slug = (k: string) =>
     const prev = root.querySelector<HTMLButtonElement>('[data-prev]');
     const next = root.querySelector<HTMLButtonElement>('[data-next]');
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    // a panel you leave is marked .is-seen; direction A uses it to play each panel's entrance once (20 Nov review)
     let current = 0;
 
     function select(i: number, focus: boolean) {
@@ -531,6 +532,7 @@ const slug = (k: string) =>
           t.setAttribute('aria-selected', String(k === n));
           t.tabIndex = k === n ? 0 : -1;
         });
+        panels[current]?.classList.add('is-seen');
         panels.forEach((p, k) => {
           if (p) p.hidden = k !== n;
         });
@@ -884,7 +886,7 @@ const slug = (k: string) =>
     transition: transform 160ms var(--ease-out), background-color 200ms var(--ease-out);
   }
   .chs-btn:active:not([aria-disabled='true']) {
-    transform: scale(0.94);
+    transform: scale(0.97);
   }
   .chs-btn--next {
     border-color: var(--color-ink);
@@ -1059,7 +1061,7 @@ const slug = (k: string) =>
     padding: 7px 0;
   }
   .ch-run-mark {
-    color: var(--color-sage);
+    color: var(--color-on-band-sage);
   }
   .ch-run > li:nth-last-child(2) .ch-run-mark {
     color: var(--color-on-band-accent);
@@ -1358,15 +1360,22 @@ const slug = (k: string) =>
     outline-offset: 2px;
   }
   .ch-swatch {
-    transition: transform 0.2s ease;
+    transition: transform 200ms var(--ease-out);
   }
+  /* lighting a row fades its background and nudges the content with transform — it used to animate padding, which
+     ran layout every frame (20 Nov review). Same look: the content still steps 10px in. */
   .ch-chain > li {
-    transition: background-color 0.2s ease, padding 0.2s ease;
+    transition: background-color 200ms var(--ease-out);
     border-radius: 6px;
   }
+  .ch-chain > li > * {
+    transition: transform 200ms var(--ease-out);
+  }
   .ch-chain > li.is-lit {
-    padding-inline: 10px;
     background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  }
+  .ch-chain > li.is-lit > * {
+    transform: translateX(10px);
   }
 
   /* 04 · states: a real button and field, switched by the list */
@@ -1456,12 +1465,12 @@ const slug = (k: string) =>
     font: inherit;
     text-align: left;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: background-color 200ms var(--ease-out);
   }
   .ch-live-list button[aria-pressed='true'] {
     background: color-mix(in srgb, var(--color-accent) 12%, transparent);
   }
-  @media (hover: hover) {
+  @media (hover: hover) and (pointer: fine) {
     .ch-live-list button:hover {
       background: var(--color-surface-hover);
     }
@@ -1546,8 +1555,10 @@ const slug = (k: string) =>
     cursor: pointer;
     transition: background-color 200ms var(--ease-out), transform 160ms var(--ease-out);
   }
+  /* picked = tint + an accent bar, so it isn't told by colour alone (20 Nov review) */
   .ch-pick > button[aria-pressed='true'] {
     background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+    box-shadow: inset 3px 0 0 var(--color-accent);
   }
   @media (hover: hover) and (pointer: fine) {
     .ch-pick > button:hover {
