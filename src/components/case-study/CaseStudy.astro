@@ -30,7 +30,7 @@ import { caseMarkdown } from '../../lib/case-markdown';
 import SiteFooter from '../SiteFooter.astro';
 import { links } from '../../data/links';
 import { caseHref, caseStudies, getCaseStudy, type Band, type CaseStudy } from '../../data/case-studies';
-import { qbenchChaptersA } from '../../data/case-studies-a';
+import { qbenchChaptersA, everbreedAliasesDiff } from '../../data/case-studies-a';
 
 interface Props {
   study: CaseStudy;
@@ -52,7 +52,7 @@ const chapters = chaptersA && s.chapters && s.slug === 'qbench-design-system' ? 
 /** the homepage these links go back to: the site, or the direction's review homepage */
 const home = direction ? `/lab/${direction}` : '/';
 /** case studies that already have a page in the direction (review); the rest link to the live pages */
-const dirSlugs = ['qbench-design-system', 'qbench-status-workflows'];
+const dirSlugs = ['qbench-design-system', 'qbench-status-workflows', 'everbreed'];
 const caseLink = (slug: string) => (direction && dirSlugs.includes(slug) ? `/lab/${direction}/${slug}` : caseHref(slug));
 const next = getCaseStudy(s.next);
 const prev = caseStudies.find((c) => c.next === s.slug);
@@ -97,7 +97,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
         <div class:list={['cs-hero-top', s.heroVisual && 'cs-hero-top--visual']}>
           <div class="cs-hero-copy">
             <span class="caption text-ink-2">{s.kicker}</span>
-            <p class="m-0 text-case-name">{s.name}</p>
+            <p class="m-0 text-case-name" style={`--name-len:${s.name.length}`}>{s.name}</p>
             <h1 id="cs-title" class="m-0 max-w-[22ch] text-case-h1 text-balance">{s.statement}</h1>
             <p class="m-0 max-w-[52ch] text-body-lg text-pretty text-ink-2"><Gaps text={s.lede} /></p>
           </div>
@@ -159,7 +159,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
       <div class:list={['panel-wrap', s.proofViz && 'panel flex flex-col']}>
         {s.proofViz === 'names' && (namesLook === 'diff' ? <NamesDiff /> : <NamesField />)}
         {s.proofViz === 'surfaces' && <SurfacesField />}
-        {s.proofViz === 'aliases' && <AliasesField />}
+        {s.proofViz === 'aliases' && (namesLook === 'diff' ? <NamesDiff {...everbreedAliasesDiff} /> : <AliasesField />)}
         {!s.proofViz && <ul class:list={['panel', s.numbers.length === 4 ? 'grid-4' : 'grid-3']}>
           {
             s.numbers.map((n) => (

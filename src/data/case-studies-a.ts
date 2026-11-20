@@ -43,3 +43,33 @@ export function qbenchChaptersA(chapters: Chapters): Chapters {
     ...rest,
   ];
 }
+
+/**
+ * Everbreed before/after in A (Emir, 20 Nov): the same terminal window as QBench (NamesDiff) instead of the 210 alias
+ * blocks. Numbers and notes are the case study's own (210 hand-written aliases → 0; 302 tokens, each with $figmaId,
+ * $property and $codeSyntax). Only Figma names are shown — the code names are still to confirm with Goran.
+ */
+export const everbreedAliasesDiff = {
+  cap: 'Everbreed · utility config',
+  title: 'hand-written token aliases',
+  file: 'utility.config',
+  tabs: ['before · by hand', 'after · from Figma'] as [string, string],
+  cmd: 'list tokens --source',
+  lines: [
+    ['text/primary', 'alias, written by hand', '$figmaId · $codeSyntax'],
+    ['surface/hover', 'alias, written by hand', '$figmaId · $codeSyntax'],
+    ['border/selected/default', 'alias, written by hand', '$figmaId · $codeSyntax'],
+  ] as [string, string, string][],
+  before: {
+    count: 210,
+    live: '210 hand-written token aliases',
+    note: 'Someone kept 210 aliases in the config by hand, and each one could drift from Figma.',
+    more: '+ 207 more aliases · all by hand',
+  },
+  after: {
+    count: 0,
+    live: '0 hand-written token aliases: the config is generated from Figma',
+    note: 'The config is generated from Figma now. Nobody writes an alias by hand.',
+    more: '+ 299 more tokens · generated from Figma',
+  },
+};

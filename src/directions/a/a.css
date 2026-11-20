@@ -286,3 +286,14 @@
     border-color: var(--color-ink) !important;
   }
 }
+
+/* ---------- The nav in A (Emir, 20 Nov — approved from the test) ----------
+ * "Process" goes: the Free audit button already leads to that section, and it read like "How we work". The section's
+ * caption is "Free audit" (same as the button). Four links with ~30px between words instead of ~16px. */
+.dir-a .site-head .head-link[href$='#audit'],
+.dir-a .site-head .menu-link[href$='#audit'] {
+  display: none !important;
+}
+.dir-a .site-head .head-links {
+  gap: 16px;
+}
