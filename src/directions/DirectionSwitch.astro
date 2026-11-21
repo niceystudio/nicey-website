@@ -1,13 +1,13 @@
 ---
-/** Review only (lab pages, noindex): jump between the live homepage and the design directions. */
+/** Review only (lab pages, noindex): jump between the design directions; "All" goes back to the list at /. */
 interface Props {
-  current: 'now' | 'a' | 'b' | 'c' | 'd' | 'e';
+  current: 'a' | 'b' | 'c' | 'd' | 'e';
   /** on the live homepage the static | story switch already sits bottom-right */
   side?: 'left' | 'right';
 }
 const { current, side = 'right' } = Astro.props;
 const items = [
-  { id: 'now', label: 'Refined home', href: '/' },
+  { id: 'all', label: 'All', href: '/' },
   { id: 'a', label: 'A · Select', href: '/lab/a' },
   { id: 'b', label: 'B · Editorial', href: '/lab/b' },
   { id: 'c', label: 'C · Human | Machine', href: '/lab/c' },

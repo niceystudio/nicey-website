@@ -1,5 +1,4 @@
 /** The site index for agents, served at /llms.txt. (The homepage's machine view shows /index.md.) */
-import { caseStudies, caseHref } from '../data/case-studies';
 
 export function siteMarkdown(base: URL): string {
   const abs = (p: string) => new URL(p, base).href;
@@ -8,9 +7,9 @@ export function siteMarkdown(base: URL): string {
     '',
     '> A design systems studio. We build design systems that people and AI agents read the same way. Every project starts with a free, read-only audit of your Figma file.',
     '',
-    '## Case studies',
+    '## Design directions (review)',
     '',
-    ...caseStudies.map((c) => `- [${c.linkName}](${abs(`${caseHref(c.slug)}.md`)}): ${c.statement}`),
+    ...['a', 'b', 'c', 'd', 'e'].map((d) => `- [Direction ${d.toUpperCase()}](${abs(`/lab/${d}`)})`),
     '',
     '## Studio',
     '',

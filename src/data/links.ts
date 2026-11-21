@@ -3,7 +3,6 @@
  * Values of '#' are placeholders carried over from the canvas: fill them in here.
  * In-page anchors (#audit, #services, #work, #how) are real and live in the components.
  */
-import { caseHref } from './case-studies';
 
 export const links = {
   home: '/',
@@ -18,12 +17,12 @@ export const links = {
   email: '#',
   linkedin: '#',
   github: '#',
-  /** the case study pages (src/pages/work/[slug].astro) */
+  /** the case study rows: this review branch has no case study pages, so each row stays on the page (Work section) */
   work: {
-    qbench: caseHref('qbench-design-system'),
-    everbreed: caseHref('everbreed'),
-    clerky: caseHref('clerky'),
-    omnisafe: caseHref('omnisafe'),
-    flyr: caseHref('flyr'),
+    qbench: '#work',
+    everbreed: '#work',
+    clerky: '#work',
+    omnisafe: '#work',
+    flyr: '#work',
   },
 } as const;
