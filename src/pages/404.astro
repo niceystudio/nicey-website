@@ -1,10 +1,8 @@
 ---
-/** The 404 page: "This page drifted." (NotFound). */
+/** The 404 page in direction A: "404" printed on the accent block. */
+import '../directions/a/a.css';
+import '../directions/a/a-404.css';
 import NotFound from '../components/NotFound.astro';
 ---
 
-<NotFound />
-<script is:inline>
-  // review only: a missing page under /lab/a/ shows direction A's 404
-  if (location.pathname.startsWith('/lab/a/') && location.pathname !== '/lab/a/404') location.replace('/lab/a/404');
-</script>
+<NotFound direction="a" />

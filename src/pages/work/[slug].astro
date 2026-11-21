@@ -1,5 +1,8 @@
 ---
+/** One case study page, in direction A · Select. QBench and Everbreed carry the layout changes from the A review. */
 import type { GetStaticPaths } from 'astro';
+import '../../directions/a/a.css';
+import '../../directions/a/a-case.css';
 import CaseStudy from '../../components/case-study/CaseStudy.astro';
 import { caseStudies, type CaseStudy as Study } from '../../data/case-studies';
 
@@ -10,6 +13,15 @@ interface Props {
   study: Study;
 }
 const { study } = Astro.props;
+const slug = study.slug;
 ---
 
-<CaseStudy study={study} />
+{slug === 'qbench-design-system' ? (
+  <CaseStudy study={study} direction="a" noFacts namesLook="diff" ctaLook="closing" chaptersA layoutA />
+) : slug === 'qbench-status-workflows' ? (
+  <CaseStudy study={study} direction="a" noFacts ctaLook="closing" workFirst togetherA railA />
+) : slug === 'everbreed' ? (
+  <CaseStudy study={study} direction="a" noFacts namesLook="diff" ctaLook="closing" />
+) : (
+  <CaseStudy study={study} direction="a" noFacts ctaLook="closing" />
+)}

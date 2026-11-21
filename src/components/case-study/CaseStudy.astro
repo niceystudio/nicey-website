@@ -58,10 +58,8 @@ const { study: s, direction, noFacts = false, namesLook, ctaLook, chaptersA = fa
 const together = layoutA || togetherA;
 const chapters = chaptersA && s.chapters && s.slug === 'qbench-design-system' ? qbenchChaptersA(s.chapters) : s.chapters;
 /** the homepage these links go back to: the site, or the direction's review homepage */
-const home = direction ? `/lab/${direction}` : '/';
-/** case studies that already have a page in the direction (review); the rest link to the live pages */
-const dirSlugs = ['qbench-design-system', 'qbench-status-workflows', 'everbreed'];
-const caseLink = (slug: string) => (direction && dirSlugs.includes(slug) ? `/lab/${direction}/${slug}` : caseHref(slug));
+const home = '/';
+const caseLink = (slug: string) => caseHref(slug);
 const next = getCaseStudy(s.next);
 const prev = caseStudies.find((c) => c.next === s.slug);
 
@@ -96,7 +94,7 @@ const jsonLd = { '@context': 'https://schema.org', '@graph': faqLd ? [article, f
 const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https://nicey-website.vercel.app').href);
 ---
 
-<Base title={`${s.linkName} case study · Nicey`} description={s.lede} markdownHref={mdHref} jsonLd={jsonLd} noindex={!!direction}>
+<Base title={`${s.linkName} case study · Nicey`} description={s.lede} markdownHref={mdHref} jsonLd={jsonLd} >
   <div class:list={[direction && `dir-${direction}`]} data-rail-a={railA ? '' : undefined}>
   <Header variant="case" home={home} />
   <main id="main" tabindex="-1" class="cs" data-human>
