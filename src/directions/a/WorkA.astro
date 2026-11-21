@@ -1,0 +1,448 @@
+---
+/** Direction A: Work as a terminal listing (ls work/): column heads, row index, one accent bar on hover.
+ *  Copy and the hover preview are the live component's. The "signal" figures column and the `ls work/` line were
+ *  removed (Emir 19 Nov): the list now reads like an agency index — big name, what we did, preview on hover. */
+import SectionHead from '../../components/SectionHead.astro';
+import { links } from '../../data/links';
+
+interface Row {
+  name: string;
+  meta: string;
+  href: string;
+  /** null keeps the dashed placeholder: the figure isn't collected yet */
+  figure: { value: string; arrow?: boolean } | null;
+  caption: string;
+  description: string;
+  /** what the hover preview shows once the blocks have gathered */
+  preview:
+    | { kind: 'img'; src: string; w: number; h: number }
+    | { kind: 'video'; src: string; poster: string; w: number; h: number }
+    | { kind: 'card'; text: string; band: string; w: number; h: number };
+}
+
+const rows: Row[] = [
+  {
+    name: 'QBench',
+    meta: 'Design system + product · LIMS',
+    href: links.work.qbench,
+    figure: { value: '1,071', arrow: true },
+    caption: 'Outside-library references',
+    preview: { kind: 'img', src: '/work/qbench/product.webp', w: 320, h: 197 },
+    description:
+      'Years without a designer, consolidated into one semantic token system. Plus one status model for eight entry points, compliance steps included, shipped as an MVP.',
+  },
+  {
+    name: 'Everbreed',
+    meta: 'Design system + product · Agtech',
+    href: links.work.everbreed,
+    figure: { value: '302' },
+    caption: 'Variables made machine-readable',
+    preview: { kind: 'video', src: '/work/everbreed/mobile-care.webm', poster: '/work/everbreed/mobile-care.webp', w: 150, h: 325 },
+    description:
+      'A mature Figma library made machine-readable, so the code config comes from Figma. And the student app built on it, on phone and desktop.',
+  },
+  {
+    name: 'Clerky',
+    meta: 'Design system · Legal tech',
+    href: links.work.clerky,
+    figure: { value: '0 T1' },
+    caption: 'Defects at the pilot gate',
+    preview: { kind: 'card', text: '0 T1', band: 'butter', w: 260, h: 170 },
+    description:
+      'Three-tier tokens, AI-context docs on every component and token, and a zero-T1 defect gate. Validated at pilot scale on the Documents App.',
+  },
+  {
+    name: 'Omnisafe',
+    meta: 'Product design · Insurance',
+    href: links.work.omnisafe,
+    figure: { value: '16' },
+    caption: 'Modules tested before build',
+    preview: { kind: 'card', text: '16', band: 'mauve', w: 260, h: 170 },
+    description: 'Sixteen modules, tested end to end with real employees before engineering began.',
+  },
+  {
+    name: 'FLYR',
+    meta: 'Product design · Hospitality',
+    href: links.work.flyr,
+    figure: null,
+    caption: 'One business result',
+    preview: { kind: 'card', text: 'FLYR', band: 'stone', w: 260, h: 170 },
+    description: 'Group Quotation MVP shipped, so hotels can see whether a group booking makes money.',
+  },
+];
+---
+
+<section id="work" aria-labelledby="work-head" class="container-page flex flex-col pb-section wka">
+  <SectionHead id="work-head" caption="Work" class="mb-12">Systems and products we have built</SectionHead>
+  <div class="wka-head" aria-hidden="true"><span>#</span><span>client</span><span>what we did</span><span></span></div>
+  <ul class="panel flex flex-col wka-list">
+    {
+      rows.map((r, i) => (
+        <li id={`work-${r.name.toLowerCase()}`}>
+          <a href={r.href} class="work-row" data-wp={JSON.stringify({ ...r.preview, name: r.name })}>
+            <span class="wka-i" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            <span class="flex flex-[1_1_220px] flex-col gap-2.5">
+              <span class="text-work">{r.name}</span>
+              <span class="caption-sm text-ink-2">{r.meta}</span>
+            </span>
+            <span class="max-w-[44ch] flex-[1_1_300px] text-body text-pretty text-ink-2">{r.description}</span>
+            <span class="work-arr" aria-hidden="true">→</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+  {/* hover preview: one floating frame for the whole list, follows the cursor */}
+  <div class="wp" data-wp-box aria-hidden="true">
+    <canvas class="wp-canvas" data-wp-canvas></canvas>
+    <div class="wp-frame" data-wp-frame></div>
+  </div>
+</section>
+
+<style>
+  .work-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 16px 40px;
+    padding: 36px var(--spacing-cell);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+  .work-arr {
+    flex: 0 0 auto;
+    font-size: var(--text-arrow);
+    line-height: 1;
+    color: var(--color-ink);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .work-row:hover {
+      background: var(--color-surface-hover);
+    }
+  }
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .work-row {
+      transition: background-color 150ms var(--ease-out);
+    }
+    .work-arr {
+      transition: transform 150ms var(--ease-out);
+    }
+    .work-row:hover .work-arr {
+      transform: translateX(4px);
+    }
+  }
+  @media (max-width: 479px) {
+    .work-row {
+      padding-block: 28px;
+    }
+  }
+</style>
+
+<style>
+  /* ---- hover preview ---- */
+  .wp {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 30;
+    width: 600px;
+    height: 640px;
+    margin: -320px 0 0 -300px;
+    pointer-events: none;
+    visibility: hidden;
+  }
+  .wp.is-on {
+    visibility: visible;
+  }
+  .wp-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .wp-frame {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    overflow: hidden;
+    border-radius: 10px;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+    transition: opacity 220ms var(--ease-out), transform 220ms var(--ease-out);
+    box-shadow: 0 24px 48px -20px rgba(38, 37, 31, 0.35);
+  }
+  .wp-frame.is-shown {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  /* children are injected by the script, so these rules must be global */
+  .wp-frame :global(img),
+  .wp-frame :global(video) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .wp-frame--phone {
+    border: 6px solid var(--color-band);
+    border-radius: 26px;
+  }
+  .wp-frame :global(.wp-card) {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    color: var(--color-ink);
+    font-size: 64px;
+    font-weight: 500;
+    letter-spacing: -0.05em;
+  }
+  @media (hover: none), (prefers-reduced-motion: reduce) {
+    .wp {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  // Work hover, in A's own language (Emir 19 Nov: the flying pastel blocks don't belong to this direction):
+  // a square window follows the cursor; inside it an ASCII field flickers for a moment, then the project's preview
+  // prints in from the top in steps — the same "print" as the hero headline — and the glyphs fade under it.
+  const box = document.querySelector<HTMLElement>('[data-wp-box]');
+  const canvas = document.querySelector<HTMLCanvasElement>('[data-wp-canvas]');
+  const frame = document.querySelector<HTMLElement>('[data-wp-frame]');
+  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (box && canvas && frame && fine) {
+    const ctx = canvas.getContext('2d')!;
+    const BW = 600, BH = 640, CW = 9, CH = 14;
+    const GLYPHS = '·:-=+*#%@/\\|<>[]{}01';
+    const dpr = Math.min(2, devicePixelRatio || 1);
+    canvas.width = BW * dpr; canvas.height = BH * dpr;
+    let rect = { x: 0, y: 0, w: 0, h: 0 }, t0 = 0, raf = 0, mode: 'in' | 'out' = 'in';
+    let x = 0, y = 0, tx = 0, ty = 0, active = false, lastSwap = 0;
+    let cells: string[] = [];
+    // colours read once per open, not every frame (20 Nov review)
+    let ink = '', acc = '', last = 0;
+    const css = (n: string) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+    const fill = () => { cells = cells.map(() => GLYPHS[(Math.random() * GLYPHS.length) | 0]); };
+    const draw = (now: number) => {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, BW, BH);
+      const el = now - t0;
+      // in: glyphs on at once, hold, then fade as the image prints over them; out: quick fade
+      const alpha = mode === 'in' ? (el < 380 ? 1 : Math.max(0, 1 - (el - 380) / 260)) : Math.max(0, 1 - el / 160);
+      if (alpha <= 0) return mode === 'in' && el < 700;
+      if (now - lastSwap > 55) { fill(); lastSwap = now; }
+      const cols = Math.floor(rect.w / CW);
+      ctx.font = '12px "Geist Mono Variable", ui-monospace, monospace';
+      ctx.textBaseline = 'top';
+      cells.forEach((g, i) => {
+        const cx = rect.x + (i % cols) * CW, cy = rect.y + Math.floor(i / cols) * CH;
+        ctx.globalAlpha = alpha * (i % 7 === 0 ? 1 : 0.55);
+        ctx.fillStyle = i % 11 === 0 ? acc : ink;
+        ctx.fillText(g, cx, cy);
+      });
+      ctx.globalAlpha = 1;
+      return true;
+    };
+    const loop = (now: number) => {
+      // time-based follow: the same speed on 60 Hz and 120 Hz screens
+      const dt = last ? Math.min(64, now - last) : 16.7;
+      last = now;
+      const k = 1 - Math.pow(1 - 0.18, dt / 16.7);
+      x += (tx - x) * k; y += (ty - y) * k;
+      box.style.transform = `translate(${x}px, ${y}px)`;
+      const busy = reduced ? false : draw(now);
+      if (active || busy || Math.abs(tx - x) > 0.5 || Math.abs(ty - y) > 0.5) raf = requestAnimationFrame(loop);
+      else { raf = 0; last = 0; box.classList.remove('is-on'); }
+    };
+    const kick = () => { if (!raf) raf = requestAnimationFrame(loop); };
+    let showTimer = 0;
+    const open = (data: any) => {
+      frame.className = 'wp-frame' + (data.kind === 'video' ? ' wp-frame--phone' : '');
+      frame.style.width = data.w + 'px';
+      const media =
+        data.kind === 'img' ? `<img src="${data.src}" alt="">`
+        : data.kind === 'video' ? `<video src="${data.src}" poster="${data.poster}" muted playsinline autoplay loop></video>`
+        : `<div class="wp-card" style="background: var(--color-${data.band})">${data.text}</div>`;
+      frame.innerHTML = `<div class="wpa-bar"><span>${String(data.name).toLowerCase()}</span><span>preview</span></div><div class="wpa-media" style="height:${data.h}px">${media}</div>`;
+      rect = { w: data.w, h: data.h + 26, x: (BW - data.w) / 2, y: (BH - (data.h + 26)) / 2 };
+      const n = Math.floor(rect.w / CW) * Math.floor(rect.h / CH);
+      cells = new Array(n).fill('·'); fill();
+      ink = css('--color-ink-2'); acc = css('--color-accent');
+      mode = 'in'; t0 = performance.now(); active = true;
+      box.classList.add('is-on');
+      clearTimeout(showTimer);
+      showTimer = window.setTimeout(() => frame.classList.add('is-shown'), reduced ? 0 : 260);
+      kick();
+    };
+    const close = () => {
+      clearTimeout(showTimer);
+      frame.classList.remove('is-shown');
+      mode = 'out'; t0 = performance.now(); active = false;
+      kick();
+    };
+    // sit beside the cursor (not on the row being read), and stay inside the window
+    const place = (cx: number, cy: number) => {
+      const side = cx < innerWidth * 0.6 ? 1 : -1;
+      return [Math.min(innerWidth - 120, Math.max(120, cx + side * 210)), Math.min(innerHeight - 140, Math.max(140, cy))];
+    };
+    document.querySelectorAll<HTMLAnchorElement>('[data-wp]').forEach((row) => {
+      row.addEventListener('pointerenter', (e) => {
+        [tx, ty] = place(e.clientX, e.clientY);
+        if (!active) { x = tx; y = ty; }
+        open(JSON.parse(row.dataset.wp!));
+      });
+      row.addEventListener('pointermove', (e) => { [tx, ty] = place(e.clientX, e.clientY); });
+      row.addEventListener('pointerleave', close);
+    });
+    ['/work/qbench/product.webp', '/work/everbreed/mobile-care.webp'].forEach((src) => { const i = new Image(); i.src = src; });
+  }
+</script>
+
+<style is:global>
+  /* A's preview window: square, 1px rule, a title bar; the media prints in from the top in steps */
+  .dir-a .wp-frame {
+    border-radius: 0 !important;
+    border: 1px solid var(--color-ink);
+    background: var(--color-page);
+    transition: opacity 120ms linear !important;
+    transform: translate(-50%, -50%) !important;
+    box-shadow: 6px 6px 0 color-mix(in srgb, var(--color-accent) 70%, transparent) !important;
+  }
+  .dir-a .wpa-bar {
+    display: flex;
+    justify-content: space-between;
+    height: 26px;
+    padding: 0 10px;
+    align-items: center;
+    border-bottom: 1px solid var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-ink-2);
+  }
+  .dir-a .wpa-bar span:first-child {
+    color: var(--color-ink);
+  }
+  .dir-a .wpa-media {
+    overflow: hidden;
+  }
+  .dir-a .wpa-media img,
+  .dir-a .wpa-media video,
+  .dir-a .wpa-media .wp-card {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0 !important;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .dir-a .wp-frame.is-shown .wpa-media {
+      animation: wpa-print 420ms steps(8, end) both;
+    }
+  }
+  @keyframes wpa-print {
+    from {
+      clip-path: inset(0 0 100% 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+</style>
+
+<style>
+  .wka-head,
+  .wka :global(.work-row) {
+    display: grid !important;
+    grid-template-columns: 48px minmax(0, 1.2fr) minmax(0, 1.4fr) 32px;
+    align-items: center !important;
+    gap: 12px 32px;
+    align-items: start;
+  }
+  .wka-head {
+    padding: 10px 28px;
+    border-top: 1px solid var(--color-ink);
+    border-bottom: 1px solid var(--a-rule);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .wka-list {
+    border: 0 !important;
+    border-bottom: 1px solid var(--a-rule) !important;
+    gap: 0 !important;
+    background: transparent !important;
+  }
+  .wka-list > li + li {
+    border-top: 1px solid var(--a-rule);
+  }
+  .wka :global(.work-row) {
+    position: relative;
+    padding: 30px 28px !important;
+    background: transparent !important;
+  }
+  .wka :global(.work-row) > :global(span) {
+    flex: none !important;
+    max-width: none !important;
+  }
+  /* bigger names now that the signal column is gone (Emir 19 Nov) */
+  .wka :global(.text-work) {
+    font-size: clamp(36px, 4.2vw, 60px);
+    line-height: 1;
+  }
+  .wka-i {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--color-muted);
+  }
+  .wka :global(.work-row)::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--a-block);
+    transform: scaleY(0);
+    transition: transform 200ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .wka :global(.work-row:hover) {
+      background: var(--color-surface) !important;
+    }
+    .wka :global(.work-row:hover)::before {
+      transform: scaleY(1);
+    }
+    .wka :global(.work-row:hover) .wka-i {
+      color: var(--color-accent);
+    }
+  }
+  @media (max-width: 860px) {
+    .wka-head {
+      display: none !important;
+    }
+    .wka :global(.work-row) {
+      grid-template-columns: 36px minmax(0, 1fr) 24px;
+      padding: 24px 12px !important;
+    }
+    .wka :global(.work-row) > :global(span:nth-child(3)) {
+      grid-column: 2;
+    }
+  }
+</style>
+<style is:global>
+  .dir-a .wp-frame--phone {
+    border: 1px solid var(--color-ink) !important;
+  }
+  .dir-a .wpa-media .wp-card {
+    display: grid;
+    place-items: center;
+    font-family: var(--font-pixel);
+    font-weight: 400;
+  }
+</style>

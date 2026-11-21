@@ -1,0 +1,288 @@
+---
+/**
+ * Everbreed before/after, a sibling of the QBench NamesField.
+ *
+ * One cell per real hand-written alias (210). Before: crooked, hand-made cells.
+ * After: a reading line moves down the field, the aliases fade one row at a time
+ * and one block grows in their place: the utility config, generated from Figma.
+ */
+const ALIASES = 210;
+const TOKENS = 302;
+const cells = Array.from({ length: ALIASES });
+// Figma names from the Everbreed slides (code names still to confirm, so they are not shown)
+const sample = ['text/primary', 'surface/hover', 'border/selected/default'];
+
+const ticker = ['$codeSyntax → utility config', 'generated from Figma', 'web · Vue', 'mobile · React Native'];
+const NOTE_BEFORE = 'Someone kept 210 aliases in the config by hand, and each one could drift from Figma.';
+const NOTE_AFTER = 'The config is generated from Figma now. Nobody writes an alias by hand.';
+---
+
+<div class="af" data-aliases data-ticker-items={JSON.stringify(ticker)}>
+  <div class="af-copy">
+    <span class="caption flex items-center gap-2 text-ink-2">
+      <i aria-hidden="true" class="block size-[7px] rounded-full bg-accent"></i>Everbreed · Utility config
+    </span>
+    <p class="af-figure" aria-hidden="true"><span data-count>{ALIASES}</span></p>
+    <p class="sr-only" aria-live="polite" data-live>{ALIASES} hand-written token aliases</p>
+    <h3 class="m-0 mt-5 text-title">hand-written token aliases</h3>
+    <p class="af-note m-0 mt-3 max-w-[40ch] text-pretty text-ink-2" data-note data-before={NOTE_BEFORE} data-after={NOTE_AFTER}>
+      {NOTE_BEFORE}
+    </p>
+    <div class="mt-auto flex flex-wrap items-center gap-x-5 gap-y-3 pt-8">
+      <div role="group" aria-label="Show state" class="af-seg">
+        <button type="button" data-state="0" aria-pressed="true">Before</button>
+        <button type="button" data-state="1" aria-pressed="false">After</button>
+      </div>
+    </div>
+  </div>
+  <div class="af-field-col">
+    <div class="af-field">
+      <div class="af-grid" role="img" aria-label="One square per hand-written alias. Before: 210. After: 0, the config is generated from Figma.">
+        {cells.map(() => <i />)}
+      </div>
+      <div class="af-gen" aria-hidden="true" data-gen>
+        <div class="af-gen-bar">
+          <span class="af-gen-file">utility config</span>
+          <span class="af-gen-src">generated from Figma</span>
+        </div>
+        <ul class="af-gen-rows">
+          {
+            sample.map((n) => (
+              <li>
+                <span class="af-gen-name">{n}</span>
+                <span class="af-gen-fields">$figmaId · $property · $codeSyntax</span>
+              </li>
+            ))
+          }
+          <li class="af-gen-more">+ {TOKENS - sample.length} more tokens, same three fields</li>
+        </ul>
+        <span class="af-gen-foot">// edit in Figma, not here</span>
+      </div>
+      <span class="af-scan" aria-hidden="true" data-scan></span>
+    </div>
+    <p class="af-ticker" aria-hidden="true">
+      <span class="text-muted">reading</span> <span data-ticker>{ticker[0]}</span>
+    </p>
+  </div>
+</div>
+
+<style>
+  .af { display: flex; flex-wrap: wrap; align-items: stretch; }
+  .af-copy {
+    flex: 1 1 360px; min-width: 0; padding: var(--spacing-cell);
+    display: flex; flex-direction: column; container-type: inline-size;
+  }
+  .af-figure {
+    margin: 28px 0 0 -0.04em;
+    font-size: min(clamp(72px, 8vw, 128px), 30cqi);
+    line-height: 0.9; letter-spacing: -0.05em; font-weight: 500;
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .af-note { transition: opacity 0.2s ease; }
+  }
+  .af-seg {
+    display: inline-flex; padding: 3px;
+    border: 1px solid var(--color-line-strong); border-radius: var(--radius-pill);
+  }
+  .af-seg button {
+    position: relative; min-height: 38px; padding: 0 16px; border: 0;
+    border-radius: var(--radius-pill); background: transparent; color: var(--color-ink-2);
+    font-size: var(--text-label); font-weight: 500; cursor: pointer;
+  }
+  .af-seg button::before { content: ''; position: absolute; inset: -3px 0; }
+  .af-seg button[aria-pressed='true'] { background: var(--color-ink); color: var(--color-on-ink); }
+
+  .af-field-col {
+    flex: 999 1 480px; min-width: 0;
+    display: flex; flex-direction: column; gap: 14px;
+    padding: var(--spacing-cell) var(--spacing-cell) 28px;
+  }
+  .af-field { position: relative; }
+  .af-field-col { container-type: inline-size; }
+  .af-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(clamp(14px, 3.4cqi, 26px), 1fr));
+    gap: clamp(3px, 0.6cqi, 5px);
+  }
+  /* hand-made: ink, a little crooked */
+  .af-grid > i { display: block; aspect-ratio: 1; border-radius: 3px; background: var(--color-ink); opacity: 0.75; }
+  .af-grid > i:nth-child(3n) { transform: rotate(9deg) translateY(1px); }
+  .af-grid > i:nth-child(5n + 1) { transform: rotate(-12deg); }
+  .af-grid > i:nth-child(7n + 2) { transform: translate(1px, -1px) rotate(4deg); }
+  .af-grid > i.is-gone { opacity: 0; transform: scale(0.4); }
+  .af-gen {
+    position: absolute; inset: 0; display: flex; flex-direction: column; gap: 14px;
+    padding: clamp(14px, 3cqi, 24px); overflow: hidden;
+    border-radius: 8px; background: var(--color-accent); color: var(--color-on-ink);
+    font-family: var(--font-mono); font-size: var(--text-code);
+    opacity: 0; transform: scaleY(0); transform-origin: top; pointer-events: none;
+  }
+  .af-gen-bar {
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px;
+    padding-bottom: 12px; border-bottom: 1px solid color-mix(in srgb, var(--color-on-ink) 25%, transparent);
+  }
+  .af-gen-file { font-size: 1.25em; font-weight: 500; }
+  .af-gen-src { opacity: 0.75; }
+  .af-gen-rows { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .af-gen-rows li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 16px; }
+  .af-gen-name { font-weight: 500; }
+  .af-gen-fields, .af-gen-more, .af-gen-foot { opacity: 0.75; }
+  .af-gen-foot { margin-top: auto; }
+  .af-gen.is-on { opacity: 1; transform: none; }
+  .af-gen-rows li, .af-gen-foot { opacity: 0; }
+  .af-gen.is-on .af-gen-rows li { opacity: 1; }
+  .af-gen.is-on .af-gen-more, .af-gen.is-on .af-gen-foot { opacity: 0.75; }
+  @media (prefers-reduced-motion: no-preference) {
+    .af-grid > i { transition: opacity 260ms ease, transform 260ms cubic-bezier(0.23, 1, 0.32, 1); }
+    .af-gen { transition: opacity 260ms ease, transform 420ms cubic-bezier(0.23, 1, 0.32, 1); }
+    .af-gen-rows li, .af-gen-foot { transition: opacity 220ms ease; }
+    .af-gen.is-on .af-gen-rows li:nth-child(1) { transition-delay: 300ms; }
+    .af-gen.is-on .af-gen-rows li:nth-child(2) { transition-delay: 360ms; }
+    .af-gen.is-on .af-gen-rows li:nth-child(3) { transition-delay: 420ms; }
+    .af-gen.is-on .af-gen-rows li:nth-child(4) { transition-delay: 480ms; }
+    .af-gen.is-on .af-gen-foot { transition-delay: 540ms; }
+  }
+  .af-scan {
+    position: absolute; left: -8px; right: -8px; top: 0; height: 1px;
+    background: var(--color-hot); opacity: 0; pointer-events: none;
+  }
+  .af-scan.is-on { opacity: 1; }
+  .af-ticker {
+    margin: 0; min-height: 1.6em; font-family: var(--font-mono); font-size: var(--text-code);
+    color: var(--color-ink-2); overflow-wrap: anywhere;
+  }
+  /* small field: names only, the three fields are in the header line */
+  @container (max-width: 480px) {
+    .af-gen { gap: 10px; }
+    .af-gen-fields { display: none; }
+    .af-gen-rows { gap: 4px; }
+    .af-gen-src::after { content: ' · $figmaId · $property · $codeSyntax'; }
+    .af-gen-rows .af-gen-more { display: none; }
+  }
+  @container panel (max-width: 899.98px) {
+    .af-field-col { padding: 0 var(--spacing-gutter) 28px; }
+    .af-copy { padding: 28px var(--spacing-gutter); }
+  }
+</style>
+
+<script>
+  const ALIASES = 210;
+  const DURATION = 2000; // ms for the reading line to cross the field
+
+  function mount(root: HTMLElement) {
+    const cells = Array.from(root.querySelectorAll<HTMLElement>('.af-grid > i'));
+    const grid = root.querySelector<HTMLElement>('.af-grid')!;
+    const scan = root.querySelector<HTMLElement>('[data-scan]')!;
+    const gen = root.querySelector<HTMLElement>('[data-gen]')!;
+    const count = root.querySelector<HTMLElement>('[data-count]')!;
+    const live = root.querySelector<HTMLElement>('[data-live]')!;
+    const note = root.querySelector<HTMLElement>('[data-note]')!;
+    const ticker = root.querySelector<HTMLElement>('[data-ticker]')!;
+    const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-state]'));
+    const items: string[] = JSON.parse(root.dataset.tickerItems ?? '[]');
+    const notes = [note.dataset.before ?? '', note.dataset.after ?? ''];
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let state = 0;
+    let raf = 0;
+    let played = false;
+
+    const setCount = (n: number) => {
+      count.textContent = String(n);
+      live.textContent = `${n} hand-written token aliases`;
+    };
+
+    function paint(s: 0 | 1) {
+      cells.forEach((c) => c.classList.toggle('is-gone', s === 1));
+      gen.classList.toggle('is-on', s === 1);
+      scan.classList.remove('is-on');
+      setCount(s ? 0 : ALIASES);
+      ticker.textContent = items[s ? items.length - 1 : 0] ?? '';
+    }
+
+    function setNote(s: 0 | 1) {
+      if (reduced.matches) {
+        note.textContent = notes[s];
+        return;
+      }
+      note.style.opacity = '0';
+      window.setTimeout(() => {
+        note.textContent = notes[s];
+        note.style.opacity = '1';
+      }, 200);
+    }
+
+    function play() {
+      cancelAnimationFrame(raf);
+      paint(0);
+      const top = grid.offsetTop;
+      const h = grid.offsetHeight;
+      const rows = cells.map((c) => c.offsetTop - top);
+      const start = performance.now();
+      let left = ALIASES;
+      let next = 0;
+      let lastTick = 0;
+      scan.classList.add('is-on');
+      const step = (now: number) => {
+        const t = Math.min(1, (now - start) / DURATION);
+        const e = t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
+        const y = e * h;
+        scan.style.transform = `translateY(${top + y}px)`;
+        while (next < cells.length && rows[next] <= y) {
+          cells[next].classList.add('is-gone');
+          left--;
+          next++;
+        }
+        if (now - lastTick > 420 && items.length) {
+          lastTick = now;
+          ticker.textContent = items[Math.floor(now / 420) % items.length];
+        }
+        setCount(Math.max(0, left));
+        if (t < 1) raf = requestAnimationFrame(step);
+        else paint(1);
+      };
+      raf = requestAnimationFrame(step);
+    }
+
+    function setState(s: 0 | 1) {
+      if (s === state) return;
+      state = s;
+      buttons.forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.state) === s)));
+      setNote(s);
+      if (s === 1 && !reduced.matches) play();
+      else {
+        cancelAnimationFrame(raf);
+        paint(s);
+      }
+    }
+
+    buttons.forEach((b) =>
+      b.addEventListener('click', () => {
+        played = true;
+        setState(Number(b.dataset.state) === 1 ? 1 : 0);
+      }),
+    );
+
+    if (reduced.matches) {
+      played = true;
+      setState(1);
+      return;
+    }
+
+    // play once, the first time the field is half in view
+    const io = new IntersectionObserver(
+      (entries) => {
+        const e = entries[0];
+        if (!played && (e.intersectionRatio >= 0.5 || e.intersectionRect.height >= window.innerHeight * 0.5)) {
+          played = true;
+          io.disconnect();
+          window.setTimeout(() => setState(1), 700);
+        }
+      },
+      { threshold: [0, 0.5, 1] },
+    );
+    io.observe(root);
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-aliases]').forEach(mount);
+</script>

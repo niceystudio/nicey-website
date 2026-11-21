@@ -1,0 +1,245 @@
+---
+/**
+ * The agentic layer, as one comparison (Emir picked A2 and cut everything outside the panel, 13 Nov):
+ * the same agent change without a gate and with one. The heading carries the message;
+ * the five layers and the 'why it matters' line stay in the Markdown twin for agents, not on the page.
+ * The class names and the Save button are an example, labelled so.
+ */
+interface Props {
+  kicker: string;
+  heading: string;
+}
+const { kicker, heading } = Astro.props;
+const STEPS = 5;
+---
+
+<section aria-labelledby="agentic-head" class="container-page agc" data-agc data-steps={STEPS}>
+  <div class="agc-head">
+    <span class="caption text-ink-2">{kicker}</span>
+    <h2 id="agentic-head" class="m-0 max-w-[16ch] text-h2 text-balance">{heading}</h2>
+  </div>
+
+  <div class="panel agc-panel">
+    <div class="agc-bar">
+      <span class="agc-mono">Example · the same change, two ways</span>
+      <button type="button" class="agc-replay" data-agc-replay>Replay</button>
+    </div>
+    <div class="agc-cols">
+      <div class="agc-col">
+        <p class="agc-title">Without a gate</p>
+        <ol class="agc-log">
+          <li data-at="1"><span>agent</span>writes bg-brand-purple</li>
+          <li data-at="2" class="is-muted"><span>docs</span>not read</li>
+          <li data-at="3"><span>review</span>the screen looks fine</li>
+          <li data-at="4" class="is-bad"><span>ships</span>the class renders nothing</li>
+        </ol>
+        <div class="agc-shot" data-at="5">
+          <span class="agc-btn agc-btn--empty">Save</span>
+          <span class="agc-cap">no colour: it inherits</span>
+        </div>
+      </div>
+      <div class="agc-col agc-col--gate">
+        <p class="agc-title">With the gate</p>
+        <ol class="agc-log">
+          <li data-at="1"><span>agent</span>writes bg-brand-purple</li>
+          <li data-at="2" class="is-muted"><span>docs</span>not read</li>
+          <li data-at="3" class="is-bad"><span>✕ lint</span>no token. Use bg-primary.</li>
+          <li data-at="4" class="is-ok"><span>✓ fixed</span>bg-primary · merged</li>
+        </ol>
+        <div class="agc-shot" data-at="5">
+          <span class="agc-btn agc-btn--ok">Save</span>
+          <span class="agc-cap">bg-primary, from the token</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .agc {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    padding-top: var(--spacing-section);
+  }
+  .agc-head {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .agc-panel {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .agc-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 52px;
+    padding: 8px 12px 8px 24px;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .agc-mono {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption-sm);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-ink-2);
+  }
+  .agc-replay {
+    min-height: 36px;
+    padding: 0 14px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--color-ink);
+    font: inherit;
+    font-size: var(--text-body-sm);
+    cursor: pointer;
+    transition: transform 160ms var(--ease-out);
+  }
+  .agc-replay:active {
+    transform: scale(0.97);
+  }
+  .agc-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .agc-col {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 28px;
+  }
+  .agc-col + .agc-col {
+    border-left: 1px solid var(--color-line);
+  }
+  .agc-col--gate {
+    background: var(--color-surface);
+  }
+  .agc-title {
+    margin: 0;
+    font-size: var(--text-body-lg);
+    font-weight: 500;
+  }
+  .agc-log {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+  }
+  .agc-log li {
+    display: grid;
+    grid-template-columns: 9ch 1fr;
+    gap: 12px;
+  }
+  .agc-log span {
+    color: var(--color-muted);
+  }
+  .agc-log .is-bad,
+  .agc-log .is-bad span {
+    color: var(--color-hot);
+  }
+  .agc-log .is-ok,
+  .agc-log .is-ok span {
+    color: var(--color-accent);
+  }
+  .agc-log .is-muted {
+    color: var(--color-muted);
+  }
+  .agc-shot {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    border: 1px solid var(--color-line);
+    border-radius: 10px;
+    background: var(--color-page);
+  }
+  .agc-cap {
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+    color: var(--color-ink-2);
+  }
+  .agc-btn {
+    padding: 8px 18px;
+    border-radius: var(--radius-pill);
+    font-size: var(--text-body-sm);
+    font-weight: 500;
+  }
+  .agc-btn--empty {
+    border: 1px dashed var(--color-hot);
+    color: var(--color-ink);
+  }
+  .agc-btn--ok {
+    background: var(--color-accent);
+    color: var(--color-on-ink);
+  }
+  /* stepper: [data-at] shows once the run reaches it */
+  [data-at] {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  [data-at].is-on {
+    opacity: 1;
+    transform: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    [data-at] {
+      transition:
+        opacity 240ms var(--ease-out),
+        transform 240ms var(--ease-out);
+    }
+  }
+  @media (max-width: 899.98px) {
+    .agc-cols {
+      grid-template-columns: 1fr;
+    }
+    .agc-col + .agc-col {
+      border-left: 0;
+      border-top: 1px solid var(--color-line);
+    }
+  }
+</style>
+
+<script>
+  const STEP_MS = 650;
+  document.querySelectorAll<HTMLElement>('[data-agc]').forEach((root) => {
+    const max = Number(root.dataset.steps);
+    const els = Array.from(root.querySelectorAll<HTMLElement>('[data-at]'));
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let timer = 0;
+    const show = (step: number) => els.forEach((el) => el.classList.toggle('is-on', step >= Number(el.dataset.at)));
+    const play = () => {
+      window.clearInterval(timer);
+      if (reduced.matches) return show(max);
+      let step = 0;
+      show(0);
+      timer = window.setInterval(() => {
+        show(++step);
+        if (step >= max) window.clearInterval(timer);
+      }, STEP_MS);
+    };
+    show(reduced.matches ? max : 0);
+    root.querySelector('[data-agc-replay]')?.addEventListener('click', play);
+    // play once, when the panel is well in view
+    const io = new IntersectionObserver(
+      (e) => {
+        if (e[0].isIntersecting) {
+          io.disconnect();
+          play();
+        }
+      },
+      { threshold: 0.4 },
+    );
+    io.observe(root.querySelector('.agc-panel')!);
+  });
+</script>
