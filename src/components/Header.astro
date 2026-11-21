@@ -6,7 +6,7 @@ import { caseStudies } from '../data/case-studies';
 interface Props {
   /** 'case': pages other than the homepage, so section links point back to it */
   variant?: 'home' | 'case';
-  /** where "home" is: '/' on the site; a review homepage (e.g. '/lab/a') when a case study is shown in a direction */
+  /** where "home" is: '/' on the site; can be overridden */
   home?: string;
 }
 const { variant = 'home', home = '/' } = Astro.props;

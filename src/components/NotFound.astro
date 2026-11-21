@@ -7,11 +7,11 @@ import Base from '../layouts/Base.astro';
 import Header from './Header.astro';
 
 interface Props {
-  /** review only: the 404 in a design direction ('a' → .dir-a, links back to /lab/a). Emir 19 Nov. */
+  /** the 404 in a design direction ('a' → .dir-a). Emir 19 Nov. */
   direction?: 'a';
 }
 const { direction } = Astro.props;
-const home = direction ? `/lab/${direction}` : '/';
+const home = '/';
 
 // 5×7 pixel digits
 const DIGITS: Record<string, string[]> = {
