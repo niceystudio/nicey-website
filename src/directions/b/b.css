@@ -1,0 +1,130 @@
+/*
+ * Direction B — "Dither editorial". Serif display (Instrument Serif) with italic turns, all body text in
+ * mono (after Monologue), soft rounded plates, dithered light as texture, film grain over the page.
+ * Refs: Monologue, Ingenii (italic break), Antimetal (zig-zag plates), Otherkind (quiet index, big wordmark).
+ * Scoped to .dir-b. Brand colours unchanged.
+ */
+@import '@fontsource/instrument-serif/400.css';
+@import '@fontsource/instrument-serif/400-italic.css';
+
+.dir-b {
+  --font-serif: 'Instrument Serif', Georgia, serif;
+  --radius-panel: 18px;
+  position: relative;
+  min-height: 100vh;
+  background: var(--color-page);
+  font-family: var(--font-mono);
+  font-size: 15px;
+}
+/* grain over the whole page, very light */
+.dir-b::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  pointer-events: none;
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* headings: serif, the second half in italics carries the accent */
+.dir-b .text-h2 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(44px, 5.6vw, 84px);
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+}
+.dir-b .text-h2 em {
+  font-style: italic;
+  color: var(--color-ink-2);
+}
+.dir-b .b-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-ink-2);
+}
+.dir-b .b-kicker::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+
+/* buttons: soft pills, mono */
+.dir-b .pill {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+
+/* header: logo in the serif, links in one soft capsule (after Antimetal's nav) */
+.dir-b .site-head {
+  background: color-mix(in srgb, var(--color-page) 85%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom-color: transparent !important;
+}
+.dir-b .site-head .head-nav > a:first-child {
+  font-family: var(--font-serif) !important;
+  font-weight: 400 !important;
+  font-size: 30px !important;
+  letter-spacing: -0.02em !important;
+}
+.dir-b .head-links {
+  padding: 4px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--color-line-strong);
+}
+.dir-b .head-link {
+  min-height: 34px !important;
+  padding: 0 14px !important;
+  border-radius: 999px;
+  font-family: var(--font-mono) !important;
+  text-transform: none !important;
+  letter-spacing: 0.01em !important;
+  font-size: 13px !important;
+}
+@media (hover: hover) and (pointer: fine) {
+  .dir-b .head-link:hover {
+    background: var(--color-surface);
+  }
+}
+
+/* FAQ and the closing band, restyled */
+.dir-b details summary,
+.dir-b .text-faq {
+  font-family: var(--font-serif);
+  font-weight: 400;
+}
+.dir-b .closing {
+  text-align: center;
+}
+.dir-b .closing > div {
+  align-items: center !important;
+}
+.dir-b .closing h2 {
+  max-width: none !important;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-style: italic;
+  font-size: clamp(52px, 7vw, 112px);
+  line-height: 0.95;
+}
+.dir-b .site-foot-markwrap {
+  display: none;
+}
+/* heading measure in the serif's own em, not the mono body's ch */
+.dir-b .text-h2 {
+  max-width: 11.5em;
+}
+.dir-b footer a[href='/']:not(.pill) {
+  font-family: var(--font-serif) !important;
+  font-weight: 400 !important;
+  font-size: 30px !important;
+}

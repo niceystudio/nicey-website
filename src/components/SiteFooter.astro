@@ -4,7 +4,7 @@
  * contact, and the copyright line. Sits below the closing band.
  */
 import { links } from '../data/links';
-import { caseStudies, caseHref } from '../data/case-studies';
+import { caseStudies } from '../data/case-studies';
 
 interface Props {
   /** the page's Markdown twin; when set, the base line shows the Human / Machine switch (no gesture, no animation — Emir, 12 Nov) */
@@ -16,22 +16,22 @@ const cols = [
   {
     head: 'Services',
     items: [
-      { href: '/#audit', label: 'Free design system audit' },
-      { href: '/#services', label: 'Design systems for AI agents' },
-      { href: '/#services', label: 'Product design' },
-      { href: '/#how', label: 'How we work' },
-      { href: '/#faq', label: 'FAQ' },
+      { href: '#audit', label: 'Free design system audit' },
+      { href: '#services', label: 'Design systems for AI agents' },
+      { href: '#services', label: 'Product design' },
+      { href: '#how', label: 'How we work' },
+      { href: '#faq', label: 'FAQ' },
     ],
   },
   {
     head: 'Case studies',
-    items: caseStudies.map((c) => ({ href: caseHref(c.slug), label: c.linkName })),
+    items: caseStudies.map((c) => ({ href: '#work', label: c.linkName })),
   },
 ];
 // contact split by purpose (Emir, 11 Nov). The Markdown twin, llms.txt and the sitemap stay
 // discoverable for agents through <link rel="alternate"> in the head and robots.txt, not as footer links.
 const contact = [
-  { head: 'Start a project', items: [{ href: links.bookCall, label: 'Book a call' }, { href: '/#audit', label: 'Get a free audit' }] },
+  { head: 'Start a project', items: [{ href: links.bookCall, label: 'Book a call' }, { href: '#audit', label: 'Get a free audit' }] },
   { head: 'Write to us', items: [{ href: links.email, label: 'Email' }] },
   { head: 'Follow', items: [{ href: links.linkedin, label: 'LinkedIn' }, { href: links.github, label: 'GitHub' }] },
 ];

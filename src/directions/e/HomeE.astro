@@ -1,0 +1,402 @@
+---
+/**
+ * Direction E — "Colour" (review only, noindex). Layout and feel after dessn.com (Emir 19 Nov): warm cream page,
+ * centred hero over a framed product shot on a textured colour band, big rounded colour panels that stack on
+ * scroll, a "start with your agent" panel on deep green, a dark "how it works" band with light cards, FAQ, and a
+ * loud closing band. Mixed type: heavy sans with one italic serif word per headline.
+ * Nicey's copy, work and pastel family only — the pastels pushed to full saturation. dessn's flowers are replaced by
+ * Nicey's pixel language: dithered pixel-wave textures and 7×7 pixel marks (pixel.ts). None of dessn's text,
+ * images or illustrations are used.
+ */
+import './e.css';
+import Base from '../../layouts/Base.astro';
+import Faq from '../../components/Faq.astro';
+import CopyPrompt from '../../components/CopyPrompt.astro';
+import DirectionSwitch from '../DirectionSwitch.astro';
+import { links } from '../../data/links';
+import { steps } from '../../data/zero-drift';
+import { pixelWaves, pixelMark, pixelPortrait } from './pixel';
+
+/* the Nicey pastels, saturated (base / lighter tone for the texture) */
+const C = {
+  violet: ['#7466e0', '#9184ee'],
+  orange: ['#ef7a2c', '#f59a59'],
+  yellow: ['#f2b42a', '#f7cb5c'],
+  green: ['#2e7656', '#3c8d68'],
+  pink: ['#c86ad6', '#d98be4'],
+};
+const tex = {
+  orange: pixelWaves(C.orange[0], C.orange[1], { seed: 1 }),
+  violet: pixelWaves(C.violet[0], C.violet[1], { seed: 2 }),
+  yellow: pixelWaves(C.yellow[0], C.yellow[1], { seed: 3 }),
+  green: pixelWaves(C.green[0], C.green[1], { seed: 4 }),
+};
+/* a softer second texture (Emir 19 Nov): tones close together, bigger pixels — for surfaces that carry text */
+const soft = {
+  green: pixelWaves('#2e7656', '#33805e', { seed: 5, cell: 12 }),
+  violet: pixelWaves('#7466e0', '#7c6fe6', { seed: 6, cell: 12 }),
+};
+const mark = {
+  bloomO: pixelMark('bloom', C.orange[0], '#26251f'),
+  bloomV: pixelMark('bloom', C.violet[0], '#f3f0e9'),
+  spark: pixelMark('spark', C.yellow[0], C.orange[0]),
+  block: pixelMark('block', C.green[0], C.yellow[0]),
+  stack: pixelMark('stack', C.violet[0], C.orange[0]),
+};
+
+const nav = [
+  { label: 'Services', href: '#services' },
+  { label: 'Work', href: '#work' },
+  { label: 'How we work', href: '#how' },
+  { label: 'FAQ', href: '#faq' },
+];
+/* companies we have worked with — the logos from nicey.studio (our own site), copied as SVG into /public/lab/e/logos */
+const logos = [
+  { name: 'Rakuten', src: '/lab/e/logos/rakuten.svg', h: 26 },
+  { name: 'Colgate', src: '/lab/e/logos/colgate.svg', h: 22 },
+  { name: 'Samsung Food', src: '/lab/e/logos/samsung-food.svg', h: 22 },
+  { name: 'UNIDO', src: '/lab/e/logos/unido.svg', h: 30 },
+  { name: 'Omnisafe', src: '/lab/e/logos/omnisafe.svg', h: 20 },
+  { name: 'FLYR', src: '/lab/e/logos/flyr.svg', h: 18 },
+  { name: 'Geonode', src: '/lab/e/logos/geonode.svg', h: 24 },
+  { name: 'Repocket', src: '/lab/e/logos/repocket.svg', h: 24 },
+];
+/* client quotes from nicey.studio; portraits are generated placeholders until we have photos */
+const quotes = [
+  {
+    text: 'Highly recommend to work with Nicey. Goran and Predrag took a lot of attention and care in understanding our business and executed with attention to detail. Looking forward to work with Nicey again!',
+    name: 'Christopher Eller',
+    role: 'Director, ISMS',
+    img: pixelPortrait('#2e7656', '#3c8d68', '#f3f0e9'),
+    tone: 'green',
+  },
+  {
+    text: 'Working with Nicey was seamless. Their communication was always clear, they set the right expectations from the start, and consistently delivered everything on time, from our marketing website to the ebooks.',
+    name: 'Sarah Smith',
+    role: 'Director of Marketing, Rakuten',
+    img: pixelPortrait('#7466e0', '#9184ee', '#f3f0e9'),
+    tone: 'violet',
+  },
+];
+const team = [
+  { name: 'Natasa', src: '/lab/e/team/natasa.png' },
+  { name: 'Dejan', src: '/lab/e/team/dejan.png' },
+  { name: 'Predrag', src: '/lab/e/team/predrag.jpg' },
+];
+
+const panels = [
+  {
+    key: 'violet',
+    tex: tex.violet,
+    title: ['Design', 'systems', 'first.'],
+    lede: 'For products with years of drift, and teams that want their coding agents to build on-system.',
+    items: ['Audit and consolidation', 'Token architecture and theming', 'Component library, Figma to code', 'AI-ready documentation', 'Systems partner, monthly'],
+    marks: [mark.bloomO, mark.spark, mark.block],
+    visual: 'tokens',
+    href: links.exploreDesignSystems,
+    cta: 'Explore design systems',
+  },
+  {
+    key: 'orange',
+    tex: tex.orange,
+    title: ['Product design', 'alongside', '.'],
+    lede: 'Complex workflows designed on the system we build, so new screens ship consistent from day one.',
+    items: ['Product and UX design', 'Design engineering', 'AI workflows in delivery'],
+    marks: [mark.bloomV, mark.stack, mark.block],
+    visual: 'product',
+    href: links.exploreProductDesign,
+    cta: 'Explore product design',
+  },
+  {
+    key: 'yellow',
+    tex: tex.yellow,
+    title: ['It starts with a free', 'audit', '.'],
+    lede: 'Send us your Figma file. You get a score per pillar, the top findings and what to fix first. Free, and we never edit your file.',
+    items: ['Figma inspect', 'Agentic readiness', 'Conventions', 'Component API', 'Zero drift'],
+    marks: [mark.bloomO, mark.bloomV, mark.spark, mark.block, mark.stack],
+    visual: 'audit',
+    href: links.startAudit,
+    cta: 'Get a free audit',
+  },
+];
+
+const work = [
+  { name: 'QBench', meta: 'Design system + product · LIMS', href: links.work.qbench, img: '/work/qbench/product.jpg', text: 'Years without a designer, consolidated into one semantic token system. Plus one status model for eight entry points, shipped as an MVP.' },
+  { name: 'Everbreed', meta: 'Design system + product · Agtech', href: links.work.everbreed, img: '/work/everbreed/desktop-care.jpg', text: 'A mature Figma library made machine-readable, so the code config comes from Figma. And the student app built on it.' },
+  { name: 'Clerky', meta: 'Design system · Legal tech', href: links.work.clerky, tex: tex.violet, text: 'Three-tier tokens, AI-context docs on every component and token, and a zero-T1 defect gate.' },
+  { name: 'Omnisafe', meta: 'Product design · Insurance', href: links.work.omnisafe, tex: tex.green, text: 'Sixteen modules, tested end to end with real employees before engineering began.' },
+  { name: 'FLYR', meta: 'Product design · Hospitality', href: links.work.flyr, tex: tex.orange, text: 'Group Quotation MVP shipped, so hotels can see whether a group booking makes money.' },
+];
+
+const footCols = [
+  { head: 'Services', items: [{ label: 'Design systems', href: links.exploreDesignSystems }, { label: 'Product design', href: links.exploreProductDesign }, { label: 'Free audit', href: links.startAudit }] },
+  { head: 'Work', items: [{ label: 'QBench', href: links.work.qbench }, { label: 'Everbreed', href: links.work.everbreed }, { label: 'Clerky', href: links.work.clerky }, { label: 'Omnisafe', href: links.work.omnisafe }, { label: 'FLYR', href: links.work.flyr }] },
+  { head: 'Contact', items: [{ label: 'Book a call', href: links.bookCall }, { label: 'Email', href: links.email }, { label: 'LinkedIn', href: links.linkedin }] },
+];
+---
+
+<Base title="Nicey · Direction E (review)" description="Design direction E for review: colour, after dessn.com." noindex markdownHref="/index.md">
+  <div class="dir-e">
+    <header class="e-bar">
+      <a href="/" class="e-logo">nicey<span>.</span></a>
+      <nav class="e-nav" aria-label="Main">
+        {nav.map((n) => <a href={n.href}>{n.label}</a>)}
+      </nav>
+      <div class="e-bar-r">
+        <a href={links.bookCall} class="e-link">Book a call</a>
+        <a href="#audit" class="e-btn e-btn--hot">Free audit</a>
+      </div>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <!-- hero: everything on one centre line, then the framed product on a textured band -->
+      <section class="e-hero">
+        <h1>Is your design system ready for <em>AI agents?</em></h1>
+        <p class="e-lede">
+          Send us your Figma file. You get a score per pillar, the top findings and what to fix first. Free, and we never edit your file.
+        </p>
+        <div class="e-ctas">
+          <a href="#audit" class="e-btn e-btn--dark">Get a free audit</a>
+          <a href={links.bookCall} class="e-btn e-btn--ghost">Book a call</a>
+        </div>
+      </section>
+
+      <section class="e-show" aria-label="Our work, QBench">
+        <div class="e-show-band" style={`background-image:${tex.orange}`}>
+          <span class="e-float e-float--1" set:html={mark.bloomV} />
+          <span class="e-float e-float--2" set:html={mark.spark} />
+          <span class="e-float e-float--3" set:html={mark.block} />
+          <figure class="e-frame">
+            <div class="e-frame-bar"><span /><span /><span /><b>QBench · status workflows</b></div>
+            <img src="/work/qbench/product.jpg" alt="QBench product screen, built on the design system we made" width="1280" height="788" />
+          </figure>
+        </div>
+        <div class="e-logos" aria-label="Companies we have worked with">
+          <p class="e-logos-k">Teams we have worked with</p>
+          <div class="e-marquee">
+            <ul class="e-marquee-track">
+              {[...logos, ...logos].map((l, i) => (
+                <li aria-hidden={i >= logos.length ? 'true' : undefined}>
+                  <img src={l.src} alt={i < logos.length ? l.name : ''} style={`height:${l.h}px`} />
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- services + audit: big colour panels that stack while you scroll -->
+      <section id="services" class="e-sec">
+        <ol class="e-stack">
+          {
+            panels.map((p, i) => (
+              <li class={`e-panel e-panel--${p.key}`} style={`background-image:${p.tex};--i:${i}`} id={p.key === 'yellow' ? 'audit' : undefined}>
+                <div class="e-panel-top">
+                  <h3 set:html={`${p.title[0]} <em>${p.title[1]}</em>${p.title[2] === '.' ? '' : ' '}${p.title[2]}`} />
+                  <ul class="e-feats">
+                    {p.items.map((it, k) => (
+                      <li>
+                        <span class="e-mark" set:html={p.marks[k % p.marks.length]} />
+                        {it}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div class="e-panel-body">
+                  <p class="e-panel-lede">{p.lede}</p>
+                  {p.visual === 'tokens' && (
+                    <div class="e-win">
+                      <div class="e-win-bar"><span /><span /><span /><b>tokens.json</b></div>
+                      <pre>{`{
+  "border": "border/default",
+  "background": "component/input/surface/default",
+  "text": "text/default"
+}`}</pre>
+                    </div>
+                  )}
+                  {p.visual === 'product' && (
+                    <div class="e-win e-win--img">
+                      <img src="/work/everbreed/desktop-care.jpg" alt="Everbreed desktop, care plan screen" loading="lazy" />
+                    </div>
+                  )}
+                  {p.visual === 'audit' && (
+                    <div class="e-win">
+                      <div class="e-win-bar"><span /><span /><span /><b>audit · example</b></div>
+                      <ul class="e-bars">
+                        {p.items.map((it) => (
+                          <li><span>{it}</span><i /><em>[score]</em></li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  <a href={p.href} class="e-btn e-btn--dark">{p.cta}</a>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+      </section>
+
+      <!-- start with your own agent (dessn's MCP block) -->
+      <section class="e-sec e-agent">
+        <div class="e-agent-text">
+          <h2>Or start <em>on your own.</em></h2>
+          <p>Not ready to share your file? Let your agent run our seven checks, then bring the results to a call.</p>
+          <CopyPrompt />
+        </div>
+        <div class="e-agent-card" style={`background-image:${tex.green}`}>
+          <div class="e-agent-marks">
+            <span set:html={pixelMark('bloom', C.orange[0], '#26251f', 64)} />
+            <span set:html={pixelMark('block', '#f3f0e9', C.violet[0], 64)} />
+            <span set:html={pixelMark('spark', C.yellow[0], '#f3f0e9', 64)} />
+          </div>
+          <div class="e-agent-box">
+            <span>Your agent reads</span>
+            <b>/ai-ready.md</b>
+            <span class="e-agent-go" aria-hidden="true">↑</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- work -->
+      <section id="work" class="e-sec">
+        <div class="e-head">
+          <h2>Systems and products <em>we have built.</em></h2>
+        </div>
+        <div class="e-work">
+          {
+            work.map((w) => (
+              <a href={w.href} class:list={['e-tile', w.img ? 'e-tile--img' : 'e-tile--tex']} id={`work-${w.name.toLowerCase()}`}>
+                <div class="e-tile-art" style={w.tex ? `background-image:${w.tex}` : undefined}>
+                  {w.img && <img src={w.img} alt="" loading="lazy" />}
+                </div>
+                <div class="e-tile-text">
+                  <h3>{w.name}</h3>
+                  <span class="e-meta">{w.meta}</span>
+                  <p>{w.text}</p>
+                </div>
+              </a>
+            ))
+          }
+        </div>
+      </section>
+
+      <!-- what clients say: one card at a time, arrows + progress (dessn's quote carousel) -->
+      <section class="e-sec e-quotes" aria-roledescription="carousel" aria-label="What clients say" data-q>
+        <div class="e-head e-head--row">
+          <h2>What clients <em>say.</em></h2>
+          <div class="e-q-nav">
+            <button type="button" class="e-q-btn" data-q-prev aria-label="Previous quote">←</button>
+            <button type="button" class="e-q-btn" data-q-next aria-label="Next quote">→</button>
+          </div>
+        </div>
+        <div class="e-q-track" data-q-track>
+          {
+            quotes.map((q, i) => (
+              <figure class={`e-q e-q--${q.tone}`} style={`background-image:${q.tone === 'green' ? soft.green : soft.violet}`} aria-roledescription="slide" aria-label={`${i + 1} of ${quotes.length}`} data-q-slide>
+                <div class="e-q-box">
+                  <blockquote>“{q.text}”</blockquote>
+                  <figcaption>
+                    <img src={q.img} alt="" width="56" height="56" />
+                    <span><b>{q.name}</b>{q.role}</span>
+                    <i class="e-q-ph">placeholder photo</i>
+                  </figcaption>
+                </div>
+              </figure>
+            ))
+          }
+        </div>
+        <div class="e-q-dots" aria-hidden="true">{quotes.map((_, i) => <span class={i === 0 ? 'is-on' : undefined} data-q-dot />)}</div>
+      </section>
+
+      <!-- how we work: the dark band -->
+      <section id="how" class="e-dark">
+        <div class="e-dark-in">
+          <span class="e-dark-mark" set:html={pixelMark('bloom', C.orange[0], C.yellow[0], 96)} />
+          <div class="e-head e-head--dark">
+            <h2>From drift to a system that <em>holds.</em></h2>
+          </div>
+          <ol class="e-steps">
+            {
+              steps.map((s) => (
+                <li>
+                  <span class="e-step-n">{Number(s.num)}</span>
+                  <h3>{s.name}</h3>
+                  <p>{s.heading}</p>
+                  <p class="e-step-get"><span>You get</span>{s.youGet}</p>
+                </li>
+              ))
+            }
+          </ol>
+
+          <!-- who you work with: Goran large, the team small (dessn's head-of-product video, as photos) -->
+          <div class="e-founder">
+            <div class="e-founder-pics">
+              <img class="e-founder-main" src="/lab/e/team/goran.jpg" alt="Goran, co-founder of Nicey" width="400" height="400" loading="lazy" />
+              <ul class="e-founder-team" aria-label="The team">
+                {team.map((t) => <li><img src={t.src} alt={t.name} loading="lazy" /><span>{t.name}</span></li>)}
+              </ul>
+            </div>
+            <figure class="e-founder-q">
+              <p class="e-founder-who">Goran · Co-founder, Nicey <span class="e-tag">draft</span></p>
+              <blockquote>“Most teams don't need a new design system. They need the one they have to finally <em>agree with their code</em>, so people and agents can build on it without guessing.”</blockquote>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <div class="e-faq"><Faq /></div>
+
+      <!-- closing band -->
+      <section class="e-cta" style={`background-image:${tex.orange}`}>
+        <span class="e-float e-float--4" set:html={pixelMark('bloom', C.violet[0], '#f3f0e9', 72)} />
+        <span class="e-float e-float--5" set:html={pixelMark('spark', C.yellow[0], C.violet[0], 56)} />
+        <h2>Send us the system <em>you have.</em></h2>
+        <p>We will show you the one you should.</p>
+        <div class="e-ctas">
+          <a href="#audit" class="e-btn e-btn--dark">Get a free audit</a>
+          <a href={links.bookCall} class="e-btn e-btn--light">Book a call</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="e-foot">
+      <div class="e-foot-in">
+        <div class="e-foot-brand">
+          <a href="/" class="e-logo">nicey<span>.</span></a>
+          <p>Design systems people and agents read the same way.</p>
+        </div>
+        {
+          footCols.map((c) => (
+            <div class="e-foot-col">
+              <h3>{c.head}</h3>
+              <ul>{c.items.map((it) => <li><a href={it.href}>{it.label}</a></li>)}</ul>
+            </div>
+          ))
+        }
+      </div>
+      <p class="e-foot-base">© {new Date().getFullYear()} Nicey Studio · <a href="/index.md">index.md</a></p>
+    </footer>
+  </div>
+  <DirectionSwitch current="e" />
+</Base>
+
+<script>
+  // quote carousel: arrows move one card; the dots follow; swipe/scroll also works (scroll-snap)
+  document.querySelectorAll<HTMLElement>('[data-q]').forEach((root) => {
+    const track = root.querySelector<HTMLElement>('[data-q-track]')!;
+    const slides = Array.from(root.querySelectorAll<HTMLElement>('[data-q-slide]'));
+    const dots = Array.from(root.querySelectorAll<HTMLElement>('[data-q-dot]'));
+    const go = (dir: number) => {
+      const w = slides[0].getBoundingClientRect().width + 20;
+      track.scrollBy({ left: dir * w, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    };
+    root.querySelector('[data-q-prev]')?.addEventListener('click', () => go(-1));
+    root.querySelector('[data-q-next]')?.addEventListener('click', () => go(1));
+    track.addEventListener('scroll', () => {
+      const w = slides[0].getBoundingClientRect().width + 20;
+      const i = Math.round(track.scrollLeft / w);
+      dots.forEach((d, k) => d.classList.toggle('is-on', k === i));
+    }, { passive: true });
+  });
+</script>

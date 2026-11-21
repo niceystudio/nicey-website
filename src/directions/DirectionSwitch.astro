@@ -1,0 +1,86 @@
+---
+/** Review only (lab pages, noindex): jump between the design directions; "All" goes back to the list at /. */
+interface Props {
+  current: 'a' | 'b' | 'c' | 'd' | 'e';
+  /** on the live homepage the static | story switch already sits bottom-right */
+  side?: 'left' | 'right';
+}
+const { current, side = 'right' } = Astro.props;
+const items = [
+  { id: 'all', label: 'All', href: '/' },
+  { id: 'a', label: 'A · Select', href: '/lab/a' },
+  { id: 'b', label: 'B · Editorial', href: '/lab/b' },
+  { id: 'c', label: 'C · Human | Machine', href: '/lab/c' },
+  { id: 'd', label: 'D · Clean', href: '/lab/d' },
+  { id: 'e', label: 'E · Colour', href: '/lab/e' },
+];
+---
+
+<nav class:list={['dsw', side === 'left' && 'dsw--left']} aria-label="Design directions">
+  <span class="dsw-k">Direction</span>
+  {
+    items.map((it) => (
+      <a href={it.href} aria-current={it.id === current ? 'page' : undefined}>
+        {it.label}
+      </a>
+    ))
+  }
+</nav>
+
+<style>
+  .dsw {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 5px;
+    border: 1px solid var(--color-line-strong);
+    background: var(--color-page);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    box-shadow: 0 10px 30px -14px rgba(0, 0, 0, 0.5);
+  }
+  .dsw-k {
+    padding: 0 8px;
+    color: var(--color-muted);
+  }
+  .dsw a {
+    padding: 7px 10px;
+    color: var(--color-ink-2);
+    text-decoration: none;
+  }
+  .dsw--left {
+    right: auto;
+    left: 16px;
+  }
+  .dsw a {
+    white-space: nowrap;
+  }
+  @media (max-width: 600px) {
+    .dsw {
+      left: 8px;
+      right: 8px;
+      bottom: 8px;
+      justify-content: center;
+      font-size: 10px;
+    }
+    .dsw-k {
+      display: none;
+    }
+    .dsw--left {
+      bottom: 64px;
+    }
+    .dsw a {
+      padding: 7px 7px;
+    }
+  }
+  .dsw a[aria-current] {
+    background: var(--color-ink);
+    color: var(--color-page);
+  }
+</style>

@@ -1,0 +1,212 @@
+/*
+ * Direction C — "Human | Machine" (built as D, renamed after review). The page reads two ways. Human (default): condensed display capitals
+ * (Archivo, narrow), sans body, light and dark bands joined by stepped pixel edges. Machine: one switch
+ * turns every display word into the pixel face, word by word, and reveals what an agent sees: each block
+ * labelled with its role. Refs: Instantly (condensed caps, pixel/grotesk mix, ticker, two-ways cards),
+ * Parallel (key badges, HUMAN | MACHINE), Reevo (stepped pixel edges, halftone with a colour square),
+ * basement.studio (HUMAN | MACHINE toggle, big wordmark). Scoped to .dir-d. Brand colours unchanged.
+ */
+@import '@fontsource-variable/archivo/wdth.css';
+@import '@fontsource/geist-pixel/400.css';
+
+.dir-d {
+  --font-cond: 'Archivo Variable', var(--font-sans);
+  --font-pixel: 'Geist Pixel', var(--font-mono);
+  --radius-panel: 6px;
+  /* the contrast band: dark on the light theme, cream on the dark theme, so the bands always read */
+  --d-band: #26251f;
+  --d-on-band: #f3f0e9;
+  --d-on-band-2: #b6b1a3;
+  min-height: 100vh;
+  background: var(--color-page);
+}
+
+:root[data-theme='dark'] .dir-d {
+  --d-band: #ece7db;
+  --d-on-band: #141410;
+  --d-on-band-2: #4d4a40;
+}
+
+/* condensed display capitals */
+.dir-d .d-display {
+  font-family: var(--font-cond);
+  font-stretch: 68%;
+  font-weight: 760;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 0.9;
+}
+.dir-d .d-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--color-line-strong);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-ink-2);
+}
+.dir-d .d-kicker::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background:
+    linear-gradient(currentColor, currentColor) 0 0 / 3px 3px no-repeat,
+    linear-gradient(currentColor, currentColor) 5px 5px / 3px 3px no-repeat,
+    linear-gradient(currentColor, currentColor) 5px 0 / 3px 3px no-repeat;
+}
+/* words a machine reads, set in the pixel face (Instantly's mix) */
+.dir-d .d-m {
+  font-family: var(--font-pixel);
+  font-weight: 400;
+  font-stretch: 100%;
+  letter-spacing: 0;
+}
+
+/* each display word can flip to pixel in Machine mode, one after another */
+.dir-d .d-w {
+  display: inline-block;
+  transition: none;
+}
+.dir-d[data-read='machine'] .d-w {
+  font-family: var(--font-pixel);
+  font-weight: 400;
+  font-stretch: 100%;
+  letter-spacing: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .dir-d .d-w {
+    transition: font-family 0s calc(var(--k, 0) * 28ms);
+  }
+}
+
+/* Machine mode: every block shows what an agent reads it as */
+.dir-d [data-m] {
+  position: relative;
+}
+.dir-d [data-m]::after {
+  content: attr(data-m);
+  position: absolute;
+  left: 0;
+  top: -22px;
+  z-index: 5;
+  padding: 2px 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  background: var(--color-accent);
+  color: var(--color-page);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out);
+  pointer-events: none;
+}
+.dir-d[data-read='machine'] [data-m] {
+  outline: 1px dashed var(--color-accent);
+  outline-offset: 6px;
+}
+.dir-d[data-read='machine'] [data-m]::after {
+  opacity: 1;
+  transform: none;
+}
+
+/* dark band */
+.dir-d .d-band {
+  background: var(--d-band);
+  color: var(--d-on-band);
+  --color-ink: var(--d-on-band);
+  --color-ink-2: var(--d-on-band-2);
+  --color-surface: color-mix(in srgb, var(--d-on-band) 6%, var(--d-band));
+  --color-page: var(--d-band);
+  --color-line: color-mix(in srgb, var(--d-on-band) 14%, transparent);
+  --color-line-strong: color-mix(in srgb, var(--d-on-band) 28%, transparent);
+}
+
+/* buttons: dark pill + a round arrow chip (Instantly) */
+.dir-d .d-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 0 6px 0 20px;
+  border-radius: 999px;
+  background: var(--color-ink);
+  color: var(--color-page);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: transform 160ms var(--ease-out);
+}
+.dir-d .d-btn i {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-page) 16%, transparent);
+  font-style: normal;
+  transition: transform 200ms var(--ease-out);
+}
+.dir-d .d-btn--ghost {
+  background: transparent;
+  color: var(--color-ink);
+  box-shadow: inset 0 0 0 1px var(--color-line-strong);
+}
+.dir-d .d-btn--ghost i {
+  background: var(--color-surface);
+}
+@media (hover: hover) and (pointer: fine) {
+  .dir-d .d-btn:hover i {
+    transform: rotate(-45deg);
+  }
+}
+.dir-d .d-btn:active {
+  transform: scale(0.97);
+}
+
+/* header */
+.dir-d .site-head {
+  background: color-mix(in srgb, var(--color-page) 90%, transparent);
+  backdrop-filter: blur(10px);
+}
+.dir-d .head-links {
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--color-surface);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+.dir-d .head-link {
+  min-height: 32px !important;
+  padding: 0 12px !important;
+  border-radius: 999px;
+  font-family: var(--font-sans) !important;
+  font-size: 13px !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+/* reused FAQ + closing band */
+.dir-d .text-h2 {
+  font-family: var(--font-cond);
+  font-stretch: 68%;
+  font-weight: 760;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 0.92;
+}
+.dir-d .closing h2 {
+  max-width: none !important;
+  font-family: var(--font-cond);
+  font-stretch: 68%;
+  font-weight: 760;
+  text-transform: uppercase;
+  font-size: clamp(56px, 9vw, 150px);
+  line-height: 0.88;
+}
+.dir-d .site-foot-markwrap {
+  display: none;
+}
