@@ -91,19 +91,20 @@ const steps = [
     font-size: 13px;
     color: var(--color-muted);
   }
+  /* no rules between the steps (Goran, 23 Nov: too many lines) — spacing alone separates them */
   .pa-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
     margin: 0;
-    padding: 0;
+    padding: 8px 0 0;
     list-style: none;
-    border-top: 1px solid var(--a-rule);
   }
   .pa-steps li {
     display: grid;
     grid-template-columns: 32px minmax(0, 1fr);
     align-items: baseline;
     gap: 12px;
-    padding: 18px 0;
-    border-bottom: 1px solid var(--a-rule);
   }
   .pa-n {
     font-family: var(--font-mono);
@@ -114,18 +115,6 @@ const steps = [
     font-size: var(--text-cta);
     line-height: 1.3;
     color: var(--color-ink);
-  }
-  /* the steps column fills the report's height (the rows share it), so no empty block sits beside the report */
-  @media (min-width: 1024px) {
-    .pa-steps {
-      display: flex;
-      flex: 1;
-      flex-direction: column;
-    }
-    .pa-steps li {
-      flex: 1;
-      align-items: center;
-    }
   }
   /* the action comes last, after the process */
   .pa-act {
