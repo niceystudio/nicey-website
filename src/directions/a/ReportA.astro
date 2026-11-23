@@ -2,12 +2,15 @@
 /**
  * Direction A: the audit report as a terminal window with its three pages (p.1 Score, p.2 Drift map,
  * p.3 Fix first) instead of paper sheets. 19 Nov (Emir: more terminal, less capitals): each page opens with the
- * command and a # comment saying what the page holds; tabs and bar in sentence case. Marked "example": bars are drawn, scores and days stay [gaps].
+ * command and a # comment saying what the page holds; tabs and bar in sentence case. Marked "example": bars are drawn; scores, grade and days are sample values (Emir 23 Nov: fill them, it's an example).
  * 20 Nov (Emir: consistent with the design-systems.md terminal in "What we help with"): the same coloured stage with the
  * same dark window inside — soft-filled tabs, file name on the right, mono reading, blinking cursor (QBenchWork values).
  */
 const pillars = ['Figma inspect', 'Agentic readiness', 'Conventions', 'Component API', 'Zero drift'];
 const bars = [9, 4, 7, 6, 3];
+/* sample values for the example report (match the bars, out of 100) */
+const scores = ['76/100', '34/100', '58/100', '51/100', '27/100'];
+const days = ['2 days', '5 days', '1 day', '3 days', '4 days'];
 const bar = (n: number) => '▇'.repeat(n) + '░'.repeat(12 - n);
 const pages = [
   {
@@ -16,9 +19,9 @@ const pages = [
     cmd: 'nicey audit your-file.fig --page score',
     note: 'A grade and a score per pillar.',
     lines: [
-      ...pillars.map((p, i) => `${p.padEnd(19)} ${bar(bars[i])}  [score]`),
+      ...pillars.map((p, i) => `${p.padEnd(19)} ${bar(bars[i])}  ${scores[i]}`),
       ''.padEnd(46, '─'),
-      `${'grade'.padEnd(19)} [grade]`,
+      `${'grade'.padEnd(19)} C`,
     ],
   },
   {
@@ -41,7 +44,7 @@ const pages = [
     tab: 'fix first',
     cmd: 'nicey audit your-file.fig --page fix',
     note: 'Top findings, each sized in days.',
-    lines: pillars.map((p, i) => `${String(i + 1).padStart(2, '0')}  ${p.toLowerCase().padEnd(20, '.')} top finding  [days]`),
+    lines: pillars.map((p, i) => `${String(i + 1).padStart(2, '0')}  ${p.toLowerCase().padEnd(20, '.')} top finding  ${days[i]}`),
   },
 ];
 ---

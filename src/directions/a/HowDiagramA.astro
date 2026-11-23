@@ -1,0 +1,192 @@
+---
+/**
+ * Direction A · How we work illustration (after the halaska.com/agentic-systems hero, in A's square 1px style):
+ * drifted values on the left flow into one system (Tokens / Components / Docs) and leave as one line that fans out
+ * to every surface. Values are examples, not counts.
+ * Emir 23 Nov: picked from three ideas (A / B rail / C loop); the illustration alone carries the section, inside the
+ * homepage's white container — the five step cards left the page (their text stays in the Markdown twin).
+ * Motion: dots travel the routes (SMIL), layers float; paused off screen, none with reduced motion.
+ */
+const inputs = ['#1a61ec', '14px', 'blue-ish', 'grey-2 copy', 'radius 6 or 8?', 'Figma ≠ code'];
+const outputs = ['Web', 'iOS', 'Android', 'Figma library', 'Coding agents'];
+const inY = inputs.map((_, i) => 58 + i * 52);
+const outY = outputs.map((_, i) => 72 + i * 62);
+const layers = ['Tokens', 'Components', 'Docs'];
+const CY = 196;
+---
+
+<figure class="hd hd-a" data-hd>
+  <svg viewBox="0 0 1200 360" role="img" aria-label="Drifted values flow into one system of tokens, components and docs, then out to every surface.">
+    <text class="hd-cap" x="208" y="22" text-anchor="end">Drift · example</text>
+    <text class="hd-cap" x="600" y="22" text-anchor="middle">One system</text>
+    <text class="hd-cap" x="960" y="22">Every surface</text>
+
+    {
+      inputs.map((t, i) => (
+        <g>
+          <text class="hd-in" x="208" y={inY[i] + 4} text-anchor="end">{t}</text>
+          <rect class="hd-pin hd-pin-hot" x="218" y={inY[i] - 3} width="6" height="6" />
+          <path id={`hda-in-${i}`} class="hd-route hd-route-in" d={`M224 ${inY[i]} C 360 ${inY[i]} 350 ${CY} 478 ${CY}`} />
+        </g>
+      ))
+    }
+    {
+      outputs.map((t, i) => (
+        <g>
+          <path id={`hda-out-${i}`} class="hd-route" d={`M722 ${CY} L800 ${CY} C 880 ${CY} 860 ${outY[i]} 952 ${outY[i]}`} />
+          <rect class="hd-pin" x="952" y={outY[i] - 3} width="6" height="6" />
+          <text class="hd-out" x="970" y={outY[i] + 5}>{t}</text>
+        </g>
+      ))
+    }
+
+    {
+      layers.map((t, i) => (
+        <g class="hd-layer" style={`--i:${i}`}>
+          <rect x="478" y={120 + i * 52} width="244" height="44" />
+          <text x="600" y={120 + i * 52 + 29} text-anchor="middle">{t}</text>
+        </g>
+      ))
+    }
+
+    <g class="hd-dots" aria-hidden="true">
+      {
+        inputs.map((_, i) => (
+          <rect class="hd-dot hd-dot-hot" x="-3" y="-3" width="6" height="6">
+            <animateMotion dur="2.6s" begin={`-${(i * 0.43).toFixed(2)}s`} repeatCount="indefinite" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.6 1">
+              <mpath href={`#hda-in-${i}`} />
+            </animateMotion>
+          </rect>
+        ))
+      }
+      {
+        outputs.map((_, i) => (
+          <rect class="hd-dot" x="-3" y="-3" width="6" height="6">
+            <animateMotion dur="2.6s" begin={`-${(1.3 + i * 0.52).toFixed(2)}s`} repeatCount="indefinite" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.6 1">
+              <mpath href={`#hda-out-${i}`} />
+            </animateMotion>
+          </rect>
+        ))
+      }
+    </g>
+  </svg>
+</figure>
+
+<style is:global>
+  .hd-a svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .hd-cap {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    fill: var(--color-muted);
+  }
+  .hd-in {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    fill: var(--color-ink-2);
+  }
+  .hd-out {
+    font-family: var(--font-mono);
+    font-size: 15px;
+    fill: var(--color-ink);
+  }
+  .hd-route {
+    fill: none;
+    stroke: var(--a-rule);
+    stroke-width: 1;
+  }
+  .hd-route-in {
+    stroke-dasharray: 4 4;
+  }
+  .hd-pin,
+  .hd-dot {
+    fill: var(--color-accent);
+  }
+  .hd-pin-hot,
+  .hd-dot-hot {
+    fill: var(--color-hot);
+  }
+  .hd.is-paused *,
+  .hd:not(.is-in) .hd-layer {
+    animation-play-state: paused !important;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hd .hd-dots {
+      display: none;
+    }
+    .hd * {
+      animation: none !important;
+    }
+  }
+  /* the homepage's white container (same as the audit / FAQ panels), illustration only */
+  .hd.hd-a {
+    margin: 0;
+    padding: 48px 40px 40px;
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+  }
+  .hd-a .hd-layer {
+    animation: hd-float 4.8s ease-in-out infinite;
+    animation-delay: calc(var(--i) * -1.6s);
+  }
+  .hd-a .hd-layer rect {
+    fill: var(--color-surface);
+    stroke: var(--a-rule);
+  }
+  .hd-a .hd-layer[style*='--i:0'] rect {
+    fill: var(--a-block);
+    stroke: var(--a-block);
+  }
+  .hd-a .hd-layer[style*='--i:0'] text {
+    fill: var(--a-on-block);
+  }
+  .hd-a .hd-layer text {
+    font-family: var(--font-pixel);
+    font-size: 20px;
+    fill: var(--color-ink);
+  }
+  @keyframes hd-float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-4px);
+    }
+  }
+  /* phones: the same illustration, swipe sideways inside the box */
+  @media (max-width: 767px) {
+    .hd.hd-a {
+      overflow-x: auto;
+      padding: 32px 20px 24px;
+    }
+    .hd.hd-a svg {
+      width: 760px;
+      max-width: none;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-hd]').forEach((fig) => {
+    const svg = fig.querySelector('svg');
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          fig.classList.add('is-in');
+          fig.classList.remove('is-paused');
+          svg?.unpauseAnimations();
+        } else {
+          fig.classList.add('is-paused');
+          svg?.pauseAnimations();
+        }
+      },
+      { threshold: 0.25 },
+    );
+    io.observe(fig);
+  });
+</script>
