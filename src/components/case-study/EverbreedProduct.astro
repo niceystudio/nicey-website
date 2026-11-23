@@ -153,7 +153,7 @@ const clip = (id: string) => ({ src: `${base}/mobile-${id}.webm`, poster: `${bas
     justify-content: center;
     gap: 14px;
     min-height: 72vh;
-    opacity: 0.35;
+    opacity: 0.62; /* was 0.35: inactive steps failed contrast (20 Nov review) */
     transition: opacity 300ms var(--ease-out);
   }
   .ep-step.is-on {
@@ -239,7 +239,7 @@ const clip = (id: string) => ({ src: `${base}/mobile-${id}.webm`, poster: `${bas
   .ep-browser {
     overflow: hidden;
     border: 1px solid var(--color-line-strong);
-    border-radius: 14px;
+    border-radius: var(--radius-panel, 14px); /* square in direction A */
     background: var(--color-surface);
     box-shadow: 0 30px 60px -24px rgba(38, 37, 31, 0.3);
   }
