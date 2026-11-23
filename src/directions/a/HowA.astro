@@ -42,6 +42,11 @@ import HowDiagramB from './HowDiagramB.astro';
     margin-bottom: 48px;
   }
   /* one container, no rules inside: the steps are separated by space alone */
+  /* one container, no rules inside: the steps are separated by space alone */
+  /* Card proportions (Goran, 23 Nov: rebalanced): one dominant element per card — the step name. Sizes on a 4:3 scale
+     from the 15px body (15 → 20 → 27), spacing on the 8px grid. The number is a marker, not a headline: it sits one
+     step below the name, and further from it (24px) than the name is from its sentence (8px), so name + sentence
+     read as one group. */
   .ho-steps {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -55,25 +60,25 @@ import HowDiagramB from './HowDiagramB.astro';
   .ho-step {
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    padding: 20px 18px 24px;
+    padding: 24px;
   }
   .ho-num {
+    margin-bottom: 24px;
     font-family: var(--font-pixel);
-    font-size: 44px;
+    font-size: 20px;
     line-height: 1;
     color: var(--color-accent);
   }
   .ho-name {
-    margin-top: 8px;
+    margin-bottom: 8px;
     font-family: var(--font-pixel);
     font-weight: 400;
-    font-size: 26px;
-    line-height: 1.05;
+    font-size: 27px;
+    line-height: 1.1;
   }
   .ho-line {
     font-size: 15px;
-    line-height: 1.45;
+    line-height: 1.5;
     color: var(--color-ink-2);
     text-wrap: pretty;
   }

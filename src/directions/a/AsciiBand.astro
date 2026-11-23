@@ -7,8 +7,8 @@
  *   scale   the products built on the system: mini screens drawn only from the same tokens
  * "Change one token" (23 Nov): pick an accent and a corner style. The block re-colours, the agents re-read every
  * row and report "synced", and the screens on the right follow in a cascade — when the system is right, a change
- * is one edit, not a hunt. The controls are real buttons; the band itself is decorative (aria-hidden), and a live
- * region says in words what changed. Reduced motion: no scrolling, the change applies at once.
+ * is one edit, not a hunt. The controls sit under the band (Goran, 23 Nov) and are real buttons; the band itself is
+ * decorative (aria-hidden), and a screen-reader-only live region says in words what changed. Reduced motion: no scrolling, the change applies at once.
  */
 const drift = ['purple-2', 'purpleLight2', 'brand/purple/30', 'col-7', 'violet-final', '#6b5fbe', '#7266c4', '#665ab8'];
 const tokens = [
@@ -68,37 +68,6 @@ const data = Array.from({ length: ROWS }, (_, i) => {
 ---
 
 <section class="ab" aria-label="Change one token" data-ab style={`--ab-accent:${accents[0].hex};--ab-r:${styles[0].r}`}>
-  <div class="ab-bar">
-    <p class="ab-k m-0">Change one token</p>
-    <div class="ab-ctl" role="group" aria-label="color.accent">
-      <span class="ab-ctl-k" aria-hidden="true">color.accent</span>
-      {
-        accents.map((a, i) => (
-          <button
-            type="button"
-            class="ab-sw"
-            style={`--sw:${a.hex}`}
-            aria-label={a.label}
-            aria-pressed={i === 0 ? 'true' : 'false'}
-            data-accent={a.hex}
-            data-name={a.label}
-          />
-        ))
-      }
-    </div>
-    <div class="ab-ctl" role="group" aria-label="radius">
-      <span class="ab-ctl-k" aria-hidden="true">radius</span>
-      {
-        styles.map((s, i) => (
-          <button type="button" class="ab-st" aria-pressed={i === 0 ? 'true' : 'false'} data-radius={s.r} data-name={s.label}>
-            {s.label}
-          </button>
-        ))
-      }
-    </div>
-    <p class="ab-live m-0" aria-live="polite" data-live></p>
-  </div>
-
   <div class="ab-stage a-grain" aria-hidden="true">
     <div class="ab-labels">
       <span>drift</span><span>system</span><span>agents</span><span class="ab-scale-k">scale</span>
@@ -142,6 +111,43 @@ const data = Array.from({ length: ROWS }, (_, i) => {
       </div>
     </div>
   </div>
+  <div class="ab-bar">
+    <p class="ab-k ab-k--wide m-0">Change one token</p>
+    <!-- on a phone the controls fold under one button (Goran, 23 Nov) -->
+    <button type="button" class="ab-toggle" aria-expanded="false" aria-controls="ab-ctls" data-ab-toggle>
+      Change one token <span class="ab-toggle-i" aria-hidden="true">+</span>
+    </button>
+    <div class="ab-ctls" id="ab-ctls">
+    <div class="ab-ctl" role="group" aria-label="color.accent">
+      <span class="ab-ctl-k" aria-hidden="true">color.accent</span>
+      {
+        accents.map((a, i) => (
+          <button
+            type="button"
+            class="ab-sw"
+            style={`--sw:${a.hex}`}
+            aria-label={a.label}
+            aria-pressed={i === 0 ? 'true' : 'false'}
+            data-accent={a.hex}
+            data-name={a.label}
+          />
+        ))
+      }
+    </div>
+    <div class="ab-ctl" role="group" aria-label="radius">
+      <span class="ab-ctl-k" aria-hidden="true">radius</span>
+      {
+        styles.map((s, i) => (
+          <button type="button" class="ab-st" aria-pressed={i === 0 ? 'true' : 'false'} data-radius={s.r} data-name={s.label}>
+            {s.label}
+          </button>
+        ))
+      }
+    </div>
+    </div>
+    <p class="sr-only" aria-live="polite" data-live></p>
+  </div>
+
 </section>
 
 <style>
@@ -158,12 +164,62 @@ const data = Array.from({ length: ROWS }, (_, i) => {
     align-items: center;
     gap: 12px 28px;
     padding: 14px var(--spacing-gutter, 24px);
-    border-bottom: 1px solid var(--a-rule);
+    border-top: 1px solid var(--a-rule);
     font-family: var(--font-mono);
     font-size: 12px;
   }
   .ab-k {
     color: var(--color-ink);
+  }
+  .ab-ctls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 28px;
+  }
+  .ab-toggle {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 40px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-ink);
+    font: inherit;
+    cursor: pointer;
+  }
+  .ab-toggle-i {
+    font-size: 16px;
+    line-height: 1;
+    transition: transform 200ms var(--ease-out);
+  }
+  .ab-toggle[aria-expanded='true'] .ab-toggle-i {
+    transform: rotate(45deg);
+  }
+  .ab-toggle:focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+  }
+  @media (max-width: 767px) {
+    .ab-k--wide {
+      display: none;
+    }
+    .ab-toggle {
+      display: flex;
+    }
+    .ab-ctls {
+      display: none;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 14px;
+      width: 100%;
+      padding-bottom: 6px;
+    }
+    .ab-bar.is-open .ab-ctls {
+      display: flex;
+    }
   }
   .ab-ctl {
     display: flex;
@@ -204,10 +260,6 @@ const data = Array.from({ length: ROWS }, (_, i) => {
   .ab-sw:focus-visible,
   .ab-st:focus-visible {
     outline: 2px solid var(--color-ink);
-  }
-  .ab-live {
-    margin-left: auto;
-    color: var(--color-muted);
   }
   @media (hover: hover) and (pointer: fine) {
     .ab-st:not([aria-pressed='true']):hover {
@@ -390,10 +442,6 @@ const data = Array.from({ length: ROWS }, (_, i) => {
     .ab-scale-k {
       display: none;
     }
-    .ab-live {
-      flex-basis: 100%;
-      margin-left: 0;
-    }
   }
   @media (max-width: 720px) {
     .ab-stage {
@@ -416,6 +464,12 @@ const data = Array.from({ length: ROWS }, (_, i) => {
       speed: Number(row.dataset.speed) || 1,
     }));
     const live = band.querySelector<HTMLElement>('[data-live]')!;
+    const toggle = band.querySelector<HTMLButtonElement>('[data-ab-toggle]');
+    toggle?.addEventListener('click', () => {
+      const open = toggle.getAttribute('aria-expanded') !== 'true';
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.closest('.ab-bar')!.classList.toggle('is-open', open);
+    });
     let accentName = 'Violet';
     let radiusName = 'Sharp';
 
