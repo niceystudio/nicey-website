@@ -4,7 +4,9 @@
  * The source cycles every few seconds (or on click); the steps light one after another.
  * Surfaces and step order are from the QBench Figma (fields → signature / PIN → comment).
  */
-const sources = ['Order detail page', 'Test list page', 'Publishing a report', 'Automations', 'API'];
+// only places where a person changes the status (Emir 23 Nov): automations and the API can't fill fields or sign —
+// a run that needs them fails (see Problems we solved), so they don't belong in this loop
+const sources = ['Order detail page', 'Test detail page', 'Test list page', 'Batch detail page', 'Publishing a report'];
 const steps = [
   { k: 'Move', v: 'In progress → Completed' },
   { k: 'Page 1', v: 'Required fields' },
