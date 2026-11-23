@@ -28,7 +28,7 @@ import MachineView from './MachineView.astro';
 import { caseMarkdown } from '../../lib/case-markdown';
 import SiteFooter from '../SiteFooter.astro';
 import { links } from '../../data/links';
-import { caseHref, caseStudies, getCaseStudy, type Band, type CaseStudy } from '../../data/case-studies';
+import { caseHref, nextPublished, publishedCaseStudies, type Band, type CaseStudy } from '../../data/case-studies';
 import { qbenchChaptersA, everbreedAliasesDiff } from '../../data/case-studies-a';
 
 interface Props {
@@ -60,8 +60,8 @@ const chapters = chaptersA && s.chapters && s.slug === 'qbench-design-system' ? 
 /** the homepage these links go back to: the site, or the direction's review homepage */
 const home = '/';
 const caseLink = (slug: string) => caseHref(slug);
-const next = getCaseStudy(s.next);
-const prev = caseStudies.find((c) => c.next === s.slug);
+const next = nextPublished(s.slug);
+const prev = publishedCaseStudies.find((c) => c.slug !== s.slug && nextPublished(c.slug).slug === s.slug);
 
 // literal class names so Tailwind sees them
 const bandBg: Record<Band, string> = {

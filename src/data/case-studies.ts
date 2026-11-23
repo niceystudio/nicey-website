@@ -63,6 +63,8 @@ export interface Shot {
 
 export interface CaseStudy {
   slug: string;
+  /** work in progress: no page, no Markdown twin, left out of the footer, sitemap and llms.txt; its Work row isn't a link */
+  wip?: boolean;
   /** used in the "Next case study" link and the page title */
   linkName: string;
   name: string;
@@ -916,6 +918,7 @@ export const caseStudies: CaseStudy[] = [
 
   {
     slug: 'clerky',
+    wip: true,
     linkName: 'Clerky',
     name: 'Clerky',
     band: 'butter',
@@ -1000,6 +1003,7 @@ export const caseStudies: CaseStudy[] = [
 
   {
     slug: 'omnisafe',
+    wip: true,
     linkName: 'Omnisafe',
     name: 'Omnisafe',
     band: 'mauve',
@@ -1081,6 +1085,7 @@ export const caseStudies: CaseStudy[] = [
 
   {
     slug: 'flyr',
+    wip: true,
     linkName: 'FLYR Hospitality',
     name: 'FLYR',
     band: 'stone',
@@ -1163,8 +1168,18 @@ export const caseStudies: CaseStudy[] = [
 
 export const caseHref = (slug: string) => `/work/${slug}`;
 
+/** the case studies that have a page (work in progress ones are left out) */
+export const publishedCaseStudies = caseStudies.filter((c) => !c.wip);
+
 export function getCaseStudy(slug: string): CaseStudy {
   const found = caseStudies.find((c) => c.slug === slug);
   if (!found) throw new Error(`Unknown case study: ${slug}`);
   return found;
+}
+
+/** the next published case study after this one, following `next` and skipping work in progress */
+export function nextPublished(slug: string): CaseStudy {
+  let c = getCaseStudy(getCaseStudy(slug).next);
+  while (c.wip && c.slug !== slug) c = getCaseStudy(c.next);
+  return c;
 }

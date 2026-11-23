@@ -19,12 +19,9 @@ export const links = {
   email: '#',
   linkedin: 'https://www.linkedin.com/company/nicey-studio',
   github: 'https://github.com/niceystudio',
-  /** the case study pages (src/pages/work/[slug].astro) */
+  /** the case study pages (src/pages/work/[slug].astro); Clerky, Omnisafe and FLYR are work in progress, so no page yet */
   work: {
     qbench: caseHref('qbench-design-system'),
     everbreed: caseHref('everbreed'),
-    clerky: caseHref('clerky'),
-    omnisafe: caseHref('omnisafe'),
-    flyr: caseHref('flyr'),
   },
 } as const;

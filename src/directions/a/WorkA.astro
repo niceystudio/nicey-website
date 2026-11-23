@@ -8,7 +8,8 @@ import { links } from '../../data/links';
 interface Row {
   name: string;
   meta: string;
-  href: string;
+  /** null: the case study is a work in progress, so the row isn't a link */
+  href: string | null;
   /** null keeps the dashed placeholder: the figure isn't collected yet */
   figure: { value: string; arrow?: boolean } | null;
   caption: string;
@@ -44,7 +45,7 @@ const rows: Row[] = [
   {
     name: 'Clerky',
     meta: 'Design system · Legal tech',
-    href: links.work.clerky,
+    href: null,
     figure: { value: '0 T1' },
     caption: 'Defects at the pilot gate',
     preview: { kind: 'card', text: '0 T1', band: 'butter', w: 260, h: 170 },
@@ -54,7 +55,7 @@ const rows: Row[] = [
   {
     name: 'Omnisafe',
     meta: 'Product design · Insurance',
-    href: links.work.omnisafe,
+    href: null,
     figure: { value: '16' },
     caption: 'Modules tested before build',
     preview: { kind: 'card', text: '16', band: 'mauve', w: 260, h: 170 },
@@ -63,7 +64,7 @@ const rows: Row[] = [
   {
     name: 'FLYR',
     meta: 'Product design · Hospitality',
-    href: links.work.flyr,
+    href: null,
     figure: null,
     caption: 'One business result',
     preview: { kind: 'card', text: 'FLYR', band: 'stone', w: 260, h: 170 },
@@ -79,15 +80,28 @@ const rows: Row[] = [
     {
       rows.map((r, i) => (
         <li id={`work-${r.name.toLowerCase()}`}>
-          <a href={r.href} class="work-row" data-wp={JSON.stringify({ ...r.preview, name: r.name })}>
-            <span class="wka-i" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-            <span class="flex flex-[1_1_220px] flex-col gap-2.5">
-              <span class="text-work">{r.name}</span>
-              <span class="caption-sm text-ink-2">{r.meta}</span>
-            </span>
-            <span class="max-w-[44ch] flex-[1_1_300px] text-body text-pretty text-ink-2">{r.description}</span>
-            <span class="work-arr" aria-hidden="true">→</span>
-          </a>
+          {r.href ? (
+            <a href={r.href} class="work-row" data-wp={JSON.stringify({ ...r.preview, name: r.name })}>
+              <span class="wka-i" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              <span class="flex flex-[1_1_220px] flex-col gap-2.5">
+                <span class="text-work">{r.name}</span>
+                <span class="caption-sm text-ink-2">{r.meta}</span>
+              </span>
+              <span class="max-w-[44ch] flex-[1_1_300px] text-body text-pretty text-ink-2">{r.description}</span>
+              <span class="work-arr" aria-hidden="true">→</span>
+            </a>
+          ) : (
+            <div class="work-row is-wip">
+              <span class="wka-i" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              <span class="flex flex-[1_1_220px] flex-col gap-2.5">
+                <span class="text-work">{r.name}</span>
+                <span class="caption-sm text-ink-2">{r.meta}</span>
+                <span class="wka-wip">Case study in progress</span>
+              </span>
+              <span class="max-w-[44ch] flex-[1_1_300px] text-body text-pretty text-ink-2">{r.description}</span>
+              <span aria-hidden="true"></span>
+            </div>
+          )}
         </li>
       ))
     }
@@ -411,7 +425,27 @@ const rows: Row[] = [
     transform: scaleY(0);
     transition: transform 200ms var(--ease-out);
   }
+  /* work in progress: not a link, so no hover, and a quiet label under the meta line */
+  .wka-wip {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .wka :global(.work-row.is-wip) .text-work {
+    color: var(--color-ink-2);
+  }
   @media (hover: hover) and (pointer: fine) {
+    .wka :global(.work-row.is-wip:hover) {
+      background: transparent !important;
+    }
+    .wka :global(.work-row.is-wip:hover)::before {
+      transform: scaleY(0) !important;
+    }
+    .wka :global(.work-row.is-wip:hover) .wka-i {
+      color: var(--color-muted) !important;
+    }
     .wka :global(.work-row:hover) {
       background: var(--color-surface) !important;
     }
