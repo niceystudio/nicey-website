@@ -4,6 +4,8 @@
  * One big window for the real product screen + the five steps under it; click a step → its screen.
  * Screens are PLACEHOLDERS on purpose (Goran, 20 Nov: layout first, content later) — drop a real image into
  * each step's `src` in status-steps.ts when the screens are ready. Copy is rough; Goran + Predrag polish it.
+ * 23 Nov: real screens, edge to edge in the window; swipe or drag the screen (or ← / → on a step) to change step;
+ * on phones the active step card scrolls into view.
  */
 import { statusSteps as steps } from './status-steps';
 ---
@@ -14,7 +16,7 @@ import { statusSteps as steps } from './status-steps';
       <span class="ss-path">qbench · status workflows</span>
       <span class="ss-count" aria-live="polite"><span data-ss-n>01</span> / {String(steps.length).padStart(2, '0')}</span>
     </div>
-    <div class="ss-stage">
+    <div class="ss-stage" data-ss-stage>
       {
         steps.map((s, i) => (
           <div class:list={['ss-screen', i === 0 && 'is-on']} data-ss-screen={i}>
@@ -74,6 +76,12 @@ import { statusSteps as steps } from './status-steps';
   .ss-stage {
     position: relative;
     aspect-ratio: 1440 / 900;
+    overflow: hidden;
+    touch-action: pan-y;
+    cursor: grab;
+  }
+  .ss-stage.is-drag {
+    cursor: grabbing;
   }
   .ss-screen {
     position: absolute;
@@ -81,7 +89,6 @@ import { statusSteps as steps } from './status-steps';
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 24px;
     opacity: 0;
     transition: opacity 220ms var(--ease-out);
   }
@@ -91,8 +98,11 @@ import { statusSteps as steps } from './status-steps';
   .ss-screen img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
     object-position: top center;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
   }
   .ss-ph {
     display: flex;
@@ -184,6 +194,50 @@ import { statusSteps as steps } from './status-steps';
       });
       if (n) n.textContent = String(i + 1).padStart(2, '0');
     };
-    btns.forEach((b, i) => b.addEventListener('click', () => show(i)));
+    let cur = 0;
+    const go = (i: number, fromUser = true) => {
+      cur = (i + screens.length) % screens.length;
+      show(cur);
+      // phones: keep the active step card in view inside the scrolling row
+      const b = btns[cur];
+      const row = b.closest('ol');
+      if (fromUser && row && row.scrollWidth > row.clientWidth) {
+        row.scrollTo({ left: b.offsetLeft - row.offsetLeft - 16, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      }
+    };
+    btns.forEach((b, i) => {
+      b.addEventListener('click', () => go(i));
+      b.addEventListener('keydown', (e) => {
+        if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+        e.preventDefault();
+        go(cur + (e.key === 'ArrowRight' ? 1 : -1));
+        btns[cur].focus();
+      });
+    });
+    // swipe (touch) or drag (mouse) the screen to change step
+    const stage = root.querySelector<HTMLElement>('[data-ss-stage]');
+    let sx = 0;
+    let sy = 0;
+    let down = false;
+    stage?.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      down = true;
+      sx = e.clientX;
+      sy = e.clientY;
+      stage.classList.add('is-drag');
+    });
+    const end = (e: PointerEvent) => {
+      if (!down) return;
+      down = false;
+      stage?.classList.remove('is-drag');
+      const dx = e.clientX - sx;
+      const dy = e.clientY - sy;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) go(cur + (dx < 0 ? 1 : -1));
+    };
+    stage?.addEventListener('pointerup', end);
+    stage?.addEventListener('pointercancel', () => {
+      down = false;
+      stage.classList.remove('is-drag');
+    });
   });
 </script>

@@ -91,16 +91,28 @@ const { heading, head, items } = Astro.props;
               {it.ui === 'move' && (
                 <>
                   <div class="dc-p qb qb-card">
-                    <span class="qb-t">Workflow · Test approval</span>
-                    <span class="qb-flow"><b>Not started</b>→<b class="qb-gone">Draft</b>→<b>In progress</b></span>
-                    <span class="qb-warn qb-warn--bad">12 tests are still in “Draft”</span>
+                    <span class="qb-t">Remove statuses from the workflow</span>
+                    <span class="qb-flow"><b>Not started</b>→<b class="qb-gone">Draft</b>→<b>In progress</b>→<b class="qb-gone">Blocked</b></span>
+                    <span class="qb-list">
+                      <span><b>T-1042</b><i class="qb-tag qb-tag--bad">Draft</i></span>
+                      <span><b>T-1043</b><i class="qb-tag qb-tag--bad">Draft</i></span>
+                      <span><b>T-1051</b><i class="qb-tag qb-tag--bad">Blocked</i></span>
+                    </span>
+                    <span class="qb-warn qb-warn--bad">21 tests would be left in a status that no longer exists</span>
                   </div>
                   <div class="dc-s qb qb-card">
-                    <span class="qb-t">Move tests to a new status</span>
-                    <span class="qb-s">You’re about to remove “Draft” from the workflow.</span>
-                    <span class="qb-warn">This will affect 12 tests</span>
-                    <span class="qb-field"><span class="qb-lbl">Move them to</span><span class="qb-in">In progress ▾</span></span>
-                    <span class="qb-row"><u>View affected tests</u><span class="qb-btn">Move and remove</span></span>
+                    <span class="qb-t">Move tests to new statuses</span>
+                    <span class="qb-s">You’re about to remove 2 statuses from this workflow.</span>
+                    <span class="qb-warn">This will affect 21 tests</span>
+                    <u class="qb-link">View affected tests →</u>
+                    <table class="qb-table qb-table--rows">
+                      <thead><tr><th>Current status</th><th>Affected</th><th>New status</th></tr></thead>
+                      <tbody>
+                        <tr><td><b>Draft</b></td><td>12 tests</td><td><span class="qb-in">In progress ▾</span></td></tr>
+                        <tr><td><b>Blocked</b></td><td>9 tests</td><td><span class="qb-in">Cancelled ▾</span></td></tr>
+                      </tbody>
+                    </table>
+                    <span class="qb-row qb-row--end"><span class="qb-btn qb-btn--ghost">Cancel</span><span class="qb-btn">Update workflow</span></span>
                   </div>
                 </>
               )}
@@ -122,18 +134,28 @@ const { heading, head, items } = Astro.props;
               {it.ui === 'search' && (
                 <>
                   <div class="dc-p qb qb-card">
-                    <span class="qb-t">Required fields</span>
-                    {['Assay', 'Batch', 'Customer', 'Due date', 'Instrument', 'Lot number'].map((f) => (
-                      <span class="qb-swrow"><span>{f}</span><i class="qb-sw" /></span>
-                    ))}
-                    <span class="qb-s">+ 240 more fields</span>
+                    <span class="qb-t">Required fields · 246 fields</span>
+                    <span class="qb-scroll">
+                      {['Assay', 'Batch', 'Customer', 'Due date', 'Instrument', 'Lot number', 'Matrix'].map((f) => (
+                        <span class="qb-swrow"><span>{f}</span><i class="qb-sw" /></span>
+                      ))}
+                    </span>
+                    <span class="qb-s">One switch per field, for every move</span>
                   </div>
                   <div class="dc-s qb qb-card">
-                    <span class="qb-t">Set up required fields</span>
-                    <span class="qb-in qb-in--search">⌕ Search fields…</span>
-                    <span class="qb-drag"><i>⋮⋮</i> Turnaround <em>Required</em></span>
-                    <span class="qb-drag"><i>⋮⋮</i> Assigned technician <em>Required</em></span>
-                    <span class="qb-drag"><i>⋮⋮</i> Estimated complete date <em>Optional</em></span>
+                    <span class="qb-t">Add required fields</span>
+                    <span class="qb-search">
+                      <span class="qb-in qb-in--typed">⌕ tech<i class="qb-caret" /></span>
+                      <span class="qb-menu">
+                        <span class="qb-opt is-hi">Technician</span>
+                        <span class="qb-opt">Technical review date</span>
+                        <span class="qb-opt">Tech notes</span>
+                      </span>
+                    </span>
+                    <span class="qb-lbl qb-lbl--sm">Added · drag to set the order</span>
+                    <span class="qb-drag"><i>⋮⋮</i> Turnaround</span>
+                    <span class="qb-drag is-lift"><i>⋮⋮</i> Assigned technician</span>
+                    <span class="qb-drag"><i>⋮⋮</i> Estimated complete date</span>
                   </div>
                 </>
               )}
@@ -597,6 +619,113 @@ const { heading, head, items } = Astro.props;
     font-style: normal;
     color: #6b7280;
     font-size: 12px;
+  }
+  /* 03 · Move tests to new statuses (as in the QBench Figma) */
+  .qb-list {
+    display: flex;
+    flex-direction: column;
+  }
+  .qb-list > span {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid #f3f4f6;
+    color: #4b5563;
+  }
+  .qb-list b {
+    color: #1f2937;
+    font-weight: 500;
+  }
+  .qb-tag {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #f3f4f6;
+    color: #4b5563;
+    font-style: normal;
+    font-size: 12px;
+  }
+  .qb-tag--bad {
+    background: #fee2e2;
+    color: #b42318;
+    text-decoration: line-through;
+  }
+  .qb-link {
+    color: #244d9e;
+    font-weight: 500;
+  }
+  .qb-table--rows td {
+    padding: 6px 6px 6px 0;
+    border-top: 1px solid #f3f4f6;
+  }
+  .qb-table--rows b {
+    font-weight: 500;
+  }
+  .qb-row .qb-btn--ghost + .qb-btn {
+    margin-left: 0;
+  }
+  /* 05 · Add required fields: search, pick, drag to order */
+  .qb-scroll {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    max-height: 196px;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(#000 70%, transparent);
+    mask-image: linear-gradient(#000 70%, transparent);
+  }
+  .qb-search {
+    position: relative;
+    display: block;
+    padding-bottom: 104px;
+  }
+  .qb-in--typed {
+    border-color: #244d9e;
+    box-shadow: 0 0 0 3px rgba(36, 77, 158, 0.14);
+    color: #1f2937;
+  }
+  .qb-caret {
+    display: inline-block;
+    width: 1px;
+    height: 13px;
+    margin-left: 1px;
+    vertical-align: -2px;
+    background: #1f2937;
+  }
+  .qb-menu {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 36px;
+    display: flex;
+    flex-direction: column;
+    padding: 4px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  }
+  .qb-opt {
+    padding: 6px 8px;
+    border-radius: 5px;
+    color: #374151;
+  }
+  .qb-opt.is-hi {
+    background: #eef3fc;
+    color: #1f2937;
+    font-weight: 500;
+  }
+  .qb-lbl--sm {
+    font-size: 12px;
+    color: #6b7280;
+  }
+  .qb-drag.is-lift {
+    position: relative;
+    z-index: 1;
+    border-color: #244d9e;
+    background: #fff;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.14);
+    transform: translateX(8px) rotate(-1deg);
   }
 </style>
 

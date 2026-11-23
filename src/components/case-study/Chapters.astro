@@ -393,12 +393,14 @@ const slug = (k: string) =>
                       </div>
                       <p class="m-0 mt-2 text-body text-ink-2" data-every-note aria-live="polite">{b.surfaces[0].note}</p>
                     </div>
-                    <div class="ch-modal" data-every-modal aria-hidden="true">
-                      <span class="ch-modal-t">Complete required actions</span>
-                      <span class="ch-modal-move"><b>In progress</b> → <b>Completed</b></span>
-                      <span class="ch-modal-steps"><i class="is-on">1 · Required fields</i><i>2 · Signature</i></span>
-                      <span class="ch-modal-body"><span>Turnaround *</span><span>Assigned technician *</span></span>
-                      <span class="ch-modal-btn">Next</span>
+                    <div class="ch-ui">
+                      <div class="ch-modal" data-every-modal aria-hidden="true">
+                        <span class="ch-modal-t">Complete required actions</span>
+                        <span class="ch-modal-move"><b>In progress</b> → <b>Completed</b></span>
+                        <span class="ch-modal-steps"><i class="is-on">1 · Required fields</i><i>2 · Signature</i></span>
+                        <span class="ch-modal-body"><span>Turnaround *</span><span>Assigned technician *</span></span>
+                        <span class="ch-modal-btn">Next</span>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -415,7 +417,7 @@ const slug = (k: string) =>
                         ))}
                       </div>
                     </div>
-                    <div class="ch-bulk-stage">
+                    <div class="ch-bulk-stage ch-ui">
                       {b.outcomes.map((o, k) => (
                         <div class="ch-modal ch-modal--bulk" data-bulk-card={k} hidden={k !== 1}>
                           <span class="ch-bars" data-o={k} aria-hidden="true"><i /><i /></span>
@@ -1752,6 +1754,10 @@ const slug = (k: string) =>
   .ch-bulk {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
+  /* the workflow graph takes the full width so its node labels stay readable (23 Nov: they were ~6px) */
+  .ch-graph {
+    grid-template-columns: minmax(0, 1fr);
+  }
   @media (max-width: 767px) {
     .ch-graph,
     .ch-rules,
@@ -1826,6 +1832,22 @@ const slug = (k: string) =>
   }
   .ch-modal[hidden] {
     display: none;
+  }
+  /* 23 Nov (Emir): UI mockups sit on a grey stage inside the panel, smaller — the same as Problems we solved */
+  .ch-ui {
+    display: grid;
+    place-items: center;
+    min-height: 300px;
+    padding: 28px 24px;
+    border-radius: var(--radius-panel);
+    background: var(--color-page);
+  }
+  .ch-ui .ch-modal {
+    width: 100%;
+    max-width: 320px;
+    gap: 10px;
+    padding: 18px;
+    font-size: 13px;
   }
   .ch-modal-t {
     font-weight: 600;

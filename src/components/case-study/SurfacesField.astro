@@ -31,7 +31,8 @@ const after = surfaces.map((_, i) => {
   return `M${x0} ${y} C ${x0 + 120} ${y}, ${mx - 140} ${my}, ${mx - 52} ${my}`;
 });
 const NOTE_BEFORE = 'Each place had its own idea of what happens next, and of which compliance steps to ask for.';
-const NOTE_AFTER = 'Now every place runs the same status model, with the same steps in the same order.';
+// 23 Nov (Figma check): imports, automations and the API don't run the steps — a move that needs a person stops them
+const NOTE_AFTER = 'Now every place follows one workflow. People get the same steps in the same order; imports, automations and the API stop when a move needs a person.';
 ---
 
 <div class="sf" data-sf>
@@ -41,7 +42,7 @@ const NOTE_AFTER = 'Now every place runs the same status model, with the same st
     </span>
     <p class="sf-figure" aria-hidden="true"><span data-sf-fig>8</span><span class="sf-of"> rule sets</span></p>
     <p class="sr-only" aria-live="polite" data-sf-live>Before: 8 places, each with its own rules.</p>
-    <h3 class="m-0 mt-5 text-title">places that can change a test’s status</h3>
+    <h3 class="m-0 mt-5 text-title">for the 8 places that can change a test’s status</h3>
     <p class="sf-note m-0 mt-3 max-w-[40ch] text-pretty text-ink-2" data-sf-note data-before={NOTE_BEFORE} data-after={NOTE_AFTER}>
       {NOTE_BEFORE}
     </p>

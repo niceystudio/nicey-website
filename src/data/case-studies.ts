@@ -487,9 +487,9 @@ export const caseStudies: CaseStudy[] = [
             kind: 'graph',
             title: 'Test approval workflow · example',
             edges: [
-              { from: 'Not started', to: 'In progress', rules: ['Assigned people only'] },
-              { from: 'In progress', to: 'Completed', rules: ['Required fields', 'E-signature', 'Reason'] },
-              { from: 'In progress', to: 'Cancelled', rules: ['Reason'] },
+              { from: 'Not started', to: 'In progress', rules: ['Assigned people or team'] },
+              { from: 'In progress', to: 'Completed', rules: ['Required fields', 'E-signature + PIN'] },
+              { from: 'In progress', to: 'Cancelled', rules: ['E-signature + PIN'] },
             ],
           },
         ],
@@ -505,7 +505,7 @@ export const caseStudies: CaseStudy[] = [
             steps: [
               { name: 'Required fields', text: 'Page 1: the fields the admin picked for this move.' },
               { name: 'Signature and PIN', text: 'Page 2: one step, so nobody signs twice.' },
-              { name: 'Comment', text: 'Page 2: why the status changed, when a reason is required.' },
+              { name: 'Comment', text: 'Page 2: an optional note, next to the signature.' },
             ],
           },
         ],
@@ -630,23 +630,23 @@ export const caseStudies: CaseStudy[] = [
     faq: [
       {
         q: 'Is this design system work or product design?',
-        a: '[Answer to add]',
+        a: 'Product design, done on a design system. The feature was designed with the new QBench design system, and the pieces it repeats became shared components: the required-actions modal and the inline notifications.',
       },
       {
         q: 'What did the MVP include?',
-        a: '[Answer to add]',
+        a: 'The admin-only workflow editor (statuses, the moves between them, the rules on each move, drafts and published versions) and the required-actions modal on every place a person changes a status, single and bulk. Automations and imports are checked against the workflow and stop with a clear reason.',
       },
       {
         q: 'How did you handle e-signatures?',
-        a: '[Answer to add]',
+        a: 'As the second page of the same modal: signature, PIN and an optional comment in one step, so nobody signs twice. If a move needs a signature the user hasn’t set up, a toast says so and links to the setup. Every change is recorded in the test’s history.',
       },
       {
         q: 'What happens when some tests in a bulk move can’t move?',
-        a: '[Answer to add]',
+        a: 'The modal says how many can move and how many can’t, and why. The user goes on with the ones that can, or reviews the blocked ones. For the MVP a bulk move starts from one status.',
       },
       {
         q: 'Who was involved?',
-        a: '[Answer to add]',
+        a: 'Goran, product designer at QBench, inside the product team with a product lead and developers. Feedback from technical account managers shaped the MVP.',
       },
     ],
     cta: {
