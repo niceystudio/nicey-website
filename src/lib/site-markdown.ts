@@ -1,5 +1,5 @@
 /** The site index for agents, served at /llms.txt. (The homepage's machine view shows /index.md.) */
-import { caseStudies, caseHref } from '../data/case-studies';
+import { publishedCaseStudies, caseHref } from '../data/case-studies';
 
 export function siteMarkdown(base: URL): string {
   const abs = (p: string) => new URL(p, base).href;
@@ -10,7 +10,7 @@ export function siteMarkdown(base: URL): string {
     '',
     '## Case studies',
     '',
-    ...caseStudies.map((c) => `- [${c.linkName}](${abs(`${caseHref(c.slug)}.md`)}): ${c.statement}`),
+    ...publishedCaseStudies.map((c) => `- [${c.linkName}](${abs(`${caseHref(c.slug)}.md`)}): ${c.statement}`),
     '',
     '## Studio',
     '',

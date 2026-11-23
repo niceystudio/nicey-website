@@ -4,7 +4,7 @@
  * contact, and the copyright line. Sits below the closing band.
  */
 import { links } from '../data/links';
-import { caseStudies, caseHref } from '../data/case-studies';
+import { publishedCaseStudies, caseHref } from '../data/case-studies';
 
 interface Props {
   /** the page's Markdown twin; when set, the base line shows the Human / Machine switch (no gesture, no animation — Emir, 12 Nov) */
@@ -31,7 +31,7 @@ const cols = [
   },
   {
     head: 'Case studies',
-    items: caseStudies.map((c) => ({ href: caseHref(c.slug), label: c.linkName })),
+    items: publishedCaseStudies.map((c) => ({ href: caseHref(c.slug), label: c.linkName })),
   },
 ];
 // contact split by purpose (Emir, 11 Nov; 'Write to us' removed 23 Nov until there is an address). The Markdown twin, llms.txt and the sitemap stay

@@ -4,10 +4,10 @@ import type { GetStaticPaths } from 'astro';
 import '../../directions/a/a.css';
 import '../../directions/a/a-case.css';
 import CaseStudy from '../../components/case-study/CaseStudy.astro';
-import { caseStudies, type CaseStudy as Study } from '../../data/case-studies';
+import { publishedCaseStudies, type CaseStudy as Study } from '../../data/case-studies';
 
 export const getStaticPaths = (() =>
-  caseStudies.map((study) => ({ params: { slug: study.slug }, props: { study } }))) satisfies GetStaticPaths;
+  publishedCaseStudies.map((study) => ({ params: { slug: study.slug }, props: { study } }))) satisfies GetStaticPaths;
 
 interface Props {
   study: Study;
