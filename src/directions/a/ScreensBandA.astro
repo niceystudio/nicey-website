@@ -1,35 +1,91 @@
 ---
 /**
- * Direction A · case study: real product screens right after the hero (Goran via Emir, 20 Nov: case studies are about
- * the screens and the layout). PLACEHOLDERS only for now — the screens come from Figma later; no content work yet.
- * One large screen + two smaller ones, all at the product's 16:10, each in A's window (a title bar, 1px rule) — the
- * screens of what we built, no before/after (Emir, 20 Nov).
+ * Direction A · case study: real screens right after the hero (Goran via Emir, 20 Nov: case studies are about
+ * the screens and the layout). One large window + two smaller ones, all 16:10, each in A's window (title bar, 1px rule).
+ * 23 Nov (Emir): each window is a topic (QBench: variables · component docs · spec). The window shows the first image;
+ * clicking it opens a gallery — swipe (touch, trackpad, mouse drag) or previous / next / arrow keys slide smoothly,
+ * a counter, zoom (2× the fitted size, drag to pan), Esc / × / a click outside the image closes.
+ * Without `galleries` the windows stay placeholders.
  */
+type Img = { src: string; alt: string; width: number; height: number };
 interface Props {
   name: string;
   slots?: string[];
+  galleries?: { title: string; cover?: { src: string; width: number; height: number }; max?: number; images: Img[] }[];
 }
-const { name, slots = ['Screen 01 · the product', 'Screen 02 · a flow', 'Screen 03 · the Figma library'] } = Astro.props;
+const { name, slots = ['Screen 01 · the product', 'Screen 02 · a flow', 'Screen 03 · the Figma library'], galleries = [] } = Astro.props;
 const slug = name.toLowerCase();
+const count = Math.max(slots.length, galleries.length);
 ---
 
 <section aria-labelledby="screens-head" class="container-page sb">
   <h2 id="screens-head" class="sr-only">{name} screens</h2>
   <div class="sb-grid">
     {
-      slots.map((t, i) => (
-        <figure class:list={['sb-fig', i === 0 && 'sb-fig--main']}>
-          <div class="sb-win">
-            <div class="sb-bar" aria-hidden="true">
-              <span>{slug} · {(t.split(' · ')[1] ?? t).toLowerCase()}</span>
-              <span>{String(i + 1).padStart(2, '0')}</span>
+      Array.from({ length: count }, (_, i) => {
+        const g = galleries[i];
+        const label = g ? g.title : ((slots[i] ?? '').split(' · ')[1] ?? slots[i] ?? '').toLowerCase();
+        return (
+          <figure class:list={['sb-fig', i === 0 && 'sb-fig--main']}>
+            <div class="sb-win">
+              <div class="sb-bar" aria-hidden="true">
+                <span>
+                  {slug} · {label}
+                </span>
+                <span>{String(i + 1).padStart(2, '0')}</span>
+              </div>
+              {g ? (
+                <button type="button" class="sb-open" data-sb-open={i} aria-label={`Open ${label}: ${g.images.length} images`}>
+                  <img class="sb-img" src={(g.cover ?? g.images[0]).src} alt="" width={(g.cover ?? g.images[0]).width} height={(g.cover ?? g.images[0]).height} loading="lazy" decoding="async" />
+                  <span class="sb-count" aria-hidden="true">
+                    1 / {g.images.length}
+                    <svg viewBox="0 0 16 16" width="12" height="12">
+                      <path d="M9.5 2.5h4v4M13.5 2.5 9 7M6.5 13.5h-4v-4M2.5 13.5 7 9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" />
+                    </svg>
+                  </span>
+                </button>
+              ) : (
+                <div class="placeholder sb-ph">[{slots[i]}]</div>
+              )}
             </div>
-            <div class="placeholder sb-ph">[{t}]</div>
-          </div>
-        </figure>
-      ))
+          </figure>
+        );
+      })
     }
   </div>
+
+  {
+    galleries.length > 0 && (
+      <dialog class="sbx" data-sbx aria-label={`${name} screens`}>
+        <div class="sbx-top">
+          <span class="sbx-title" data-sbx-title />
+          <span class="sbx-n" data-sbx-n aria-live="polite" />
+          <div class="sbx-tools">
+            <button type="button" class="sbx-btn" data-sbx-zoom aria-pressed="false">
+              Zoom in
+            </button>
+            <button type="button" class="sbx-btn sbx-x" data-sbx-close aria-label="Close">
+              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                <path d="M3 3l10 10M13 3 3 13" stroke="currentColor" stroke-width="1.6" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="sbx-track" data-sbx-track />
+        <button type="button" class="sbx-nav sbx-prev" data-sbx-prev aria-label="Previous image">
+          <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+            <path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.6" />
+          </svg>
+        </button>
+        <button type="button" class="sbx-nav sbx-next" data-sbx-next aria-label="Next image">
+          <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+            <path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6" />
+          </svg>
+        </button>
+        <script type="application/json" data-sbx-data set:html={JSON.stringify(galleries)} />
+      </dialog>
+    )
+  }
 </section>
 
 <style>
@@ -86,6 +142,199 @@ const slug = name.toLowerCase();
     border: 0;
     border-radius: 0;
   }
+  .sb-open {
+    position: relative;
+    display: flex;
+    flex: 1;
+    padding: 0;
+    border: 0;
+    background: #fff;
+    cursor: zoom-in;
+    overflow: hidden;
+  }
+  .sb-img {
+    display: block;
+    flex: 1;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    object-position: left top;
+    transition: transform 300ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .sb-open:hover .sb-img {
+      transform: scale(1.02);
+    }
+  }
+  .sb-count {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    background: var(--color-ink);
+    color: var(--color-page);
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+  .sb-open:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: -2px;
+  }
+
+  /* gallery: a full-screen dark stage; images sit on a horizontal snap track (swipe on touch and trackpad,
+     drag with the mouse, arrows and keys slide smoothly) */
+  .sbx {
+    --sbx-bg: #1c1b17;
+    --sbx-fg: #f3f0e9;
+    width: 100vw;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: var(--sbx-bg);
+    color: var(--sbx-fg);
+    overflow: hidden;
+  }
+  .sbx::backdrop {
+    background: var(--sbx-bg);
+  }
+  .sbx[open] {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  .sbx-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 16px 12px 24px;
+    border-bottom: 1px solid color-mix(in srgb, var(--sbx-fg) 16%, transparent);
+    font-family: var(--font-mono);
+    font-size: 13px;
+  }
+  .sbx-n {
+    color: color-mix(in srgb, var(--sbx-fg) 65%, transparent);
+    font-variant-numeric: tabular-nums;
+  }
+  .sbx-tools {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+  }
+  .sbx-btn,
+  .sbx-nav {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1px solid color-mix(in srgb, var(--sbx-fg) 28%, transparent);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    transition:
+      background-color 120ms var(--ease-out),
+      transform 160ms var(--ease-out);
+  }
+  .sbx-btn:active,
+  .sbx-nav:active {
+    transform: scale(0.97);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .sbx-btn:hover,
+    .sbx-nav:hover {
+      background: color-mix(in srgb, var(--sbx-fg) 12%, transparent);
+    }
+  }
+  .sbx-btn[aria-pressed='true'] {
+    background: var(--sbx-fg);
+    color: var(--sbx-bg);
+  }
+  .sbx-track {
+    display: flex;
+    min-height: 0;
+    height: 100%;
+    touch-action: pan-x pinch-zoom;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    cursor: grab;
+  }
+  .sbx-track::-webkit-scrollbar {
+    display: none;
+  }
+  .sbx-track.is-drag {
+    scroll-snap-type: none;
+    cursor: grabbing;
+  }
+  .sbx-track :global(.sbx-slide) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 100%;
+    height: 100%;
+    min-width: 0;
+    padding: 32px 96px;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+  }
+  /* fitted: inside the screen and never larger than the gallery's max (text pages read smaller) */
+  .sbx-track :global(.sbx-img) {
+    display: block;
+    max-width: min(100%, var(--sbx-max, 1180px));
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    background: #fff;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
+  }
+  /* zoomed: the track stops swiping, the current slide scrolls and pans */
+  .sbx.is-zoom .sbx-track {
+    overflow: hidden;
+    cursor: default;
+    touch-action: auto; /* a finger pans the zoomed image both ways */
+  }
+  .sbx.is-zoom :global(.sbx-slide.is-current) {
+    display: block;
+    overflow: auto;
+    cursor: grab;
+  }
+  .sbx.is-zoom :global(.sbx-slide.is-current.is-pan) {
+    cursor: grabbing;
+  }
+  .sbx.is-zoom :global(.sbx-slide.is-current) :global(.sbx-img) {
+    max-width: none;
+    max-height: none;
+    margin: 0 auto;
+  }
+  .sbx-nav {
+    position: fixed;
+    top: 50%;
+    padding: 0;
+    translate: 0 -50%;
+    background: color-mix(in srgb, var(--sbx-bg) 80%, transparent);
+  }
+  .sbx-prev {
+    left: 20px;
+  }
+  .sbx-next {
+    right: 20px;
+  }
+  .sbx-nav[hidden] {
+    display: none;
+  }
   @media (max-width: 860px) {
     .sb-grid {
       grid-template-columns: minmax(0, 1fr);
@@ -93,5 +342,207 @@ const slug = name.toLowerCase();
     .sb-fig--main {
       grid-row: auto;
     }
+    .sbx-top {
+      padding-left: 16px;
+    }
+    .sbx-track :global(.sbx-slide) {
+      padding: 16px 12px 88px;
+    }
+    .sbx-nav {
+      top: auto;
+      bottom: 20px;
+      translate: none;
+    }
   }
 </style>
+
+<script>
+  type Img = { src: string; alt: string; width: number; height: number };
+  type Gallery = { title: string; max?: number; images: Img[] };
+
+  document.querySelectorAll<HTMLDialogElement>('[data-sbx]').forEach((dlg) => {
+    const data: Gallery[] = JSON.parse(dlg.querySelector('[data-sbx-data]')!.textContent || '[]');
+    const track = dlg.querySelector<HTMLElement>('[data-sbx-track]')!;
+    const title = dlg.querySelector<HTMLElement>('[data-sbx-title]')!;
+    const n = dlg.querySelector<HTMLElement>('[data-sbx-n]')!;
+    const zoomBtn = dlg.querySelector<HTMLButtonElement>('[data-sbx-zoom]')!;
+    const prev = dlg.querySelector<HTMLButtonElement>('[data-sbx-prev]')!;
+    const next = dlg.querySelector<HTMLButtonElement>('[data-sbx-next]')!;
+    const smooth = () => (matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth') as ScrollBehavior;
+    let g = 0;
+    let i = 0;
+    let opener: HTMLElement | null = null;
+
+    const slides = () => [...track.children] as HTMLElement[];
+    const count = () => data[g].images.length;
+    const zoomed = () => dlg.classList.contains('is-zoom');
+
+    const label = () => {
+      n.textContent = `${i + 1} / ${count()}`;
+      slides().forEach((s, k) => s.classList.toggle('is-current', k === i));
+    };
+    const go = (k: number, behavior: ScrollBehavior = smooth()) => {
+      if (zoomed()) setZoom(false);
+      i = (k + count()) % count();
+      track.scrollTo({ left: i * track.clientWidth, behavior });
+      label();
+    };
+
+    const build = () => {
+      const gal = data[g];
+      track.style.setProperty('--sbx-max', gal.max ? `${gal.max}px` : '');
+      track.innerHTML = '';
+      gal.images.forEach((it, k) => {
+        const slide = document.createElement('div');
+        slide.className = 'sbx-slide';
+        const img = document.createElement('img');
+        img.className = 'sbx-img';
+        img.src = it.src;
+        img.alt = it.alt;
+        img.width = it.width;
+        img.height = it.height;
+        img.decoding = 'async';
+        img.loading = k === 0 ? 'eager' : 'lazy';
+        img.draggable = false;
+        slide.append(img);
+        track.append(slide);
+      });
+      title.textContent = gal.title;
+      const many = gal.images.length > 1;
+      prev.hidden = !many;
+      next.hidden = !many;
+    };
+
+    // zoom = twice the fitted size of the current image (never past the file's pixels)
+    const setZoom = (on: boolean) => {
+      const slide = slides()[i];
+      const img = slide?.querySelector('img');
+      if (!img) return;
+      if (on) {
+        const fit = img.getBoundingClientRect().width;
+        img.style.width = `${Math.min(fit * 2, img.naturalWidth || fit * 2)}px`;
+      } else {
+        img.style.width = '';
+      }
+      dlg.classList.toggle('is-zoom', on);
+      zoomBtn.setAttribute('aria-pressed', String(on));
+      zoomBtn.textContent = on ? 'Fit to screen' : 'Zoom in';
+      slide.scrollTo(0, 0);
+    };
+
+    // the counter follows a swipe
+    let raf = 0;
+    track.addEventListener('scroll', () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        if (zoomed() || !track.clientWidth) return;
+        const k = Math.round(track.scrollLeft / track.clientWidth);
+        if (k !== i && k >= 0 && k < count()) {
+          i = k;
+          label();
+        }
+      });
+    });
+
+    document.querySelectorAll<HTMLButtonElement>('[data-sb-open]').forEach((b) =>
+      b.addEventListener('click', () => {
+        g = Number(b.dataset.sbOpen);
+        i = 0;
+        opener = b;
+        build();
+        dlg.showModal();
+        dlg.classList.remove('is-zoom');
+        zoomBtn.setAttribute('aria-pressed', 'false');
+        zoomBtn.textContent = 'Zoom in';
+        go(0, 'auto');
+      }),
+    );
+    dlg.querySelector('[data-sbx-close]')!.addEventListener('click', () => dlg.close());
+    dlg.addEventListener('close', () => opener?.focus());
+    prev.addEventListener('click', () => go(i - 1));
+    next.addEventListener('click', () => go(i + 1));
+    zoomBtn.addEventListener('click', () => setZoom(!zoomed()));
+    dlg.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        go(i + 1);
+      }
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        go(i - 1);
+      }
+    });
+    window.addEventListener('resize', () => {
+      if (dlg.open && !zoomed()) track.scrollTo({ left: i * track.clientWidth });
+    });
+
+    // mouse: drag the track to swipe (touch and trackpads swipe natively); a click without a drag on the dark
+    // area closes, a click on the image zooms
+    let down = false;
+    let moved = false;
+    let sx = 0;
+    let sy = 0;
+    let sl = 0;
+    let st = 0;
+    let panEl: HTMLElement | null = null;
+    track.addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'mouse' || e.button !== 0) return;
+      down = true;
+      moved = false;
+      sx = e.clientX;
+      sy = e.clientY;
+      if (zoomed()) {
+        panEl = slides()[i];
+        sl = panEl.scrollLeft;
+        st = panEl.scrollTop;
+        panEl.classList.add('is-pan');
+      } else {
+        panEl = null;
+        sl = track.scrollLeft;
+        track.classList.add('is-drag');
+      }
+      track.setPointerCapture(e.pointerId);
+    });
+    track.addEventListener('pointermove', (e) => {
+      if (!down) return;
+      const dx = e.clientX - sx;
+      const dy = e.clientY - sy;
+      if (Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true;
+      if (panEl) {
+        panEl.scrollLeft = sl - dx;
+        panEl.scrollTop = st - dy;
+      } else {
+        track.scrollLeft = sl - dx;
+      }
+    });
+    const up = (e: PointerEvent) => {
+      if (!down) return;
+      down = false;
+      if (panEl) {
+        panEl.classList.remove('is-pan');
+      } else {
+        const dx = e.clientX - sx;
+        track.classList.remove('is-drag');
+        if (moved) go(Math.abs(dx) > 60 ? i + (dx < 0 ? 1 : -1) : i);
+      }
+      if (!moved) {
+        const target = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
+        const onImage = !!target && target.classList.contains('sbx-slide') === false && !!target.closest('.sbx-slide');
+        const img = slides()[i]?.querySelector('img');
+        const r = img?.getBoundingClientRect();
+        const inside = !!r && e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+        if (inside || onImage) {
+          if (!zoomed()) setZoom(true);
+        } else if (!zoomed()) {
+          dlg.close();
+        }
+      }
+    };
+    track.addEventListener('pointerup', up);
+    track.addEventListener('pointercancel', () => {
+      down = false;
+      track.classList.remove('is-drag');
+      panEl?.classList.remove('is-pan');
+    });
+  });
+</script>

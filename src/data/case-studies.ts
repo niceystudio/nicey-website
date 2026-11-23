@@ -72,6 +72,16 @@ export interface CaseStudy {
   lede: string;
   facts: { term: string; detail: string }[];
   who: string;
+  /** direction A · the screens band after the hero (one large + two small, 16:10): each window is a topic that opens
+   *  a gallery (lightbox); the first image shows in the window. Missing = placeholders. */
+  screensA?: {
+    title: string;
+    /** optional crop shown in the window when the first image is too wide to read small */
+    cover?: { src: string; width: number; height: number };
+    /** largest width (px) an image of this gallery shows at when fitted, e.g. a text page */
+    max?: number;
+    images: { src: string; alt: string; width: number; height: number }[];
+  }[];
   /** the block under the hero: a project image, or Everbreed's audit callout */
   lead?:
     | { kind: 'image'; placeholder: string; src?: Shot; alt?: string }
@@ -132,6 +142,39 @@ export const caseStudies: CaseStudy[] = [
     band: 'lavender',
     kicker: 'Case study · Design system · LIMS software',
     statement: 'A design system AI agents can build with.',
+    screensA: [
+      {
+        title: 'variables',
+        max: 960,
+        images: [
+        { src: '/work/qbench/vars-semantic.webp', alt: 'Figma variables, Semantic Tokens collection (179): surface tokens such as default, hover and primary, each pointing at a primitive.', width: 1556, height: 1126 },
+        { src: '/work/qbench/vars-dimensions.webp', alt: 'Figma variables, Dimensions collection (84): border radius and spacing steps.', width: 1556, height: 1122 },
+        { src: '/work/qbench/vars-typography.webp', alt: 'Figma variables, Typography collection (28): font size and line height.', width: 1556, height: 1126 },
+        { src: '/work/qbench/vars-elevation.webp', alt: 'Figma variables, Elevation collection (6): shadow colours from core black and white at set opacities.', width: 1556, height: 1126 },
+        ],
+      },
+      {
+        title: 'component docs',
+        cover: { src: '/work/qbench/doc-cover.webp', width: 1600, height: 1000 },
+        images: [
+        { src: '/work/qbench/doc-sheet-1.webp', alt: 'Input documentation page: use for / not for, then Input and InputGroupDropdown in every state, and Field.', width: 4409, height: 2787 },
+        { src: '/work/qbench/doc-sheet-2.webp', alt: 'Input documentation page: .FieldBackplate and InputGroup/.Backplate, every state with and without error.', width: 4409, height: 2310 },
+        { src: '/work/qbench/doc-sheet-3.webp', alt: 'Input documentation page: .FieldText and Label states.', width: 4409, height: 1316 },
+        { src: '/work/qbench/doc-sheet-4.webp', alt: 'Input documentation page: usage, do and don\u2019t.', width: 4409, height: 1065 },
+        { src: '/work/qbench/doc-examples-1.webp', alt: 'Input examples: on a modal.', width: 2978, height: 1860 },
+        { src: '/work/qbench/doc-examples-2.webp', alt: 'Input examples: on a table.', width: 2978, height: 1420 },
+        { src: '/work/qbench/doc-examples-3.webp', alt: 'Input examples: on a detail page, view with Field and edit with Input.', width: 2978, height: 1714 },
+        ],
+      },
+      {
+        title: 'spec',
+        max: 720,
+        images: [
+        { src: '/work/qbench/spec-input-1.webp', alt: 'Input spec: structure, use for and not for.', width: 1776, height: 1280 },
+        { src: '/work/qbench/spec-input-2.webp', alt: 'Input spec: component keys and properties, internal parts, do and don\u2019t.', width: 1776, height: 1430 },
+        ],
+      },
+    ],
     lede: 'QBench’s lab software grew for years without a designer. We rebuilt its design system as one Figma library that designers, developers and AI agents read the same way.',
     facts: [
       { term: 'Company', detail: 'Lab information management (LIMS), B2B SaaS' },
@@ -312,14 +355,14 @@ export const caseStudies: CaseStudy[] = [
     ],
     agentic: {
       kicker: 'The agentic layer',
-      heading: 'Docs agents might skip. A gate they can’t.',
+      heading: 'Without a system, agents guess. With one, they can’t drift.',
       items: [
-        { label: 'Rules', text: 'State the target. They never get softened to match the code.' },
-        { label: 'Facts', text: 'Measure what the code does today. Generated, not written by hand.' },
-        { label: 'Gap list', text: 'Maps one to the other. Deleting a row is the unit of progress.' },
+        { label: 'What good looks like', text: 'The rules state the target. They never get softened to match the code.' },
+        { label: 'What the code does today', text: 'Measure what the code does today. Generated, not written by hand.' },
+        { label: 'What’s left to fix', text: 'Maps one to the other. Deleting a row is the unit of progress.' },
         { label: 'Docs', text: 'Every component says when to use it and what to use instead: 126 of 126 sets.' },
         {
-          label: 'Gate',
+          label: 'A check that stops off-system code',
           text: 'A lint rule enforces the tokens, whether or not an agent read a single document.',
         },
       ],
@@ -353,23 +396,19 @@ export const caseStudies: CaseStudy[] = [
     faq: [
       {
         q: 'Did the product have to stop while the system changed?',
-        a: '[Answer to add]',
-      },
-      {
-        q: 'What happened to the old libraries?',
-        a: '[Answer to add]',
+        a: 'No. The system and the redesign ran in parallel, inside the product team. A pilot area let engineers check the token model on real screens first; then it rolled out area by area while QBench kept shipping.',
       },
       {
         q: 'How do AI agents use the system?',
-        a: '[Answer to add]',
+        a: 'They read what people read: design-conventions.md and library.json. One skill builds a screen in Figma from the published library (243 components it may use), a second walks every layer against it, and a designer refines the result. In code, a lint rule enforces the tokens whether or not an agent read a single document.',
       },
       {
-        q: 'What stops the code from drifting again?',
-        a: '[Answer to add]',
+        q: 'Can the team grow the system without you?',
+        a: 'Yes. We hand over how to extend it: when to add a token or a component, how to name it, and what to update in the docs. The checks stay on, so a new screen that steps outside the library is caught in Figma and in code.',
       },
       {
         q: 'How are component states kept consistent?',
-        a: '[Answer to add]',
+        a: 'Every state comes from one shared token. Focus uses the same ring on 28 components, error uses border/critical/default, and disabled is one opacity token across 716 layers, so a state changed once changes everywhere.',
       },
     ],
     cta: {
