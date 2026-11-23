@@ -1,0 +1,147 @@
+---
+/**
+ * Direction A · How we work: one rail over the five step cards (Emir 23 Nov: picked B after trying A). Tangled
+ * lines at Drift straighten step by step until they run parallel at Proof; hot → accent along the way. The columns
+ * line up with the cards below, and hovering a card lights its column. Draws in once on screen, then dashes flow;
+ * paused off screen, still with reduced motion. Hidden on phones, where the cards stack.
+ */
+const W = 1000;
+const H = 180;
+const lines = [
+  { y: 50, p: 0.0, f: 1.0 },
+  { y: 66, p: 2.1, f: 1.35 },
+  { y: 82, p: 4.0, f: 0.8 },
+  { y: 98, p: 1.2, f: 1.6 },
+  { y: 114, p: 3.3, f: 1.15 },
+  { y: 130, p: 5.2, f: 0.95 },
+];
+const settle = 800; // straight from the start of column 5 (Proof)
+function path(l: { y: number; p: number; f: number }) {
+  const pts: string[] = [];
+  for (let x = 0; x <= W; x += 8) {
+    const t = Math.max(0, 1 - x / settle);
+    const amp = 44 * t * t;
+    const y = l.y + amp * Math.sin((x / 70) * l.f + l.p) + 12 * t * Math.sin(x / 23 + l.p * 2);
+    pts.push(`${x === 0 ? 'M' : 'L'}${x} ${y.toFixed(1)}`);
+  }
+  return pts.join(' ');
+}
+const ids = ['drift', 'audit', 'system', 'context', 'proof'];
+---
+
+<figure class="hdb" data-hdb aria-hidden="true">
+  <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none">
+    <defs>
+      <linearGradient id="hdb-grad" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2={W} y2="0">
+        <stop offset="0" stop-color="var(--color-hot)" />
+        <stop offset="0.55" stop-color="var(--color-accent)" />
+        <stop offset="1" stop-color="var(--color-accent)" />
+      </linearGradient>
+    </defs>
+    {ids.map((id, i) => <rect class={`hdb-col hdb-col-${id}`} x={i * 200} y="0" width="200" height={H} />)}
+    {[200, 400, 600, 800].map((x) => <line class="hdb-div" x1={x} y1="0" x2={x} y2={H} vector-effect="non-scaling-stroke" />)}
+    {lines.map((l, i) => <path class="hdb-line" style={`--i:${i}`} d={path(l)} pathLength="1" />)}
+    {lines.map((l, i) => <path class="hdb-flow" style={`--i:${i}`} d={path(l)} pathLength="1" />)}
+  </svg>
+</figure>
+
+<style is:global>
+  .hdb {
+    margin: 0;
+    border: 1px solid var(--color-line);
+    border-bottom: 0;
+    background: var(--color-page);
+  }
+  .hdb svg {
+    display: block;
+    width: 100%;
+    height: 180px;
+  }
+  .hdb-col {
+    fill: var(--a-block);
+    opacity: 0;
+    transition: opacity 200ms var(--ease-out);
+  }
+  .hdb-div {
+    stroke: var(--a-rule);
+    stroke-width: 1;
+    stroke-dasharray: 3 5;
+  }
+  .hdb-line {
+    fill: none;
+    stroke: url(#hdb-grad);
+    stroke-width: 1.5;
+    stroke-dasharray: 1 1;
+    stroke-dashoffset: 1;
+  }
+  .hdb.is-in .hdb-line {
+    animation: hdb-draw 1.6s var(--ease-out) forwards;
+    animation-delay: calc(var(--i) * 70ms);
+  }
+  .hdb-flow {
+    fill: none;
+    stroke: var(--color-accent);
+    stroke-width: 3;
+    stroke-dasharray: 0.012 0.188;
+    opacity: 0;
+  }
+  .hdb.is-in .hdb-flow {
+    opacity: 0.9;
+    transition: opacity 400ms 1.4s;
+    animation: hdb-flow 7s linear infinite;
+    animation-delay: calc(var(--i) * -1.1s);
+  }
+  .hdb.is-paused .hdb-flow {
+    animation-play-state: paused;
+  }
+  @keyframes hdb-draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes hdb-flow {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  /* hovering a step card lights its column */
+  @media (hover: hover) and (pointer: fine) {
+    .ho:has(#step-drift:hover) .hdb-col-drift,
+    .ho:has(#step-audit:hover) .hdb-col-audit,
+    .ho:has(#step-system:hover) .hdb-col-system,
+    .ho:has(#step-context:hover) .hdb-col-context,
+    .ho:has(#step-proof:hover) .hdb-col-proof {
+      opacity: 0.07;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hdb .hdb-line {
+      stroke-dashoffset: 0;
+      animation: none !important;
+    }
+    .hdb .hdb-flow {
+      display: none;
+    }
+  }
+  /* the columns only line up with five cards in a row */
+  @media (max-width: 1023px) {
+    .hdb {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-hdb]').forEach((fig) => {
+    new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) fig.classList.add('is-in');
+        fig.classList.toggle('is-paused', !e.isIntersecting);
+      },
+      { threshold: 0.25 },
+    ).observe(fig);
+  });
+</script>

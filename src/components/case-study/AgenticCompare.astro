@@ -4,6 +4,8 @@
  * the same agent change without a gate and with one. The heading carries the message;
  * the five layers and the 'why it matters' line stay in the Markdown twin for agents, not on the page.
  * The class names and the Save button are an example, labelled so.
+ * 23 Nov (Emir: 'gate' explained nothing): framed as without / with the system — without it an agent guesses a
+ * value and the drift ships; with it the names, the rules and a check keep the agent on the system.
  */
 interface Props {
   kicker: string;
@@ -26,29 +28,29 @@ const STEPS = 5;
     </div>
     <div class="agc-cols">
       <div class="agc-col">
-        <p class="agc-title">Without a gate</p>
+        <p class="agc-title">Without the system</p>
         <ol class="agc-log">
-          <li data-at="1"><span>agent</span>writes bg-brand-purple</li>
-          <li data-at="2" class="is-muted"><span>docs</span>not read</li>
+          <li data-at="1"><span>agent</span>needs a purple, writes #7c6cf0</li>
+          <li data-at="2" class="is-muted"><span>rules</span>none to read</li>
           <li data-at="3"><span>review</span>the screen looks fine</li>
-          <li data-at="4" class="is-bad"><span>ships</span>the class renders nothing</li>
+          <li data-at="4" class="is-bad"><span>ships</span>one more purple nobody owns</li>
         </ol>
         <div class="agc-shot" data-at="5">
-          <span class="agc-btn agc-btn--empty">Save</span>
-          <span class="agc-cap">no colour: it inherits</span>
+          <span class="agc-btn agc-btn--off">Save</span>
+          <span class="agc-cap">close to the brand, not the brand</span>
         </div>
       </div>
       <div class="agc-col agc-col--gate">
-        <p class="agc-title">With the gate</p>
+        <p class="agc-title">With the system</p>
         <ol class="agc-log">
-          <li data-at="1"><span>agent</span>writes bg-brand-purple</li>
-          <li data-at="2" class="is-muted"><span>docs</span>not read</li>
-          <li data-at="3" class="is-bad"><span>✕ lint</span>no token. Use bg-primary.</li>
+          <li data-at="1"><span>agent</span>needs a purple, writes #7c6cf0</li>
+          <li data-at="2"><span>rules</span>colours come from named tokens</li>
+          <li data-at="3" class="is-bad"><span>✕ check</span>raw colour. Use bg-primary.</li>
           <li data-at="4" class="is-ok"><span>✓ fixed</span>bg-primary · merged</li>
         </ol>
         <div class="agc-shot" data-at="5">
           <span class="agc-btn agc-btn--ok">Save</span>
-          <span class="agc-cap">bg-primary, from the token</span>
+          <span class="agc-cap">the same Save as every screen</span>
         </div>
       </div>
     </div>
@@ -175,9 +177,10 @@ const STEPS = 5;
     font-size: var(--text-body-sm);
     font-weight: 500;
   }
-  .agc-btn--empty {
-    border: 1px dashed var(--color-hot);
-    color: var(--color-ink);
+  /* example only: a near-brand purple an agent might guess */
+  .agc-btn--off {
+    background: #7c6cf0;
+    color: #fff;
   }
   .agc-btn--ok {
     background: var(--color-accent);

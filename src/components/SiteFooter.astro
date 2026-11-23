@@ -34,11 +34,10 @@ const cols = [
     items: caseStudies.map((c) => ({ href: caseHref(c.slug), label: c.linkName })),
   },
 ];
-// contact split by purpose (Emir, 11 Nov). The Markdown twin, llms.txt and the sitemap stay
+// contact split by purpose (Emir, 11 Nov; 'Write to us' removed 23 Nov until there is an address). The Markdown twin, llms.txt and the sitemap stay
 // discoverable for agents through <link rel="alternate"> in the head and robots.txt, not as footer links.
 const contact = [
   { head: 'Start a project', items: [{ href: links.bookCall, label: 'Book a call' }, { href: '/#audit', label: 'Get a free audit' }] },
-  { head: 'Write to us', items: [{ href: links.email, label: 'Email' }] },
   { head: 'Follow', items: [{ href: links.linkedin, label: 'LinkedIn' }, { href: links.github, label: 'GitHub' }] },
 ];
 ---

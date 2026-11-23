@@ -130,7 +130,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
       </div>
     </section>
 
-    {layoutA && <ScreensBandA name={s.name} />}
+    {layoutA && <ScreensBandA name={s.name} galleries={s.screensA} />}
     {workFirst && <CaseWork study={s} direction={direction} />}
 
     {
