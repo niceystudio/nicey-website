@@ -1,17 +1,15 @@
 ---
 /**
- * Direction A: the ASCII band (after Supabase Select 26). Not decoration: it is the Zero Drift story.
- * Left, dim: the values a drifted product really carries, flowing in (the "found" names shown on the
- * homepage). Middle, on the accent block: the token names they collapse into (real QBench V2 tokens,
- * the same ones the Services terminal reads). Right: what an agent does with them.
+ * Direction A: the drift → system → agents → scale band (after Supabase Select 26). It is the Zero Drift story:
+ *   drift   the values a drifted product really carries, flowing in (dim, unordered)
+ *   system  the token names they collapse into (real QBench V2 tokens), on the accent block
+ *   agents  what a coding agent reads from them, and that it reads them fine
+ *   scale   the products built on the system: mini screens drawn only from the same tokens
+ * "Change one token" (23 Nov): pick an accent and a corner style. The block re-colours, the agents re-read every
+ * row and report "synced", and the screens on the right follow in a cascade — when the system is right, a change
+ * is one edit, not a hunt. The controls are real buttons; the band itself is decorative (aria-hidden), and a live
+ * region says in words what changed. Reduced motion: no scrolling, the change applies at once.
  */
-interface Props {
-  /** which slice of the story to show under the band labels */
-  labels?: [string, string, string];
-  rows?: number;
-}
-const { labels = ['drift', 'system', 'agent'], rows = 8 } = Astro.props;
-
 const drift = ['purple-2', 'purpleLight2', 'brand/purple/30', 'col-7', 'violet-final', '#6b5fbe', '#7266c4', '#665ab8'];
 const tokens = [
   'color.accent',
@@ -25,6 +23,22 @@ const tokens = [
 ];
 const reads = ['input.md', 'tokens.json', 'Input.fig', 'button.md', 'field.md', 'select.md', 'library.json', 'theme.css'];
 
+// the accent choices: each keeps white text readable on the block
+const accents = [
+  { id: 'violet', label: 'Violet', hex: '#6b5fbe' },
+  { id: 'blue', label: 'Blue', hex: '#2f5fd0' },
+  { id: 'green', label: 'Green', hex: '#2c7a57' },
+  { id: 'orange', label: 'Orange', hex: '#b9541f' },
+  { id: 'pink', label: 'Pink', hex: '#b0407a' },
+];
+const styles = [
+  { id: 'sharp', label: 'Sharp', r: '0px' },
+  { id: 'soft', label: 'Soft', r: '4px' },
+  { id: 'round', label: 'Round', r: '999px' },
+];
+const products = ['LIMS', 'Mobile', 'Admin'];
+
+const ROWS = 8;
 const B = 36;
 const glyphs = ['→', '→', '→', '·', '·', '↓', '↑', '·'];
 // deterministic, so the server render and the first frame match
@@ -39,46 +53,173 @@ const leftRow = (i: number) => {
   }
   return s;
 };
-const rightRow = (i: number) => {
+const rightRead = (i: number) => {
   const brackets = ['[[(<{', '{<([[', '(<{[[', '[(<{('];
   const b = brackets[i % brackets.length];
   const close = b.split('').reverse().map((c) => ({ '[': ']', '(': ')', '<': '>', '{': '}' })[c]).join('');
-  let s = ` ${b} ${reads[i % reads.length]} ${close} → ok `;
-  while (s.length < 170) s += rnd() < 0.5 ? '→' : rnd() < 0.5 ? '·' : ' ';
-  return s;
+  return ` ${b} ${reads[i % reads.length]} ${close} → `;
 };
-const data = Array.from({ length: rows }, (_, i) => {
+const data = Array.from({ length: ROWS }, (_, i) => {
   const t = tokens[i % tokens.length];
   const num = String(i + 1).padStart(2, '0');
   const fill = Math.max(1, B - num.length - 2 - t.length - 2);
-  return { left: leftRow(i), block: `${num}  ${t}${' '.padEnd(fill, '·')}■`, right: rightRow(i) };
+  return { left: leftRow(i), block: `${num}  ${t}${' '.padEnd(fill, '·')}■`, read: rightRead(i) };
 });
 ---
 
-<div class="ab a-grain" aria-hidden="true" data-ab>
-  <div class="ab-labels">
-    <span>{labels[0]}</span><span>{labels[1]}</span><span>{labels[2]}</span>
+<section class="ab" aria-label="Change one token" data-ab style={`--ab-accent:${accents[0].hex};--ab-r:${styles[0].r}`}>
+  <div class="ab-bar">
+    <p class="ab-k m-0">Change one token</p>
+    <div class="ab-ctl" role="group" aria-label="color.accent">
+      <span class="ab-ctl-k" aria-hidden="true">color.accent</span>
+      {
+        accents.map((a, i) => (
+          <button
+            type="button"
+            class="ab-sw"
+            style={`--sw:${a.hex}`}
+            aria-label={a.label}
+            aria-pressed={i === 0 ? 'true' : 'false'}
+            data-accent={a.hex}
+            data-name={a.label}
+          />
+        ))
+      }
+    </div>
+    <div class="ab-ctl" role="group" aria-label="radius">
+      <span class="ab-ctl-k" aria-hidden="true">radius</span>
+      {
+        styles.map((s, i) => (
+          <button type="button" class="ab-st" aria-pressed={i === 0 ? 'true' : 'false'} data-radius={s.r} data-name={s.label}>
+            {s.label}
+          </button>
+        ))
+      }
+    </div>
+    <p class="ab-live m-0" aria-live="polite" data-live></p>
   </div>
-  <div class="ab-rows">
-    {
-      data.map((r, i) => (
-        <div class="ab-row" data-speed={1 + (i % 3)}>
-          <span class="ab-l"><span data-l>{r.left}</span></span>
-          <span class:list={['ab-b', i === 0 && 'is-reading']} data-b>{r.block}</span>
-          <span class="ab-r" data-r>{r.right}</span>
-        </div>
-      ))
-    }
+
+  <div class="ab-stage a-grain" aria-hidden="true">
+    <div class="ab-labels">
+      <span>drift</span><span>system</span><span>agents</span><span class="ab-scale-k">scale</span>
+    </div>
+    <div class="ab-grid">
+      <div class="ab-rows">
+        {
+          data.map((r, i) => (
+            <div class="ab-row" data-speed={1 + (i % 3)}>
+              <span class="ab-l"><span data-l>{r.left}</span></span>
+              <span class:list={['ab-b', i === 0 && 'is-reading']} data-b>{r.block}</span>
+              <span class="ab-r">
+                {r.read}
+                <span class="ab-ok" data-ok>ok</span>
+                <span data-r>{' →·→→ ·→ → ·→→→ · →→ ·→ →→· → ·→→ →· → ·→→ ·→ →→ · →→·→ → ·→→ →· →→ ·→'}</span>
+              </span>
+            </div>
+          ))
+        }
+      </div>
+      <div class="ab-scale">
+        {
+          products.map((p, i) => (
+            <div class="ab-app" style={`--d:${i}`}>
+              <div class="ab-app-top">
+                <span class="ab-dot" />
+                <span class="ab-app-name">{p}</span>
+              </div>
+              <div class="ab-app-body">
+                <span class="ab-in" />
+                <span class="ab-chips">
+                  <span class="ab-chip" />
+                  <span class="ab-chip is-on" />
+                  <span class="ab-chip" />
+                </span>
+                <span class="ab-btn">Save</span>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
   </div>
-</div>
+</section>
 
 <style>
   .ab {
+    --ab-on: #fff;
     position: relative;
     width: 100%;
-    overflow: hidden;
-    padding: 20px 0 22px;
     border-block: 1px solid var(--a-rule);
+  }
+  /* ---------- the control bar ---------- */
+  .ab-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 28px;
+    padding: 14px var(--spacing-gutter, 24px);
+    border-bottom: 1px solid var(--a-rule);
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+  .ab-k {
+    color: var(--color-ink);
+  }
+  .ab-ctl {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .ab-ctl-k {
+    margin-right: 4px;
+    color: var(--color-muted);
+  }
+  .ab-sw {
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 1px solid transparent;
+    background: var(--sw);
+    background-clip: content-box;
+    outline-offset: 2px;
+    cursor: pointer;
+  }
+  .ab-sw[aria-pressed='true'] {
+    border-color: var(--color-ink);
+    padding: 3px;
+  }
+  .ab-st {
+    padding: 3px 8px;
+    border: 1px solid var(--a-rule);
+    background: transparent;
+    color: var(--color-ink-2);
+    font: inherit;
+    cursor: pointer;
+  }
+  .ab-st[aria-pressed='true'] {
+    border-color: var(--color-ink);
+    background: var(--color-ink);
+    color: var(--color-page);
+  }
+  .ab-sw:focus-visible,
+  .ab-st:focus-visible {
+    outline: 2px solid var(--color-ink);
+  }
+  .ab-live {
+    margin-left: auto;
+    color: var(--color-muted);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .ab-st:not([aria-pressed='true']):hover {
+      border-color: var(--color-ink-2);
+      color: var(--color-ink);
+    }
+  }
+
+  /* ---------- the band ---------- */
+  .ab-stage {
+    overflow: hidden;
+    padding: 18px 0 22px;
     background: color-mix(in srgb, var(--color-page) 70%, transparent);
     font-family: var(--font-mono);
     font-size: 15px;
@@ -89,9 +230,10 @@ const data = Array.from({ length: rows }, (_, i) => {
   .ab-labels,
   .ab-row {
     display: grid;
-    grid-template-columns: minmax(0, 0.9fr) auto minmax(0, 1.4fr);
+    grid-template-columns: minmax(0, 0.9fr) auto minmax(0, 1fr);
   }
   .ab-labels {
+    grid-template-columns: minmax(0, 0.9fr) auto minmax(0, 1fr) var(--ab-scale-w);
     margin-bottom: 10px;
     font-size: 11px;
     letter-spacing: 0.14em;
@@ -107,8 +249,18 @@ const data = Array.from({ length: rows }, (_, i) => {
     width: calc(36ch * 15 / 11);
     padding-left: 0.5ch;
   }
-  .ab-labels span:last-child {
+  .ab-labels span:nth-child(3) {
     padding-left: 16px;
+  }
+  .ab-labels .ab-scale-k {
+    padding-left: 20px;
+  }
+  .ab-stage {
+    --ab-scale-w: 300px;
+  }
+  .ab-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--ab-scale-w);
   }
   /* the left run hugs the block: it overflows towards the page edge, not into the block */
   .ab-l {
@@ -123,9 +275,11 @@ const data = Array.from({ length: rows }, (_, i) => {
   .ab-b {
     width: 36ch;
     padding: 0 0.5ch;
-    background: var(--a-block);
-    color: var(--a-on-block);
-    transition: background-color 240ms var(--ease-out), color 240ms var(--ease-out);
+    background: var(--ab-accent);
+    color: var(--ab-on);
+    transition:
+      background-color 240ms var(--ease-out),
+      color 240ms var(--ease-out);
   }
   .ab-b.is-reading {
     background: var(--color-ink);
@@ -135,8 +289,114 @@ const data = Array.from({ length: rows }, (_, i) => {
     overflow: hidden;
     color: color-mix(in srgb, var(--color-ink) 62%, transparent);
   }
+  .ab-ok {
+    color: var(--color-ink);
+    transition: color 200ms var(--ease-out);
+  }
+  .ab-ok.is-synced {
+    color: var(--ab-accent);
+  }
+
+  /* ---------- scale: products drawn only from the tokens ---------- */
+  .ab-scale {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 2px 24px 0 20px;
+    border-left: 1px solid var(--a-rule);
+    white-space: normal;
+  }
+  .ab-app {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    height: 52px;
+    padding: 0 10px;
+    border: 1px solid var(--a-rule);
+    border-radius: min(var(--ab-r), 8px);
+    background: var(--color-surface);
+    transition: border-radius 260ms var(--ease-out) calc(var(--d) * 90ms);
+  }
+  .ab-app-top {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--color-ink-2);
+  }
+  .ab-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: var(--ab-r);
+    background: var(--ab-accent);
+  }
+  .ab-app-body {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .ab-in {
+    flex: 1;
+    height: 20px;
+    border: 1px solid var(--a-rule);
+    border-radius: var(--ab-r);
+    background: var(--color-page);
+  }
+  .ab-chips {
+    display: flex;
+    gap: 3px;
+  }
+  .ab-chip {
+    width: 10px;
+    height: 10px;
+    border: 1px solid var(--a-rule);
+    border-radius: var(--ab-r);
+  }
+  .ab-chip.is-on {
+    border-color: var(--ab-accent);
+    background: var(--ab-accent);
+  }
+  .ab-btn {
+    padding: 3px 9px;
+    border-radius: var(--ab-r);
+    background: var(--ab-accent);
+    color: var(--ab-on);
+    font-size: 11px;
+    line-height: 1.3;
+  }
+  /* the change cascades: each screen follows a beat after the one above */
+  .ab-dot,
+  .ab-in,
+  .ab-chip,
+  .ab-btn {
+    transition:
+      background-color 260ms var(--ease-out) calc(var(--d) * 90ms + 120ms),
+      border-color 260ms var(--ease-out) calc(var(--d) * 90ms + 120ms),
+      border-radius 260ms var(--ease-out) calc(var(--d) * 90ms + 120ms);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ab *,
+    .ab *::before {
+      transition: none !important;
+    }
+  }
+
+  @media (max-width: 1023px) {
+    .ab-stage {
+      --ab-scale-w: 0px;
+    }
+    .ab-scale,
+    .ab-scale-k {
+      display: none;
+    }
+    .ab-live {
+      flex-basis: 100%;
+      margin-left: 0;
+    }
+  }
   @media (max-width: 720px) {
-    .ab {
+    .ab-stage {
       font-size: 12px;
     }
     .ab-labels span:nth-child(2) {
@@ -147,16 +407,29 @@ const data = Array.from({ length: rows }, (_, i) => {
 
 <script>
   document.querySelectorAll<HTMLElement>('[data-ab]').forEach((band) => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const rows = Array.from(band.querySelectorAll<HTMLElement>('.ab-row')).map((row) => ({
       l: row.querySelector<HTMLElement>('[data-l]')!,
       r: row.querySelector<HTMLElement>('[data-r]')!,
       b: row.querySelector<HTMLElement>('[data-b]')!,
+      ok: row.querySelector<HTMLElement>('[data-ok]')!,
       speed: Number(row.dataset.speed) || 1,
     }));
+    const live = band.querySelector<HTMLElement>('[data-live]')!;
+    let accentName = 'Violet';
+    let radiusName = 'Sharp';
+
     let tick = 0;
     let reading = 0;
+    let sweep = -1; // row the post-change sweep is on; -1 when idle
     let timer = 0;
+
+    const setReading = (i: number) => {
+      rows[reading].b.classList.remove('is-reading');
+      reading = i;
+      rows[reading].b.classList.add('is-reading');
+    };
+
     // values flow right, into the block and out the other side as something an agent can read
     const step = () => {
       tick++;
@@ -167,12 +440,56 @@ const data = Array.from({ length: rows }, (_, i) => {
         const r = x.r.textContent ?? '';
         x.r.textContent = r.slice(-1) + r.slice(0, -1);
       });
-      if (tick % 14 === 0) {
-        rows[reading].b.classList.remove('is-reading');
-        reading = (reading + 1) % rows.length;
-        rows[reading].b.classList.add('is-reading');
-      }
+      if (sweep >= 0) {
+        // after a change the agents re-read every row, fast, and each one comes back synced
+        if (tick % 2 === 0) {
+          setReading(sweep);
+          rows[sweep].ok.textContent = 'synced';
+          rows[sweep].ok.classList.add('is-synced');
+          sweep++;
+          if (sweep === rows.length) {
+            sweep = -1;
+            window.setTimeout(() => rows.forEach((x) => ((x.ok.textContent = 'ok'), x.ok.classList.remove('is-synced'))), 2200);
+          }
+        }
+      } else if (tick % 14 === 0) setReading((reading + 1) % rows.length);
     };
+
+    const announce = () => {
+      live.textContent = `${accentName}, ${radiusName.toLowerCase()} — 1 token changed, ${rows.length} rows re-read, 3 products updated`;
+    };
+    const changed = () => {
+      announce();
+      if (reduced) {
+        rows.forEach((x) => ((x.ok.textContent = 'synced'), x.ok.classList.add('is-synced')));
+        return;
+      }
+      sweep = 0;
+    };
+
+    const press = (group: string, btn: HTMLButtonElement) => {
+      band.querySelectorAll<HTMLButtonElement>(group).forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+    };
+    band.querySelectorAll<HTMLButtonElement>('[data-accent]').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        if (btn.getAttribute('aria-pressed') === 'true') return;
+        press('[data-accent]', btn);
+        band.style.setProperty('--ab-accent', btn.dataset.accent!);
+        accentName = btn.dataset.name!;
+        changed();
+      }),
+    );
+    band.querySelectorAll<HTMLButtonElement>('[data-radius]').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        if (btn.getAttribute('aria-pressed') === 'true') return;
+        press('[data-radius]', btn);
+        band.style.setProperty('--ab-r', btn.dataset.radius!);
+        radiusName = btn.dataset.name!;
+        changed();
+      }),
+    );
+
+    if (reduced) return;
     new IntersectionObserver((es) => {
       window.clearInterval(timer);
       if (es[0].isIntersecting) timer = window.setInterval(step, 90);

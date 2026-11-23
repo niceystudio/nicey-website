@@ -2,8 +2,9 @@
 /**
  * Direction A: the band after the ASCII band. 19 Nov (Goran via Emir): not a case-study list — the same square tiles,
  * filled with the logos of companies we have worked with (taken from nicey.studio, our own live site; SVGs in
- * /public/logos). Logos are one colour (ink; inverted in the dark theme) and show their own colours on hover.
- * Not links: the case studies live in Work.
+ * /public/logos). Logos are one colour (ink; inverted in the dark theme).
+ * Not links: the case studies live in Work, so no numbers and no hover (23 Nov interface review: accent-on-hover means
+ * "clickable" everywhere else on the page).
  */
 // w = h × the SVG's aspect ratio, so the browser reserves the space (Lighthouse: unsized images).
 // heights are optical (Emir, 20 Nov audit): Colgate and UNIDO read smaller than the rest at the same height
@@ -26,9 +27,8 @@ const logos = [
     </div>
     <ul class="panel sa-row">
       {
-        logos.map((l, i) => (
+        logos.map((l) => (
           <li class="sa-tile">
-            <span class="sa-n" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
             <img src={l.src} alt={l.name} width={l.w} height={l.h} style={`height:${l.h}px`} />
           </li>
         ))
@@ -38,8 +38,9 @@ const logos = [
 </section>
 
 <style>
+  /* the page's one rhythm: every section ends on pb-section (it doubled up with Services' top padding before) */
   .sa {
-    padding: 64px 0 88px;
+    padding: 64px 0 var(--spacing-section);
   }
   .sa-top {
     display: flex;
@@ -53,20 +54,11 @@ const logos = [
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
   .sa-tile {
-    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 136px;
     padding: 28px 24px;
-  }
-  .sa-n {
-    position: absolute;
-    top: 14px;
-    left: 16px;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--color-muted);
   }
   .sa-tile img {
     display: block;
@@ -74,21 +66,9 @@ const logos = [
     max-width: 78%;
     filter: grayscale(1) brightness(0);
     opacity: 0.72;
-    transition:
-      filter 200ms var(--ease-out),
-      opacity 200ms var(--ease-out);
   }
   :global(:root[data-theme='dark']) .sa-tile img {
     filter: grayscale(1) brightness(0) invert(1);
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .sa-tile:hover img {
-      filter: none;
-      opacity: 1;
-    }
-    .sa-tile:hover .sa-n {
-      color: var(--color-accent);
-    }
   }
   @media (max-width: 767px) {
     .sa-row {

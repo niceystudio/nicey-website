@@ -6,9 +6,11 @@
  * not aligned). The "Selected work" strip moved out of the hero into its own band (SelectedA) after the ASCII band.
  */
 import { links } from '../../data/links';
+import PixelFieldA from './PixelFieldA.astro';
 ---
 
 <section class="ha">
+  <PixelFieldA mode="drift" fade="left" class="ha-field" />
   <div class="container-page ha-in">
     <h1 class="ha-h m-0">
       <span class="ha-line">Designing the</span>
@@ -34,10 +36,24 @@ import { links } from '../../data/links';
 
 <style>
   .ha {
+    position: relative;
+    overflow: hidden;
     padding-top: 96px;
     padding-bottom: 64px;
   }
+  /* the pixel field sits on the right half and fades out towards the headline */
+  .ha :global(.ha-field) {
+    left: 38%;
+  }
+  @media (max-width: 767px) {
+    .ha :global(.ha-field) {
+      left: 0;
+      opacity: 0.6;
+    }
+  }
   .ha-in {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
     gap: 56px;

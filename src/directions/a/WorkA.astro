@@ -75,14 +75,13 @@ const rows: Row[] = [
 
 <section id="work" aria-labelledby="work-head" class="container-page flex flex-col pb-section wka">
   <SectionHead id="work-head" caption="Work" class="mb-12">Systems and products we have built</SectionHead>
-  <div class="wka-head" aria-hidden="true"><span>#</span><span>client</span><span>what we did</span><span></span></div>
+  <div class="wka-head" aria-hidden="true"><span>client</span><span>what we did</span><span></span></div>
   <ul class="panel flex flex-col wka-list">
     {
-      rows.map((r, i) => (
+      rows.map((r) => (
         <li id={`work-${r.name.toLowerCase()}`}>
           {r.href ? (
             <a href={r.href} class="work-row" data-wp={JSON.stringify({ ...r.preview, name: r.name })}>
-              <span class="wka-i" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
               <span class="flex flex-[1_1_220px] flex-col gap-2.5">
                 <span class="text-work">{r.name}</span>
                 <span class="caption-sm text-ink-2">{r.meta}</span>
@@ -92,7 +91,6 @@ const rows: Row[] = [
             </a>
           ) : (
             <div class="work-row is-wip">
-              <span class="wka-i" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
               <span class="flex flex-[1_1_220px] flex-col gap-2.5">
                 <span class="text-work">{r.name}</span>
                 <span class="caption-sm text-ink-2">{r.meta}</span>
@@ -371,14 +369,13 @@ const rows: Row[] = [
   .wka-head,
   .wka :global(.work-row) {
     display: grid !important;
-    grid-template-columns: 48px minmax(0, 1.2fr) minmax(0, 1.4fr) 32px;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.4fr) 32px;
     align-items: center !important;
     gap: 12px 32px;
-    align-items: start;
   }
   .wka-head {
     padding: 10px 28px;
-    border-top: 1px solid var(--color-ink);
+    border-top: 1px solid var(--a-rule);
     border-bottom: 1px solid var(--a-rule);
     font-family: var(--font-mono);
     font-size: 11px;
@@ -404,16 +401,8 @@ const rows: Row[] = [
     flex: none !important;
     max-width: none !important;
   }
-  /* bigger names now that the signal column is gone (Emir 19 Nov) */
-  .wka :global(.text-work) {
-    font-size: clamp(36px, 4.2vw, 60px);
-    line-height: 1;
-  }
-  .wka-i {
-    font-family: var(--font-mono);
-    font-size: 13px;
-    color: var(--color-muted);
-  }
+  /* client names stay on --text-work (32–48px), a step below the section heading (23 Nov interface review: at 60px
+     they matched the h2 and flattened the hierarchy); no index column, the list isn't a numbered process */
   .wka :global(.work-row)::before {
     content: '';
     position: absolute;
@@ -443,17 +432,11 @@ const rows: Row[] = [
     .wka :global(.work-row.is-wip:hover)::before {
       transform: scaleY(0) !important;
     }
-    .wka :global(.work-row.is-wip:hover) .wka-i {
-      color: var(--color-muted) !important;
-    }
     .wka :global(.work-row:hover) {
       background: var(--color-surface) !important;
     }
     .wka :global(.work-row:hover)::before {
       transform: scaleY(1);
-    }
-    .wka :global(.work-row:hover) .wka-i {
-      color: var(--color-accent);
     }
   }
   @media (max-width: 860px) {
@@ -461,11 +444,17 @@ const rows: Row[] = [
       display: none !important;
     }
     .wka :global(.work-row) {
-      grid-template-columns: 36px minmax(0, 1fr) 24px;
+      grid-template-columns: minmax(0, 1fr) 24px;
       padding: 24px 12px !important;
+    }
+    /* name and arrow on the first line, what we did under the name */
+    .wka :global(.work-row) > :global(span:nth-child(2)) {
+      grid-column: 1;
+      grid-row: 2;
     }
     .wka :global(.work-row) > :global(span:nth-child(3)) {
       grid-column: 2;
+      grid-row: 1;
     }
   }
 </style>

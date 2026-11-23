@@ -1,21 +1,13 @@
 ---
 /**
  * Direction A: Zero Drift, simplified (Emir 19 Nov: too much text and noise). D's structure — five step cards in one
- * row — in A's brand: square cells on 1px rules, pixel numbers, one accent. Each step = name, one sentence, what you
- * get. The step pipeline strip and the per-step windows (seeing / we do / proof figures) are gone; the full text
- * stays in the Markdown twin for agents. Cells sit in the shared .panel container (same as FAQ).
+ * row — in A's brand: pixel numbers, one accent. Each step = number, name, one sentence. The step pipeline strip and
+ * the per-step windows (seeing / we do / proof figures) are gone; the full text stays in the Markdown twin for agents.
  * 23 Nov (Emir): the rail above the cards (HowDiagramB) — tangled lines straighten from Drift to Proof.
+ * 23 Nov (Goran): no "You get" line and no rules between the steps — one container, spacing separates them.
  */
 import { steps } from '../../data/zero-drift';
 import HowDiagramB from './HowDiagramB.astro';
-
-/* A only (Emir 19 Nov): shorter "You get" lines so every step reads in two lines; the full text stays in the data
-   and on the live page */
-const shortGet: Record<string, string> = {
-  drift: 'A drift map: where design and code disagree.',
-  audit: 'A score per pillar and a roadmap in days.',
-  context: 'Docs people and agents read the same way.',
-};
 ---
 
 <section id="how" aria-labelledby="how-head" class="ho">
@@ -25,17 +17,13 @@ const shortGet: Record<string, string> = {
       <h2 id="how-head" class="m-0 text-h2">From drift to a system that holds.</h2>
     </div>
     <HowDiagramB />
-    <ol class="panel ho-steps">
+    <ol class="ho-steps">
       {
         steps.map((s) => (
           <li class="ho-step" id={`step-${s.id}`}>
             <span class="ho-num" aria-hidden="true">{s.num}</span>
             <h3 class="ho-name m-0">{s.name}</h3>
             <p class="ho-line m-0">{s.heading}</p>
-            <p class="ho-get m-0">
-              <span>You get</span>
-              {shortGet[s.id] ?? s.youGet}
-            </p>
           </li>
         ))
       }
@@ -53,34 +41,22 @@ const shortGet: Record<string, string> = {
     gap: 18px;
     margin-bottom: 48px;
   }
+  /* one container, no rules inside: the steps are separated by space alone */
   .ho-steps {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px 0;
+    margin: 0;
+    padding: 8px;
+    list-style: none;
+    border: 1px solid var(--a-rule);
+    background: var(--color-surface);
   }
   .ho-step {
-    position: relative;
     display: flex;
     flex-direction: column;
     gap: 14px;
-    padding: 24px 22px 26px;
-  }
-  /* one accent line on top of each step, drawn on hover */
-  .ho-step::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    height: 3px;
-    background: var(--a-block);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 220ms var(--ease-out);
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .ho-step:hover::before {
-      transform: scaleX(1);
-    }
+    padding: 20px 18px 24px;
   }
   .ho-num {
     font-family: var(--font-pixel);
@@ -100,26 +76,6 @@ const shortGet: Record<string, string> = {
     line-height: 1.45;
     color: var(--color-ink-2);
     text-wrap: pretty;
-    /* three lines reserved, so every "You get" starts on the same line */
-    min-height: calc(1.45em * 3);
-  }
-  .ho-get {
-    /* "You get" + two lines reserved, so every step ends on the same line */
-    min-height: calc(14px + 6px + 1.45em * 2 + 14px);
-    padding-top: 14px;
-    border-top: 1px solid var(--a-rule);
-    font-size: 14px;
-    line-height: 1.45;
-    color: var(--color-ink);
-  }
-  .ho-get span {
-    display: block;
-    margin-bottom: 6px;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--color-muted);
   }
   @media (max-width: 1023px) {
     .ho-steps {

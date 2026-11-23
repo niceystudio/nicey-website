@@ -6,6 +6,8 @@
  * 20 Nov (Emir: consistent with the design-systems.md terminal in "What we help with"): the same coloured stage with the
  * same dark window inside — soft-filled tabs, file name on the right, mono reading, blinking cursor (QBenchWork values).
  */
+import PixelFieldA from './PixelFieldA.astro';
+
 const pillars = ['Figma inspect', 'Agentic readiness', 'Conventions', 'Component API', 'Zero drift'];
 const bars = [9, 4, 7, 6, 3];
 /* sample values for the example report (match the bars, out of 100) */
@@ -49,7 +51,8 @@ const pages = [
 ];
 ---
 
-<div class="ra-stage a-grain bg-lavender">
+<div class="ra-stage">
+  <PixelFieldA mode="drift" still seed={11} />
   <div class="ra" data-ra>
     <div class="ra-bar">
       <div class="ra-tabs" role="tablist" aria-label="Report pages">

@@ -6,6 +6,8 @@
  * Reused and restyled by a.css: free audit, FAQ, closing band, footer.
  * 19 Nov (Emir): Selected work = its own band after the ASCII band; removed the ASCII band above the footer,
  * the big animated wordmark (MarkA) and the Human | Machine view (the page's .md link stays in the footer).
+ * 23 Nov (interface review): the closing band is gone — the call band is the closer, after the FAQ that leads into it
+ * ("Before you book a call"); every CTA was on the page twice.
  */
 import './a.css';
 import Base from '../../layouts/Base.astro';
@@ -14,7 +16,6 @@ import ServicesA from './ServicesA.astro';
 import WorkA from './WorkA.astro';
 import ProcessA from './ProcessA.astro';
 import Faq from '../../components/Faq.astro';
-import Footer from '../../components/Footer.astro';
 import SiteFooter from '../../components/SiteFooter.astro';
 import HeroA from './HeroA.astro';
 import AsciiBand from './AsciiBand.astro';
@@ -39,10 +40,9 @@ import BookCallA from './BookCallA.astro';
       <WorkA />
       <HowA />
       <ProcessA />
-      <BookCallA />
       <Faq />
+      <BookCallA />
     </main>
-    <Footer />
     <SiteFooter mdHref="/index.md" directionA />
   </div>
 </Base>
