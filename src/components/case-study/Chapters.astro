@@ -125,7 +125,7 @@ const slug = (k: string) =>
                       <li>
                         <span class="caption-sm text-ink-2">{it.label}</span>
                         <span class="ch-fig">{it.value}</span>
-                        {it.seenAt && <span class="caption-sm text-hot">{it.seenAt}</span>}
+                        {it.seenAt && <span class="caption-sm text-ink-2">{it.seenAt}</span>}
                         <span class="text-body text-pretty">{it.caption}</span>
                       </li>
                     ))}
@@ -539,7 +539,7 @@ const slug = (k: string) =>
             <ul class="ch-proof" data-stagger>
               {/* "Seen at …" once, as the row's label; every column is then just number + caption */}
               {c.proof.find((p) => p.seenAt) && (
-                <li class="ch-proof-label caption-sm text-hot">{c.proof.find((p) => p.seenAt)!.seenAt}</li>
+                <li class="ch-proof-label caption-sm text-ink-2">{c.proof.find((p) => p.seenAt)!.seenAt}</li>
               )}
               {c.proof.map((p) => (
                 <li class="ch-proof-item">
@@ -1368,7 +1368,7 @@ const slug = (k: string) =>
     }
     .ch-compare tr {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: minmax(0, 1fr); /* before and after on their own lines (they were cut at 390) */
       gap: 4px 16px;
       padding: 12px 0;
       border-bottom: 1px solid var(--color-line);

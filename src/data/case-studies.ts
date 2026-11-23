@@ -665,12 +665,43 @@ export const caseStudies: CaseStudy[] = [
     band: 'peach',
     kicker: 'Case study · Design system · Agtech',
     statement: 'The library looked healthy. No pipeline could read it.',
+    screensA: [
+      {
+        title: 'variables',
+        max: 960,
+        images: [
+          { src: '/work/everbreed/vars-semantic.webp', alt: 'Everbreed variables in Figma, Semantic Tokens (234): surface, border, text, icon, component and brand groups, each pointing at a primitive.', width: 1556, height: 1317 },
+          { src: '/work/everbreed/vars-primitives.webp', alt: 'Everbreed variables, Primitives (56): white, black and the green, grey, orange, red, blue and slate ramps.', width: 1556, height: 1317 },
+          { src: '/work/everbreed/vars-dimensions.webp', alt: 'Everbreed variables, Dimensions (60): radius, spacing, breakpoints and effects.', width: 1556, height: 1317 },
+          { src: '/work/everbreed/vars-elevation.webp', alt: 'Everbreed variables, Elevation (10): button and elevation shadow colours.', width: 1556, height: 1317 },
+        ],
+      },
+      {
+        title: 'component docs',
+        cover: { src: '/work/everbreed/doc-cover.webp', width: 1600, height: 1000 },
+        images: [
+          { src: '/work/everbreed/doc-button-1.webp', alt: 'Button in the Figma library: icon-only buttons in every variant, treatment, size and state.', width: 2475, height: 1900 },
+          { src: '/work/everbreed/doc-button-2.webp', alt: 'Button in the Figma library: label buttons in every variant, treatment, size and state.', width: 3021, height: 1900 },
+          { src: '/work/everbreed/doc-button-examples-1.webp', alt: 'Button examples: overview, variants and treatments.', width: 2978, height: 3720 },
+          { src: '/work/everbreed/doc-button-examples-2.webp', alt: 'Button examples: states, sizes, content and icons.', width: 2978, height: 1880 },
+          { src: '/work/everbreed/doc-button-examples-3.webp', alt: 'Button examples: text length and usage notes.', width: 2978, height: 2112 },
+        ],
+      },
+      {
+        title: 'pedigree card',
+        cover: { src: '/work/everbreed/pedigree-cover.webp', width: 1600, height: 1000 },
+        images: [
+          { src: '/work/everbreed/doc-pedigree-1.webp', alt: 'PedigreeCard documentation: what it is for, then the card in every size for a buck, a doe and an unknown rabbit.', width: 4226, height: 2850 },
+          { src: '/work/everbreed/doc-pedigree-2.webp', alt: 'PedigreeCard documentation: the horizontal card and the print card used in exported pedigrees.', width: 1750, height: 1943 },
+        ],
+      },
+    ],
     lede: 'Everbreed had a mature Figma library, but the code had drifted from it and no tool could read it. We gave every token an ID, a scope and a code name, so the code config now comes from Figma, for web and for mobile.',
     facts: [
       { term: 'Company', detail: 'Agtech platform: a web app and a student app on iOS and Android' },
       { term: 'Team', detail: '[Team size]' },
       { term: 'Stack', detail: 'Figma DS Desktop and DS Mobile, Vue on web, React Native on mobile' },
-      { term: 'Scale', detail: '302 variables, 89 component sets' },
+      { term: 'Scale', detail: '360 variables today (302 when the sync was built), 89 component sets' },
       { term: 'Work by', detail: 'Goran Babarogić, design systems, [2025 to now]' },
     ],
     who: '',
@@ -855,23 +886,23 @@ export const caseStudies: CaseStudy[] = [
     faq: [
       {
         q: 'Did you rename the tokens?',
-        a: '[Answer to add]',
+        a: 'No. The plan started as a rename of all 302 variables, and Everbreed’s engineer proposed a better route: keep every name, and give each token three fields Figma already has, an ID, a scope and a code name. Code matches tokens by ID, so a later rename doesn’t break it.',
       },
       {
         q: 'How long did adding the metadata take?',
-        a: '[Answer to add]',
+        a: 'The fields come from what Figma already stores (the variable ID, its scopes and the web code syntax), so the work was filling in scopes and code names for every token, not inventing a new naming system. [How long it took]',
       },
       {
         q: 'Does it work for the mobile app?',
-        a: '[Answer to add]',
+        a: 'Yes. DS Mobile follows the same contract: a typed React Native export for iOS and Android with the same tokens. Button and Input were checked in one flow on both platforms, with enlarged text too, and native differences are written down instead of guessed.',
       },
       {
         q: 'What stops new drift?',
-        a: '[Answer to add]',
+        a: 'Two things. The web config is generated from Figma, so there’s no hand-kept copy to drift. And every pull request is checked: raw colours, raw shadows and tokens missing a field fail the check.',
       },
       {
         q: 'Can AI agents build Everbreed screens?',
-        a: '[Answer to add]',
+        a: 'Yes. An agent reads the handoff spec on the Figma canvas, loads the rules for its platform, builds with library components and tokens only, and check-screen compares the result with the library before a designer sees it. The first test screen had 0 issues.',
       },
     ],
     cta: {
