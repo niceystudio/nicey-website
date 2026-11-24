@@ -84,7 +84,7 @@ const tabList = [
 ---
 
 <figure class:list={['qw m-0', terminal && 'qw--terminal']} data-qw data-states={JSON.stringify(states.map((s) => s.read))} data-readers={tabs ? JSON.stringify(readers) : undefined}>
-  <div class:list={['qw-stage', bare ? 'qw-stage--bare' : 'bg-lavender']}>
+  <div class:list={['qw-stage', bare && 'qw-stage--bare']}>
     {!terminal && (
     <div class="qw-states" role="group" aria-label="Input states">
       {
@@ -148,11 +148,12 @@ const tabList = [
 </figure>
 
 <style>
+  /* 24 Nov: the Direction A look lives here now (it was an override layer in a-case.css): sentence-case mono labels,
+     the stage on the surface in a 1px rule, the picked state in accent text, the window is the shared Terminal */
   .qw-mono {
     font-family: var(--font-mono);
     font-size: var(--text-caption-sm);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    letter-spacing: 0.02em;
   }
   /* label and sentence share one baseline, the sentence wraps under itself (case study only) */
   .qw-cap {
@@ -168,9 +169,12 @@ const tabList = [
     flex: none;
     font-family: var(--font-mono);
     font-size: var(--text-caption-sm);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    letter-spacing: 0.02em;
     color: var(--color-muted);
+  }
+  .qw-cap-k::before {
+    content: '//\00a0';
+    color: var(--color-accent);
   }
   .qw-stage--bare {
     width: 100%;
@@ -192,8 +196,14 @@ const tabList = [
     flex-direction: column;
     gap: 20px;
     padding: 36px;
+    border: 1px solid var(--color-rule);
     border-radius: var(--radius-panel);
-    color: #26251f;
+    background: var(--color-surface);
+    color: var(--color-ink);
+  }
+  .qw-stage--bare {
+    border: 0;
+    background: transparent;
   }
   .qw-states {
     display: grid;
@@ -213,7 +223,7 @@ const tabList = [
     cursor: pointer;
   }
   .qw-state-n {
-    color: #4d4a40;
+    color: var(--color-ink-2);
   }
   .qw-field {
     display: flex;
@@ -221,24 +231,19 @@ const tabList = [
     gap: 6px;
     padding: 16px;
     border-radius: 10px;
-    background: #fff;
+    /* the product's cards: warm grey in both themes, so they stand out from the white stage; fields stay white */
+    background: #f3f0e9;
     color: #1f2a3d;
     font-size: var(--text-caption);
     outline: 2px solid transparent;
     outline-offset: 3px;
   }
   .qw-state[aria-pressed='true'] .qw-field {
-    outline-color: #26251f;
+    outline-color: var(--color-ink);
   }
+  /* the picked state: accent text only (Emir 19 Nov: no fill, no underline) */
   .qw-state[aria-pressed='true'] .qw-state-n {
-    color: #26251f;
-  }
-  /* the lavender stage is dark at night: the state labels go light so they stay readable */
-  :global([data-theme='dark']) .qw-state-n {
-    color: rgba(243, 240, 233, 0.55);
-  }
-  :global([data-theme='dark']) .qw-state[aria-pressed='true'] .qw-state-n {
-    color: #f3f0e9;
+    color: var(--color-accent);
   }
   .qw-state:focus-visible {
     outline: none;
@@ -256,6 +261,7 @@ const tabList = [
   }
   .qw-input {
     padding: 8px 10px;
+    background: #fff;
     border: 1px solid #cbd5e1;
     border-radius: 6px;
   }
@@ -284,7 +290,7 @@ const tabList = [
   .qw-dot {
     width: 7px;
     height: 7px;
-    background: var(--color-term-ok);
+    background: var(--color-accent);
   }
   .qw-agent-k {
     color: var(--color-term-accent);
@@ -306,6 +312,7 @@ const tabList = [
 </style>
 
 <script>
+  import { selectTab, tabKeys } from '../../lib/tabs';
   function mount(root: HTMLElement) {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     const plain: string[][] = JSON.parse(root.dataset.states ?? '[]');
@@ -347,7 +354,7 @@ const tabList = [
 
     const showTab = (id: string) => {
       tab = id;
-      tabEls.forEach((x) => x.setAttribute('aria-selected', String(x.dataset.tab === id)));
+      selectTab(tabEls, tabEls.findIndex((x) => x.dataset.tab === id));
       if (srcEl) srcEl.textContent = SRC[tab];
       read(current);
     };
@@ -371,6 +378,14 @@ const tabList = [
         showTab(t.dataset.tab!);
       });
     });
+    if (tabEls.length) {
+      selectTab(tabEls, Math.max(0, tabEls.findIndex((x) => x.getAttribute('aria-selected') === 'true')));
+      tabKeys(tabEls, (i) => {
+        userTook = true;
+        window.clearInterval(tour);
+        showTab(tabEls[i].dataset.tab!);
+      });
+    }
 
     buttons.forEach((b) => {
       const i = Number(b.dataset.i);

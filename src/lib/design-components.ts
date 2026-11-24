@@ -51,6 +51,13 @@ export const components: Component[] = [
     classes: ['term', 'term-bar', 'term-tabs', 'term-tab', 'term-src', 'term-body', 'term-cursor'],
   },
   {
+    name: 'Tabs',
+    file: 'src/components/ui/Tabs.astro',
+    what: 'A row of file tabs: mono, the open tab on the surface with an accent line on top. Behaviour (selection, ← → Home End) from src/lib/tabs.ts, shared by every tab list including the dark windows.',
+    api: ['label: accessible name of the tab list', 'fill: tabs share the row (a fixed set of steps)', 'children: <button role="tab" class="tab">, optional <span class="tab-k"> above the name', 'script: selectTab(tabs, i) and tabKeys(tabs, go) from src/lib/tabs.ts'],
+    classes: ['tabs', 'tabs--fill', 'tab', 'tab-k'],
+  },
+  {
     name: 'PixelFieldA',
     file: 'src/directions/a/PixelFieldA.astro',
     what: 'The brand pattern: soft pastel cells. Animated in the hero, still behind windows.',

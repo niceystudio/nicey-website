@@ -730,6 +730,7 @@ const { heading, head, items } = Astro.props;
 </style>
 
 <script>
+  import { selectTab, tabKeys } from '../../lib/tabs';
   document.querySelectorAll<HTMLElement>('[data-dc]').forEach((root) => {
     const tabs = root.querySelectorAll<HTMLButtonElement>('[data-dc-pick]');
     const items = root.querySelectorAll<HTMLElement>('[data-dc-item]');
@@ -747,11 +748,8 @@ const { heading, head, items } = Astro.props;
     const show = (i: number, play: boolean) => {
       current = i;
       clearTimeout(timer);
-      tabs.forEach((t, k) => {
-        t.setAttribute('aria-selected', String(k === i));
-        t.tabIndex = k === i ? 0 : -1;
-        t.classList.remove('is-timing');
-      });
+      selectTab(tabs, i);
+      tabs.forEach((t) => t.classList.remove('is-timing'));
       items.forEach((it, k) => {
         it.toggleAttribute('data-off', k !== i);
         it.toggleAttribute('inert', k !== i);
@@ -767,17 +765,8 @@ const { heading, head, items } = Astro.props;
       timer = window.setTimeout(() => setState('solved'), DELAY);
     };
 
-    tabs.forEach((t, i) => {
-      t.addEventListener('click', () => show(i, true));
-      t.addEventListener('keydown', (e) => {
-        const to = e.key === 'ArrowDown' || e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowUp' || e.key === 'ArrowLeft' ? i - 1 : -9;
-        if (to === -9) return;
-        e.preventDefault();
-        const n = (to + tabs.length) % tabs.length;
-        show(n, false);
-        tabs[n].focus();
-      });
-    });
+    tabs.forEach((t, i) => t.addEventListener('click', () => show(i, true)));
+    tabKeys(tabs, (i) => show(i, false), { vertical: true });
     segs.forEach((b) =>
       b.addEventListener('click', () => {
         clearTimeout(timer);

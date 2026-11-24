@@ -1,0 +1,19 @@
+---
+/**
+ * A row of file tabs (the tab list). Put <button role="tab" class="tab"> children inside; wire them with
+ * selectTab / tabKeys from src/lib/tabs.ts so every tab list selects and moves the same way.
+ * Styles: .tabs / .tab / .tab-k in src/styles/global.css.
+ *
+ *   fill   tabs share the row equally (a fixed set of steps) and scroll on narrow screens
+ */
+interface Props {
+  label: string;
+  fill?: boolean;
+  class?: string;
+}
+const { label, fill = false, class: cls } = Astro.props;
+---
+
+<div class:list={['tabs', fill && 'tabs--fill', cls]} role="tablist" aria-label={label}>
+  <slot />
+</div>

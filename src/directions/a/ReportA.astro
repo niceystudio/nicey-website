@@ -110,6 +110,7 @@ const pages = [
 </style>
 
 <script>
+  import { selectTab, tabKeys } from '../../lib/tabs';
   document.querySelectorAll<HTMLElement>('[data-ra]').forEach((root) => {
     const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-ra-tab]'));
     const pages = Array.from(root.querySelectorAll<HTMLElement>('[data-ra-page]'));
@@ -118,9 +119,15 @@ const pages = [
     let took = false;
     const show = (k: number) => {
       i = k;
-      tabs.forEach((t, n) => t.setAttribute('aria-selected', String(n === k)));
+      selectTab(tabs, k);
       pages.forEach((p, n) => (p.hidden = n !== k));
     };
+    selectTab(tabs, 0);
+    tabKeys(tabs, (n) => {
+      took = true;
+      window.clearInterval(timer);
+      show(n);
+    });
     tabs.forEach((t, n) =>
       t.addEventListener('click', () => {
         took = true;

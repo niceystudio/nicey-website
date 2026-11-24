@@ -70,10 +70,18 @@ const STEPS = 5;
     gap: 14px;
     margin-bottom: 20px;
   }
+  /* 24 Nov: the Direction A look lives here now (was an override layer in a-case.css): one split window in an ink
+     rule, panes titled like logs, every line a prompt, results as QBench's own primary button */
   .agc-panel {
     display: flex;
     flex-direction: column;
+    gap: 0;
     overflow: hidden;
+    border: 1px solid var(--color-ink);
+    background: var(--color-ink);
+  }
+  .agc-panel > * {
+    background: var(--color-surface);
   }
   .agc-bar {
     display: flex;
@@ -82,14 +90,13 @@ const STEPS = 5;
     gap: 12px;
     min-height: 52px;
     padding: 8px 12px 8px 24px;
-    border-bottom: 1px solid var(--color-line);
+    border-bottom: 1px solid var(--color-ink);
   }
   .agc-mono {
     font-family: var(--font-mono);
     font-size: var(--text-caption-sm);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--color-ink-2);
+    letter-spacing: 0.02em;
+    color: var(--color-ink);
   }
   .agc-replay {
     min-height: 36px;
@@ -98,10 +105,14 @@ const STEPS = 5;
     border-radius: var(--radius-pill);
     background: transparent;
     color: var(--color-ink);
-    font: inherit;
-    font-size: var(--text-body-sm);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    letter-spacing: 0.02em;
     cursor: pointer;
     transition: transform 160ms var(--ease-out);
+  }
+  .agc-replay::before {
+    content: '↻\00a0';
   }
   .agc-replay:active {
     transform: scale(0.97);
@@ -117,15 +128,28 @@ const STEPS = 5;
     padding: 28px;
   }
   .agc-col + .agc-col {
-    border-left: 1px solid var(--color-line);
+    border-left: 1px solid var(--color-ink);
   }
   .agc-col--gate {
     background: var(--color-surface);
   }
   .agc-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     margin: 0;
-    font-size: var(--text-body-lg);
-    font-weight: 500;
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+    letter-spacing: 0.02em;
+  }
+  .agc-title::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: var(--color-hot);
+  }
+  .agc-col--gate .agc-title::before {
+    background: var(--color-accent);
   }
   .agc-log {
     margin: 0;
@@ -145,6 +169,18 @@ const STEPS = 5;
   .agc-log span {
     color: var(--color-muted);
   }
+  /* every line is a prompt; a failed line without the system is marked ✕ */
+  .agc-log li > span::before {
+    content: '$\00a0';
+    color: var(--color-accent);
+  }
+  .agc-log li.is-bad > span::before,
+  .agc-log li.is-ok > span::before {
+    content: '';
+  }
+  .agc-col:not(.agc-col--gate) .agc-log li.is-bad > span::before {
+    content: '✕\00a0';
+  }
   .agc-log .is-bad,
   .agc-log .is-bad span {
     color: var(--color-hot);
@@ -163,7 +199,7 @@ const STEPS = 5;
     gap: 14px;
     padding: 16px;
     border: 1px solid var(--color-line);
-    border-radius: 10px;
+    border-radius: var(--radius-panel);
     background: var(--color-page);
   }
   .agc-cap {
@@ -171,10 +207,12 @@ const STEPS = 5;
     font-size: var(--text-code);
     color: var(--color-ink-2);
   }
+  /* the results: QBench's own primary button (product values, not the site's) */
   .agc-btn {
-    padding: 8px 18px;
-    border-radius: var(--radius-pill);
-    font-size: var(--text-body-sm);
+    padding: 9px 16px;
+    border-radius: 6px;
+    font-family: var(--font-sans);
+    font-size: var(--text-label);
     font-weight: 500;
   }
   /* example only: a near-brand purple an agent might guess */
@@ -183,8 +221,8 @@ const STEPS = 5;
     color: #fff;
   }
   .agc-btn--ok {
-    background: var(--color-accent);
-    color: var(--color-on-ink);
+    background: #244d9e;
+    color: #fff;
   }
   /* stepper: [data-at] shows once the run reaches it */
   [data-at] {
@@ -201,6 +239,31 @@ const STEPS = 5;
         opacity 240ms var(--ease-out),
         transform 240ms var(--ease-out);
     }
+    /* lines print in steps; the lint line flashes once — that's where the two runs part */
+    [data-at].is-on {
+      animation: agc-print 360ms steps(6, end) both;
+    }
+    .agc-col--gate .agc-log li.is-bad.is-on {
+      animation:
+        agc-print 360ms steps(6, end) both,
+        agc-flash 1100ms 360ms ease-out both;
+    }
+  }
+  @keyframes agc-print {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+  @keyframes agc-flash {
+    0% {
+      background: color-mix(in srgb, var(--color-accent) 34%, transparent);
+    }
+    100% {
+      background: transparent;
+    }
   }
   @media (max-width: 899.98px) {
     .agc-cols {
@@ -208,7 +271,7 @@ const STEPS = 5;
     }
     .agc-col + .agc-col {
       border-left: 0;
-      border-top: 1px solid var(--color-line);
+      border-top: 1px solid var(--color-ink);
     }
   }
 </style>

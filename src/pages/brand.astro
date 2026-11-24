@@ -13,6 +13,7 @@ import SectionHead from '../components/SectionHead.astro';
 import Button from '../components/ui/Button.astro';
 import Label from '../components/ui/Label.astro';
 import Terminal from '../components/ui/Terminal.astro';
+import Tabs from '../components/ui/Tabs.astro';
 import PixelFieldA from '../directions/a/PixelFieldA.astro';
 import { byGroup, colorFamilies, tokens } from '../lib/design-tokens';
 import { components, usedIn } from '../lib/design-components';
@@ -25,6 +26,7 @@ const spacing = byGroup('spacing');
 const radius = byGroup('radius');
 const shadows = byGroup('shadow');
 const ease = byGroup('ease');
+const file = (name: string) => components.find((c) => c.name === name)?.file;
 const use = Object.fromEntries(components.map((c) => [c.name, usedIn(c)]));
 const px = (v: string) => (/^\d+px$/.test(v) ? Number(v.replace('px', '')) : 0);
 ---
@@ -182,7 +184,7 @@ const px = (v: string) => (/^\d+px$/.test(v) ? Number(v.replace('px', '')) : 0);
         <article class="br-comp">
           <header class="br-comp-head">
             <h3 class="m-0 br-h3">Button</h3>
-            <code class="br-val">{components[0].file}</code>
+            <code class="br-val">{file('Button')}</code>
           </header>
           <div class="br-demo">
             <Button href="#br-comp">Primary</Button>
@@ -200,7 +202,7 @@ const px = (v: string) => (/^\d+px$/.test(v) ? Number(v.replace('px', '')) : 0);
         <article class="br-comp">
           <header class="br-comp-head">
             <h3 class="m-0 br-h3">Label</h3>
-            <code class="br-val">{components[1].file}</code>
+            <code class="br-val">{file('Label')}</code>
           </header>
           <div class="br-demo br-demo--col">
             <Label variant="section">section · a caption with the path prefix</Label>
@@ -214,7 +216,7 @@ const px = (v: string) => (/^\d+px$/.test(v) ? Number(v.replace('px', '')) : 0);
         <article class="br-comp">
           <header class="br-comp-head">
             <h3 class="m-0 br-h3">SectionHead</h3>
-            <code class="br-val">{components[2].file}</code>
+            <code class="br-val">{file('SectionHead')}</code>
           </header>
           <div class="br-demo br-demo--col">
             <SectionHead id="br-demo-head" caption="Section caption">A section heading.</SectionHead>
@@ -224,8 +226,23 @@ const px = (v: string) => (/^\d+px$/.test(v) ? Number(v.replace('px', '')) : 0);
 
         <article class="br-comp">
           <header class="br-comp-head">
+            <h3 class="m-0 br-h3">Tabs</h3>
+            <code class="br-val">src/components/ui/Tabs.astro · src/lib/tabs.ts</code>
+          </header>
+          <div class="br-tabs" data-br-tabs>
+            <Tabs label="Example tabs" fill>
+              <button type="button" role="tab" class="tab" aria-selected="true" tabindex="0"><span class="tab-k">01</span>Audit</button>
+              <button type="button" role="tab" class="tab" aria-selected="false" tabindex="-1"><span class="tab-k">02</span>Tokens</button>
+              <button type="button" role="tab" class="tab" aria-selected="false" tabindex="-1"><span class="tab-k">03</span>Agents build</button>
+            </Tabs>
+          </div>
+          <p class="m-0 br-used">Used in {use.Tabs.length} files: {use.Tabs.join(' · ')} · behaviour also in ReportA, QBenchWork, Decisions</p>
+        </article>
+
+        <article class="br-comp">
+          <header class="br-comp-head">
             <h3 class="m-0 br-h3">Terminal</h3>
-            <code class="br-val">{components[3].file}</code>
+            <code class="br-val">{file('Terminal')}</code>
           </header>
           <div class="br-demo br-demo--stage">
             <PixelFieldA mode="rings" seed={3} cx={0.8} cy={0.4} />
@@ -244,7 +261,7 @@ const px = (v: string) => (/^\d+px$/.test(v) ? Number(v.replace('px', '')) : 0);
         <article class="br-comp">
           <header class="br-comp-head">
             <h3 class="m-0 br-h3">PixelField</h3>
-            <code class="br-val">{components[4].file}</code>
+            <code class="br-val">{file('PixelFieldA')}</code>
           </header>
           <div class="br-fields">
             <div class="br-field"><PixelFieldA mode="drift" still seed={11} /><span class="label-mono">drift</span></div>
@@ -567,4 +584,16 @@ const px = (v: string) => (/^\d+px$/.test(v) ? Number(v.replace('px', '')) : 0);
       padding: var(--spacing-md);
     }
   }
+  .br-tabs {
+    border: 1px solid var(--color-rule);
+  }
 </style>
+
+<script>
+  import { selectTab, tabKeys } from '../lib/tabs';
+  document.querySelectorAll<HTMLElement>('[data-br-tabs]').forEach((root) => {
+    const tabs = Array.from(root.querySelectorAll<HTMLElement>('[role="tab"]'));
+    tabs.forEach((t, i) => t.addEventListener('click', () => selectTab(tabs, i)));
+    tabKeys(tabs, (i) => selectTab(tabs, i));
+  });
+</script>

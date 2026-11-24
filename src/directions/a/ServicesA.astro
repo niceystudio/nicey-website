@@ -12,6 +12,7 @@
 import QBenchWork from '../../components/case-study/QBenchWork.astro';
 import PixelFieldA from './PixelFieldA.astro';
 import SectionHead from '../../components/SectionHead.astro';
+import Tabs from '../../components/ui/Tabs.astro';
 
 type Visual = 'qbench' | 'phone';
 const services: {
@@ -61,7 +62,7 @@ const services: {
   </SectionHead>
 
   <div class="sa-win" data-svc>
-    <div class="sa-tabs" role="tablist" aria-label="Services">
+    <Tabs label="Services">
       {
         services.map((s, i) => (
           <button
@@ -71,13 +72,14 @@ const services: {
             aria-controls={`svc-${s.id}`}
             aria-selected={i === 0 ? 'true' : 'false'}
             tabindex={i === 0 ? 0 : -1}
+            class="tab"
             data-svc-tab={s.id}
           >
             {s.label}
           </button>
         ))
       }
-    </div>
+    </Tabs>
     {
       services.map((s, i) => (
         <div class="sa-pane" role="tabpanel" id={`svc-${s.id}`} aria-labelledby={`svc-tab-${s.id}`} data-svc-pane={s.id} hidden={i !== 0}>
@@ -126,56 +128,7 @@ const services: {
     border: 1px solid var(--a-rule);
     background: var(--color-surface);
   }
-  .sa-tabs {
-    display: flex;
-    align-items: stretch;
-    border-bottom: 1px solid var(--a-rule);
-    background: var(--color-page);
-    font-family: var(--font-mono);
-    font-size: var(--text-caption);
-    letter-spacing: 0.04em;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .sa-tabs button {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    min-height: 48px;
-    padding: 0 18px;
-    border: 0;
-    border-right: 1px solid var(--a-rule);
-    background: transparent;
-    color: var(--color-ink-2);
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background-color 160ms var(--ease-out), color 160ms var(--ease-out);
-  }
-  /* 320: tab 02 sat past the edge with no cue — stack the two tabs (20 Nov review); after the base rule, so no !important */
-  @media (max-width: 480px) {
-    .sa-tabs {
-      flex-direction: column;
-    }
-    .sa-tabs button {
-      border-right: 0;
-      border-bottom: 1px solid var(--a-rule);
-    }
-    .sa-tabs button:last-child {
-      border-bottom: 0;
-    }
-  }
-  .sa-tabs button[aria-selected='true'] {
-    background: var(--color-surface);
-    color: var(--color-ink);
-    box-shadow: inset 0 2px 0 var(--a-block);
-    margin-bottom: -1px;
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .sa-tabs button[aria-selected='false']:hover {
-      color: var(--color-ink);
-      background: color-mix(in srgb, var(--color-surface) 60%, transparent);
-    }
-  }
+  /* the tab row is the shared Tabs (.tabs / .tab in global.css) */
   .sa-pane {
     display: grid;
     grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
@@ -263,6 +216,7 @@ const services: {
 </style>
 
 <script>
+  import { selectTab, tabKeys } from '../../lib/tabs';
   document.querySelectorAll<HTMLElement>('[data-svc]').forEach((root) => {
     const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-svc-tab]'));
     const panes = Array.from(root.querySelectorAll<HTMLElement>('[data-svc-pane]'));
@@ -283,29 +237,13 @@ const services: {
     );
     const watch = () => videos.forEach((v) => (io.unobserve(v), io.observe(v)));
 
-    const pick = (i: number, focus = false) => {
-      tabs.forEach((t, k) => {
-        t.setAttribute('aria-selected', String(k === i));
-        t.tabIndex = k === i ? 0 : -1;
-      });
+    const pick = (i: number) => {
+      selectTab(tabs, i);
       panes.forEach((p, k) => (p.hidden = k !== i));
-      if (focus) tabs[i].focus();
       watch();
     };
-    tabs.forEach((t, i) => {
-      t.addEventListener('click', () => pick(i));
-      t.addEventListener('keydown', (e) => {
-        const n = tabs.length;
-        let to = -1;
-        if (e.key === 'ArrowRight') to = (i + 1) % n;
-        else if (e.key === 'ArrowLeft') to = (i - 1 + n) % n;
-        else if (e.key === 'Home') to = 0;
-        else if (e.key === 'End') to = n - 1;
-        if (to < 0) return;
-        e.preventDefault();
-        pick(to, true);
-      });
-    });
+    tabs.forEach((t, i) => t.addEventListener('click', () => pick(i)));
+    tabKeys(tabs, pick);
     watch();
   });
 </script>
