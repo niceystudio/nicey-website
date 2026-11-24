@@ -17,11 +17,11 @@ const slug = study.slug;
 ---
 
 {slug === 'qbench-design-system' ? (
-  <CaseStudy study={study} direction="a" noFacts namesLook="diff" ctaLook="closing" chaptersA layoutA />
+  <CaseStudy study={study} direction="a" noFacts namesLook="diff" ctaLook="closing" chaptersA layoutA projectA />
 ) : slug === 'qbench-status-workflows' ? (
-  <CaseStudy study={study} direction="a" noFacts ctaLook="closing" workFirst togetherA railA />
+  <CaseStudy study={study} direction="a" noFacts ctaLook="closing" workFirst togetherA railA projectA />
 ) : slug === 'everbreed' ? (
-  <CaseStudy study={study} direction="a" noFacts namesLook="diff" ctaLook="closing" togetherA />
+  <CaseStudy study={study} direction="a" noFacts namesLook="diff" ctaLook="closing" togetherA projectA />
 ) : (
   <CaseStudy study={study} direction="a" noFacts ctaLook="closing" />
 )}

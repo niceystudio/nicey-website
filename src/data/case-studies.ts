@@ -73,6 +73,16 @@ export interface CaseStudy {
   statement: string;
   lede: string;
   facts: { term: string; detail: string }[];
+  /** direction A · hero v2 + the written story (Goran, 24 Nov): client card, intro and challenge / result text.
+   *  Lorem ipsum where the client facts and copy aren't known yet. */
+  client?: {
+    name: string;
+    overview: string[];
+    facts: { term: string; detail: string }[];
+    storyHeading: string;
+    challenge: string[];
+    results: string[];
+  };
   who: string;
   /** direction A · the screens band after the hero (one large + two small, 16:10): each window is a topic that opens
    *  a gallery (lightbox); the first image shows in the window. Missing = placeholders. */
@@ -188,6 +198,31 @@ export const caseStudies: CaseStudy[] = [
       { term: 'Scale', detail: '141 components across three library pages' },
       { term: 'Work by', detail: 'Goran Babarogić, product designer and design system engineer, June 2025 to now' },
     ],
+    client: {
+      name: 'QBench',
+      overview: [
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      ],
+      facts: [
+        { term: 'Industry', detail: 'Lab software (LIMS), B2B SaaS' },
+        { term: 'Headquarters', detail: 'Lorem ipsum' },
+        { term: 'Founded', detail: '0000' },
+        { term: 'Company size', detail: '00–00' },
+        { term: 'Year', detail: '2025 – ongoing' },
+        { term: 'The work', detail: 'Design system, tokens, component docs, AI agent skills' },
+        { term: 'Result', detail: 'Lorem ipsum dolor sit amet' },
+      ],
+      storyHeading: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
+      challenge: [
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      ],
+      results: [
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      ],
+    },
     who: '',
     heroVisual: 'qbench-build',
     heroContext: 'Today, every component reads two ways: as UI for people, as props and tokens for agents.',
@@ -437,6 +472,31 @@ export const caseStudies: CaseStudy[] = [
       { term: 'Timeline', detail: 'January to February 2026' },
       { term: 'Work by', detail: 'Goran Babarogić, product designer at QBench' },
     ],
+    client: {
+      name: 'QBench',
+      overview: [
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      ],
+      facts: [
+        { term: 'Industry', detail: 'Lab software (LIMS), regulated industries' },
+        { term: 'Headquarters', detail: 'Lorem ipsum' },
+        { term: 'Founded', detail: '0000' },
+        { term: 'Company size', detail: '00–00' },
+        { term: 'Year', detail: '2026' },
+        { term: 'The work', detail: 'Product design: status workflows, single and bulk' },
+        { term: 'Result', detail: 'Lorem ipsum dolor sit amet' },
+      ],
+      storyHeading: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
+      challenge: [
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      ],
+      results: [
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      ],
+    },
     who: '',
     heroVisual: 'qbench-status',
     heroContext: 'Wherever a status changes, the same rules run in the same order.',
@@ -706,6 +766,31 @@ export const caseStudies: CaseStudy[] = [
       { term: 'Scale', detail: '360 variables today (302 when the sync was built), 89 component sets' },
       { term: 'Work by', detail: 'Goran Babarogić, design systems, [2025 to now]' },
     ],
+    client: {
+      name: 'Everbreed',
+      overview: [
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      ],
+      facts: [
+        { term: 'Industry', detail: 'Agtech: breeding management, web and mobile' },
+        { term: 'Headquarters', detail: 'Lorem ipsum' },
+        { term: 'Founded', detail: '0000' },
+        { term: 'Company size', detail: '00–00' },
+        { term: 'Year', detail: '2025 – ongoing' },
+        { term: 'The work', detail: 'Design system: DS Desktop and DS Mobile, tokens, code sync' },
+        { term: 'Result', detail: 'Lorem ipsum dolor sit amet' },
+      ],
+      storyHeading: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
+      challenge: [
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      ],
+      results: [
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      ],
+    },
     who: '',
     heroVisual: 'everbreed',
     workVisual: 'everbreed',

@@ -21,6 +21,7 @@ import AliasesField from './AliasesField.astro';
 import CaseWork from './CaseWork.astro';
 import ScreensBandA from '../../directions/a/ScreensBandA.astro';
 import TogetherA from '../../directions/a/TogetherA.astro';
+import CaseStoryA from '../../directions/a/CaseStoryA.astro';
 import Decisions from './Decisions.astro';
 import Chapters from './Chapters.astro';
 import SectionHead from '../SectionHead.astro';
@@ -53,8 +54,13 @@ interface Props {
   workFirst?: boolean;
   togetherA?: boolean;
   railA?: boolean;
+  /** direction A (Goran's feedback, 24 Nov): the client card + the written story after the screens band (CaseStoryA);
+   *  the hero stays as it was (Emir); needs `study.client` */
+  projectA?: boolean;
+  noindex?: boolean;
 }
-const { study: s, direction, noFacts = false, namesLook, ctaLook, chaptersA = false, layoutA = false, workFirst = false, togetherA = false, railA = false } = Astro.props;
+const { study: s, direction, noFacts = false, namesLook, ctaLook, chaptersA = false, layoutA = false, workFirst = false, togetherA = false, railA = false, projectA = false, noindex = false } = Astro.props;
+const project = projectA && !!s.client;
 const together = layoutA || togetherA;
 const chapters = chaptersA && s.chapters && s.slug === 'qbench-design-system' ? qbenchChaptersA(s.chapters) : s.chapters;
 /** the homepage these links go back to: the site, or the direction's review homepage */
@@ -94,7 +100,7 @@ const jsonLd = { '@context': 'https://schema.org', '@graph': faqLd ? [article, f
 const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https://nicey-website.vercel.app').href);
 ---
 
-<Base title={`${s.linkName} case study · Nicey`} description={s.lede} markdownHref={mdHref} jsonLd={jsonLd} >
+<Base title={`${s.linkName} case study · Nicey`} description={s.lede} markdownHref={mdHref} jsonLd={jsonLd} noindex={noindex} >
   <div class:list={[direction && `dir-${direction}`]} data-rail-a={railA ? '' : undefined}>
   <Header variant="case" home={home} />
   <main id="main" tabindex="-1" class="cs" data-human>
@@ -130,6 +136,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
       </div>
     </section>
 
+    {project && <CaseStoryA study={s} />}
     {(layoutA || s.screensA) && <ScreensBandA name={s.name} galleries={s.screensA} />}
     {workFirst && <CaseWork study={s} direction={direction} />}
 
