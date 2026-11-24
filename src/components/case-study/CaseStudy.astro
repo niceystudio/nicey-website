@@ -24,6 +24,8 @@ import TogetherA from '../../directions/a/TogetherA.astro';
 import Decisions from './Decisions.astro';
 import Chapters from './Chapters.astro';
 import SectionHead from '../SectionHead.astro';
+import Button from '../ui/Button.astro';
+import Label from '../ui/Label.astro';
 import MachineView from './MachineView.astro';
 import { caseMarkdown } from '../../lib/case-markdown';
 import SiteFooter from '../SiteFooter.astro';
@@ -151,9 +153,9 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
               </h2>
               <p class="m-0 text-body text-on-band-2">{s.lead.text}</p>
             </div>
-            <a href={`${home}#audit`} class="pill bg-on-band px-[22px] text-body text-band">
+            <Button href={`${home}#audit`} variant="on-band">
               {s.lead.cta}
-            </a>
+            </Button>
           </div>
         </section>
       )
@@ -273,22 +275,23 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     )}
   </main>
 
-  {/* one CTA on every page: the homepage closing band, only the words change (Emir, 11 Nov) */}
-  <section aria-labelledby="cs-cta-head" class:list={['cs-cta bg-band text-on-band', ctaLook === 'closing' && 'closing']} data-human>
+  {/* one CTA on every page, on the shared pieces: section label, h2, Button (24 Nov: the closing band styles left with
+      the homepage band, so this is built from the system instead of restyled per direction) */}
+  <section aria-labelledby="cs-cta-head" class="cs-cta" data-human>
     <div class="container-page flex flex-col items-start gap-6 py-section">
-      <span class="caption text-on-band-2">{s.cta.action === 'audit' ? 'Free audit · read-only' : 'Work with us'}</span>
-      <h2 id="cs-cta-head" class="m-0 max-w-[16ch] text-h1">{s.cta.heading}</h2>
-      <p class="m-0 max-w-[40ch] text-sub text-on-band-2">{s.cta.text}</p>
+      <Label variant="section">{s.cta.action === 'audit' ? 'Free audit · read-only' : 'Work with us'}</Label>
+      <h2 id="cs-cta-head" class="m-0 max-w-[16ch] text-h2">{s.cta.heading}</h2>
+      <p class="m-0 max-w-[40ch] text-sub text-ink-2">{s.cta.text}</p>
       <div class="mt-4 flex flex-wrap gap-2.5">
         {s.cta.action === 'audit' ? (
           <>
-            <a href={`${home}#audit`} class="pill pill-lg bg-on-band text-band">Get a free audit</a>
-            <a href={links.bookCall} class="pill pill-lg border border-on-band px-[23px] py-[15px] text-on-band">Book a call</a>
+            <Button href={`${home}#audit`}>Get a free audit</Button>
+            <Button href={links.bookCall} variant="secondary">Book a call</Button>
           </>
         ) : (
           <>
-            <a href={links.bookCall} class="pill pill-lg bg-on-band text-band">Book a call</a>
-            <a href={`${home}#audit`} class="pill pill-lg border border-on-band px-[23px] py-[15px] text-on-band">Get a free audit</a>
+            <Button href={links.bookCall}>Book a call</Button>
+            <Button href={`${home}#audit`} variant="secondary">Get a free audit</Button>
           </>
         )}
       </div>
@@ -622,8 +625,8 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     padding-bottom: 0;
   }
   .cs-cta {
-    --color-focus: var(--color-on-band);
     margin-top: var(--spacing-section);
+    border-block: 1px solid var(--color-rule);
   }
   /* the next case study is a second path, not a second card: an open row between two lines */
   .cs-next {

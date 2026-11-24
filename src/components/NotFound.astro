@@ -5,6 +5,7 @@
  */
 import Base from '../layouts/Base.astro';
 import Header from './Header.astro';
+import Button from './ui/Button.astro';
 
 interface Props {
   /** the 404 in a design direction ('a' → .dir-a). Emir 19 Nov. */
@@ -47,8 +48,8 @@ const cells: { x: number; y: number }[] = [];
               feeling. It's most of our work.
             </p>
             <div class="flex flex-wrap gap-2.5">
-              <a href={home} class="pill pill-ink pill-lg">Back to the homepage</a>
-              <a href={`${home}#audit`} class="pill pill-outline pill-lg">Get a free audit</a>
+              <Button href={home}>Back to the homepage</Button>
+              <Button href={`${home}#audit`} variant="secondary">Get a free audit</Button>
             </div>
             {!direction && <span class="font-mono text-caption text-ink-2">Psst: the blocks move if you poke them.</span>}
           </div>

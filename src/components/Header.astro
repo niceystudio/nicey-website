@@ -1,6 +1,7 @@
 ---
 import { links } from '../data/links';
 import ThemeToggle from './ThemeToggle.astro';
+import Button from './ui/Button.astro';
 import { caseStudies } from '../data/case-studies';
 
 interface Props {
@@ -47,12 +48,12 @@ const audit = variant === 'case' ? `${home}#audit` : '#audit';
       }
     </div>
     <div class="head-row head-end items-center gap-2 text-body-sm">
-      <a href={audit} class="pill pill-ink px-[18px] py-3">Free audit</a>
+      <Button href={audit} size="sm">Free audit</Button>
       <ThemeToggle />
     </div>
     <!-- phone: Free audit stays visible, the rest sits behind the menu button (Emir, 12 Nov) -->
     <div class="head-compact items-center justify-end gap-2">
-      <a href={audit} class="pill pill-ink px-[18px] py-3 text-body-sm">Free audit</a>
+      <Button href={audit} size="sm">Free audit</Button>
       <button
         type="button"
         class="menu-btn"

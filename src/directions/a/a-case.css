@@ -95,7 +95,7 @@
 .dir-a .qh-seg button {
   border-radius: 0 !important;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-caption);
   letter-spacing: 0.02em;
 }
 .dir-a .qh-seg button[aria-pressed='true'] {
@@ -104,10 +104,6 @@
 }
 /* 3 · the facts row (Company, Team, Stack…) is not rendered in A (CaseStudy noFacts) — Emir 19 Nov */
 
-/* the closing CTA uses the homepage closing look (shared .closing rules in a.css); a rule above it like the homepage */
-.dir-a .cs-cta.closing {
-  border-top: 1px solid var(--a-rule);
-}
 
 /* ---------- "What we did" (Chapters) in A — approved 19 Nov ----------
  * File-like tabs (mono, accent line on top of the open one), no colour markers, sentence-case labels, pixel figures,
@@ -138,7 +134,7 @@
 }
 .dir-a [data-chapters] .chs-tab-name {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--text-code);
   font-weight: 400 !important;
 }
 .dir-a [data-chapters] .chs-tab + .chs-tab {
@@ -214,7 +210,7 @@
 .dir-a .agc-replay {
   border-radius: 0 !important;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-caption);
   letter-spacing: 0.02em;
 }
 .dir-a .agc-replay::before {
@@ -229,7 +225,7 @@
   align-items: center;
   gap: 8px;
   font-family: var(--font-mono) !important;
-  font-size: 13px !important;
+  font-size: var(--text-code) !important;
   font-weight: 400 !important;
   letter-spacing: 0.02em;
 }
@@ -291,7 +287,7 @@
   padding: 9px 16px !important;
   border-radius: 6px !important;
   font-family: var(--font-sans) !important;
-  font-size: 14px !important;
+  font-size: var(--text-label) !important;
   font-weight: 500 !important;
   letter-spacing: 0 !important;
   text-transform: none !important;
@@ -395,7 +391,7 @@
 .dir-a [data-sh] .sh-chip {
   border-radius: 0 !important;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-caption);
 }
 .dir-a [data-sh] .sh-chip[aria-pressed='true'] {
   background: var(--a-block) !important;
@@ -417,9 +413,6 @@
  * 3. The purple offset shadow stays on the hero cards only — removed from the gate panel and the agent terminal above. */
 .dir-a [data-chapters] .chs-controls {
   display: none;
-}
-.dir-a .cs-cta.closing {
-  border-bottom: 1px solid var(--a-rule);
 }
 
 /* ---------- Status workflows · Before / after diagram in A (Emir, 20 Nov audit: fix directly, no test) ----------
@@ -522,7 +515,7 @@
 }
 .dir-a [data-chapters] .ch-rows-code {
   font-family: var(--font-mono);
-  font-size: 15px;
+  font-size: var(--text-body-sm);
 }
 
 /* ---------- Everbreed · What we built in A (Emir, 20 Nov) ----------

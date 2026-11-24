@@ -6,6 +6,7 @@
  * not aligned). The "Selected work" strip moved out of the hero into its own band (SelectedA) after the ASCII band.
  */
 import { links } from '../../data/links';
+import Button from '../../components/ui/Button.astro';
 import PixelFieldA from './PixelFieldA.astro';
 ---
 
@@ -23,12 +24,8 @@ import PixelFieldA from './PixelFieldA.astro';
         edit your file.
       </p>
       <div class="ha-ctas">
-        <a href="#audit" class="pill pill-ink pill-lg">
-          Get a free audit
-        </a>
-        <a href={links.bookCall} class="pill pill-outline pill-lg">
-          Book a call
-        </a>
+        <Button href="#audit">Get a free audit</Button>
+        <Button href={links.bookCall} variant="secondary">Book a call</Button>
       </div>
     </div>
   </div>

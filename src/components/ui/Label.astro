@@ -1,0 +1,27 @@
+---
+/**
+ * Small text that names things. One component, four roles, so a label never gets styled by hand again:
+ *
+ *   section  section caption with the // path prefix ("// HOW WE WORK") — also what SectionHead renders
+ *   caption  uppercase mono caption (kickers like "PRIMARY PRACTICE")
+ *   meta     smaller uppercase mono (meta lines, column heads, "case study in progress")
+ *   mono     sentence-case mono, muted (control names, "How it goes")
+ *
+ * Styles: .caption / .caption-sm / .label-mono / .a-path in src/styles/global.css.
+ */
+interface Props {
+  variant?: 'section' | 'caption' | 'meta' | 'mono';
+  as?: 'span' | 'p' | 'h2' | 'h3' | 'div';
+  id?: string;
+  class?: string;
+}
+const { variant = 'caption', as: Tag = 'span', id, class: cls } = Astro.props;
+const byVariant = {
+  section: 'caption a-path text-ink-2',
+  caption: 'caption text-ink-2',
+  meta: 'caption-sm text-ink-2',
+  mono: 'label-mono',
+};
+---
+
+<Tag id={id} class:list={[byVariant[variant], Tag !== 'span' && 'm-0', cls]}><slot /></Tag>

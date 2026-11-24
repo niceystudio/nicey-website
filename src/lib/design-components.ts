@@ -1,0 +1,74 @@
+/**
+ * The component inventory. Usage is counted from the source at build time (every .astro file that imports the
+ * component), so the /brand page and /brand.md always say where a change will land.
+ */
+const sources = import.meta.glob('/src/**/*.astro', { query: '?raw', import: 'default', eager: true }) as Record<
+  string,
+  string
+>;
+
+export interface Component {
+  name: string;
+  /** path from the repo root */
+  file: string;
+  what: string;
+  /** props an agent needs to know */
+  api: string[];
+  /** global classes it renders (so hand-written markup can be found and migrated) */
+  classes?: string[];
+}
+
+export const components: Component[] = [
+  {
+    name: 'Button',
+    file: 'src/components/ui/Button.astro',
+    what: 'Every call to action. Square, mono, uppercase. Primary is the accent, secondary an outline.',
+    api: [
+      "variant: 'primary' | 'secondary' | 'on-band' | 'on-band-outline' (default primary)",
+      "size: 'sm' | 'lg' (default lg)",
+      'href: renders a link; without it a <button>',
+    ],
+    classes: ['pill', 'pill-ink', 'pill-outline', 'pill-sm', 'pill-lg'],
+  },
+  {
+    name: 'Label',
+    file: 'src/components/ui/Label.astro',
+    what: 'Small text that names things: section captions, kickers, meta lines, control names.',
+    api: ["variant: 'section' | 'caption' | 'meta' | 'mono'", "as: 'span' | 'p' | 'h2' | 'h3' | 'div'"],
+    classes: ['caption', 'caption-sm', 'label-mono', 'a-path'],
+  },
+  {
+    name: 'SectionHead',
+    file: 'src/components/SectionHead.astro',
+    what: 'The opener every section shares: a // caption and the h2.',
+    api: ['id: the h2 id', 'caption: the label text', 'headingClass: e.g. a max width'],
+  },
+  {
+    name: 'Terminal',
+    file: 'src/components/ui/Terminal.astro',
+    what: 'The dark window: three pixel lights, optional tabs and file name, a body in mono.',
+    api: ['src: file name on the right', 'tabsLabel: accessible name of the tab list', 'slot "tabs": buttons with class term-tab'],
+    classes: ['term', 'term-bar', 'term-tabs', 'term-tab', 'term-src', 'term-body', 'term-cursor'],
+  },
+  {
+    name: 'PixelFieldA',
+    file: 'src/directions/a/PixelFieldA.astro',
+    what: 'The brand pattern: soft pastel cells. Animated in the hero, still behind windows.',
+    api: ["mode: 'drift' | 'rings' | 'drop'", "fade: 'left' | 'edges' | 'none'", 'still, seed, cx, cy, cell'],
+  },
+  {
+    name: 'Faq',
+    file: 'src/components/Faq.astro',
+    what: 'Questions as an accordion, with a section opener.',
+    api: ['items, caption, heading, id'],
+  },
+];
+
+/** files that import the component (excluding itself and the brand page) */
+export function usedIn(c: Component): string[] {
+  const base = c.file.split('/').pop()!;
+  return Object.entries(sources)
+    .filter(([path, src]) => !path.endsWith(c.file) && !path.endsWith('/pages/brand.astro') && src.includes(`/${base}'`))
+    .map(([path]) => path.replace(/^\//, ''))
+    .sort();
+}

@@ -12,6 +12,8 @@ import SectionHead from '../../components/SectionHead.astro';
 import CopyPrompt from '../../components/CopyPrompt.astro';
 import ReportA from './ReportA.astro';
 import { links } from '../../data/links';
+import Button from '../../components/ui/Button.astro';
+import Label from '../../components/ui/Label.astro';
 
 // time placeholders removed in A (Emir, 20 Nov: we don't need them). 20 Nov: caption "Free audit" (same as the header button; "Process" left the nav);
 // steps marked with → (How we work above is the only numbered process); the list fills the column beside the report
@@ -31,7 +33,7 @@ const steps = [
   <div class="panel pa-box">
     <div class="pa-body">
       <div class="pa-left">
-        <p class="pa-k m-0">How it goes</p>
+        <Label variant="mono" as="p">How it goes</Label>
         <ol class="pa-steps">
           {
             steps.map((s) => (
@@ -44,13 +46,13 @@ const steps = [
         </ol>
       </div>
       <div class="pa-right">
-        <p class="pa-k m-0">What you get</p>
+        <Label variant="mono" as="p">What you get</Label>
         <ReportA />
       </div>
     </div>
 
     <div class="pa-act">
-      <a href={links.startAudit} class="pill pill-ink pill-lg">Get a free audit</a>
+      <Button href={links.startAudit}>Get a free audit</Button>
       <div class="pa-own">
         <p class="m-0 pa-own-p">
           Not ready to share your file? Let your agent run our seven checks, then bring the results to a call.
@@ -85,12 +87,6 @@ const steps = [
     gap: 16px;
     min-width: 0;
   }
-  /* small labels: sentence case, mono, muted — no capitals */
-  .pa-k {
-    font-family: var(--font-mono);
-    font-size: 13px;
-    color: var(--color-muted);
-  }
   /* no rules between the steps (Goran, 23 Nov: too many lines) — spacing alone separates them */
   .pa-steps {
     display: flex;
@@ -108,7 +104,7 @@ const steps = [
   }
   .pa-n {
     font-family: var(--font-mono);
-    font-size: 13px;
+    font-size: var(--text-code);
     color: var(--color-ink-2);
   }
   .pa-title {
@@ -135,7 +131,7 @@ const steps = [
   }
   .pa-own-p {
     flex: 1 1 320px;
-    font-size: 15px;
+    font-size: var(--text-body-sm);
     line-height: 1.45;
     color: var(--color-ink-2);
     text-wrap: pretty;

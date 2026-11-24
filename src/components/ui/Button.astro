@@ -1,0 +1,44 @@
+---
+/**
+ * The button. Every call to action on the site renders through here, so its look lives in one place:
+ * the `.pill` rules in src/styles/global.css (square, mono, uppercase; tokens only).
+ *
+ *   variant  primary (accent fill) · secondary (outline) · on-band (cream on the dark band) · on-band-outline
+ *   size     sm (header) · lg (page CTAs)
+ *   href     renders a link; without it, a <button>
+ *
+ * Change the button here or in `.pill` and it changes on every page, on /brand, and in /brand.md.
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+type Variant = 'primary' | 'secondary' | 'on-band' | 'on-band-outline';
+type Size = 'sm' | 'lg';
+interface Props extends Omit<HTMLAttributes<'a'>, 'class'> {
+  variant?: Variant;
+  size?: Size;
+  href?: string;
+  type?: 'button' | 'submit';
+  class?: string;
+}
+
+const { variant = 'primary', size = 'lg', href, type = 'button', class: cls, ...rest } = Astro.props;
+const variantClass: Record<Variant, string> = {
+  primary: 'pill-ink',
+  secondary: 'pill-outline',
+  'on-band': 'bg-on-band text-band',
+  'on-band-outline': 'border border-on-band text-on-band',
+};
+const classes = ['pill', variantClass[variant], size === 'lg' ? 'pill-lg' : 'pill-sm', cls];
+---
+
+{
+  href ? (
+    <a href={href} class:list={classes} {...rest}>
+      <slot />
+    </a>
+  ) : (
+    <button type={type} class:list={classes} {...(rest as HTMLAttributes<'button'>)}>
+      <slot />
+    </button>
+  )
+}

@@ -1042,7 +1042,7 @@ const slug = (k: string) =>
     border: 1px solid var(--color-line-strong);
     background: var(--sw, transparent);
     font-family: var(--font-sans);
-    font-size: 11px;
+    font-size: var(--text-caption-sm);
     font-weight: 600;
     line-height: 1;
   }
@@ -1080,7 +1080,7 @@ const slug = (k: string) =>
   }
   .ch-sync-k {
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: var(--text-caption);
     color: var(--color-ink);
   }
   .is-before .ch-sync-k {
@@ -1098,7 +1098,7 @@ const slug = (k: string) =>
   }
   .ch-sync-head {
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: var(--text-caption-sm);
     color: var(--color-ink-2);
   }
   .ch-sync ul {
@@ -1115,13 +1115,13 @@ const slug = (k: string) =>
     border: 1px solid var(--color-line-strong);
     background: var(--color-surface);
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: var(--text-caption);
     overflow-wrap: anywhere;
   }
   .ch-sync-mark {
     text-align: center;
     font-family: var(--font-mono);
-    font-size: 13px;
+    font-size: var(--text-code);
   }
   .is-before .ch-sync-mark,
   .is-before .ch-sync-code {
@@ -1555,7 +1555,7 @@ const slug = (k: string) =>
     border-radius: var(--radius-panel);
     background: #ffffff;
     color: #1f2937;
-    font-size: 14px;
+    font-size: var(--text-label);
     --qb-primary: #244d9e;
     --qb-critical: #c2341b;
   }
@@ -1571,7 +1571,7 @@ const slug = (k: string) =>
   .ch-live-err {
     min-height: 1.4em;
     color: var(--qb-critical);
-    font-size: 13px;
+    font-size: var(--text-code);
     visibility: hidden;
   }
   .ch-live-btn {
@@ -1770,7 +1770,7 @@ const slug = (k: string) =>
     width: 100%;
     height: auto;
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: var(--text-caption);
   }
   .ch-graph-svg rect {
     fill: var(--color-surface);
@@ -1827,7 +1827,7 @@ const slug = (k: string) =>
     border-radius: 12px;
     background: #ffffff;
     color: #1f2937;
-    font-size: 14px;
+    font-size: var(--text-label);
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
   }
   .ch-modal[hidden] {
@@ -1847,14 +1847,14 @@ const slug = (k: string) =>
     max-width: 320px;
     gap: 10px;
     padding: 18px;
-    font-size: 13px;
+    font-size: var(--text-code);
   }
   .ch-modal-t {
     font-weight: 600;
-    font-size: 15px;
+    font-size: var(--text-body-sm);
   }
   .ch-modal-move {
-    font-size: 13px;
+    font-size: var(--text-code);
     color: #6b7280;
   }
   .ch-modal-move b {
@@ -1871,7 +1871,7 @@ const slug = (k: string) =>
     gap: 6px 16px;
     padding-bottom: 10px;
     border-bottom: 1px solid #e5e7eb;
-    font-size: 13px;
+    font-size: var(--text-code);
     color: #9ca3af;
   }
   .ch-modal-steps :global(i) {

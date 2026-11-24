@@ -5,19 +5,13 @@
  * Monologue (grain). Colours stay the brand's; only type, shape, layout and texture change.
  * Everything is scoped to .dir-a so the live site is untouched.
  */
-@import '@fontsource/geist-pixel/400.css';
-
+/* the pixel face, radii, rules and the accent block are global tokens now (src/styles/global.css); these old names
+   stay as aliases so nothing that still uses them breaks */
 .dir-a {
-  --font-pixel: 'Geist Pixel', var(--font-mono);
-  --radius-panel: 0px;
-  --radius-code: 0px;
-  --radius-chip: 0px;
-  --radius-pill: 0px;
-  /* one rule weight for the whole page (23 Nov interface review: panels drew at 10%, windows and lists at 16%) */
-  --a-rule: var(--color-line);
-  --a-dim: color-mix(in srgb, var(--color-ink) 34%, transparent);
+  --a-rule: var(--color-rule);
+  --a-dim: var(--color-dim);
   --a-block: var(--color-accent);
-  --a-on-block: var(--color-page);
+  --a-on-block: var(--color-on-accent);
   min-height: 100vh;
   /* plain page, no dot grid (Goran, 23 Nov): the pixel fields carry the texture now */
   background-color: var(--color-page);
@@ -61,28 +55,6 @@
   color: var(--color-accent);
 }
 
-/* ---------- buttons: square, mono (the A/B key badges were removed, Emir 19 Nov) ---------- */
-.dir-a .pill {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  border-radius: 0;
-}
-.dir-a .pill-lg {
-  padding: 15px 20px;
-  font-size: 13px;
-}
-.dir-a .pill-ink {
-  background: var(--a-block);
-  color: var(--a-on-block);
-}
-@media (hover: hover) and (pointer: fine) {
-  .dir-a .pill-ink:hover {
-    background: color-mix(in srgb, var(--a-block) 86%, var(--color-ink));
-  }
-}
-
 /* ---------- header ---------- */
 .dir-a .site-head {
   background: color-mix(in srgb, var(--color-page) 92%, transparent);
@@ -95,18 +67,6 @@
   letter-spacing: 0;
 }
 
-/* ---------- reused sections: square, ruled ---------- */
-.dir-a .panel {
-  border-radius: 0;
-}
-.dir-a .chip {
-  border-radius: 0;
-}
-.dir-a details,
-.dir-a summary {
-  border-radius: 0;
-}
-
 .dir-a .text-h3-card,
 .dir-a .text-title,
 .dir-a .text-faq {
@@ -115,12 +75,6 @@
   letter-spacing: 0;
 }
 
-/* the services terminal: square, like every other window in A */
-.dir-a .qw-agent,
-.dir-a .qw-tab,
-.dir-a .qw-stage {
-  border-radius: 0 !important;
-}
 /* footer wordmark in the pixel face too */
 .dir-a footer a[href='/']:not(.pill) {
   font-family: var(--font-pixel);
@@ -133,7 +87,7 @@
   padding: 0 7px;
   text-transform: none;
   letter-spacing: 0.02em;
-  font-size: 13px;
+  font-size: var(--text-code);
   /* background and white text ease together (20 Nov review: Header's own rule won, the purple came in alone) */
   transition:
     background-color 120ms var(--ease-out),
@@ -143,8 +97,8 @@
 @media (hover: hover) and (pointer: fine) {
   /* white text on a purple that holds it in both themes (Emir 19 Nov: the text must be white) */
   .dir-a .head-link:hover {
-    background: #6b5fbe;
-    color: #fff !important;
+    background: var(--color-accent-solid);
+    color: var(--color-on-accent-solid) !important;
   }
   .dir-a .head-link:hover .head-count {
     color: inherit;
@@ -177,21 +131,6 @@
   display: none !important;
 }
 
-/* secondary buttons share one border with the nav's theme button (Emir 19 Nov): line-strong, ink on hover */
-.dir-a .pill-outline {
-  border-color: var(--color-line-strong);
-  /* keep the press and background easing the global .pill has (20 Nov review: this rule had dropped them) */
-  transition:
-    border-color 160ms var(--ease-out),
-    background-color 160ms var(--ease-out),
-    transform 160ms var(--ease-out);
-}
-@media (hover: hover) and (pointer: fine) {
-  .dir-a .pill-outline:hover {
-    border-color: var(--color-ink) !important;
-  }
-}
-
 /* ---------- The nav in A (Emir, 20 Nov — approved from the test) ----------
  * "Process" goes: the Free audit button already leads to that section, and it read like "How we work". The section's
  * caption is "Free audit" (same as the button). Four links with ~30px between words instead of ~16px. */
@@ -203,89 +142,10 @@
   gap: 16px;
 }
 
-/* ---------- terminal windows (23 Nov) ----------
- * The audit report (ReportA) and the QBench reader in "What we help with" (QBenchWork) share one window:
- * square corners like the rest of A, a title bar with three pixel lights, an underline for the active tab
- * instead of a filled pill, and a lift off the pixel field behind it. */
-.dir-a .ra-stage > :not(.pf),
+/* ---------- terminal windows ----------
+ * The window itself is the shared Terminal (src/components/ui/Terminal.astro, .term* in global.css).
+ * Only the stage it sits on lives here: content above the pixel field. */
 .dir-a .sa-stage > :not(.pf) {
   position: relative;
   z-index: 1;
-}
-.dir-a .ra,
-.dir-a .qw-agent {
-  border-radius: 0;
-  outline: 1px solid rgb(243 240 233 / 0.08);
-  outline-offset: -1px;
-  box-shadow:
-    0 2px 4px rgb(38 37 31 / 0.12),
-    0 28px 56px -28px rgb(38 37 31 / 0.55);
-}
-.dir-a .ra .ra-bar,
-.dir-a .qw-agent .qw-agent-bar {
-  position: relative;
-  min-height: 44px;
-  padding-block: 0;
-  padding-left: 62px;
-}
-/* one line where it fits; on a phone the tabs wrap so "fix first" is never clipped (20 Nov review) and the file name goes */
-@media (min-width: 640px) {
-  .dir-a .ra .ra-bar,
-  .dir-a .ra .ra-tabs {
-    flex-wrap: nowrap;
-  }
-}
-@media (max-width: 639px) {
-  .dir-a .ra .ra-src {
-    display: none;
-  }
-}
-.dir-a .ra .ra-tabs button {
-  padding-inline: 10px;
-}
-.dir-a .ra .ra-src {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.dir-a .ra .ra-bar::before,
-.dir-a .qw-agent .qw-agent-bar::before {
-  content: '';
-  position: absolute;
-  left: 18px;
-  top: 50%;
-  width: 7px;
-  height: 7px;
-  margin-top: -3.5px;
-  background: rgb(243 240 233 / 0.22);
-  box-shadow:
-    12px 0 0 rgb(243 240 233 / 0.22),
-    24px 0 0 rgb(243 240 233 / 0.22);
-}
-.dir-a .ra .ra-tabs,
-.dir-a .qw-agent .qw-tabs {
-  align-self: stretch;
-}
-.dir-a .ra .ra-tabs button,
-.dir-a .qw-agent .qw-tab {
-  min-height: 44px;
-  border-radius: 0;
-  background: transparent;
-}
-.dir-a .ra .ra-tabs button[aria-selected='true'],
-.dir-a .qw-agent .qw-tab[aria-selected='true'] {
-  background: transparent;
-  color: #f3f0e9;
-  box-shadow: inset 0 -2px 0 #d9d2ef;
-}
-@media (hover: hover) and (pointer: fine) {
-  .dir-a .qw-agent .qw-tab[aria-selected='false']:hover {
-    background: transparent;
-  }
-}
-.dir-a .ra .ra-tabs button:focus-visible,
-.dir-a .qw-agent .qw-tab:focus-visible {
-  outline: 2px solid #d9d2ef;
-  outline-offset: -2px;
 }

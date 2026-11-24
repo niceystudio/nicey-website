@@ -17,5 +17,10 @@ export function siteMarkdown(base: URL): string {
     `- [Home](${abs('/index.md')}): the homepage as Markdown: services, how we work, work, FAQ`,
     `- [Free audit](${abs('/#audit')}): share your Figma file; get a score per pillar, the top findings, and what to fix first`,
     '',
+    '## Design system',
+    '',
+    `- [Design system](${abs('/brand.md')}): rules, components and every token the site is built from`,
+    `- [Tokens](${abs('/tokens.json')}): the tokens as W3C design-tokens JSON`,
+    '',
   ].join('\n');
 }

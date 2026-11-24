@@ -5,6 +5,7 @@
  * Copy is rough (Goran + Predrag polish).
  */
 import { links } from '../../data/links';
+import Button from '../../components/ui/Button.astro';
 ---
 
 <section aria-labelledby="call-head" class="container-page pb-section">
@@ -16,11 +17,11 @@ import { links } from '../../data/links';
         <h2 id="call-head" class="bc-head m-0">Rather talk it through first?</h2>
         <p class="bc-line m-0">Book a short intro call. Bring your Figma file or just the question.</p>
       </div>
-      <a href={links.bookCall} class="pill pill-ink pill-lg bc-btn" target="_blank" rel="noopener">
+      <Button href={links.bookCall} class="bc-btn" target="_blank" rel="noopener">
         Book a call
         <svg class="bc-ext" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 3h8v8M13 3 3 13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square" /></svg>
         <span class="sr-only"> (opens in a new tab)</span>
-      </a>
+      </Button>
     </div>
   </div>
 </section>
@@ -66,7 +67,7 @@ import { links } from '../../data/links';
   }
   .bc-role {
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: var(--text-caption);
     color: var(--color-muted);
   }
   .bc-head {
@@ -76,7 +77,7 @@ import { links } from '../../data/links';
     line-height: 1.1;
   }
   .bc-line {
-    font-size: 15px;
+    font-size: var(--text-body-sm);
     line-height: 1.45;
     color: var(--color-ink-2);
   }

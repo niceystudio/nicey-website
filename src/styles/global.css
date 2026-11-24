@@ -4,6 +4,10 @@
  * Tokens. Every value lives here once; components use only these.
  * Day values come from the v3 canvas. Night values are overridden
  * below under [data-theme='dark'].
+ *
+ * This file is the single source of truth for the design system. The /brand page renders every token and
+ * component straight from it, /brand.md and /tokens.json serve it to agents, so a change here (or in a
+ * component in src/components/ui) shows up on every page and in every export at once.
  * ------------------------------------------------------------------ */
 @theme static {
   --color-*: initial;
@@ -46,16 +50,28 @@
   --color-on-band-sage: #cbdac4;
   --color-on-band-peach: #f6d9c4;
 
-  /* the purples found in step 01: content, identical in both themes */
-  --color-found-1: #6b5fbe;
-  --color-found-2: #7266c4;
-  --color-found-3: #665ab8;
-  --color-found-4: #5f53b0;
-  --color-found-5: #7a6ecc;
+  /* Direction A roles (24 Nov: A is the site, so these are the defaults now) */
+  --color-rule: var(--color-line);
+  --color-dim: color-mix(in srgb, var(--color-ink) 34%, transparent);
+  --color-on-accent: var(--color-page);
+  /* the accent that stays the same in both themes, for white text on purple (nav hover) */
+  --color-accent-solid: #6b5fbe;
+  --color-on-accent-solid: #ffffff;
+
+  /* terminal windows: the same dark window in both themes */
+  --color-term: #26251f;
+  --color-term-ink: #f3f0e9;
+  --color-term-muted: #b6b1a3;
+  --color-term-accent: #d9d2ef;
+  --color-term-ok: #cbdac4;
+  --color-term-rule: rgb(243 240 233 / 0.12);
+  --color-term-light: rgb(243 240 233 / 0.22);
 
   /* type */
   --font-sans: 'Geist Variable', 'Geist Fallback', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'Geist Mono Variable', 'Geist Mono Fallback', ui-monospace, monospace;
+  /* display face: headlines, names, figures */
+  --font-pixel: 'Geist Pixel', 'Geist Mono Variable', ui-monospace, monospace;
 
   --text-display-figure: clamp(104px, 13vw, 196px);
   --text-display-figure--line-height: 0.84;
@@ -172,14 +188,27 @@
   --text-arrow: 24px;
   --text-arrow--line-height: 1;
 
-  /* shape */
-  --radius-panel: 16px;
-  --radius-code: 8px;
-  --radius-chip: 6px;
-  --radius-swatch: 2px;
-  --radius-pill: 999px;
+  /* shape: square everywhere (Direction A) */
+  --radius-panel: 0px;
+  --radius-code: 0px;
+  --radius-chip: 0px;
+  --radius-swatch: 0px;
+  --radius-pill: 0px;
 
-  /* space */
+  /* elevation: windows lift off the page; nothing else casts a shadow */
+  --shadow-sm: 0 1px 2px rgb(38 37 31 / 0.08);
+  --shadow-window: 0 2px 4px rgb(38 37 31 / 0.12), 0 28px 56px -28px rgb(38 37 31 / 0.55);
+
+  /* space: one scale on the 4/8px grid, plus the layout roles below it */
+  --spacing-3xs: 4px;
+  --spacing-2xs: 8px;
+  --spacing-xs: 12px;
+  --spacing-sm: 16px;
+  --spacing-md: 24px;
+  --spacing-lg: 32px;
+  --spacing-xl: 48px;
+  --spacing-2xl: 64px;
+  --spacing-3xl: 96px;
   --spacing-section: 128px;
   --spacing-gutter: 24px;
   --spacing-cell: 40px;
@@ -410,6 +439,140 @@
     text-transform: uppercase;
   }
 
+  /* Sentence-case mono label: column heads, control names, small "what this is" notes.
+     Rendered by src/components/ui/Label.astro (variant="mono"). */
+  .label-mono {
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+    line-height: var(--text-code--line-height);
+    color: var(--color-muted);
+  }
+  /* a section caption reads like a path: // prefix in the accent (Label variant="section", SectionHead) */
+  .a-path::before {
+    content: '//\00a0';
+    color: var(--color-accent);
+  }
+
+  /* ---------- The terminal window ----------
+     Rendered by src/components/ui/Terminal.astro. Dark in both themes, square, a title bar with three pixel lights,
+     an underline under the active tab, lifted off whatever sits behind it. */
+  .term {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--color-term);
+    color: var(--color-term-ink);
+    border-radius: var(--radius-code);
+    outline: 1px solid rgb(243 240 233 / 0.08);
+    outline-offset: -1px;
+    box-shadow: var(--shadow-window);
+  }
+  .term-bar {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px var(--spacing-xs);
+    min-height: 44px;
+    padding: 0 18px 0 62px;
+    border-bottom: 1px solid var(--color-term-rule);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    letter-spacing: 0.02em;
+    color: var(--color-term-muted);
+  }
+  .term-bar::before {
+    content: '';
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    width: 7px;
+    height: 7px;
+    margin-top: -3.5px;
+    background: var(--color-term-light);
+    box-shadow:
+      12px 0 0 var(--color-term-light),
+      24px 0 0 var(--color-term-light);
+  }
+  @media (min-width: 640px) {
+    .term-bar,
+    .term-tabs {
+      flex-wrap: nowrap;
+    }
+  }
+  .term-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    align-self: stretch;
+    gap: 2px;
+  }
+  .term-tab {
+    min-height: 44px;
+    padding: 0 10px;
+    border: 0;
+    background: transparent;
+    color: var(--color-term-muted);
+    font: inherit;
+    letter-spacing: inherit;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color 160ms var(--ease-out);
+  }
+  .term-tab[aria-selected='true'] {
+    color: var(--color-term-ink);
+    box-shadow: inset 0 -2px 0 var(--color-term-accent);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .term-tab:hover {
+      color: var(--color-term-ink);
+    }
+  }
+  .term-tab:focus-visible {
+    outline: 2px solid var(--color-term-accent);
+    outline-offset: -2px;
+  }
+  .term-src {
+    margin-left: auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  @media (max-width: 639px) {
+    .term-src {
+      display: none;
+    }
+  }
+  .term-body {
+    flex: 1;
+    margin: 0;
+    padding: var(--spacing-sm) 18px;
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+    line-height: 1.7;
+    color: var(--color-term-ink);
+  }
+  .term-cursor::after {
+    content: '▍';
+    color: var(--color-term-ok);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .term-cursor::after {
+      animation: term-blink 1s steps(1) infinite;
+    }
+  }
+  @keyframes term-blink {
+    50% {
+      opacity: 0;
+    }
+  }
+  .term-ps {
+    color: var(--color-term-accent);
+  }
+  .term-note {
+    color: var(--color-term-muted);
+  }
+
   .marker {
     display: block;
     flex: none;
@@ -417,16 +580,29 @@
     height: 8px;
   }
 
+  /* The button. Rendered by src/components/ui/Button.astro — use that, not these classes, in new markup.
+     Square, mono, uppercase (Direction A). Primary = accent, secondary = outline. */
   .pill {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: var(--spacing-2xs);
     min-height: 44px;
     border-radius: var(--radius-pill);
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
     font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
     text-decoration: none;
     white-space: nowrap;
-    transition: transform 160ms var(--ease-out), background-color 160ms var(--ease-out);
+    transition:
+      transform 160ms var(--ease-out),
+      background-color 160ms var(--ease-out),
+      border-color 160ms var(--ease-out);
+  }
+  .pill-sm {
+    padding: var(--spacing-xs) 18px;
   }
   /* press feedback: the button confirms it heard the click */
   .pill:active,
@@ -459,29 +635,30 @@
     transform: translateX(4px);
   }
   .pill-ink {
-    background: var(--color-ink);
-    color: var(--color-on-ink);
+    background: var(--color-accent);
+    color: var(--color-on-accent);
   }
   .pill-outline {
-    border: 1px solid var(--color-ink);
+    border: 1px solid var(--color-line-strong);
     color: var(--color-ink);
   }
   .pill-lg {
-    padding: 16px 24px;
-    font-size: var(--text-cta);
+    padding: 15px 20px;
     line-height: 1.5;
   }
+  /* the border is inside the size: an outline button is exactly as tall as a solid one */
   .pill-lg.pill-outline {
-    padding: 15px 23px;
+    padding: 14px 19px;
   }
 
   /* button states (Emir, 11 Nov). Primary = solid, secondary = outline, on the page and on the dark band.
      Hover only where a pointer can hover; pressed goes one step further than hover, plus the scale above. */
   @media (hover: hover) and (pointer: fine) {
     .pill-ink:hover {
-      background: color-mix(in srgb, var(--color-ink) 84%, var(--color-page));
+      background: color-mix(in srgb, var(--color-accent) 86%, var(--color-ink));
     }
     .pill-outline:hover {
+      border-color: var(--color-ink);
       background: color-mix(in srgb, var(--color-ink) 6%, transparent);
     }
     .pill.border-on-band:hover {
@@ -489,7 +666,7 @@
     }
   }
   .pill-ink:active {
-    background: color-mix(in srgb, var(--color-ink) 74%, var(--color-page));
+    background: color-mix(in srgb, var(--color-accent) 74%, var(--color-ink));
   }
   .pill-outline:active {
     background: color-mix(in srgb, var(--color-ink) 12%, transparent);
