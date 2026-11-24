@@ -32,7 +32,7 @@ import Button from '../../components/ui/Button.astro';
     grid-template-columns: 136px minmax(0, 1fr) auto;
     align-items: center;
     gap: var(--spacing-lg);
-    padding: 28px var(--spacing-lg) 28px 28px;
+    padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
     background: var(--color-surface);
   }
   .bc-photo {
@@ -44,7 +44,7 @@ import Button from '../../components/ui/Button.astro';
   .bc-btn {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--spacing-xs);
   }
   .bc-ext {
     flex: none;
@@ -52,7 +52,7 @@ import Button from '../../components/ui/Button.astro';
   .bc-text {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: var(--spacing-xs);
   }
   .bc-who {
     display: flex;
@@ -84,8 +84,8 @@ import Button from '../../components/ui/Button.astro';
   @media (max-width: 767px) {
     .bc-in {
       grid-template-columns: 96px minmax(0, 1fr);
-      gap: 20px;
-      padding: 20px;
+      gap: var(--spacing-md);
+      padding: var(--spacing-md);
     }
     .bc-photo {
       width: 96px;

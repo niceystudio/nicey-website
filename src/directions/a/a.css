@@ -84,7 +84,7 @@
 /* nav: plain links, no prompt / cursor / ./ prefixes (Emir 18 Nov: less "code") */
 .dir-a .site-head .head-link {
   min-height: 32px;
-  padding: 0 7px;
+  padding: 0 var(--spacing-2xs);
   text-transform: none;
   letter-spacing: 0.02em;
   font-size: var(--text-code);

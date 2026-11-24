@@ -44,14 +44,14 @@ const fmEnd = lines.indexOf('---', 1);
     display: none;
   }
   .mv-in {
-    padding-block: var(--spacing-md) 72px;
+    padding-block: var(--spacing-md) var(--spacing-2xl);
   }
   .mv-head {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--spacing-2xs) 20px;
-    padding: 14px 18px;
+    gap: var(--spacing-2xs) var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-sm);
     border: 1px solid var(--color-line-strong);
     border-bottom: 0;
     border-radius: var(--radius-panel) var(--radius-panel) 0 0;
@@ -90,7 +90,7 @@ const fmEnd = lines.indexOf('---', 1);
   }
   .mv-lead {
     margin: 0;
-    padding: 14px 18px;
+    padding: var(--spacing-sm) var(--spacing-sm);
     border: 1px solid var(--color-line-strong);
     border-bottom: 0;
     font-size: var(--text-body-sm);
@@ -98,7 +98,7 @@ const fmEnd = lines.indexOf('---', 1);
   }
   .mv-doc {
     margin: 0;
-    padding: var(--spacing-md) 18px var(--spacing-lg);
+    padding: var(--spacing-md) var(--spacing-sm) var(--spacing-lg);
     border: 1px solid var(--color-line-strong);
     border-radius: 0 0 var(--radius-panel) var(--radius-panel);
     background: var(--color-surface);

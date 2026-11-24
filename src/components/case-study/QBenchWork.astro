@@ -160,7 +160,7 @@ const tabList = [
     display: flex;
     align-items: baseline;
     gap: var(--spacing-xs);
-    margin-top: 14px;
+    margin-top: var(--spacing-sm);
     font-size: var(--text-body-sm);
     line-height: 1.5;
     color: var(--color-ink-2);
@@ -184,7 +184,7 @@ const tabList = [
   @media (max-width: 600px) {
     .qw-stage--bare .qw-states {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
+      gap: var(--spacing-xs);
     }
     .qw-stage--bare .qw-field {
       padding: var(--spacing-xs);
@@ -194,8 +194,8 @@ const tabList = [
   .qw-stage {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    padding: 36px;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg);
     border: 1px solid var(--color-rule);
     border-radius: var(--radius-panel);
     background: var(--color-surface);
@@ -213,7 +213,7 @@ const tabList = [
   .qw-state {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: var(--spacing-xs);
     padding: 0;
     border: 0;
     background: none;
@@ -260,7 +260,7 @@ const tabList = [
     font-weight: 600;
   }
   .qw-input {
-    padding: var(--spacing-2xs) 10px;
+    padding: var(--spacing-2xs) var(--spacing-xs);
     background: #fff;
     border: 1px solid #cbd5e1;
     border-radius: 6px;
@@ -306,7 +306,7 @@ const tabList = [
   }
   @media (max-width: 600px) {
     .qw-stage {
-      padding: 20px;
+      padding: var(--spacing-md);
     }
   }
 </style>

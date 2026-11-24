@@ -61,14 +61,14 @@ const STEPS = 5;
   .agc {
     display: flex;
     flex-direction: column;
-    gap: 28px;
+    gap: var(--spacing-lg);
     padding-top: var(--spacing-section);
   }
   .agc-head {
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    margin-bottom: 20px;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
   }
   /* 24 Nov: the Direction A look lives here now (was an override layer in a-case.css): one split window in an ink
      rule, panes titled like logs, every line a prompt, results as QBench's own primary button */
@@ -100,7 +100,7 @@ const STEPS = 5;
   }
   .agc-replay {
     min-height: 36px;
-    padding: 0 14px;
+    padding: 0 var(--spacing-sm);
     border: 1px solid var(--color-line-strong);
     border-radius: var(--radius-pill);
     background: transparent;
@@ -124,8 +124,8 @@ const STEPS = 5;
   .agc-col {
     display: flex;
     flex-direction: column;
-    gap: 18px;
-    padding: 28px;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-lg);
   }
   .agc-col + .agc-col {
     border-left: 1px solid var(--color-ink);
@@ -196,7 +196,7 @@ const STEPS = 5;
     margin-top: auto;
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: var(--spacing-sm);
     padding: var(--spacing-sm);
     border: 1px solid var(--color-line);
     border-radius: var(--radius-panel);
@@ -209,7 +209,7 @@ const STEPS = 5;
   }
   /* the results: QBench's own primary button (product values, not the site's) */
   .agc-btn {
-    padding: 9px var(--spacing-sm);
+    padding: var(--spacing-2xs) var(--spacing-sm);
     border-radius: 6px;
     font-family: var(--font-sans);
     font-size: var(--text-label);

@@ -359,12 +359,12 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md);
-    padding-block: var(--cs-lg) 56px;
+    padding-block: var(--cs-lg) var(--spacing-2xl);
   }
   .cs-hero-top {
     display: flex;
     flex-direction: column;
-    gap: 40px;
+    gap: var(--spacing-xl);
   }
   .cs-hero-copy {
     display: flex;
@@ -377,13 +377,13 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       align-items: center;
-      gap: 56px;
+      gap: var(--spacing-2xl);
     }
   }
   .cs-hero-opt {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: var(--spacing-md);
   }
   .cs-hero-opt[hidden] {
     display: none;
@@ -426,8 +426,8 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     margin: var(--spacing-2xs) 0 0;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-    padding-top: 20px;
+    gap: var(--spacing-md);
+    padding-top: var(--spacing-md);
     border-top: 1px solid var(--color-line-strong);
   }
   .cs-facts > div {
@@ -467,7 +467,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     align-items: center;
     justify-content: space-between;
     gap: var(--spacing-xs) var(--spacing-lg);
-    padding: 28px var(--spacing-lg);
+    padding: var(--spacing-lg) var(--spacing-lg);
     border-radius: var(--radius-panel);
     /* the accent ring is under 3:1 on the band */
     --color-focus: var(--color-on-band);
@@ -476,8 +476,8 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
   .cs-num {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 28px;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-lg);
     container-type: inline-size;
   }
   .cs-num-fig {
@@ -490,7 +490,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     white-space: nowrap;
   }
   .cs-num-meaning {
-    padding-top: 10px;
+    padding-top: var(--spacing-xs);
     border-top: 1px solid var(--color-line);
     font-size: var(--text-body);
     line-height: 1.45;
@@ -504,7 +504,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     gap: var(--spacing-xs) var(--spacing-md);
   }
   .cs-step {
-    padding: var(--spacing-2xs) 14px;
+    padding: var(--spacing-2xs) var(--spacing-sm);
     border-radius: var(--radius-pill);
     background: var(--color-ink);
     color: var(--color-on-ink);
@@ -512,7 +512,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     line-height: var(--text-label--line-height);
   }
   .cs-step--open {
-    padding: 7px 13px;
+    padding: var(--spacing-2xs) var(--spacing-xs);
     background: transparent;
     border: 1px dashed var(--color-ink);
     color: var(--color-ink);
@@ -523,7 +523,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     flex-wrap: wrap;
     align-items: baseline;
     gap: var(--spacing-2xs) var(--spacing-md);
-    padding: var(--spacing-md) 28px;
+    padding: var(--spacing-md) var(--spacing-lg);
   }
 
   .cs-split {
@@ -548,7 +548,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     display: grid;
     grid-template-columns: 48px minmax(0, 1fr);
     gap: var(--spacing-sm);
-    padding: 18px 0;
+    padding: var(--spacing-sm) 0;
     border-bottom: 1px solid var(--color-line);
   }
 
@@ -556,7 +556,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md);
-    padding: 40px;
+    padding: var(--spacing-xl);
     border-radius: var(--radius-panel);
   }
   .cs-agentic-list {
@@ -571,7 +571,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     display: flex;
     flex-direction: column;
     gap: var(--spacing-2xs);
-    padding: 22px;
+    padding: var(--spacing-md);
     border-radius: var(--radius-code);
     background: color-mix(in srgb, var(--color-on-band) 8%, transparent);
   }
@@ -592,7 +592,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
 
   .cs-collect {
     margin: 0;
-    padding: 18px 20px;
+    padding: var(--spacing-sm) var(--spacing-md);
     border: 1px dashed var(--color-dashed);
     border-radius: var(--radius-panel);
     font-size: var(--text-body);
@@ -633,7 +633,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--spacing-md) 40px;
+    gap: var(--spacing-md) var(--spacing-xl);
     padding-block: var(--spacing-lg);
     border-top: 1px solid var(--color-line-strong);
     border-bottom: 1px solid var(--color-line-strong);
@@ -643,7 +643,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
   .cs-next-copy {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: var(--spacing-xs);
     min-width: 0;
   }
   .cs-next-name {
@@ -662,14 +662,14 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     flex: none;
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: var(--spacing-md);
   }
   .cs-more {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     gap: var(--spacing-xs) var(--spacing-md);
-    padding-top: 18px;
+    padding-top: var(--spacing-sm);
   }
   .cs-more-link {
     display: inline-flex;

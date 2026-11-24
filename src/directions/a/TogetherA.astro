@@ -55,7 +55,7 @@ const { together, changed } = Astro.props;
     display: grid;
     grid-row: span 3;
     grid-template-rows: subgrid;
-    row-gap: 20px;
+    row-gap: var(--spacing-md);
     padding: var(--spacing-cell-lg);
   }
   .tg-cell + .tg-cell {
@@ -77,9 +77,9 @@ const { together, changed } = Astro.props;
   .tg-card {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: var(--spacing-xs);
     margin-top: var(--spacing-xs);
-    padding: 20px 22px;
+    padding: var(--spacing-md) var(--spacing-md);
     border: 1px dashed var(--color-dashed);
     background: var(--color-page);
   }

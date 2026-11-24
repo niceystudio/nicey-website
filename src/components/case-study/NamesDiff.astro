@@ -96,7 +96,7 @@ const figs = JSON.stringify({ before, after });
   .nd-copy {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: var(--spacing-sm);
     padding: var(--spacing-cell);
   }
   .nd-figure {
@@ -134,7 +134,7 @@ const figs = JSON.stringify({ before, after });
     align-items: center;
     justify-content: space-between;
     gap: var(--spacing-xs);
-    padding: var(--spacing-2xs) 10px var(--spacing-2xs) 18px;
+    padding: var(--spacing-2xs) var(--spacing-xs) var(--spacing-2xs) var(--spacing-sm);
     border-bottom: 1px solid var(--color-line);
     font-family: var(--font-mono);
     font-size: var(--text-caption);
@@ -165,7 +165,7 @@ const figs = JSON.stringify({ before, after });
   .nd-body {
     flex: 1;
     margin: 0;
-    padding: 28px 26px;
+    padding: var(--spacing-lg) var(--spacing-md);
     font-family: var(--font-mono);
     font-size: var(--text-label);
     line-height: 2;
@@ -215,7 +215,7 @@ const figs = JSON.stringify({ before, after });
   /* phones: the value moves under its name (20 Nov review: values ran past the edge) */
   @media (max-width: 560px) {
     .nd-body {
-      padding: 20px var(--spacing-sm);
+      padding: var(--spacing-md) var(--spacing-sm);
       font-size: var(--text-caption);
       line-height: 1.8;
     }

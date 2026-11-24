@@ -162,8 +162,8 @@ const data = Array.from({ length: ROWS }, (_, i) => {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--spacing-xs) 28px;
-    padding: 14px var(--spacing-gutter, var(--spacing-md));
+    gap: var(--spacing-xs) var(--spacing-lg);
+    padding: var(--spacing-sm) var(--spacing-gutter, var(--spacing-md));
     border-top: 1px solid var(--a-rule);
     font-family: var(--font-mono);
     font-size: var(--text-caption);
@@ -175,7 +175,7 @@ const data = Array.from({ length: ROWS }, (_, i) => {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--spacing-xs) 28px;
+    gap: var(--spacing-xs) var(--spacing-lg);
   }
   .ab-toggle {
     display: none;
@@ -213,7 +213,7 @@ const data = Array.from({ length: ROWS }, (_, i) => {
       display: none;
       flex-direction: column;
       align-items: flex-start;
-      gap: 14px;
+      gap: var(--spacing-sm);
       width: 100%;
       padding-bottom: 6px;
     }
@@ -271,7 +271,7 @@ const data = Array.from({ length: ROWS }, (_, i) => {
   /* ---------- the band ---------- */
   .ab-stage {
     overflow: hidden;
-    padding: 18px 0 22px;
+    padding: var(--spacing-sm) 0 var(--spacing-md);
     background: color-mix(in srgb, var(--color-page) 70%, transparent);
     font-family: var(--font-mono);
     font-size: var(--text-body-sm);
@@ -286,7 +286,7 @@ const data = Array.from({ length: ROWS }, (_, i) => {
   }
   .ab-labels {
     grid-template-columns: minmax(0, 0.9fr) auto minmax(0, 1fr) var(--ab-scale-w);
-    margin-bottom: 10px;
+    margin-bottom: var(--spacing-xs);
     font-size: var(--text-caption-sm);
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -305,7 +305,7 @@ const data = Array.from({ length: ROWS }, (_, i) => {
     padding-left: var(--spacing-sm);
   }
   .ab-labels .ab-scale-k {
-    padding-left: 20px;
+    padding-left: var(--spacing-md);
   }
   .ab-stage {
     --ab-scale-w: 300px;
@@ -354,7 +354,7 @@ const data = Array.from({ length: ROWS }, (_, i) => {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-2xs);
-    padding: 2px var(--spacing-md) 0 20px;
+    padding: 2px var(--spacing-md) 0 var(--spacing-md);
     border-left: 1px solid var(--a-rule);
     white-space: normal;
   }
@@ -362,9 +362,9 @@ const data = Array.from({ length: ROWS }, (_, i) => {
     display: grid;
     grid-template-columns: 64px minmax(0, 1fr);
     align-items: center;
-    gap: 10px;
+    gap: var(--spacing-xs);
     height: 52px;
-    padding: 0 10px;
+    padding: 0 var(--spacing-xs);
     border: 1px solid var(--a-rule);
     border-radius: min(var(--ab-r), 8px);
     background: var(--color-surface);
@@ -410,7 +410,7 @@ const data = Array.from({ length: ROWS }, (_, i) => {
     background: var(--ab-accent);
   }
   .ab-btn {
-    padding: 3px 9px;
+    padding: 3px var(--spacing-2xs);
     border-radius: var(--ab-r);
     background: var(--ab-accent);
     color: var(--ab-on);

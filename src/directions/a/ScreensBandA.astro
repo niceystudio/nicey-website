@@ -101,7 +101,7 @@ const count = Math.max(slots.length, galleries.length);
   .sb-fig {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: var(--spacing-xs);
     margin: 0;
   }
   .sb-fig--main {
@@ -121,7 +121,7 @@ const count = Math.max(slots.length, galleries.length);
     display: flex;
     justify-content: space-between;
     gap: var(--spacing-xs);
-    padding: 10px 14px;
+    padding: var(--spacing-xs) var(--spacing-sm);
     border-bottom: 1px solid var(--a-rule, var(--color-line));
     font-family: var(--font-mono);
     font-size: var(--text-caption);
@@ -174,7 +174,7 @@ const count = Math.max(slots.length, galleries.length);
     display: inline-flex;
     align-items: center;
     gap: var(--spacing-2xs);
-    padding: 6px 10px;
+    padding: 6px var(--spacing-xs);
     background: var(--color-ink);
     color: var(--color-page);
     font-family: var(--font-mono);
@@ -233,7 +233,7 @@ const count = Math.max(slots.length, galleries.length);
     justify-content: center;
     min-width: 44px;
     min-height: 44px;
-    padding: 0 14px;
+    padding: 0 var(--spacing-sm);
     border: 1px solid color-mix(in srgb, var(--sbx-fg) 28%, transparent);
     background: transparent;
     color: inherit;
@@ -346,7 +346,7 @@ const count = Math.max(slots.length, galleries.length);
       padding-left: var(--spacing-sm);
     }
     .sbx-track :global(.sbx-slide) {
-      padding: var(--spacing-sm) var(--spacing-xs) 88px;
+      padding: var(--spacing-sm) var(--spacing-xs) var(--spacing-3xl);
     }
     .sbx-nav {
       top: auto;

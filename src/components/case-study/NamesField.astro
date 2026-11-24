@@ -92,7 +92,7 @@ const NOTE_AFTER = 'In V2 every variable carries its web code name, so designers
     container-type: inline-size;
   }
   .nf-figure {
-    margin: 28px 0 0 -0.04em;
+    margin: var(--spacing-lg) 0 0 -0.04em;
     font-size: min(clamp(72px, 8vw, 128px), 30cqi);
     line-height: 0.9;
     letter-spacing: -0.05em;
@@ -144,8 +144,8 @@ const NOTE_AFTER = 'In V2 every variable carries its web code name, so designers
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    padding: var(--spacing-cell) var(--spacing-cell) 28px;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-cell) var(--spacing-cell) var(--spacing-lg);
   }
   .nf-field {
     position: relative;
@@ -209,10 +209,10 @@ const NOTE_AFTER = 'In V2 every variable carries its web code name, so designers
   }
   @container panel (max-width: 899.98px) {
     .nf-field-col {
-      padding: 0 var(--spacing-gutter) 28px;
+      padding: 0 var(--spacing-gutter) var(--spacing-lg);
     }
     .nf-copy {
-      padding: 28px var(--spacing-gutter);
+      padding: var(--spacing-lg) var(--spacing-gutter);
     }
   }
 </style>

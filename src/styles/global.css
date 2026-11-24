@@ -563,17 +563,18 @@
       12px 0 0 var(--color-term-light),
       24px 0 0 var(--color-term-light);
   }
-  @media (min-width: 640px) {
-    .term-bar,
-    .term-tabs {
-      flex-wrap: nowrap;
-    }
-  }
   .term-tabs {
     display: flex;
     flex-wrap: wrap;
     align-self: stretch;
     gap: 2px;
+  }
+  /* one line where it fits (after the base rules, so it wins); on a phone the tabs wrap and the file name goes */
+  @media (min-width: 640px) {
+    .term-bar,
+    .term-tabs {
+      flex-wrap: nowrap;
+    }
   }
   .term-tab {
     min-height: 44px;
