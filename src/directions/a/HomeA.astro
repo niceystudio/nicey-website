@@ -1,0 +1,49 @@
+---
+/**
+ * Direction A — "Select" (terminal, ASCII, dither). Homepage only, same copy and order as live.
+ * New: hero (headline + CTAs), ASCII band, How we work (step windows).
+ * Also: Services as one window with file tabs + a tree, Work as a terminal listing.
+ * Reused and restyled by a.css: free audit, FAQ, closing band, footer.
+ * 19 Nov (Emir): Selected work = its own band after the ASCII band; removed the ASCII band above the footer,
+ * the big animated wordmark (MarkA) and the Human | Machine view (the page's .md link stays in the footer).
+ */
+import './a.css';
+import Base from '../../layouts/Base.astro';
+import Header from '../../components/Header.astro';
+import ServicesA from './ServicesA.astro';
+import WorkA from './WorkA.astro';
+import ProcessA from './ProcessA.astro';
+import Faq from '../../components/Faq.astro';
+import Footer from '../../components/Footer.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import HeroA from './HeroA.astro';
+import AsciiBand from './AsciiBand.astro';
+import HowA from './HowA.astro';
+import SelectedA from './SelectedA.astro';
+import BookCallA from './BookCallA.astro';
+
+
+---
+
+<Base
+  title="Nicey · Design systems people and agents read the same way"
+  description="We turn years of drifted UI into one system: tokens, components and documentation that a designer, an engineer and a coding agent understand the same way. Product design when you need the screens too."
+  markdownHref="/index.md"
+>
+  <div class="dir-a">
+    <Header />
+    <main id="main" tabindex="-1" data-human>
+      <HeroA />
+      <AsciiBand />
+      <SelectedA />
+      <ServicesA />
+      <WorkA />
+      <HowA />
+      <ProcessA />
+      <BookCallA />
+      <Faq />
+    </main>
+    <Footer />
+    <SiteFooter mdHref="/index.md" directionA />
+  </div>
+</Base>

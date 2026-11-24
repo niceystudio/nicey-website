@@ -1,0 +1,295 @@
+---
+/**
+ * Everbreed hero: Figma and code side by side. Drifted tokens first (only in
+ * Figma, only in the repo), then the sync: matched by $figmaId, count 53 → 0.
+ * Facts from the Figma "Case Study Documentation" Everbreed slides 02–03.
+ * [Confirm with Goran: the code names of surface/hover and border/selected/default.]
+ */
+const rows = [
+  { figma: 'text/primary', code: '--text-primary', type: 'match' },
+  { figma: 'surface/hover', code: '--surface-hover', type: 'figma' },
+  { figma: 'border/selected/default', code: '--border-selected-default', type: 'figma' },
+  { figma: '', code: 'bg-eb-neutral-subtle', type: 'repo' },
+  { figma: '', code: 'bg-eb-accent-red', type: 'repo' },
+];
+---
+
+<div class="eh" data-eh>
+  <div class="eh-card">
+    <div class="eh-bar">
+      <span class="eh-mono">Web · Figma ↔ code</span>
+      <span class="eh-mono eh-count"><b data-b-count>53</b> drifted</span>
+    </div>
+    <div class="eh-b">
+      <div class="eh-b-head">
+        <span class="eh-mono">Figma</span>
+        <span></span>
+        <span class="eh-mono">Repo</span>
+      </div>
+      <ul class="eh-b-rows">
+        {
+          rows.map((r, i) => (
+            <li class:list={['eh-b-row', `is-${r.type}`]} style={`--i:${i}`}>
+              <code class="eh-b-cell eh-b-figma">{r.figma || '—'}</code>
+              <span class="eh-b-link" aria-hidden="true">
+                <i />
+                <em>ID</em>
+              </span>
+              <code class="eh-b-cell eh-b-code">{r.code}</code>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="eh-b-note eh-mono">
+        <span data-b-note>17 only in Figma · 36 only in the repo</span>
+      </p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .eh {
+    width: 100%;
+  }
+  .eh-card {
+    overflow: hidden;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-panel);
+    background: var(--color-surface);
+    color: var(--color-ink);
+  }
+  .eh-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 48px;
+    padding: 8px 18px;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .eh-mono {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption-sm);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-ink-2);
+  }
+  code {
+    font-family: var(--font-mono);
+  }
+  .eh-count b {
+    font-weight: 500;
+    color: var(--color-hot);
+    font-variant-numeric: tabular-nums;
+  }
+  .eh[data-synced] .eh-count b {
+    color: var(--color-ink);
+  }
+  .eh-b {
+    padding: 18px 20px 20px;
+  }
+  .eh-b-head,
+  .eh-b-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 44px minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+  }
+  .eh-b-head {
+    padding-bottom: 8px;
+  }
+  .eh-b-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .eh-b-cell {
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    padding: 6px 10px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 8px;
+    font-size: var(--text-caption);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: opacity 260ms var(--ease-out), border-color 260ms var(--ease-out), color 260ms var(--ease-out);
+    transition-delay: calc(var(--i) * 80ms); /* 80ms rows (was 220ms; 20 Nov motion review) */
+  }
+  .eh-b-link {
+    position: relative;
+    display: grid;
+    place-items: center;
+    height: 100%;
+  }
+  .eh-b-link i {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+    background: var(--color-accent);
+    transform: scaleX(0);
+    transform-origin: left; /* the ID link draws from Figma towards code */
+    transition: transform 280ms var(--ease-out);
+    transition-delay: calc(var(--i) * 80ms);
+  }
+  .eh-b-link em {
+    position: relative;
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: var(--color-accent);
+    color: var(--color-on-ink);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-style: normal;
+    opacity: 0;
+    transition: opacity 200ms var(--ease-out);
+    transition-delay: calc(var(--i) * 80ms + 60ms);
+  }
+  /* the loop goes back to the drifted state in one frame, so the sync never plays backwards */
+  .eh.is-resetting * {
+    transition: none !important;
+  }
+  /* drifted: the missing side is dashed and empty */
+  .eh-b-row.is-figma .eh-b-code,
+  .eh-b-row.is-repo .eh-b-figma {
+    border-style: dashed;
+    color: transparent;
+  }
+  .eh-b-row.is-figma .eh-b-figma,
+  .eh-b-row.is-repo .eh-b-code {
+    border-color: var(--color-hot);
+  }
+  .eh-b-row.is-match .eh-b-link i,
+  .eh[data-synced] .eh-b-row:not(.is-repo) .eh-b-link i {
+    transform: none;
+  }
+  .eh-b-row.is-match .eh-b-link em,
+  .eh[data-synced] .eh-b-row:not(.is-repo) .eh-b-link em {
+    opacity: 1;
+  }
+  /* synced: Figma-only tokens get their code name; repo-only names are removed */
+  .eh[data-synced] .eh-b-row.is-figma .eh-b-code {
+    border-style: solid;
+    color: inherit;
+  }
+  .eh[data-synced] .eh-b-row.is-figma .eh-b-figma {
+    border-color: var(--color-line-strong);
+  }
+  .eh[data-synced] .eh-b-row.is-repo .eh-b-code {
+    border-color: var(--color-line);
+    color: var(--color-muted);
+    text-decoration: line-through;
+    opacity: 0.75;
+  }
+  .eh[data-synced] .eh-b-row.is-repo .eh-b-figma {
+    opacity: 0.55;
+  }
+  .eh-b-note {
+    margin: 14px 0 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .eh * {
+      transition-duration: 1ms !important;
+      transition-delay: 0ms !important;
+    }
+  }
+  /* phones: smaller names and a shorter ID link so every name fits on one line (20 Nov review: broke at 320/390) */
+  @media (max-width: 420px) {
+    .eh-b-head,
+    .eh-b-row {
+      grid-template-columns: minmax(0, 1fr) 30px minmax(0, 1fr);
+      gap: 6px;
+    }
+    .eh-b-cell {
+      padding: 6px 8px;
+      font-size: 11px;
+    }
+  }
+  @media (max-width: 360px) {
+    .eh-b {
+      padding: 14px 12px 16px;
+    }
+    .eh-b-head,
+    .eh-b-row {
+      grid-template-columns: minmax(0, 1fr) 24px minmax(0, 1fr);
+      gap: 4px;
+    }
+    .eh-b-cell {
+      padding: 6px;
+      font-size: 10px;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-eh]').forEach((root) => {
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const count = root.querySelector<HTMLElement>('[data-b-count]');
+    const note = root.querySelector<HTMLElement>('[data-b-note]');
+    const synced = () => {
+      root.dataset.synced = '';
+      if (note) note.textContent = 'Matched by $figmaId · 0 drifted';
+    };
+    if (reduced) {
+      synced();
+      if (count) count.textContent = '0';
+      return;
+    }
+    // drifted rows first, then the sync: the count runs 53 → 0 (easing out, like the chapter counters); repeats.
+    // 20 Nov motion review: the reset is instant (no rewind), and the loop runs only while the card is on screen and
+    // not under the pointer or focus.
+    let syncTimer = 0;
+    const play = () => {
+      window.clearTimeout(syncTimer);
+      root.classList.add('is-resetting');
+      delete root.dataset.synced;
+      if (count) count.textContent = '53';
+      if (note) note.textContent = '17 only in Figma · 36 only in the repo';
+      requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('is-resetting')));
+      syncTimer = window.setTimeout(() => {
+        root.dataset.synced = '';
+        const start = performance.now();
+        const tick = (now: number) => {
+          const p = Math.min(1, (now - start) / 1100);
+          if (count) count.textContent = String(Math.round(53 * Math.pow(1 - p, 3)));
+          if (p < 1) requestAnimationFrame(tick);
+          else synced();
+        };
+        requestAnimationFrame(tick);
+      }, 1800);
+    };
+    let loop = 0;
+    let seen = false;
+    let held = false;
+    let started = false;
+    const run = () => {
+      window.clearInterval(loop);
+      if (!seen || held) return;
+      if (!started) {
+        started = true;
+        play();
+      }
+      loop = window.setInterval(play, 6400);
+    };
+    const hold = (v: boolean) => {
+      held = v;
+      run();
+    };
+    root.addEventListener('pointerenter', () => hold(true));
+    root.addEventListener('pointerleave', () => hold(false));
+    root.addEventListener('focusin', () => hold(true));
+    root.addEventListener('focusout', (e) => {
+      if (!root.contains(e.relatedTarget as Node)) hold(false);
+    });
+    new IntersectionObserver((es) => {
+      seen = es[0].isIntersecting;
+      run();
+    }).observe(root);
+  });
+</script>

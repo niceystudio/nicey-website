@@ -1,0 +1,115 @@
+---
+/**
+ * Direction A hero (Select layout). The headline is set like the Supabase Select logotype: pixel capitals printed on
+ * blocks, the last line on the accent. Below it one ruled row: the lede on the headline's left edge, the two keys
+ * flush with the container's right edge, both sitting on the same bottom line (Emir 19 Nov: text and buttons were
+ * not aligned). The "Selected work" strip moved out of the hero into its own band (SelectedA) after the ASCII band.
+ */
+import { links } from '../../data/links';
+---
+
+<section class="ha">
+  <div class="container-page ha-in">
+    <h1 class="ha-h m-0">
+      <span class="ha-line">Designing</span>
+      <span class="ha-line">systems that</span>
+      <span class="ha-line ha-line--accent">scale products.</span>
+    </h1>
+    <div class="ha-aside">
+      <p class="ha-lede m-0">
+        Send us your Figma file. You get a score per pillar, the top findings and what to fix first. Free, and we never
+        edit your file.
+      </p>
+      <div class="ha-ctas">
+        {/* Goran 24 Nov: one action here — Get a free audit is already in the nav */}
+        <a href={links.bookCall} class="pill pill-ink pill-lg" target="_blank" rel="noopener">
+          Book a call
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ha {
+    padding-top: 96px;
+    padding-bottom: 64px;
+  }
+  .ha-in {
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+  }
+  /* under the headline: the lede, then the one action right below it on the same left edge
+     (Emir 24 Nov: the button sat too far from the text at the right edge) */
+  .ha-aside {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 28px;
+  }
+  @media (max-width: 1023px) {
+    .ha {
+      padding-top: 56px;
+    }
+    .ha-in {
+      gap: 40px;
+    }
+  }
+  .ha-h {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    font-family: var(--font-pixel);
+    font-weight: 400;
+    font-size: clamp(32px, 7.6vw, 112px);
+    line-height: 1;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+  .ha-line {
+    display: inline-block;
+    white-space: nowrap;
+    padding: 0.06em 0.14em 0.02em;
+    background: var(--color-ink);
+    color: var(--color-page);
+  }
+  .ha-line--accent {
+    background: var(--a-block);
+    color: var(--a-on-block);
+  }
+  .ha-lede {
+    max-width: 44ch;
+    font-size: var(--text-cta);
+    line-height: 1.45;
+    color: var(--color-ink-2);
+    text-wrap: pretty;
+  }
+  .ha-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+  /* the headline prints line by line on first view */
+  @media (prefers-reduced-motion: no-preference) {
+    .ha-line {
+      animation: ha-print 520ms steps(6, end) both;
+    }
+    .ha-line:nth-child(2) {
+      animation-delay: 140ms;
+    }
+    .ha-line:nth-child(3) {
+      animation-delay: 280ms;
+    }
+  }
+  @keyframes ha-print {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+</style>

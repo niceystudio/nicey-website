@@ -1,0 +1,243 @@
+---
+/**
+ * Direction A · QBench status workflows "See it work" (Emir, 20 Nov: option 1 of the test, kept simple).
+ * One big window for the real product screen + the five steps under it; click a step → its screen.
+ * Screens are PLACEHOLDERS on purpose (Goran, 20 Nov: layout first, content later) — drop a real image into
+ * each step's `src` in status-steps.ts when the screens are ready. Copy is rough; Goran + Predrag polish it.
+ * 23 Nov: real screens, edge to edge in the window; swipe or drag the screen (or ← / → on a step) to change step;
+ * on phones the active step card scrolls into view.
+ */
+import { statusSteps as steps } from './status-steps';
+---
+
+<div class="ss" data-ss>
+  <div class="ss-win">
+    <div class="ss-bar">
+      <span class="ss-path">qbench · status workflows</span>
+      <span class="ss-count" aria-live="polite"><span data-ss-n>01</span> / {String(steps.length).padStart(2, '0')}</span>
+    </div>
+    <div class="ss-stage" data-ss-stage>
+      {
+        steps.map((s, i) => (
+          <div class:list={['ss-screen', i === 0 && 'is-on']} data-ss-screen={i}>
+            {s.src ? (
+              <img src={s.src} alt={s.alt} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />
+            ) : (
+              <span class="placeholder ss-ph">[Screen {s.n} · {s.title}]</span>
+            )}
+          </div>
+        ))
+      }
+    </div>
+  </div>
+
+  <ol class="ss-steps" aria-label="Steps">
+    {
+      steps.map((s, i) => (
+        <li>
+          <button type="button" class:list={['ss-step', i === 0 && 'is-on']} data-ss-step={i} aria-pressed={i === 0 ? 'true' : 'false'}>
+            <span class="ss-meta">
+              {s.n} · {s.role}
+            </span>
+            <span class="ss-title">{s.title}</span>
+            <span class="ss-text">{s.text}</span>
+          </button>
+        </li>
+      ))
+    }
+  </ol>
+</div>
+
+<style>
+  .ss {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .ss-win {
+    border: 1px solid var(--a-rule);
+    background: var(--color-surface);
+  }
+  .ss-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--a-rule);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: var(--color-ink-2);
+  }
+  .ss-count {
+    color: var(--color-ink);
+  }
+  .ss-stage {
+    position: relative;
+    aspect-ratio: 1440 / 900;
+    overflow: hidden;
+    touch-action: pan-y;
+    cursor: grab;
+  }
+  .ss-stage.is-drag {
+    cursor: grabbing;
+  }
+  .ss-screen {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 220ms var(--ease-out);
+  }
+  .ss-screen.is-on {
+    opacity: 1;
+  }
+  .ss-screen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
+  }
+  .ss-ph {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+  .ss-steps {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (max-width: 900px) {
+    .ss-steps {
+      grid-template-columns: repeat(5, minmax(160px, 1fr));
+      overflow-x: auto;
+    }
+  }
+  .ss-step {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    width: 100%;
+    height: 100%;
+    padding: 14px 14px 16px;
+    border: 1px solid var(--a-rule);
+    border-top: 2px solid transparent;
+    background: var(--color-surface);
+    color: var(--color-ink);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 160ms var(--ease-out), transform 160ms var(--ease-out);
+  }
+  .ss-step:active {
+    transform: scale(0.97);
+  }
+  .ss-step.is-on {
+    border-top-color: var(--color-accent);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .ss-step:hover {
+      border-color: var(--a-dim);
+    }
+    .ss-step.is-on:hover {
+      border-top-color: var(--color-accent);
+    }
+  }
+  .ss-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--color-ink-2);
+  }
+  .ss-step.is-on .ss-meta {
+    color: var(--color-accent);
+  }
+  .ss-title {
+    font-size: 15px;
+    line-height: 1.3;
+  }
+  .ss-text {
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--color-ink-2);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ss-screen {
+      transition-duration: 80ms;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-ss]').forEach((root) => {
+    const screens = Array.from(root.querySelectorAll<HTMLElement>('[data-ss-screen]'));
+    const btns = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-ss-step]'));
+    const n = root.querySelector<HTMLElement>('[data-ss-n]');
+    const show = (i: number) => {
+      screens.forEach((el, k) => el.classList.toggle('is-on', k === i));
+      btns.forEach((b, k) => {
+        b.classList.toggle('is-on', k === i);
+        b.setAttribute('aria-pressed', k === i ? 'true' : 'false');
+      });
+      if (n) n.textContent = String(i + 1).padStart(2, '0');
+    };
+    let cur = 0;
+    const go = (i: number, fromUser = true) => {
+      cur = (i + screens.length) % screens.length;
+      show(cur);
+      // phones: keep the active step card in view inside the scrolling row
+      const b = btns[cur];
+      const row = b.closest('ol');
+      if (fromUser && row && row.scrollWidth > row.clientWidth) {
+        row.scrollTo({ left: b.offsetLeft - row.offsetLeft - 16, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      }
+    };
+    btns.forEach((b, i) => {
+      b.addEventListener('click', () => go(i));
+      b.addEventListener('keydown', (e) => {
+        if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+        e.preventDefault();
+        go(cur + (e.key === 'ArrowRight' ? 1 : -1));
+        btns[cur].focus();
+      });
+    });
+    // swipe (touch) or drag (mouse) the screen to change step
+    const stage = root.querySelector<HTMLElement>('[data-ss-stage]');
+    let sx = 0;
+    let sy = 0;
+    let down = false;
+    stage?.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      down = true;
+      sx = e.clientX;
+      sy = e.clientY;
+      stage.classList.add('is-drag');
+    });
+    const end = (e: PointerEvent) => {
+      if (!down) return;
+      down = false;
+      stage?.classList.remove('is-drag');
+      const dx = e.clientX - sx;
+      const dy = e.clientY - sy;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) go(cur + (dx < 0 ? 1 : -1));
+    };
+    stage?.addEventListener('pointerup', end);
+    stage?.addEventListener('pointercancel', () => {
+      down = false;
+      stage.classList.remove('is-drag');
+    });
+  });
+</script>

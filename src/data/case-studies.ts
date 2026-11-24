@@ -11,8 +11,60 @@ export interface Collect {
   text: string;
 }
 
+/** One slide of the "Case Study Documentation" Figma file, rebuilt as a page section. */
+export type ChapterBlock =
+  | { kind: 'stats'; items: { value: string; label: string; caption: string; seenAt?: string }[] }
+  | { kind: 'rows'; title: string; rows: { label: string; value: string }[] }
+  | {
+      kind: 'map';
+      title: string;
+      /** swatch: an optional preview of the token (direction A, 20 Nov) — a colour, text colour, spacing or radius */
+      rows: { from: string; to: string; swatch?: { kind: 'color' | 'text' | 'space' | 'radius'; hex?: string } }[];
+    }
+  | { kind: 'ramp'; title: string; swatches: { step: string; hex: string; feeds?: boolean }[]; note: string }
+  | { kind: 'chain'; title: string; root: string; links: { token: string; from: string; state: string; hex?: string }[] }
+  /** Figma vs code, before and after, side by side (direction A, 20 Nov: Source of truth as a picture, not a table) */
+  | { kind: 'sync'; title: string; rows: { figma: string; before: string; after: string }[] }
+  | {
+      kind: 'docs';
+      title: string;
+      items: { name: string; purpose: string; useFor: string; notFor: string; instead: string }[];
+    }
+  | { kind: 'flow'; title: string; steps: { n: string; name: string; text: string }[] }
+  | { kind: 'checks'; title: string; subject: string; status: string; items: { value: string; label: string }[] }
+  | { kind: 'meters'; title: string; items: { label: string; value: string }[] }
+  | { kind: 'states'; title: string; rows: { state: string; token: string; example: string }[] }
+  | { kind: 'audit'; title: string; layers: number; items: { label: string; value: string }[] }
+  | { kind: 'surfaces'; title: string; items: { name: string; how: string }[] }
+  | { kind: 'graph'; title: string; edges: { from: string; to: string; rules: string[] }[] }
+  | { kind: 'order'; title: string; steps: { name: string; text: string }[] }
+  | { kind: 'everywhere'; title: string; surfaces: { name: string; note: string }[] }
+  | { kind: 'bulk'; title: string; outcomes: { label: string; title: string; text: string; cta: string }[] }
+  | { kind: 'compare'; rows: { label: string; before: string; after: string; note: string }[] }
+  | { kind: 'images'; images: { src: string; alt: string; width: number; height: number }[] };
+
+export interface Chapter {
+  /** e.g. "01 · Audit" */
+  kicker: string;
+  heading: string;
+  lede: string;
+  blocks: ChapterBlock[];
+  /** the big figure with its "Seen at …" line */
+  proof?: { value: string; caption: string; seenAt?: string }[];
+}
+
+/** an image from the Figma case study; `dark` is the night version if there is one */
+export interface Shot {
+  light: string;
+  dark?: string;
+  width: number;
+  height: number;
+}
+
 export interface CaseStudy {
   slug: string;
+  /** work in progress: no page, no Markdown twin, left out of the footer, sitemap and llms.txt; its Work row isn't a link */
+  wip?: boolean;
   /** used in the "Next case study" link and the page title */
   linkName: string;
   name: string;
@@ -21,16 +73,66 @@ export interface CaseStudy {
   statement: string;
   lede: string;
   facts: { term: string; detail: string }[];
+  /** direction A · hero v2 + the written story (Goran, 24 Nov): client card, intro and challenge / result text.
+   *  Lorem ipsum where the client facts and copy aren't known yet. */
+  client?: {
+    name: string;
+    overview: string[];
+    facts: { term: string; detail: string }[];
+    storyHeading: string;
+    /** another case study for the same client: the 'More for <client>' section before the CTA (SameClientA) */
+    related?: { slug: string; label: string };
+    challenge: string[];
+    results: string[];
+  };
   who: string;
+  /** direction A · the screens band after the hero (one large + two small, 16:10): each window is a topic that opens
+   *  a gallery (lightbox); the first image shows in the window. Missing = placeholders. */
+  screensA?: {
+    title: string;
+    /** optional crop shown in the window when the first image is too wide to read small */
+    cover?: { src: string; width: number; height: number };
+    /** largest width (px) an image of this gallery shows at when fitted, e.g. a text page */
+    max?: number;
+    images: { src: string; alt: string; width: number; height: number }[];
+  }[];
   /** the block under the hero: a project image, or Everbreed's audit callout */
-  lead:
-    | { kind: 'image'; placeholder: string }
+  lead?:
+    | { kind: 'image'; placeholder: string; src?: Shot; alt?: string }
     | { kind: 'audit'; heading: string; text: string; cta: string };
   numbersHeading: string;
   numbers: { value: string; label: string; meaning: string }[];
+  /** a custom visual on the right of the hero */
+  heroVisual?: 'qbench-build' | 'qbench-status' | 'everbreed';
+  /** one line above the hero visual that says what it shows */
+  heroContext?: string;
+  /** product decisions: the problem, what we did, and a small UI piece that shows it */
+  decisions?: {
+    heading: string;
+    items: { ui: 'table' | 'toast' | 'move' | 'log' | 'search'; title: string; problem: string; solved: string }[];
+  };
+  /** homepage-style section openers (caption + heading) above the custom sections */
+  heads?: {
+    proof?: { caption: string; heading: string };
+    chapters?: { caption: string; heading: string };
+    decisions?: { caption: string; heading: string };
+    work?: { caption: string; heading: string };
+  };
+  /** heading of the "From the work" section */
+  workHeading?: string;
+  /** custom "From the work" visuals instead of image figures */
+  workVisual?: 'qbench' | 'qbench-status' | 'everbreed';
+  /** an animated before/after above the numbers */
+  proofViz?: 'names' | 'surfaces' | 'aliases';
   steps?: { label: string; inProgress?: boolean }[];
+  /** the slides of the Figma case study, one section each */
+  chapters?: Chapter[];
+  /** 'scroll' = sticky rail + stacked steps (homepage Zero Drift layout); default tabs */
+  chaptersLayout?: 'tabs' | 'scroll';
   note?: { heading: string; text: string };
   did: string[];
+  /** 'gate': the five layers shown working (AgenticGate) instead of the dark card */
+  agenticStyle?: 'band' | 'gate';
   agentic?: {
     kicker: string;
     heading: string;
@@ -39,7 +141,9 @@ export interface CaseStudy {
   };
   together: { text: string; collect: Collect };
   changed: { text: string; collect: Collect };
-  work: { placeholder: string; caption: string }[];
+  work: { placeholder: string; caption: string; src?: Shot; alt?: string }[];
+  /** questions about this project, shown before the CTA (facts from the page only) */
+  faq?: { q: string; a: string }[];
   cta: { heading: string; text: string; label: string; action: 'audit' | 'call' };
   next: string;
 }
@@ -51,8 +155,41 @@ export const caseStudies: CaseStudy[] = [
     name: 'QBench',
     band: 'lavender',
     kicker: 'Case study · Design system · LIMS software',
-    statement: 'No one owned the design system, so nothing in the product agreed with itself.',
-    lede: 'A B2B SaaS product built for years without a designer in the room. Every screen was a developer’s best guess, and each new feature meant relearning decisions nobody had written down. If your team copies screens instead of reusing parts, this is your starting point too.',
+    statement: 'A design system AI agents can build with.',
+    screensA: [
+      {
+        title: 'variables',
+        max: 960,
+        images: [
+        { src: '/work/qbench/vars-semantic.webp', alt: 'Figma variables, Semantic Tokens collection (179): surface tokens such as default, hover and primary, each pointing at a primitive.', width: 1556, height: 1126 },
+        { src: '/work/qbench/vars-dimensions.webp', alt: 'Figma variables, Dimensions collection (84): border radius and spacing steps.', width: 1556, height: 1122 },
+        { src: '/work/qbench/vars-typography.webp', alt: 'Figma variables, Typography collection (28): font size and line height.', width: 1556, height: 1126 },
+        { src: '/work/qbench/vars-elevation.webp', alt: 'Figma variables, Elevation collection (6): shadow colours from core black and white at set opacities.', width: 1556, height: 1126 },
+        ],
+      },
+      {
+        title: 'component docs',
+        cover: { src: '/work/qbench/doc-cover.webp', width: 1600, height: 1000 },
+        images: [
+        { src: '/work/qbench/doc-sheet-1.webp', alt: 'Input documentation page: use for / not for, then Input and InputGroupDropdown in every state, and Field.', width: 4409, height: 2787 },
+        { src: '/work/qbench/doc-sheet-2.webp', alt: 'Input documentation page: .FieldBackplate and InputGroup/.Backplate, every state with and without error.', width: 4409, height: 2310 },
+        { src: '/work/qbench/doc-sheet-3.webp', alt: 'Input documentation page: .FieldText and Label states.', width: 4409, height: 1316 },
+        { src: '/work/qbench/doc-sheet-4.webp', alt: 'Input documentation page: usage, do and don\u2019t.', width: 4409, height: 1065 },
+        { src: '/work/qbench/doc-examples-1.webp', alt: 'Input examples: on a modal.', width: 2978, height: 1860 },
+        { src: '/work/qbench/doc-examples-2.webp', alt: 'Input examples: on a table.', width: 2978, height: 1420 },
+        { src: '/work/qbench/doc-examples-3.webp', alt: 'Input examples: on a detail page, view with Field and edit with Input.', width: 2978, height: 1714 },
+        ],
+      },
+      {
+        title: 'spec',
+        max: 720,
+        images: [
+        { src: '/work/qbench/spec-input-1.webp', alt: 'Input spec: structure, use for and not for.', width: 1776, height: 1280 },
+        { src: '/work/qbench/spec-input-2.webp', alt: 'Input spec: component keys and properties, internal parts, do and don\u2019t.', width: 1776, height: 1430 },
+        ],
+      },
+    ],
+    lede: 'QBench’s lab software grew for years without a designer. We rebuilt its design system as one Figma library that designers, developers and AI agents read the same way.',
     facts: [
       { term: 'Company', detail: 'Lab information management (LIMS), B2B SaaS' },
       { term: 'Team', detail: '[Team size: engineers and designers]' },
@@ -61,10 +198,47 @@ export const caseStudies: CaseStudy[] = [
         detail: 'Legacy product plus a new app, Figma Foundation and Components libraries [confirm stack]',
       },
       { term: 'Scale', detail: '141 components across three library pages' },
+      { term: 'Work by', detail: 'Goran Babarogić, product designer and design system engineer, June 2025 to now' },
     ],
-    who: 'Who did the work: Goran Babarogić, as product designer and design system engineer at QBench, June 2025 to now.',
-    lead: { kind: 'image', placeholder: '[Screenshot: Foundation library, before and after]' },
-    numbersHeading: 'In numbers, and what they mean',
+    client: {
+      name: 'QBench',
+      overview: [
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      ],
+      facts: [
+        { term: 'Industry', detail: 'Lab software (LIMS), B2B SaaS' },
+        { term: 'Headquarters', detail: 'Lorem ipsum' },
+        { term: 'Founded', detail: '0000' },
+        { term: 'Company size', detail: '00–00' },
+        { term: 'Year', detail: '2025 – ongoing' },
+        { term: 'The work', detail: 'Design system, tokens, component docs, AI agent skills' },
+        { term: 'Result', detail: 'Lorem ipsum dolor sit amet' },
+      ],
+      related: { slug: 'qbench-status-workflows', label: 'QBench status workflows' },
+      storyHeading: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
+      challenge: [
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      ],
+      results: [
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      ],
+    },
+    who: '',
+    heroVisual: 'qbench-build',
+    heroContext: 'Today, every component reads two ways: as UI for people, as props and tokens for agents.',
+    workHeading: 'What the agent reads',
+    heads: {
+      proof: { caption: 'Before and after', heading: 'Every variable now has a name developers can type.' },
+      chapters: { caption: 'What we did', heading: 'Five steps, from an audit to agents building screens.' },
+      work: { caption: 'See it work', heading: 'What the agent reads' },
+    },
+    proofViz: 'names',
+    agenticStyle: 'gate',
+    workVisual: 'qbench',
+    numbersHeading: 'Before and after',
     numbers: [
       {
         value: '1,071 → 0',
@@ -77,34 +251,158 @@ export const caseStudies: CaseStudy[] = [
         meaning: 'So the library no longer leans on files nobody maintains.',
       },
       {
-        value: '141',
-        label: 'components on one Foundation library',
-        meaning: 'So every new screen starts from the same parts.',
+        value: '2 files → 1',
+        label: 'for tokens and components',
+        meaning: 'So a change to a token reaches every component on its own.',
       },
     ],
-    steps: [
-      { label: '01 Drift' },
-      { label: '02 Audit' },
-      { label: '03 System' },
-      { label: '04 Context' },
-      { label: '05 Proof · pilot' },
+    chapters: [
+      {
+        kicker: '01 · Audit',
+        heading: 'First, we measured what was really there.',
+        lede: 'Scripts read every layer and report what is bound to a token, instead of trusting how it looks.',
+        blocks: [
+          {
+            kind: 'audit',
+            title: 'Token coverage · values bound to a token',
+            layers: 1610,
+            items: [
+              { label: 'Fill', value: '97%' },
+              { label: 'Stroke', value: '99.7%' },
+              { label: 'Text', value: '99.8%' },
+              { label: 'Corner radius', value: '100%' },
+              { label: 'Gap', value: '99.8%' },
+              { label: 'Padding', value: '100%' },
+              { label: 'Effects', value: '99%' },
+            ],
+          },
+        ],
+        proof: [
+          { value: '1,071 → 0', caption: 'references to outside libraries, repointed to the system.', seenAt: 'Seen at QBench' },
+          { value: '99.5%', caption: 'of values bound to a token, across 1,610 component variants.' },
+        ],
+      },
+      {
+        kicker: '02 · One file',
+        heading: 'One library, with the names developers type.',
+        lede: 'Tokens and components moved into one file, and every variable got its CSS name.',
+        blocks: [
+          {
+            kind: 'map',
+            title: 'Figma variable → web code name',
+            rows: [
+              { from: 'text/default', to: 'var(--text-default)' },
+              { from: 'surface/default', to: 'var(--surface-default)' },
+              { from: 'primitives/primary/600', to: 'var(--primary-600)' },
+              { from: 'spacing/4', to: 'var(--spacing-4)' },
+              { from: 'radius/md', to: 'var(--radius-md)' },
+            ],
+          },
+        ],
+        proof: [{ value: '2 files → 1', caption: 'for tokens and components, so a token change reaches every component.' }],
+      },
+      {
+        kicker: '03 · Tokens',
+        heading: 'One colour ramp, aliased down to the button.',
+        lede: 'Point at or tap a step of the ramp to see which button state it feeds.',
+        blocks: [
+          {
+            kind: 'ramp',
+            title: 'primitives / primary · 11 steps',
+            swatches: [
+              { step: '50', hex: 'F1F6FD' },
+              { step: '100', hex: 'E4EFFC' },
+              { step: '200', hex: 'D2E6FB' },
+              { step: '300', hex: 'ACD1F4' },
+              { step: '400', hex: '8FBEF0' },
+              { step: '500', hex: '5B8ED7' },
+              { step: '600', hex: '4074C7' },
+              { step: '700', hex: '275FBE' },
+              { step: '800', hex: '244D9E', feeds: true },
+              { step: '900', hex: '23437B', feeds: true },
+              { step: '950', hex: '182749' },
+            ],
+            note: '800 and 900 feed the primary button.',
+          },
+          {
+            kind: 'chain',
+            title: 'Alias chain · primary button',
+            root: 'primary button',
+            links: [
+              { from: 'primitives/primary/800', token: 'button/surface/solid/primary/default', state: 'Default · 800' },
+              { from: 'primitives/primary/900', token: 'button/surface/solid/primary/hover', state: 'Hover · 900' },
+            ],
+          },
+        ],
+        proof: [{ value: '256 → 178 → 2', caption: 'primitives, semantic tokens and component tokens.', seenAt: 'Three layers' }],
+      },
+      {
+        kicker: '04 · States',
+        heading: 'Every state comes from one shared token.',
+        lede: 'Pick a state to see it on a real button and field, and the token behind it.',
+        blocks: [
+          {
+            kind: 'states',
+            title: 'Shared across the library',
+            rows: [
+              { state: 'Focus · button', token: 'ring/ring-selected', example: 'Create CAPA' },
+              { state: 'Focus · text field', token: 'border/primary/default', example: 'Batch ID' },
+              { state: 'Error · text field', token: 'border/critical/default', example: 'Batch ID' },
+              { state: 'Disabled', token: 'opacity/disabled · 50%', example: 'Create CAPA' },
+            ],
+          },
+        ],
+        proof: [
+          { value: '28', caption: 'components focus with the same ring style.', seenAt: 'Seen at QBench' },
+          { value: '716', caption: 'layers fade with one opacity token when disabled.' },
+        ],
+      },
+      {
+        kicker: '05 · Agents build',
+        heading: 'A developer hands over a PRD. An agent builds the screen.',
+        lede: 'One skill builds in Figma from the library, a second checks every layer, a designer refines.',
+        blocks: [
+          {
+            kind: 'flow',
+            title: 'From PRD to screen',
+            steps: [
+              { n: '01', name: 'PRD', text: 'Issue list: filters, table, pagination.' },
+              { n: '02', name: 'generate-screen', text: 'Reads design-conventions.md and library.json, then builds in Figma.' },
+              { n: '03', name: 'check-screen', text: 'Walks every layer against the library and the allowed list.' },
+              { n: '04', name: 'Designer', text: 'Refines the screen and hands it to development.' },
+            ],
+          },
+          {
+            kind: 'checks',
+            title: 'Test run · check-screen',
+            subject: 'Issue list · 239 layers',
+            status: 'Pass · 0 issues',
+            items: [
+              { value: '0', label: 'Tokens from outside the library' },
+              { value: '0', label: 'Raw colour or spacing values' },
+              { value: '0', label: 'Components outside the allowed list' },
+            ],
+          },
+        ],
+        proof: [{ value: '243', caption: 'components the agent may use, all from the published library.', seenAt: 'Seen at QBench' }],
+      },
     ],
     did: [
-      'Audited and consolidated the legacy system: colours, tokens and components that had drifted apart.',
-      'Built a semantic token architecture across libraries, and piloted the migration before rolling it out.',
-      'Designed and shipped components with every state defined, and one action link pattern instead of several.',
-      'Set Code Connect as the contract between Figma and code, so a screen can be built from Figma without anyone correcting it afterwards.',
-      'Reorganised the Figma library so components are found by what they do, not by memory.',
+      'Audited the legacy system and pulled drifted colours, tokens and components back together.',
+      'Built a token architecture in three layers, piloted it, then rolled it out.',
+      'Defined every component state, with one link pattern instead of several.',
+      'Set Code Connect as the contract between Figma and code.',
     ],
     agentic: {
       kicker: 'The agentic layer',
-      heading: 'Docs agents might skip. A gate they can’t.',
+      heading: 'Without a system, agents guess. With one, they can’t drift.',
       items: [
-        { label: 'Rules', text: 'State the target. They never get softened to match the code.' },
-        { label: 'Facts', text: 'Measure what the code actually does today, generated, not written by hand.' },
-        { label: 'Gap list', text: 'Maps one to the other. Deleting a row is the unit of progress.' },
+        { label: 'What good looks like', text: 'The rules state the target. They never get softened to match the code.' },
+        { label: 'What the code does today', text: 'Measure what the code does today. Generated, not written by hand.' },
+        { label: 'What’s left to fix', text: 'Maps one to the other. Deleting a row is the unit of progress.' },
+        { label: 'Docs', text: 'Every component says when to use it and what to use instead: 126 of 126 sets.' },
         {
-          label: 'Gate',
+          label: 'A check that stops off-system code',
           text: 'A lint rule enforces the tokens, whether or not an agent read a single document.',
         },
       ],
@@ -112,14 +410,14 @@ export const caseStudies: CaseStudy[] = [
         'Why it matters: a colour class with no token behind it renders nothing, the element inherits, and the screen still passes review. Only a gate catches that every time.',
     },
     together: {
-      text: 'Embedded in the product team, with the design system and the product redesign moving in parallel. The migration was piloted on one area first, so engineers could check the token model against real screens before the rollout.',
+      text: 'Embedded in the product team, with the system and the redesign in parallel. A pilot area let engineers check the token model on real screens first.',
       collect: {
         label: 'To collect · client quote',
         text: '“[A sentence from a QBench engineer or product lead on what changed for them.]”',
       },
     },
     changed: {
-      text: 'The component library now runs on one Foundation, with no outside libraries behind it, and the Figma to code contract is in place for the rollout.',
+      text: 'The component library now runs on one Foundation, with no outside libraries behind it, and the Figma-to-code contract is in place for the rollout.',
       collect: {
         label: 'To collect · business result',
         text: '[One real result: time to build a screen, UI bugs, or how often an agent’s first attempt was usable, before and after.]',
@@ -128,15 +426,29 @@ export const caseStudies: CaseStudy[] = [
     work: [
       {
         placeholder: '[Screenshot: token layers]',
-        caption: 'Primitive, semantic and component layers, with every component bound to the Foundation only.',
+        caption: 'The V2 variables in Figma: semantic tokens grouped by role, each one pointing at a primitive.',
       },
       {
         placeholder: '[Screenshot: library by function]',
-        caption: 'The library reorganised so components are found by what they do.',
+        caption: 'Input and InputGroup in the library, with every state drawn: default, hover, focus, filled, disabled, error.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Did the product have to stop while the system changed?',
+        a: 'No. The system and the redesign ran in parallel, inside the product team. A pilot area let engineers check the token model on real screens first; then it rolled out area by area while QBench kept shipping.',
       },
       {
-        placeholder: '[Screenshot: Code Connect]',
-        caption: 'Code Connect linking the Figma component to the code component.',
+        q: 'How do AI agents use the system?',
+        a: 'They read what people read: design-conventions.md and library.json. One skill builds a screen in Figma from the published library (243 components it may use), a second walks every layer against it, and a designer refines the result. In code, a lint rule enforces the tokens whether or not an agent read a single document.',
+      },
+      {
+        q: 'Can the team grow the system without you?',
+        a: 'Yes. We hand over how to extend it: when to add a token or a component, how to name it, and what to update in the docs. The checks stay on, so a new screen that steps outside the library is caught in Figma and in code.',
+      },
+      {
+        q: 'How are component states kept consistent?',
+        a: 'Every state comes from one shared token. Focus uses the same ring on 28 components, error uses border/critical/default, and disabled is one opacity token across 716 layers, so a state changed once changes everywhere.',
       },
     ],
     cta: {
@@ -145,7 +457,8 @@ export const caseStudies: CaseStudy[] = [
       label: 'Get a free audit',
       action: 'audit',
     },
-    next: 'qbench-status-workflows',
+    // Emir 24 Nov: next follows the homepage order (QBench → Everbreed); status workflows is linked from The project card
+    next: 'everbreed',
   },
 
   {
@@ -154,68 +467,254 @@ export const caseStudies: CaseStudy[] = [
     name: 'QBench',
     band: 'sage',
     kicker: 'Case study · Product design · LIMS software',
-    statement: 'A status change could skip the compliance step it legally needed.',
-    lede: 'A test’s status could change from eight places, from the order screen to imports, automations and the API. None agreed on what should happen next, and none accounted for the e-signatures and PINs some changes legally needed. If one action in your product behaves differently depending on where it’s triggered, this is the same problem.',
+    statement: 'One status model for every place a test can change.',
+    lede: 'In QBench’s lab software, admins now draw one workflow for a test, and lab staff move tests through it with the compliance steps it needs, from any screen.',
     facts: [
       { term: 'Company', detail: 'Lab information management (LIMS), regulated industries' },
       { term: 'Team', detail: '[Team size]' },
       { term: 'Scope', detail: '8 surfaces that change a status, single and bulk' },
       { term: 'Timeline', detail: 'January to February 2026' },
+      { term: 'Work by', detail: 'Goran Babarogić, product designer at QBench' },
     ],
-    who: 'Who did the work: Goran Babarogić, as product designer at QBench.',
-    lead: { kind: 'image', placeholder: '[Screenshot: a status change with its compliance step]' },
-    numbersHeading: 'In numbers, and what they mean',
+    client: {
+      name: 'QBench',
+      overview: [
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      ],
+      facts: [
+        { term: 'Industry', detail: 'Lab software (LIMS), regulated industries' },
+        { term: 'Headquarters', detail: 'Lorem ipsum' },
+        { term: 'Founded', detail: '0000' },
+        { term: 'Company size', detail: '00–00' },
+        { term: 'Year', detail: '2026' },
+        { term: 'The work', detail: 'Product design: status workflows, single and bulk' },
+        { term: 'Result', detail: 'Lorem ipsum dolor sit amet' },
+      ],
+      related: { slug: 'qbench-design-system', label: 'QBench design system' },
+      storyHeading: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
+      challenge: [
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      ],
+      results: [
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      ],
+    },
+    who: '',
+    heroVisual: 'qbench-status',
+    heroContext: 'Wherever a status changes, the same rules run in the same order.',
+    proofViz: 'surfaces',
+    workVisual: 'qbench-status',
+    workHeading: 'Two people, one workflow',
+    chaptersLayout: 'scroll',
+    heads: {
+      proof: { caption: 'Before and after', heading: 'Eight places that change a status. One model.' },
+      chapters: { caption: 'What we did', heading: 'Five steps to one workflow on every screen.' },
+      decisions: { caption: 'Product decisions', heading: 'Problems we solved' },
+      work: { caption: 'See it work', heading: 'Two people, one workflow' },
+    },
+    numbersHeading: 'Before and after',
     numbers: [
       {
         value: '8 → 1',
         label: 'places a status could change, now on one model',
         meaning: 'So a status behaves the same wherever it’s changed.',
       },
+    ],
+    chapters: [
       {
-        value: '4',
-        label: 'compliance steps in the flow: required fields, comments, e-signatures, PIN',
-        meaning: 'So required steps can’t be skipped, and people aren’t stuck at dead ends.',
+        kicker: '01 · Map',
+        heading: 'First, we found every place a status can change.',
+        lede: 'Screens, bulk edits, imports, automations and the API. Each one had its own idea of what happens next.',
+        blocks: [
+          {
+            kind: 'surfaces',
+            title: 'Places a test status can change',
+            items: [
+              { name: 'Order detail page', how: 'Single' },
+              { name: 'Test detail page', how: 'Single' },
+              { name: 'Test list page', how: 'Bulk' },
+              { name: 'Batch detail page', how: 'Bulk' },
+              { name: 'Publishing a report', how: 'Prompt' },
+              { name: 'Spreadsheet import', how: 'Import' },
+              { name: 'Automations', how: 'System' },
+              { name: 'API', how: 'System' },
+            ],
+          },
+        ],
       },
       {
-        value: 'MVP',
-        label: 'shipped, including bulk status update',
-        meaning: 'So the model was proven in the product, not only in Figma.',
+        kicker: '02 · Model',
+        heading: 'One workflow: statuses, and the moves between them.',
+        lede: 'An admin draws the workflow once. Pick a move to see the rules that travel with it.',
+        blocks: [
+          {
+            kind: 'graph',
+            title: 'Test approval workflow · example',
+            edges: [
+              { from: 'Not started', to: 'In progress', rules: ['Assigned people or team'] },
+              { from: 'In progress', to: 'Completed', rules: ['Required fields', 'E-signature + PIN'] },
+              { from: 'In progress', to: 'Cancelled', rules: ['E-signature + PIN'] },
+            ],
+          },
+        ],
+      },
+      {
+        kicker: '03 · Rules',
+        heading: 'Compliance lives on the move, in one fixed order.',
+        lede: 'However many rules a move has, people meet them the same way: fields on the first page, then signature, PIN and comment together.',
+        blocks: [
+          {
+            kind: 'order',
+            title: 'The order every move follows',
+            steps: [
+              { name: 'Required fields', text: 'Page 1: the fields the admin picked for this move.' },
+              { name: 'Signature and PIN', text: 'Page 2: one step, so nobody signs twice.' },
+              { name: 'Comment', text: 'Page 2: an optional note, next to the signature.' },
+            ],
+          },
+        ],
+      },
+      {
+        kicker: '04 · Everywhere',
+        heading: 'Every surface opens the same steps.',
+        lede: 'From a status badge, a dropdown or a publish prompt, the same two-page flow runs.',
+        blocks: [
+          {
+            kind: 'everywhere',
+            title: 'Where the flow starts',
+            surfaces: [
+              { name: 'Order detail page', note: 'The status badge becomes a dropdown of the next allowed statuses.' },
+              { name: 'Test detail page', note: 'The dropdown lists only the statuses the workflow allows next.' },
+              { name: 'Publishing a report', note: 'Tests that aren’t completed are moved first.' },
+            ],
+          },
+        ],
+      },
+      {
+        kicker: '05 · Bulk',
+        heading: 'Many tests at once, with an honest answer.',
+        lede: 'When some tests can’t move, the modal says how many, and lets the user go on with the rest.',
+        blocks: [
+          {
+            kind: 'bulk',
+            title: 'Publishing a report for selected tests',
+            outcomes: [
+              {
+                label: 'All can move',
+                title: 'Move tests to completed?',
+                text: 'Every selected test can move. The same steps run, then the report is published.',
+                cta: 'Yes, continue',
+              },
+              {
+                label: 'Some can move',
+                title: '6 tests can move to completed',
+                text: '2 tests can’t, because of workflow rules. Go on with the 6, or review the blocked ones.',
+                cta: 'Proceed with 6 tests',
+              },
+              {
+                label: 'None can move',
+                title: 'Selected tests can’t be moved',
+                text: 'Workflow rules block every selected test, so the report can’t be published yet.',
+                cta: 'Back to tests',
+              },
+            ],
+          },
+        ],
+        proof: [{ value: 'MVP', caption: 'shipped, including bulk status update.' }],
       },
     ],
-    note: {
-      heading: 'Why it’s on a design systems site',
-      text: 'It’s the same thinking applied to behaviour: one definition, used everywhere. A status model works like a token, and every surface consumes it.',
-    },
     did: [
       'Designed one model for how a status change happens, gets validated and gets recorded, and applied it on every surface that can trigger one.',
       'Designed the compliance layer as steps in the flow, not dead ends.',
       'Designed bulk status update, with a field-set based flow for changing many records at once.',
       'Shipped an MVP.',
     ],
+    decisions: {
+      heading: 'Problems we solved',
+      items: [
+        {
+          ui: 'table',
+          title: 'Different rules in one bulk move',
+          problem: 'Moving many tests at once, from different statuses, meant a different set of rules for each one.',
+          solved: 'Rules always run in one order, with signature and PIN as one step. For the MVP a bulk move starts from one status, and required fields show as a table: a row per test, a column per field.',
+        },
+        {
+          ui: 'toast',
+          title: 'No signature set up',
+          problem: 'A move needed a signature the user had never set up, so the flow hit a dead end.',
+          solved: 'No extra modal. A short error toast says what’s missing, with a link straight to the setup.',
+        },
+        {
+          ui: 'move',
+          title: 'Removing a status in use',
+          problem: 'Removing a status from a workflow would strand the tests sitting in it.',
+          solved: 'The admin sees how many tests are affected, picks where they go, and gets a link to the filtered list.',
+        },
+        {
+          ui: 'log',
+          title: 'Automations can’t sign',
+          problem: 'Automations run with no person there, so they can’t fill a field or sign.',
+          solved: 'A move with rules can’t be automated. If a run breaks the workflow, it fails and says exactly why.',
+        },
+        {
+          ui: 'search',
+          title: 'Hundreds of fields',
+          problem: 'A test can have hundreds of fields. A switch for each one wouldn’t scale.',
+          solved: 'Admins search and add the fields they need, and drag them into the order people will fill them.',
+        },
+      ],
+    },
+    agentic: {
+      kicker: 'Why it’s on a design systems site',
+      heading: 'Designed in the new system, built in the old one.',
+      items: [
+        { label: 'New system', text: 'The screens were designed with the new QBench design system.' },
+        { label: 'Old UI', text: 'The MVP was built in the existing QBench UI, reusing what already worked.' },
+        { label: 'One modal', text: 'The required-actions modal became one component, the same on every screen.' },
+        { label: 'One notice', text: 'Inline notifications used across the flow became a component too.' },
+      ],
+      footnote:
+        'The workflow is the same idea as a design system, applied to behaviour: one definition, used on every surface, so nothing drifts.',
+    },
     together: {
-      text: 'Two months from zero to a shipped MVP, working inside the product team. [Add who the work was reviewed with, such as compliance or support, and one decision that came out of it.]',
+      text: 'Inside the product team, with a product lead and developers. Design syncs and feedback from technical account managers shaped the MVP.',
       collect: {
         label: 'To collect · client quote',
         text: '“[A sentence from a QBench product lead or a lab user on the new status flow.]”',
       },
     },
     changed: {
-      text: 'One status model shipped as an MVP, with compliance built into the flow instead of left to each screen.',
+      text: 'One status model shipped as an MVP, with compliance built into the flow instead of left to each screen, the same on every surface.',
       collect: {
         label: 'To collect · business result',
-        text: '[One result since launch: adoption of bulk update, fewer compliance errors, or fewer support tickets about status changes.]',
+        text: '[One result since launch: bulk update adoption, fewer compliance errors or fewer status tickets.]',
       },
     },
-    work: [
+    work: [],
+    faq: [
       {
-        placeholder: '[Screenshot: the status model]',
-        caption: 'One model for every surface that can change a status.',
+        q: 'Is this design system work or product design?',
+        a: 'Product design, done on a design system. The feature was designed with the new QBench design system, and the pieces it repeats became shared components: the required-actions modal and the inline notifications.',
       },
       {
-        placeholder: '[Screenshot: e-signature step]',
-        caption: 'Compliance as a step in the flow, not a blocked screen.',
+        q: 'What did the MVP include?',
+        a: 'The admin-only workflow editor (statuses, the moves between them, the rules on each move, drafts and published versions) and the required-actions modal on every place a person changes a status, single and bulk. Automations and imports are checked against the workflow and stop with a clear reason.',
       },
-      { placeholder: '[Screenshot: bulk update]', caption: 'Bulk status update, driven by field sets.' },
+      {
+        q: 'How did you handle e-signatures?',
+        a: 'As the second page of the same modal: signature, PIN and an optional comment in one step, so nobody signs twice. If a move needs a signature the user hasn’t set up, a toast says so and links to the setup. Every change is recorded in the test’s history.',
+      },
+      {
+        q: 'What happens when some tests in a bulk move can’t move?',
+        a: 'The modal says how many can move and how many can’t, and why. The user goes on with the ones that can, or reviews the blocked ones. For the MVP a bulk move starts from one status.',
+      },
+      {
+        q: 'Who was involved?',
+        a: 'Goran, product designer at QBench, inside the product team with a product lead and developers. Feedback from technical account managers shaped the MVP.',
+      },
     ],
     cta: {
       heading: 'Complex, regulated workflows?',
@@ -231,83 +730,271 @@ export const caseStudies: CaseStudy[] = [
     linkName: 'Everbreed',
     name: 'Everbreed',
     band: 'peach',
-    kicker: 'Case study · Design system · Agtech · In progress',
+    kicker: 'Case study · Design system · Agtech',
     statement: 'The library looked healthy. No pipeline could read it.',
-    lede: 'A mature Figma design system with most styles already bound to tokens. But the tokens carried no metadata, the code had drifted from the file, and the team assumed the fix was renaming everything. If your design system looks fine in Figma but engineers still copy values by hand, this is likely you.',
-    facts: [
-      { term: 'Company', detail: 'Agtech platform, web and mobile' },
-      { term: 'Team', detail: '[Team size]' },
-      { term: 'Stack', detail: 'Figma library, Tailwind config in the web app [confirm stack]' },
-      { term: 'Scale', detail: '302 variables, 89 component sets' },
+    screensA: [
+      {
+        title: 'variables',
+        max: 960,
+        images: [
+          { src: '/work/everbreed/vars-semantic.webp', alt: 'Everbreed variables in Figma, Semantic Tokens (234): surface, border, text, icon, component and brand groups, each pointing at a primitive.', width: 1556, height: 1317 },
+          { src: '/work/everbreed/vars-primitives.webp', alt: 'Everbreed variables, Primitives (56): white, black and the green, grey, orange, red, blue and slate ramps.', width: 1556, height: 1317 },
+          { src: '/work/everbreed/vars-dimensions.webp', alt: 'Everbreed variables, Dimensions (60): radius, spacing, breakpoints and effects.', width: 1556, height: 1317 },
+          { src: '/work/everbreed/vars-elevation.webp', alt: 'Everbreed variables, Elevation (10): button and elevation shadow colours.', width: 1556, height: 1317 },
+        ],
+      },
+      {
+        title: 'component docs',
+        cover: { src: '/work/everbreed/doc-cover.webp', width: 1600, height: 1000 },
+        images: [
+          { src: '/work/everbreed/doc-button-1.webp', alt: 'Button in the Figma library: icon-only buttons in every variant, treatment, size and state.', width: 2475, height: 1900 },
+          { src: '/work/everbreed/doc-button-2.webp', alt: 'Button in the Figma library: label buttons in every variant, treatment, size and state.', width: 3021, height: 1900 },
+          { src: '/work/everbreed/doc-button-examples-1.webp', alt: 'Button examples: overview, variants and treatments.', width: 2978, height: 3720 },
+          { src: '/work/everbreed/doc-button-examples-2.webp', alt: 'Button examples: states, sizes, content and icons.', width: 2978, height: 1880 },
+          { src: '/work/everbreed/doc-button-examples-3.webp', alt: 'Button examples: text length and usage notes.', width: 2978, height: 2112 },
+        ],
+      },
+      {
+        title: 'pedigree card',
+        cover: { src: '/work/everbreed/pedigree-cover.webp', width: 1600, height: 1000 },
+        images: [
+          { src: '/work/everbreed/doc-pedigree-1.webp', alt: 'PedigreeCard documentation: what it is for, then the card in every size for a buck, a doe and an unknown rabbit.', width: 4226, height: 2850 },
+          { src: '/work/everbreed/doc-pedigree-2.webp', alt: 'PedigreeCard documentation: the horizontal card and the print card used in exported pedigrees.', width: 1750, height: 1943 },
+        ],
+      },
     ],
-    who: 'Who did the work: Goran Babarogić, design systems, 2025 to now. [Confirm how to describe the engagement.]',
-    lead: {
-      kind: 'audit',
-      heading: 'This is what our audit looks like.',
-      text: 'The findings below come from a review of the full Figma file. The free audit gives you the same kind of picture for your system.',
-      cta: 'Get yours free',
+    lede: 'Everbreed had a mature Figma library, but the code had drifted from it and no tool could read it. We gave every token an ID, a scope and a code name, so the code config now comes from Figma, for web and for mobile.',
+    facts: [
+      { term: 'Company', detail: 'Agtech platform: a web app and a student app on iOS and Android' },
+      { term: 'Team', detail: '[Team size]' },
+      { term: 'Stack', detail: 'Figma DS Desktop and DS Mobile, Vue on web, React Native on mobile' },
+      { term: 'Scale', detail: '360 variables today (302 when the sync was built), 89 component sets' },
+      { term: 'Work by', detail: 'Goran Babarogić, design systems, [2025 to now]' },
+    ],
+    client: {
+      name: 'Everbreed',
+      overview: [
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      ],
+      facts: [
+        { term: 'Industry', detail: 'Agtech: breeding management, web and mobile' },
+        { term: 'Headquarters', detail: 'Lorem ipsum' },
+        { term: 'Founded', detail: '0000' },
+        { term: 'Company size', detail: '00–00' },
+        { term: 'Year', detail: '2025 – ongoing' },
+        { term: 'The work', detail: 'Design system: DS Desktop and DS Mobile, tokens, code sync' },
+        { term: 'Result', detail: 'Lorem ipsum dolor sit amet' },
+      ],
+      storyHeading: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
+      challenge: [
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      ],
+      results: [
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      ],
     },
-    numbersHeading: 'What the review found, and what it means',
+    who: '',
+    heroVisual: 'everbreed',
+    workVisual: 'everbreed',
+    proofViz: 'aliases',
+    heroContext: 'Every token now carries an ID, a scope and a code name, so code reads it straight from Figma.',
+    heads: {
+      proof: { caption: 'Before and after', heading: 'The config is generated from Figma, not kept by hand.' },
+      chapters: { caption: 'What we did', heading: 'Four steps, from drift to agents building screens.' },
+      work: { caption: 'What we built', heading: 'The student app, on phone and desktop.' },
+    },
+    numbersHeading: 'Before and after',
     numbers: [
       {
-        value: '98%',
-        label: 'of text styles bound to tokens',
-        meaning: 'So no redesign was needed. The design work was already good.',
+        value: '53 → 0',
+        label: 'tokens out of sync between Figma and code',
+        meaning: 'So engineers can trust that the code matches the design.',
+      },
+      {
+        value: '210 → 0',
+        label: 'hand-written token aliases',
+        meaning: 'So the utility config is generated from Figma, not kept by hand.',
       },
       {
         value: '302 / 302',
-        label: 'variables with no scope and no code name',
-        meaning: 'So no tool could tell what a token is for, or turn it into code.',
+        label: 'tokens with a code name and a scope',
+        meaning: 'So code reads the system mechanically. Nothing was renamed.',
       },
       {
-        value: '53',
-        label: 'variables drifted: 17 only in Figma, 36 only in code',
-        meaning: 'So engineers couldn’t trust that the code matched the design.',
-      },
-      {
-        value: '144',
-        label: 'button variants and no focus state',
-        meaning: 'So adding focus would have doubled the work. Fixing the structure first halves it to 72.',
+        value: '144 → 72',
+        label: 'button variants',
+        meaning: 'So Focus and Pressed were added without doubling the matrix.',
       },
     ],
-    steps: [
-      { label: '01 Drift' },
-      { label: '02 Audit' },
-      { label: '03 System · in progress', inProgress: true },
-      { label: '04 Context' },
+    chapters: [
+      {
+        kicker: '01 · Drift',
+        heading: 'Figma and the code had drifted 53 tokens apart.',
+        lede: 'Same names lived in three libraries, and an agent can’t tell which one is right.',
+        blocks: [
+          {
+            kind: 'rows',
+            title: 'Web · Figma ↔ code, before',
+            rows: [
+              { label: 'Only in Figma', value: '17 · surface/hover, border/selected/default …' },
+              { label: 'Only in the repo', value: '36 · bg-eb-neutral-subtle, bg-eb-accent-red …' },
+              { label: 'One name, three libraries', value: 'spacing/4 in Desktop, the old DS and an old UI kit' },
+            ],
+          },
+        ],
+        proof: [
+          { value: '53', caption: 'tokens drifted between the Figma file and the repo.', seenAt: 'Seen at Everbreed' },
+          { value: '3,046', caption: 'token issues on the student mobile screens, and 10,471 on web, before the clean-up.' },
+        ],
+      },
+      {
+        kicker: '02 · Tokens',
+        heading: 'Better metadata, not new names.',
+        lede: 'No token was renamed. Three fields Figma already has became the contract between design and code, and almost every value now points to a token.',
+        blocks: [
+          {
+            kind: 'rows',
+            title: 'Token field · from Figma · what it buys',
+            rows: [
+              { label: '$figmaId', value: 'variable.id · identity across renames' },
+              { label: '$property', value: 'variable.scopes · the CSS property it paints' },
+              { label: '$codeSyntax', value: 'codeSyntax.WEB · the name code uses' },
+            ],
+          },
+          {
+            kind: 'meters',
+            title: 'Token coverage · mobile, after',
+            items: [
+              { label: 'Spacing', value: '99.4%' },
+              { label: 'Text styles', value: '99.5%' },
+              { label: 'Corner radius', value: '97.8%' },
+              { label: 'Effects', value: '85.6%' },
+            ],
+          },
+        ],
+        proof: [
+          { value: '210 → 0', caption: 'hand-written aliases. The config is generated from Figma.', seenAt: 'Seen at Everbreed' },
+          { value: '99%', caption: 'of values bound to a token, 5,373 of 5,433.' },
+        ],
+      },
+      {
+        kicker: '03 · Components',
+        heading: 'One vocabulary, so agents read the API straight from Figma.',
+        lede: 'Across 89 component sets almost every one named its axes differently. Nothing broke on screen; it broke the mapping to code.',
+        blocks: [
+          {
+            kind: 'compare',
+            rows: [
+              { label: 'Axis name', before: 'Property 1', after: 'Variant', note: 'The same four words in every set' },
+              { label: 'State', before: 'Status / State / States', after: 'state', note: 'Focus and Pressed added' },
+              { label: 'Size', before: 'Large (48)', after: 'size: "lg"', note: 'No pixels in the name' },
+              { label: 'Label', before: 'Show Label axis', after: 'iconOnly: boolean', note: 'Halves the matrix' },
+            ],
+          },
+        ],
+        proof: [
+          { value: '144 → 72', caption: 'button variants, with Focus and Pressed added.', seenAt: 'Seen at Everbreed' },
+        ],
+      },
+      {
+        kicker: '04 · Agents build',
+        heading: 'Agents build from the system, and checks stop new drift.',
+        lede: 'A rulebook written for Everbreed’s system, so any AI agent builds screens the way the team would. Every pull request is checked, raw colours and shadows included.',
+        blocks: [
+          {
+            kind: 'flow',
+            title: 'From spec to screen',
+            steps: [
+              { n: '01', name: 'Read the spec', text: 'A handoff spec on the Figma canvas says where everything is.' },
+              { n: '02', name: 'Load the rules', text: 'design-conventions.md and allowed-components.json, per platform.' },
+              { n: '03', name: 'generate-screen', text: 'Builds with library components and tokens only.' },
+              { n: '04', name: 'check-screen', text: 'Compares the screen with the library before a designer sees it.' },
+            ],
+          },
+          {
+            kind: 'checks',
+            title: 'Every pull request',
+            subject: 'macOS, Linux and Windows',
+            status: 'Blocks new drift',
+            items: [
+              { value: '0', label: 'Raw colours' },
+              { value: '0', label: 'Raw shadows' },
+              { value: '0', label: 'Tokens missing a field' },
+            ],
+          },
+        ],
+        proof: [
+          { value: '0 issues', caption: 'on the test screen, Log Grooming 01, at the first check.', seenAt: 'Seen at Everbreed' },
+        ],
+      },
     ],
     did: [
-      'Reviewed the whole Figma file and counted every binding, so the conversation started from facts.',
-      'Defined three fields that do the work: an ID that survives renames, where a token may be used, and its name in code.',
-      'Wrote the sync plan, so the code config is generated from Figma and the 210-line hand-written alias layer goes away.',
-      'Wrote the agent instructions, with one rule above the rest: report the gap, don’t invent the value.',
+      'Measured the drift between Figma and code, token by token.',
+      'Made three Figma fields the contract between design and code, without renaming anything.',
+      'Gave every component the same four axis names and added Focus and Pressed.',
+      'Wrote the agent rulebook and the checks that block new drift.',
     ],
+    agentic: {
+      kicker: 'Two platforms',
+      heading: 'One source of truth, adapted for each platform, not copied.',
+      items: [
+        { label: 'Source', text: 'Figma: two libraries, DS Desktop for the web and DS Mobile for the apps.' },
+        { label: 'Contract', text: 'Token JSON: every token carries $figmaId, $property and $codeSyntax.' },
+        { label: 'Web', text: 'A generated utility config and Vue components. Shipped first.' },
+        { label: 'Mobile', text: 'A typed React Native export for iOS and Android, same tokens.' },
+        { label: 'Verified', text: 'Button and Input in one flow, checked on iOS and Android, enlarged text too.' },
+      ],
+      footnote:
+        'Native differences are written down instead of guessed: elevation, text scaling, touch targets, keyboard and safe areas.',
+    },
     together: {
       text: 'The plan started as a rename of all 302 variables. Everbreed’s engineer proposed a better route: don’t rename, track every token by its Figma ID, and let Figma stay the source of truth. We agreed, and the plan got smaller and safer. The best fix came from their side, and the process made room for it.',
       collect: {
         label: 'To collect · client quote and permission',
-        text: '“[A sentence from the Everbreed engineer on the review.]” Also confirm Everbreed is happy for these figures to be published by name.',
+        text: '“[A sentence from the Everbreed engineer on the work.]” Also confirm Everbreed is happy for these figures to be published by name.',
       },
     },
     changed: {
-      text: 'Design and engineering agreed one path: no rename, metadata instead, and a prioritised work list. Generating the code config from Figma is the next step.',
+      text: 'Figma and the code now hold the same tokens, matched by ID. The web config is generated from Figma, checks stop new drift on every pull request, and mobile follows the same contract for React Native.',
       collect: {
-        label: 'To collect · result once the sync ships',
-        text: '[Drift count after sync, hours saved maintaining the config by hand, or time from a Figma change to code.]',
+        label: 'To collect · business result',
+        text: '[One result since the sync shipped: hours saved maintaining the config by hand, or time from a Figma change to code.]',
       },
     },
+    // shown by EverbreedProduct (workVisual); these lines are what the Markdown twin lists
     work: [
       {
-        placeholder: '[Image: binding coverage]',
-        caption: 'Binding coverage by property. Shadows were the weak spot at 40%.',
+        placeholder: 'Student app clips: Daily Care, care saved, Home, Log Weight typo check, weight saved, milestone',
+        caption: 'The Everbreed student app on the phone, recorded from the coded prototype.',
       },
       {
-        placeholder: '[Image: the three metadata fields]',
-        caption: 'ID, usage and code name: the metadata that keeps Figma the source of truth.',
+        placeholder: 'Project Book on desktop: Care & Health and Photos',
+        caption: 'The same records on desktop, ready for the fair.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Did you rename the tokens?',
+        a: 'No. The plan started as a rename of all 302 variables, and Everbreed’s engineer proposed a better route: keep every name, and give each token three fields Figma already has, an ID, a scope and a code name. Code matches tokens by ID, so a later rename doesn’t break it.',
       },
       {
-        placeholder: '[Image: the work list]',
-        caption: 'A prioritised work list, agreed with the engineer who owns the code side.',
+        q: 'How long did adding the metadata take?',
+        a: 'The fields come from what Figma already stores (the variable ID, its scopes and the web code syntax), so the work was filling in scopes and code names for every token, not inventing a new naming system. [How long it took]',
+      },
+      {
+        q: 'Does it work for the mobile app?',
+        a: 'Yes. DS Mobile follows the same contract: a typed React Native export for iOS and Android with the same tokens. Button and Input were checked in one flow on both platforms, with enlarged text too, and native differences are written down instead of guessed.',
+      },
+      {
+        q: 'What stops new drift?',
+        a: 'Two things. The web config is generated from Figma, so there’s no hand-kept copy to drift. And every pull request is checked: raw colours, raw shadows and tokens missing a field fail the check.',
+      },
+      {
+        q: 'Can AI agents build Everbreed screens?',
+        a: 'Yes. An agent reads the handoff spec on the Figma canvas, loads the rules for its platform, builds with library components and tokens only, and check-screen compares the result with the library before a designer sees it. The first test screen had 0 issues.',
       },
     ],
     cta: {
@@ -321,6 +1008,7 @@ export const caseStudies: CaseStudy[] = [
 
   {
     slug: 'clerky',
+    wip: true,
     linkName: 'Clerky',
     name: 'Clerky',
     band: 'butter',
@@ -405,6 +1093,7 @@ export const caseStudies: CaseStudy[] = [
 
   {
     slug: 'omnisafe',
+    wip: true,
     linkName: 'Omnisafe',
     name: 'Omnisafe',
     band: 'mauve',
@@ -486,6 +1175,7 @@ export const caseStudies: CaseStudy[] = [
 
   {
     slug: 'flyr',
+    wip: true,
     linkName: 'FLYR Hospitality',
     name: 'FLYR',
     band: 'stone',
@@ -568,8 +1258,18 @@ export const caseStudies: CaseStudy[] = [
 
 export const caseHref = (slug: string) => `/work/${slug}`;
 
+/** the case studies that have a page (work in progress ones are left out) */
+export const publishedCaseStudies = caseStudies.filter((c) => !c.wip);
+
 export function getCaseStudy(slug: string): CaseStudy {
   const found = caseStudies.find((c) => c.slug === slug);
   if (!found) throw new Error(`Unknown case study: ${slug}`);
   return found;
+}
+
+/** the next published case study after this one, following `next` and skipping work in progress */
+export function nextPublished(slug: string): CaseStudy {
+  let c = getCaseStudy(getCaseStudy(slug).next);
+  while (c.wip && c.slug !== slug) c = getCaseStudy(c.next);
+  return c;
 }

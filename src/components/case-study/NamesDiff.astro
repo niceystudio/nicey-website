@@ -1,0 +1,268 @@
+---
+/**
+ * Before/after as a terminal window, for direction A (Emir 19 Nov: no blocks — present it in the direction's own
+ * language). Default = QBench: real variables from the V2 library; V1 had no code name (13 of 553), V2 all (554 of
+ * 554). Everbreed passes its own data (20 Nov: the same window instead of the 210 alias blocks). The switch reprints
+ * the list line by line.
+ */
+type State = { count: number; total?: number; live: string; note: string; more: string };
+interface Props {
+  cap?: string;
+  title?: string;
+  file?: string;
+  tabs?: [string, string];
+  cmd?: string;
+  /** [name, value before, value after] */
+  lines?: [string, string, string][];
+  before?: State;
+  after?: State;
+}
+const qbench: [string, string][] = [
+  ['text/default', 'var(--text-default)'],
+  ['surface/default', 'var(--surface-default)'],
+  ['primitives/primary/600', 'var(--primary-600)'],
+  ['spacing/4', 'var(--spacing-4)'],
+  ['radius/md', 'var(--radius-md)'],
+];
+const {
+  cap = 'QBench · variables',
+  title = 'variables with a name developers can type in CSS',
+  file = 'variables.css',
+  tabs = ['V1 · before', 'V2 · after'],
+  cmd = 'list variables --with-code-name',
+  lines = qbench.map(([n, v]) => [n, 'no code name', v] as [string, string, string]),
+  before = {
+    count: 13,
+    total: 553,
+    live: '13 of 553 variables named',
+    note: 'V1 had 553 variables. Only 13 had a name a developer could type in CSS. The rest showed a raw value.',
+    more: '+ 548 more · 13 named',
+  },
+  after = {
+    count: 554,
+    total: 554,
+    live: '554 of 554 variables named',
+    note: 'In V2 every variable carries its web code name, so designers, developers and agents use the same word.',
+    more: '+ 549 more · all named',
+  },
+} = Astro.props;
+const pad = Math.max(...lines.map(([n]) => n.length)) + 4;
+const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+// one string so no template whitespace ends up inside the <pre>
+const body =
+  `<span class="nd-ps">$</span> ${esc(cmd)}\n\n` +
+  lines
+    .map(
+      ([n, b, a]) =>
+        `<span class="nd-line" data-nd-line><span class="nd-name">${esc(n.padEnd(pad, '.'))}</span><span class="nd-val" data-before="${esc(b)}" data-after="${esc(a)}">${esc(b)}</span></span>`,
+    )
+    .join('') +
+  `\n<span class="nd-more" data-nd-more data-before="${esc(before.more)}" data-after="${esc(after.more)}">${esc(before.more)}</span>`;
+const figs = JSON.stringify({ before, after });
+---
+
+<div class="nd" data-nd data-nd-figs={figs} data-state="0">
+  <div class="nd-copy">
+    <span class="caption nd-cap">{cap}</span>
+    <p class="nd-figure" aria-hidden="true">
+      <span data-nd-count>{before.count}</span>{before.total !== undefined && <span class="nd-of"> / <span data-nd-total>{before.total}</span></span>}
+    </p>
+    <p class="sr-only" aria-live="polite" data-nd-live>{before.live}</p>
+    <h3 class="m-0 nd-title">{title}</h3>
+    <p class="m-0 nd-note" data-nd-note data-before={before.note} data-after={after.note}>{before.note}</p>
+  </div>
+  <div class="nd-win">
+    <div class="nd-bar">
+      <span>{file}</span>
+      <div role="group" aria-label="Show state" class="nd-tabs">
+        <button type="button" data-nd-state="0" aria-pressed="true">{tabs[0]}</button>
+        <button type="button" data-nd-state="1" aria-pressed="false">{tabs[1]}</button>
+      </div>
+    </div>
+    <pre class="nd-body" tabindex="0" aria-label={file} data-nd-body set:html={body} />
+  </div>
+</div>
+
+<style>
+  .nd {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 1px;
+    background: var(--color-line);
+  }
+  .nd > * {
+    background: var(--color-surface);
+  }
+  .nd-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: var(--spacing-cell);
+  }
+  .nd-figure {
+    margin: 12px 0 0;
+    font-family: var(--font-pixel);
+    font-size: clamp(64px, 7vw, 112px);
+    line-height: 0.9;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .nd-of {
+    font-size: 0.42em;
+    color: var(--color-muted);
+  }
+  .nd-title {
+    font-family: var(--font-pixel);
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 1.15;
+  }
+  .nd-note {
+    max-width: 40ch;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--color-ink-2);
+    text-wrap: pretty;
+  }
+  .nd-win {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .nd-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 10px 8px 18px;
+    border-bottom: 1px solid var(--color-line);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-ink);
+  }
+  .nd-tabs {
+    display: inline-flex;
+    border: 1px solid var(--color-line-strong);
+  }
+  .nd-tabs button {
+    min-height: 32px;
+    padding: 0 12px;
+    border: 0;
+    background: transparent;
+    color: var(--color-ink-2);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    cursor: pointer;
+    transition: transform 160ms var(--ease-out);
+  }
+  .nd-tabs button:active {
+    transform: scale(0.97);
+  }
+  .nd-tabs button[aria-pressed='true'] {
+    background: var(--a-block, var(--color-accent));
+    color: var(--a-on-block, var(--color-page));
+  }
+  .nd-body {
+    flex: 1;
+    margin: 0;
+    padding: 28px 26px;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 2;
+    white-space: pre;
+    overflow-x: auto;
+    color: var(--color-ink);
+  }
+  .nd-body :global(.nd-line) {
+    display: block;
+  }
+  .nd-body :global(.nd-ps) {
+    color: var(--color-accent);
+  }
+  .nd-body :global(.nd-name) {
+    color: var(--color-ink-2);
+  }
+  .nd-body :global(.nd-val) {
+    color: var(--color-muted);
+  }
+  [data-state='1'] .nd-body :global(.nd-val) {
+    color: var(--color-accent);
+  }
+  .nd-body :global(.nd-more) {
+    color: var(--color-muted);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .nd-body :global(.nd-line.is-print) {
+      animation: nd-print 260ms steps(5, end) both;
+    }
+  }
+  @keyframes nd-print {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+  .nd-line {
+    display: block;
+  }
+  @media (max-width: 899px) {
+    .nd {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  /* phones: the value moves under its name (20 Nov review: values ran past the edge) */
+  @media (max-width: 560px) {
+    .nd-body {
+      padding: 20px 16px;
+      font-size: 12px;
+      line-height: 1.8;
+    }
+    .nd-body :global(.nd-val) {
+      display: block;
+      padding-left: 2ch;
+      margin-bottom: 4px;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-nd]').forEach((root) => {
+    const count = root.querySelector<HTMLElement>('[data-nd-count]')!;
+    const total = root.querySelector<HTMLElement>('[data-nd-total]');
+    const figs = JSON.parse(root.dataset.ndFigs!);
+    const live = root.querySelector<HTMLElement>('[data-nd-live]')!;
+    const note = root.querySelector<HTMLElement>('[data-nd-note]')!;
+    const more = root.querySelector<HTMLElement>('[data-nd-more]')!;
+    const lines = Array.from(root.querySelectorAll<HTMLElement>('[data-nd-line]'));
+    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-nd-state]'));
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const set = (after: boolean) => {
+      // the state already showing: nothing to reprint (20 Nov motion review)
+      if (root.dataset.state === (after ? '1' : '0')) return;
+      root.dataset.state = after ? '1' : '0';
+      tabs.forEach((t) => t.setAttribute('aria-pressed', String((t.dataset.ndState === '1') === after)));
+      const k = after ? 'after' : 'before';
+      const f = after ? figs.after : figs.before;
+      count.textContent = String(f.count);
+      if (total) total.textContent = String(f.total);
+      live.textContent = f.live;
+      note.textContent = note.dataset[k]!;
+      more.textContent = more.dataset[k]!;
+      lines.forEach((l, i) => {
+        const v = l.querySelector<HTMLElement>('.nd-val')!;
+        l.classList.remove('is-print');
+        const apply = () => {
+          v.textContent = v.dataset[k]!;
+          if (!reduce) {
+            void l.offsetWidth;
+            l.classList.add('is-print');
+          }
+        };
+        reduce ? apply() : window.setTimeout(apply, i * 90);
+      });
+    };
+    tabs.forEach((t) => t.addEventListener('click', () => set(t.dataset.ndState === '1')));
+  });
+</script>

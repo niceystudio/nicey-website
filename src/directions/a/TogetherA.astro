@@ -1,0 +1,119 @@
+---
+/**
+ * Direction A · "Working together" + "What changed for the team" in one band (Emir, 20 Nov: a new layout instead of two
+ * identical heading-left / text-right rows). Two cells side by side in one panel; each ends on its own card: a quote
+ * card (Working together) and a result card (What changed). The card texts are the "to collect" placeholders — the
+ * real quote and result come later from the client.
+ */
+import Gaps from '../../components/case-study/Gaps.astro';
+
+type Block = { text: string; collect: { label: string; text: string } };
+interface Props {
+  together: Block;
+  changed: Block;
+}
+const { together, changed } = Astro.props;
+---
+
+<section aria-labelledby="tg-head" class="container-page tg">
+  <h2 id="tg-head" class="sr-only">Working together and what changed for the team</h2>
+  <div class="panel tg-grid">
+    {
+      [
+        { title: 'Working together', b: together, k: 'Client quote', mark: '“' },
+        { title: 'What changed for the team', b: changed, k: 'Business result', mark: '↗' },
+      ].map((c) => (
+        <div class="tg-cell">
+          <h3 class="tg-title m-0">{c.title}</h3>
+          <p class="tg-text m-0">
+            <Gaps text={c.b.text} />
+          </p>
+          <div class="tg-card">
+            <p class="tg-k m-0">
+              <span aria-hidden="true">{c.mark}</span>
+              {c.k} · to collect
+            </p>
+            <p class="tg-card-text m-0">{c.b.collect.text}</p>
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .tg {
+    padding-top: var(--spacing-section);
+  }
+  /* two cells whose rows line up: title, text and card start on the same lines in both (subgrid) */
+  .tg-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto auto 1fr;
+  }
+  .tg-cell {
+    display: grid;
+    grid-row: span 3;
+    grid-template-rows: subgrid;
+    row-gap: 20px;
+    padding: var(--spacing-cell-lg);
+  }
+  .tg-cell + .tg-cell {
+    border-left: 1px solid var(--color-line);
+  }
+  .tg-title {
+    font-family: var(--font-pixel);
+    font-weight: 400;
+    font-size: clamp(28px, 2.6vw, 40px);
+    line-height: 1.05;
+  }
+  .tg-text {
+    max-width: 48ch;
+    font-size: var(--text-lede);
+    line-height: 1.5;
+    text-wrap: pretty;
+  }
+  /* the same card on both sides: a mono label, then the text that is still to collect */
+  .tg-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 12px;
+    padding: 20px 22px;
+    border: 1px dashed var(--color-dashed);
+    background: var(--color-page);
+  }
+  .tg-k {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-ink-2);
+  }
+  .tg-k span {
+    font-family: var(--font-pixel);
+    font-size: 18px;
+    line-height: 1;
+    color: var(--color-accent);
+  }
+  .tg-card-text {
+    font-size: var(--text-body);
+    line-height: 1.5;
+    color: var(--color-ink-2);
+  }
+  @media (max-width: 860px) {
+    .tg-grid {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: none;
+    }
+    .tg-cell {
+      grid-row: auto;
+      grid-template-rows: none;
+    }
+    .tg-cell + .tg-cell {
+      border-left: 0;
+      border-top: 1px solid var(--color-line);
+    }
+  }
+</style>

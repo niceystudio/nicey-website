@@ -1,0 +1,205 @@
+---
+/**
+ * Direction A: "What we help with" (Goran, 24 Nov: "not sure about the tabs view here … it shows that we lack other services; we need to better
+ * organize a view here for two services" + "mockup used for Everbreed is not good, the UX around the CTA is a bad
+ * example"). The two services side by side, no tabs: Design systems wider (primary), Product design beside it
+ * (alongside). Each card: kicker, title, lede, included/ tree, then its visual on a stage at the bottom.
+ * Product design shows Everbreed's weekly care summary (one clear Continue button) instead of the weight log.
+ */
+import QBenchWork from '../../components/case-study/QBenchWork.astro';
+
+const services = [
+  {
+    id: 'design-systems',
+    label: 'Design systems',
+    kicker: 'Primary practice',
+    lede: 'For products with years of drift, and teams that want their coding agents to build on-system.',
+    items: [
+      'Audit and consolidation',
+      'Token architecture and theming',
+      'Component library, Figma to code',
+      'AI-ready documentation',
+      'Systems partner, monthly',
+      'Free audit to start',
+    ],
+    visual: 'qbench',
+    stage: 'bg-lavender',
+  },
+  {
+    id: 'product-design',
+    label: 'Product design',
+    kicker: 'Alongside',
+    lede: 'Complex workflows designed on the system we build, so new screens ship consistent from day one.',
+    items: ['Product and UX design', 'Design engineering', 'AI workflows in delivery'],
+    visual: 'phone',
+    stage: 'bg-peach',
+  },
+];
+---
+
+<section id="services" aria-labelledby="services-head" class="container-page sc2-sec">
+  <div class="flex flex-col gap-3.5">
+    <span class="caption text-ink-2">What we help with</span>
+    <h2 id="services-head" class="m-0 text-h2 max-w-[16ch]">Design systems first. Product design alongside.</h2>
+  </div>
+
+  <div class="sc2-grid">
+    {
+      services.map((s) => (
+        <article class:list={['sc2-card', `sc2-card--${s.id}`]} aria-labelledby={`sc2-${s.id}`}>
+          <div class="sc2-text">
+            <span class="caption text-ink-2">{s.kicker}</span>
+            <h3 id={`sc2-${s.id}`} class="sc2-h m-0">{s.label}</h3>
+            <p class="m-0 sc2-lede">{s.lede}</p>
+            <div class="sc2-tree" aria-label="What's included">
+              <span class="sc2-tree-root">included/</span>
+              <ul>
+                {s.items.map((item, k) => (
+                  <li>
+                    <span class="sc2-branch" aria-hidden="true">{k === s.items.length - 1 ? '└──' : '├──'}</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          <figure class:list={['sc2-stage a-grain m-0', s.stage]}>
+            {s.visual === 'qbench' ? (
+              <QBenchWork terminal bare />
+            ) : (
+              <div class="sc2-phone">
+                <video muted loop playsinline preload="none" poster="/work/everbreed/mobile-care.webp" aria-label="Everbreed student app: the weekly care summary, seven days cared for, added to the Project Book" data-sc2-video>
+                  <source src="/work/everbreed/mobile-care.webm" type="video/webm" />
+                </video>
+              </div>
+            )}
+          </figure>
+        </article>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .sc2-sec {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+    padding-top: var(--spacing-section);
+    padding-bottom: var(--spacing-section);
+  }
+  /* design systems wider: it is the primary practice */
+  .sc2-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: 24px;
+    align-items: stretch;
+  }
+  @media (max-width: 1023px) {
+    .sc2-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  .sc2-card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--a-rule);
+    background: var(--color-surface);
+  }
+  .sc2-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 40px 40px 36px;
+    flex: 1;
+  }
+  @media (max-width: 639px) {
+    .sc2-text {
+      padding: 28px 24px;
+    }
+  }
+  .sc2-h {
+    font-family: var(--font-pixel);
+    font-weight: 400;
+    font-size: 40px;
+    line-height: 1.05;
+  }
+  .sc2-lede {
+    max-width: 44ch;
+    font-size: 17px;
+    line-height: 1.5;
+    color: var(--color-ink-2);
+    text-wrap: pretty;
+  }
+  .sc2-tree {
+    width: 100%;
+    margin-top: 4px;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 2;
+  }
+  .sc2-tree-root {
+    color: var(--color-accent);
+  }
+  .sc2-tree ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .sc2-tree li {
+    display: flex;
+    gap: 10px;
+  }
+  .sc2-branch {
+    color: var(--a-dim);
+  }
+  /* both stages the same height so the two cards end on one line */
+  .sc2-stage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 440px;
+    padding: 32px;
+    border-top: 1px solid var(--a-rule);
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+  }
+  @media (max-width: 639px) {
+    .sc2-stage {
+      height: auto;
+      padding: 24px;
+    }
+  }
+  .sc2-stage > :global(.qw) {
+    width: 100%;
+  }
+  .sc2-phone {
+    width: 180px;
+    aspect-ratio: 393 / 852;
+    padding: 7px;
+    border-radius: 34px;
+    background: var(--color-band);
+  }
+  .sc2-phone video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 27px;
+    object-fit: cover;
+  }
+</style>
+
+<script>
+  // the phone clip plays only while it is on screen; reduced motion keeps the poster
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const io = new IntersectionObserver((es) =>
+    es.forEach((e) => {
+      const v = e.target as HTMLVideoElement;
+      if (e.isIntersecting && !reduced) v.play().catch(() => {});
+      else v.pause();
+    }),
+  );
+  document.querySelectorAll<HTMLVideoElement>('[data-sc2-video]').forEach((v) => io.observe(v));
+</script>

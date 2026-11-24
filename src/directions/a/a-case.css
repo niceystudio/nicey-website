@@ -1,0 +1,544 @@
+/*
+ * Direction A on the case-study pages (review: /lab/a/<slug>). Same page and copy as the live case study; only the
+ * direction changes: pixel face for names, headings and figures, the client name printed on a block like the hero,
+ * square corners, `//` captions, sentence-case small labels. Scoped to .dir-a, loaded only by the lab page.
+ */
+
+/* the client name, printed on a block (like the homepage hero) */
+.dir-a .text-case-name {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 0.06em 0.14em 0.02em;
+  font-family: var(--font-pixel);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1;
+  text-transform: uppercase;
+  background: var(--color-ink);
+  color: var(--color-page);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .dir-a .text-case-name {
+    animation: a-case-print 520ms steps(6, end) both;
+  }
+}
+@keyframes a-case-print {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* headings and figures in the pixel face */
+.dir-a .text-case-h1,
+.dir-a .text-case-h2,
+.dir-a .cs-num-fig {
+  font-family: var(--font-pixel);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+/* captions read as paths, like the homepage */
+.dir-a .cs .caption:not(.caption-sm)::before {
+  content: '//\00a0';
+  color: var(--color-accent);
+}
+
+/* square everything that the shared radius tokens don't reach */
+.dir-a .cs :where(.rounded, [class*='rounded-'], .cs-audit, .cs-shot, .panel, .chip, img, video) {
+  border-radius: 0 !important;
+}
+
+/* ---------- hero, pass 1 (Emir 19 Nov, test) ---------- */
+/* 1 · no filled colour band: the page and its dot grid, like the homepage hero; the colour lives on the name block */
+.dir-a .cs > section:first-child {
+  background: transparent !important;
+}
+.dir-a .text-case-name {
+  background: var(--a-block);
+  color: var(--a-on-block);
+}
+/* 5 · the statement steps down so the name block is the one main element */
+.dir-a .cs-hero .text-case-h1 {
+  font-size: clamp(24px, 2.6vw, 36px);
+  line-height: 1.12;
+}
+/* 4 · copy and window end on the same bottom line */
+@media (min-width: 1100px) {
+  .dir-a .cs-hero-top--visual {
+    align-items: end;
+  }
+}
+/* 2 · the window: no caption that narrates it; A's window chrome and tabs */
+.dir-a .cs-hero-context {
+  display: none;
+}
+.dir-a .qh-card {
+  border-color: var(--color-ink);
+  box-shadow: 6px 6px 0 color-mix(in srgb, var(--color-accent) 70%, transparent);
+}
+.dir-a .qh-bar {
+  border-bottom: 1px solid var(--color-ink);
+}
+.dir-a .qh-mono {
+  text-transform: none !important;
+  letter-spacing: 0.02em !important;
+  color: var(--color-ink) !important;
+}
+.dir-a .qh-seg {
+  padding: 0;
+  gap: 0;
+  border-radius: 0 !important;
+}
+.dir-a .qh-seg button {
+  border-radius: 0 !important;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
+.dir-a .qh-seg button[aria-pressed='true'] {
+  background: var(--a-block) !important;
+  color: var(--a-on-block) !important;
+}
+/* 3 · the facts row (Company, Team, Stack…) is not rendered in A (CaseStudy noFacts) — Emir 19 Nov */
+
+/* the closing CTA uses the homepage closing look (shared .closing rules in a.css); a rule above it like the homepage */
+.dir-a .cs-cta.closing {
+  border-top: 1px solid var(--a-rule);
+}
+
+/* ---------- "What we did" (Chapters) in A — approved 19 Nov ----------
+ * File-like tabs (mono, accent line on top of the open one), no colour markers, sentence-case labels, pixel figures,
+ * segmented meters, square arrow keys; step 01 reports problems (status in hot). */
+.dir-a [data-chapters] .marker {
+  display: none !important;
+}
+/* tabs */
+.dir-a [data-chapters] .chs-tab {
+  gap: 4px;
+  padding: 16px 20px 14px;
+}
+.dir-a [data-chapters] .chs-tab::after {
+  top: -1px;
+  bottom: auto;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+.dir-a [data-chapters] .chs-tab[aria-selected='true'] {
+  background: var(--color-page);
+}
+.dir-a [data-chapters] .chs-tab[aria-selected='true']::after {
+  background: var(--a-block);
+}
+.dir-a [data-chapters] .chs-tab > span:first-child {
+  color: var(--color-accent) !important;
+}
+.dir-a [data-chapters] .chs-tab-name {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 400 !important;
+}
+.dir-a [data-chapters] .chs-tab + .chs-tab {
+  border-left: 1px solid var(--color-line);
+}
+/* the step caption: no double `//` + marker, sentence case */
+.dir-a [data-chapters] .ch-head > .caption {
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+/* small labels inside the steps: sentence case */
+.dir-a [data-chapters] .caption-sm {
+  text-transform: none !important;
+  letter-spacing: 0.02em !important;
+}
+/* figures in the pixel face */
+.dir-a [data-chapters] .ch-fig {
+  font-family: var(--font-pixel);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+/* meters: square, segmented like pixels */
+.dir-a [data-chapters] .ch-meter {
+  height: 8px;
+  border-radius: 0 !important;
+  background: repeating-linear-gradient(90deg, var(--color-cell-quiet) 0 6px, transparent 6px 8px);
+}
+.dir-a [data-chapters] .ch-meter > span {
+  background: repeating-linear-gradient(90deg, var(--a-block) 0 6px, transparent 6px 8px);
+}
+/* arrow keys: square */
+.dir-a [data-chapters] .chs-btn {
+  border-radius: 0 !important;
+}
+.dir-a [data-chapters] .chs-btn--next {
+  border-color: var(--a-block);
+  background: var(--a-block);
+  color: var(--a-on-block);
+}
+
+/* step 01 reports problems: the status reads as a warning, not a pass */
+.dir-a [data-chapters] .chs-tabs + .ch .ch-pass,
+.dir-a [data-chapters] .chs-tabs ~ .ch:nth-of-type(1) .ch-pass {
+  color: var(--color-hot) !important;
+  border-color: currentColor !important;
+  background: transparent !important;
+}
+.dir-a [data-chapters] .ch-fig-sm {
+  font-family: var(--font-pixel);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+/* ---------- The agentic layer as one split terminal — approved 19 Nov ----------
+ * Two panes in one window (unlike See it work's single terminal), prompt lines that print in steps, the lint line
+ * flashes once, results = QBench's own primary button. */
+.dir-a .agc-panel {
+  border: 1px solid var(--color-ink) !important;
+  background: var(--color-ink) !important;
+  gap: 0 !important;
+}
+.dir-a .agc-panel > * {
+  background: var(--color-surface);
+}
+.dir-a .agc-bar {
+  border-bottom: 1px solid var(--color-ink);
+}
+.dir-a .agc-mono {
+  text-transform: none !important;
+  letter-spacing: 0.02em !important;
+  color: var(--color-ink) !important;
+}
+.dir-a .agc-replay {
+  border-radius: 0 !important;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
+.dir-a .agc-replay::before {
+  content: '↻\00a0';
+}
+/* two panes: a vertical rule between them, each pane titled like a log */
+.dir-a .agc-col + .agc-col {
+  border-left: 1px solid var(--color-ink) !important;
+}
+.dir-a .agc-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono) !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.02em;
+}
+.dir-a .agc-title::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: var(--color-hot);
+}
+.dir-a .agc-col--gate .agc-title::before {
+  background: var(--a-block);
+}
+/* every line is a prompt */
+.dir-a .agc-log li > span::before {
+  content: '$\00a0';
+  color: var(--color-accent);
+}
+.dir-a .agc-log li.is-bad > span::before,
+.dir-a .agc-log li.is-ok > span::before {
+  content: '';
+}
+.dir-a .agc-col:not(.agc-col--gate) .agc-log li.is-bad > span::before {
+  content: '✕\00a0';
+}
+/* lines print in steps; the lint line flashes once — that's where the two runs part */
+@media (prefers-reduced-motion: no-preference) {
+  .dir-a .agc [data-at].is-on {
+    animation: agc-print 360ms steps(6, end) both;
+  }
+  .dir-a .agc-col--gate .agc-log li.is-bad.is-on {
+    animation:
+      agc-print 360ms steps(6, end) both,
+      agc-flash 1100ms 360ms ease-out both;
+  }
+}
+@keyframes agc-print {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes agc-flash {
+  0% {
+    background: color-mix(in srgb, var(--color-accent) 34%, transparent);
+  }
+  100% {
+    background: transparent;
+  }
+}
+/* the results: QBench's own primary button (same as the hero dialog and step 04 · States, Emir 19 Nov):
+   with the gate = the real button (#244d9e, white, 6 px corners); without = the same button with no colour,
+   marked by a dashed hot outline */
+.dir-a .agc-shot {
+  border-radius: 0 !important;
+}
+.dir-a .agc-btn {
+  padding: 9px 16px !important;
+  border-radius: 6px !important;
+  font-family: var(--font-sans) !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+.dir-a .agc-btn--ok {
+  background: #244d9e !important;
+  color: #fff !important;
+}
+.dir-a .agc-btn--empty {
+  background: transparent !important;
+  color: var(--color-ink) !important;
+  border: 1px dashed var(--color-hot) !important;
+}
+
+/* ---------- See it work / What the agent reads — approved 19 Nov ----------
+ * No colour band, stage in a 1px-ruled container, sentence-case labels, the picked state in accent text only (no fill, no line),
+ * the agent terminal as A's window. */
+.dir-a [data-qw] .qw-stage {
+  background: var(--color-surface) !important;
+  border: 1px solid var(--color-line);
+  border-radius: 0 !important;
+}
+.dir-a [data-qw] .qw-mono,
+.dir-a [data-qw] .qw-state-n,
+.dir-a [data-qw] .qw-agent-bar,
+.dir-a [data-qw] .qw-agent-k,
+.dir-a [data-qw] .qw-agent-src,
+.dir-a [data-qw] .qw-cap,
+.dir-a [data-qw] .qw-cap-k {
+  text-transform: none !important;
+  letter-spacing: 0.02em !important;
+}
+/* the state numbers read as A's tabs: square, accent when pressed */
+.dir-a [data-qw] .qw-state-n {
+  border-radius: 0 !important;
+}
+/* the picked state: accent text only (Emir 19 Nov: no filled bar, no underline) */
+.dir-a [data-qw] .qw-state-n {
+  background: transparent !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+.dir-a [data-qw] .qw-state[aria-pressed='true'] .qw-state-n {
+  background: transparent !important;
+  color: var(--color-accent) !important;
+}
+/* the picked card keeps an ink outline in both themes (the fixed #26251f vanished on A's dark stage — 20 Nov review) */
+.dir-a [data-qw] .qw-state[aria-pressed='true'] .qw-field {
+  outline-color: var(--color-ink);
+}
+/* the five state cards: warm grey like the page, so they stand out from the white stage; the fields stay white
+   (Emir, 20 Nov). :where() keeps the field rule weaker than the hover/focus/disabled/error states. */
+.dir-a [data-qw] .qw-field {
+  background: #f3f0e9 !important;
+}
+.dir-a [data-qw] :where(.qw-input) {
+  background: #fff;
+}
+/* the agent terminal: A's window */
+.dir-a [data-qw] .qw-agent {
+  border-radius: 0 !important;
+  border: 1px solid var(--color-ink);
+}
+.dir-a [data-qw] .qw-agent-bar {
+  border-bottom: 1px solid var(--color-ink);
+}
+.dir-a [data-qw] .qw-dot {
+  border-radius: 0 !important;
+  background: var(--a-block) !important;
+}
+.dir-a [data-qw] .qw-cap-k::before {
+  content: '//\00a0';
+  color: var(--color-accent);
+}
+
+
+/* ---------- status workflows hero — approved 19 Nov ---------- */
+/* ---- status workflows hero : the same treatment as QBench's approved hero ----
+ * no facts row (noFacts), the hero context line hidden (a-case.css), and the "Status change" card as A's window:
+ * ink rule, accent offset shadow, sentence-case mono labels, square chips (pressed = accent), square step dots. */
+.dir-a [data-sh] .sh-card {
+  border: 1px solid var(--color-ink) !important;
+  border-radius: 0 !important;
+  box-shadow: 6px 6px 0 color-mix(in srgb, var(--color-accent) 70%, transparent);
+}
+.dir-a [data-sh] .sh-bar {
+  border-bottom: 1px solid var(--color-ink) !important;
+}
+.dir-a [data-sh] .sh-mono,
+.dir-a [data-sh] .sh-k {
+  text-transform: none !important;
+  letter-spacing: 0.02em !important;
+}
+.dir-a [data-sh] .sh-mono:first-child {
+  color: var(--color-ink) !important;
+}
+.dir-a [data-sh] .sh-live i {
+  border-radius: 0 !important;
+  background: var(--a-block) !important;
+}
+.dir-a [data-sh] .sh-chip {
+  border-radius: 0 !important;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.dir-a [data-sh] .sh-chip[aria-pressed='true'] {
+  background: var(--a-block) !important;
+  color: var(--a-on-block) !important;
+  border-color: var(--a-block) !important;
+}
+.dir-a [data-sh] .sh-dot {
+  border-radius: 0 !important;
+}
+.dir-a [data-sh] .sh-steps > li.is-on .sh-dot {
+  background: var(--a-block) !important;
+  border-color: var(--a-block) !important;
+}
+
+/* ---------- 20 Nov audit — approved (Emir), on every A case page ----------
+ * 1. What we did: the tabs are the navigation; the prev/next arrows under the steps are hidden.
+ * 2. The closing CTA has no band in A: a full-width line closes it like the one that opens it, then the usual gap
+ *    before Next case study.
+ * 3. The purple offset shadow stays on the hero cards only — removed from the gate panel and the agent terminal above. */
+.dir-a [data-chapters] .chs-controls {
+  display: none;
+}
+.dir-a .cs-cta.closing {
+  border-bottom: 1px solid var(--a-rule);
+}
+
+/* ---------- Status workflows · Before / after diagram in A (Emir, 20 Nov audit: fix directly, no test) ----------
+ * It was the last part of the page still in the live site's rounded look: pill chips, rounded model box, sans figure.
+ * Now A's language: square chips and model box, square end markers, the figure in the pixel face. */
+.dir-a [data-sf] .sf-figure {
+  font-family: var(--font-pixel);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.dir-a [data-sf] .sf-of {
+  margin-left: 0.15em;
+  font-family: var(--font-sans);
+}
+.dir-a [data-sf] .sf-src rect,
+.dir-a [data-sf] .sf-before rect,
+.dir-a [data-sf] .sf-model {
+  rx: 0;
+  ry: 0;
+}
+
+/* ---------- 20 Nov review, group B — approved (Emir; the Work preview change was not) ----------
+ * 10. The last rounded / sans details in A: Next case title in the pixel face, a square arrow, a square Machine pane.
+ * 12. What we did: a panel's entrance plays once (.is-seen after you leave it); the row staggers at 60ms, not 120ms.
+ * 13. Status See it work: the new screen fades in over the old one (no see-through mid-swap). */
+.dir-a .cs-next-name {
+  font-family: var(--font-pixel);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.dir-a .cs-next-arrow,
+.dir-a .qh-machine {
+  border-radius: 0 !important;
+}
+.dir-a .ch.is-seen .ch-run > li,
+.dir-a .ch.is-seen .ch-meters--scan .ch-meter > span,
+.dir-a .ch.is-seen .ch-map > li,
+.dir-a .ch.is-seen .ch-map > li .ch-code--accent,
+.dir-a .ch.is-seen .ch-surf > li,
+.dir-a .ch.is-seen .ch-order-list > li {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .dir-a .ch:not([hidden]) .ch-map > li {
+    animation-duration: 400ms !important;
+    animation-timing-function: var(--ease-out) !important;
+  }
+  .dir-a .ch:not([hidden]) .ch-map > li:nth-child(2) { animation-delay: 60ms !important; }
+  .dir-a .ch:not([hidden]) .ch-map > li:nth-child(3) { animation-delay: 120ms !important; }
+  .dir-a .ch:not([hidden]) .ch-map > li:nth-child(4) { animation-delay: 180ms !important; }
+  .dir-a .ch:not([hidden]) .ch-map > li:nth-child(5) { animation-delay: 240ms !important; }
+  .dir-a .ch:not([hidden]) .ch-order-list > li {
+    animation-delay: calc(var(--i) * 60ms + 80ms) !important;
+  }
+}
+/* the outgoing screen stays fully visible until the new one has faded in on top of it */
+.dir-a [data-ss] .ss-screen {
+  background: var(--color-surface);
+  transition: opacity 0s linear 220ms;
+}
+.dir-a [data-ss] .ss-screen.is-on {
+  z-index: 1;
+  transition: opacity 220ms var(--ease-out);
+}
+
+/* ---------- Everbreed hero in A (Emir, 20 Nov — test page /lab/a/everbreed-test) ----------
+ * 1. The name block fits its column: a long name (EVERBREED, 9 letters) ran into the window. The size comes from the
+ *    column width and the letter count (pixel face ≈ 0.55em a letter + 1em of block padding); QBench stays ~128px.
+ * 2. The Figma ↔ code window in A's chrome, like QBench's: ink rule, accent offset shadow, square cells, sentence-case
+ *    mono labels. */
+.dir-a .cs-hero-copy {
+  container-type: inline-size;
+}
+.dir-a .text-case-name {
+  font-size: min(var(--text-case-name), calc(100cqi / (var(--name-len, 6) * 0.55 + 1.02)));
+}
+.dir-a [data-eh] .eh-card {
+  border-color: var(--color-ink);
+  border-radius: 0;
+  box-shadow: 6px 6px 0 color-mix(in srgb, var(--color-accent) 70%, transparent);
+}
+.dir-a [data-eh] .eh-bar {
+  border-bottom: 1px solid var(--color-ink);
+}
+.dir-a [data-eh] .eh-mono {
+  text-transform: none;
+  letter-spacing: 0.02em;
+  color: var(--color-ink);
+}
+.dir-a [data-eh] .eh-b-cell,
+.dir-a [data-eh] .eh-b-link em {
+  border-radius: 0;
+}
+
+/* ---------- What we did in A, from the Everbreed pass (Emir, 20 Nov) — every A case page ----------
+ * The dark "from spec to screen" run was still rounded (12px) on Everbreed and QBench: square, like every A window.
+ * Row labels that are code ($figmaId, $property, $codeSyntax) read in mono, like QBench's variable → code-name list. */
+.dir-a [data-chapters] .ch-run {
+  border-radius: 0 !important;
+}
+.dir-a [data-chapters] .ch-rows-code {
+  font-family: var(--font-mono);
+  font-size: 15px;
+}
+
+/* ---------- Everbreed · What we built in A (Emir, 20 Nov) ----------
+ * A squares every img/video; the phone keeps its real screen corners so they don't poke past the rounded frame. */
+.dir-a .cs .ep-video {
+  border-radius: 42px !important;
+}
+
+/* ---------- Status workflows: the What we did rail ([data-rail-a]) — approved (Emir, 20 Nov) ----------
+ * The heading broke into 6 lines in the narrow sticky column and pushed the step list down: a wider column, a
+ * smaller heading (3–4 lines), and the rail sticks below the header (it went under it at top: 24px). */
+.dir-a[data-rail-a] .ch-rail {
+  flex-basis: 360px;
+  top: 104px;
+}
+.dir-a[data-rail-a] .ch-rail h2 {
+  font-size: clamp(30px, 2.8vw, 40px);
+  line-height: 1.1;
+}

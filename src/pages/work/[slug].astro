@@ -1,15 +1,27 @@
 ---
+/** One case study page, in direction A · Select. QBench and Everbreed carry the layout changes from the A review. */
 import type { GetStaticPaths } from 'astro';
+import '../../directions/a/a.css';
+import '../../directions/a/a-case.css';
 import CaseStudy from '../../components/case-study/CaseStudy.astro';
-import { caseStudies, type CaseStudy as Study } from '../../data/case-studies';
+import { publishedCaseStudies, type CaseStudy as Study } from '../../data/case-studies';
 
 export const getStaticPaths = (() =>
-  caseStudies.map((study) => ({ params: { slug: study.slug }, props: { study } }))) satisfies GetStaticPaths;
+  publishedCaseStudies.map((study) => ({ params: { slug: study.slug }, props: { study } }))) satisfies GetStaticPaths;
 
 interface Props {
   study: Study;
 }
 const { study } = Astro.props;
+const slug = study.slug;
 ---
 
-<CaseStudy study={study} />
+{slug === 'qbench-design-system' ? (
+  <CaseStudy study={study} direction="a" noFacts namesLook="diff" ctaLook="closing" chaptersA layoutA projectA filmA />
+) : slug === 'qbench-status-workflows' ? (
+  <CaseStudy study={study} direction="a" noFacts ctaLook="closing" workFirst togetherA railA projectA filmA />
+) : slug === 'everbreed' ? (
+  <CaseStudy study={study} direction="a" noFacts namesLook="diff" ctaLook="closing" togetherA projectA filmA />
+) : (
+  <CaseStudy study={study} direction="a" noFacts ctaLook="closing" />
+)}

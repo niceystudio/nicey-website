@@ -1,0 +1,24 @@
+/* Direction A on the 404 (review: /lab/a/404). "404" printed on the accent block in the pixel face; the headline in
+   the pixel face; no blocks (Emir 19 Nov). Loaded only by the lab page. */
+.dir-a .nf-code {
+  display: inline-block;
+  justify-self: start;
+  margin: 0;
+  padding: 0.04em 0.12em 0;
+  font-family: var(--font-pixel);
+  font-size: clamp(96px, 15vw, 220px);
+  line-height: 1;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+  background: var(--a-block);
+  color: var(--a-on-block);
+}
+.dir-a .nf-h {
+  font-family: var(--font-pixel);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.dir-a .nf-copy > .caption::before {
+  content: '//\00a0';
+  color: var(--color-accent);
+}

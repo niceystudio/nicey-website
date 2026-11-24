@@ -1,0 +1,602 @@
+---
+/**
+ * TEST (Emir 24 Nov, after Bitovi's ratings case study): a short case-study "film" in three scenes, drawn in code
+ * (sharp, light, not a video file). One stage, a chapter bar on top; scenes play one after another while the
+ * stage is on screen, and the chapters can be clicked.
+ *   01 Components — the QBench library as a wall of real components; a cursor uses them, and under each tile the
+ *      name the library uses updates (component · prop · state). Tags are status badges, so they are not clicked;
+ *      no toast (Emir: too much detail, and not the real one).
+ *   02 Variables  — the collections (real counts from the QBench file) and the chain behind the primary button:
+ *      primitive → semantic token → the button in that state.
+ *   03 Agent docs — an agent reads the component docs written for it (Input.md, Button.md, Tag.md) and builds the
+ *      "Report new CAPA" dialog from the library; a log says what it used and that no raw value slipped in.
+ * QBench's own light look in both themes (same values as QBenchHero). Reduced motion: finished scenes, no cursor.
+ * NOTE: hover / pressed token names in scene 2 follow the default's pattern — check them against the QBench file.
+ */
+import './film.css';
+
+const chapters = ['Components', 'Variables', 'Agent docs'];
+const collections = [
+  ['Semantic Tokens', 179],
+  ['Primitives', 256],
+  ['Dimensions', 84],
+  ['Typography', 28],
+  ['Elevation', 6],
+] as const;
+const chain = [
+  { state: 'default', prim: 'primitives/primary/800', hex: '#244d9e', token: 'button/surface/solid/primary/default' },
+  { state: 'hover', prim: 'primitives/primary/900', hex: '#1b3c7d', token: 'button/surface/solid/primary/hover' },
+  { state: 'focus', prim: 'ring/ring-selected', hex: '#244d9e', token: 'effect · ring', ring: true },
+];
+const doc = [
+  ['h', 'Input'],
+  ['p', 'Single-line fields for typing short values.'],
+  ['k', 'Use for'],
+  ['li', 'A short, single-line value: names, IDs, emails, numbers.'],
+  ['k', 'Not for'],
+  ['li', 'Long or multi-line text → TextArea.'],
+  ['k', 'Structure'],
+  ['p', 'Label + .FieldBackplate (.FieldText inside) + helper or error text.'],
+  ['k', 'Props'],
+  ['code', 'state: default | focus | filled | error'],
+] as const;
+const log = [
+  ['you', '› build the "Report new CAPA" dialog'],
+  ['dim', '● reading Input.md · Tag.md · Button.md'],
+  ['ok', '✓ Input · state default · from the library'],
+  ['ok', '✓ Tag · status open / in-review / closed'],
+  ['ok', '✓ Button · tone primary for the main action'],
+  ['ok', '✓ check · every value from a token · 0 raw colours'],
+] as const;
+---
+
+<section aria-label="The QBench system in three short scenes" class="container-page cw" data-film="qbench">
+  <div class="cw-bar" role="tablist" aria-label="Scenes">
+    {
+      chapters.map((c, i) => (
+        <button type="button" role="tab" aria-selected={i === 0 ? 'true' : 'false'} data-cw-ch={i}>
+          <span class="cw-ch-n">{String(i + 1).padStart(2, '0')}</span> {c}
+          <span class="cw-ch-fill" aria-hidden="true"></span>
+        </button>
+      ))
+    }
+  </div>
+
+  <div class="cw-stage a-grain">
+    <!-- ───────── scene 1 · components ───────── -->
+    <div class="cw-scene" data-cw-scene="0">
+      <div class="cw-grid">
+        <div class="cw-tile cw-in">
+          <div class="q-field">
+            <span class="q-label">Title *</span>
+            <span class="q-input" data-cw-input><span data-cw-type></span><span class="q-caret" aria-hidden="true"></span></span>
+            <span class="q-help">Short and specific, e.g. where it happened.</span>
+          </div>
+          <span class="cw-name" data-cw-name="in">Input · state default</span>
+        </div>
+        <div class="cw-tile cw-bt">
+          <div class="q-row">
+            <span class="q-btn q-btn--ghost">Cancel</span>
+            <span class="q-btn q-btn--critical">Delete</span>
+            <span class="q-btn q-btn--primary" data-cw-btn>Create CAPA</span>
+          </div>
+          <span class="cw-name" data-cw-name="bt">Button · tone primary · default</span>
+        </div>
+        <div class="cw-tile cw-tg">
+          <div class="q-toggle-row">
+            <span class="q-toggle" data-cw-toggle><span></span></span>
+            <span class="q-tlabel">Notify reviewers</span>
+          </div>
+          <span class="cw-name" data-cw-name="tg">Switch · checked false</span>
+        </div>
+        <div class="cw-tile cw-tb">
+          <div class="q-table" role="presentation">
+            <div class="q-tr q-th"><span></span><span>CAPA</span><span>Owner</span><span>Status</span></div>
+            <div class="q-tr" data-cw-row><span class="q-check" data-cw-check></span><span>CAPA-104</span><span>Lab A</span><span class="q-tag q-tag--open">Open</span></div>
+            <div class="q-tr"><span class="q-check"></span><span>CAPA-103</span><span>Lab B</span><span class="q-tag q-tag--review">In review</span></div>
+            <div class="q-tr"><span class="q-check"></span><span>CAPA-102</span><span>QA</span><span class="q-tag q-tag--closed">Closed</span></div>
+          </div>
+          <span class="cw-name" data-cw-name="tb">Table · row selected false</span>
+        </div>
+        <div class="cw-tile cw-st">
+          <div class="q-tags">
+            <span class="q-tag q-tag--open q-tag--lg">Open</span>
+            <span class="q-tag q-tag--review q-tag--lg">In review</span>
+            <span class="q-tag q-tag--closed q-tag--lg">Closed</span>
+          </div>
+          <span class="cw-name">Tag · status</span>
+        </div>
+        <div class="cw-tile cw-ts">
+          <div class="q-tabs">
+            <span class="q-tab is-on" data-cw-tab="0">Overview</span>
+            <span class="q-tab" data-cw-tab="1">Tests</span>
+            <span class="q-tab" data-cw-tab="2">History</span>
+          </div>
+          <span class="cw-name" data-cw-name="ts">Tabs · selected overview</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───────── scene 2 · variables ───────── -->
+    <div class="cw-scene" data-cw-scene="1" hidden>
+      <div class="sv">
+        <div class="cw-tile sv-coll">
+          <span class="q-label">Variables</span>
+          <ul class="sv-list">
+            {
+              collections.map(([n, c], i) => (
+                <li data-sv-coll={i}>
+                  <span>{n}</span>
+                  <span class="sv-count">{c}</span>
+                </li>
+              ))
+            }
+          </ul>
+          <span class="cw-name">553 variables · each with a code name</span>
+        </div>
+        <div class="cw-tile sv-chain">
+          <div class="sv-head"><span>Primitive</span><span></span><span>Semantic token</span><span></span><span>State</span></div>
+          {
+            chain.map((r, i) => (
+              <div class="sv-row" data-sv-row={i}>
+                <span class="sv-chip">
+                  <span class:list={['sv-sw', r.ring && 'sv-sw--ring']} style={`--sw:${r.hex}`}></span>
+                  {r.prim}
+                </span>
+                <span class="sv-arr" aria-hidden="true"></span>
+                <span class="sv-chip sv-chip--tok">{r.token}</span>
+                <span class="sv-arr" aria-hidden="true"></span>
+                <span class="sv-state">{r.state}</span>
+              </div>
+            ))
+          }
+          <div class="sv-preview">
+            <span class="q-btn q-btn--primary" data-sv-btn>Create CAPA</span>
+            <span class="cw-name" data-sv-name>Button · tone primary · default</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───────── scene 3 · agent docs ───────── -->
+    <div class="cw-scene" data-cw-scene="2" hidden>
+      <div class="sa3">
+        <div class="cw-tile sa3-doc">
+          <span class="sa3-file">Input.md · written for people and agents</span>
+          <div class="sa3-md">
+            {
+              doc.map(([k, t], i) => (
+                <p class:list={['m-0', `md-${k}`]} data-md={i}>
+                  {k === 'li' ? '– ' : ''}
+                  {t}
+                </p>
+              ))
+            }
+          </div>
+        </div>
+        <div class="sa3-log">
+          <span class="sa3-file sa3-file--dark">agent · session</span>
+          <div class="sa3-lines">
+            {log.map(([k, t], i) => <p class:list={['m-0', `lg-${k}`]} data-lg={i}>{t}</p>)}
+          </div>
+        </div>
+        <div class="cw-tile sa3-out">
+          <div class="qd" data-qd>
+            <span class="qd-title" data-qd-p="0">Report new CAPA</span>
+            <span class="q-label" data-qd-p="1">Title *</span>
+            <span class="q-input" data-qd-p="1">Temperature excursion in cold storage</span>
+            <span class="q-label" data-qd-p="2">Status</span>
+            <span class="q-tags" data-qd-p="2">
+              <span class="q-tag q-tag--open">Open</span>
+              <span class="q-tag q-tag--review">In review</span>
+              <span class="q-tag q-tag--closed">Closed</span>
+            </span>
+            <span class="qd-actions" data-qd-p="3">
+              <span class="q-btn q-btn--ghost">Cancel</span>
+              <span class="q-btn q-btn--primary">Create CAPA</span>
+            </span>
+          </div>
+          <span class="cw-name">Built from the library · no new components</span>
+        </div>
+      </div>
+    </div>
+
+    <svg class="cw-cursor" data-cw-cursor aria-hidden="true" width="22" height="22" viewBox="0 0 22 22"
+      ><path d="M3 2l15 8.2-6.6 1.6L8.6 18z" fill="#1f2a3d" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"></path></svg
+    >
+  </div>
+</section>
+
+<style>
+  /* scene 2 */
+  .sv {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    gap: 16px;
+    min-height: 440px;
+  }
+  @media (max-width: 1023px) {
+    .sv {
+      grid-template-columns: minmax(0, 1fr);
+      min-height: 0;
+    }
+  }
+  .sv-coll {
+    justify-content: flex-start;
+  }
+  .sv-coll > .cw-name {
+    margin-top: auto;
+  }
+  .sv-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .sv-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 9px 12px;
+    border-radius: 6px;
+    transition: background-color 200ms;
+  }
+  .sv-list li.is-on {
+    background: #eef3fc;
+  }
+  .sv-count {
+    font-family: var(--font-mono);
+    color: #6b7588;
+  }
+  .sv-chain {
+    justify-content: flex-start;
+    gap: 14px;
+  }
+  .sv-head,
+  .sv-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) 28px minmax(0, 1.5fr) 28px 70px;
+    align-items: center;
+    gap: 6px;
+  }
+  .sv-head {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: #6b7588;
+  }
+  .sv-row {
+    opacity: 0.35;
+    transition: opacity 300ms;
+  }
+  .sv-row.is-on {
+    opacity: 1;
+  }
+  .sv-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    padding: 8px 10px;
+    border: 1px solid #e3e7ee;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    overflow-wrap: anywhere;
+  }
+  .sv-chip--tok {
+    background: #f6f8fb;
+  }
+  .sv-row.is-on .sv-chip--tok {
+    border-color: #244d9e;
+    background: #eef3fc;
+  }
+  .sv-sw {
+    flex: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    background: var(--sw);
+  }
+  .sv-sw--ring {
+    background: #fff;
+    box-shadow:
+      0 0 0 2px #fff,
+      0 0 0 4px var(--sw);
+  }
+  .sv-arr {
+    height: 2px;
+    background: #c9d0db;
+    position: relative;
+    transform-origin: left;
+    transform: scaleX(0.2);
+    transition: transform 400ms ease-out, background-color 300ms;
+  }
+  .sv-row.is-on .sv-arr {
+    transform: none;
+    background: #244d9e;
+  }
+  .sv-state {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: #6b7588;
+  }
+  .sv-preview {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-top: auto;
+    padding-top: 18px;
+    border-top: 1px solid #eef1f5;
+  }
+
+  /* scene 3 */
+  .sa3 {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 4fr) minmax(0, 4fr);
+    gap: 16px;
+    min-height: 440px;
+  }
+  @media (max-width: 1023px) {
+    .sa3 {
+      grid-template-columns: minmax(0, 1fr);
+      min-height: 0;
+    }
+  }
+  .sa3-doc {
+    justify-content: flex-start;
+  }
+  .sa3-file {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: #6b7588;
+  }
+  .sa3-md {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 12.5px;
+    line-height: 1.45;
+  }
+  .sa3-md p {
+    padding: 2px 6px;
+    margin: 0 -6px;
+    border-radius: 4px;
+    transition: background-color 200ms;
+  }
+  .sa3-md p.is-on {
+    background: #fff4c2;
+  }
+  .md-h {
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .md-k {
+    margin-top: 6px !important;
+    font-weight: 700;
+  }
+  .md-code {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: #244d9e;
+  }
+  .sa3-log {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 20px;
+    border-radius: 10px;
+    background: #1d2433;
+    color: #e6e9ef;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.6;
+  }
+  .sa3-file--dark {
+    color: #8e97a8;
+  }
+  .sa3-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .sa3-lines p {
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 260ms, transform 260ms;
+  }
+  .sa3-lines p.is-on {
+    opacity: 1;
+    transform: none;
+  }
+  .lg-you {
+    color: #c8c2ef;
+  }
+  .lg-dim {
+    color: #8e97a8;
+  }
+  .lg-ok {
+    color: #9fe0b8;
+  }
+  .sa3-out {
+    justify-content: space-between;
+  }
+  .qd {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    border: 1px solid #d6dbe4;
+    border-radius: 10px;
+  }
+  .qd [data-qd-p] {
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 300ms, transform 300ms;
+  }
+  .qd [data-qd-p].is-on {
+    opacity: 1;
+    transform: none;
+  }
+  .qd-title {
+    font-size: 15px;
+    font-weight: 700;
+  }
+  .qd-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 8px;
+    padding-top: 12px;
+    border-top: 1px solid #eef1f5;
+  }
+
+</style>
+
+<script>
+  import { mountFilm, type FilmCtx } from '../../lib/film';
+  const TEXT = 'Temperature excursion in cold storage';
+
+  document.querySelectorAll<HTMLElement>('[data-film="qbench"]').forEach((root) =>
+    mountFilm(root, (root) => {
+      const $ = (s: string) => root.querySelector<HTMLElement>(s)!;
+      const $$ = (s: string) => Array.from(root.querySelectorAll<HTMLElement>(s));
+
+      // 01 · components
+      const input = $('[data-cw-input]');
+      const typed = $('[data-cw-type]');
+      const btn = $('[data-cw-btn]');
+      const toggle = $('[data-cw-toggle]');
+      const row = $('[data-cw-row]');
+      const check = $('[data-cw-check]');
+      const tabs = $$('[data-cw-tab]');
+      const n = (k: string) => $(`[data-cw-name="${k}"]`);
+      const set1 = (done: boolean) => {
+        typed.textContent = done ? TEXT : '';
+        input.classList.remove('is-focus');
+        btn.classList.remove('is-hover', 'is-press');
+        toggle.classList.toggle('is-on', done);
+        row.classList.toggle('is-sel', done);
+        check.classList.toggle('is-on', done);
+        tabs.forEach((t, i) => t.classList.toggle('is-on', i === (done ? 2 : 0)));
+        n('in').textContent = done ? 'Input · state filled' : 'Input · state default';
+        n('bt').textContent = 'Button · tone primary · default';
+        n('tg').textContent = `Switch · checked ${done}`;
+        n('tb').textContent = `Table · row selected ${done}`;
+        n('ts').textContent = done ? 'Tabs · selected history' : 'Tabs · selected overview';
+      };
+      const play1 = async (c: FilmCtx, id: number) => {
+        set1(false);
+        await c.sleep(400);
+        await c.to(input, 0.12);
+        if (!c.live(id)) return;
+        await c.click();
+        input.classList.add('is-focus');
+        c.name(n('in'), 'Input · state focus');
+        for (let i = 1; i <= TEXT.length; i++) {
+          if (!c.live(id)) return;
+          typed.textContent = TEXT.slice(0, i);
+          await c.sleep(36);
+        }
+        input.classList.remove('is-focus');
+        c.name(n('in'), 'Input · state filled');
+        await c.to(toggle);
+        if (!c.live(id)) return;
+        await c.click();
+        toggle.classList.add('is-on');
+        c.name(n('tg'), 'Switch · checked true');
+        await c.to(check);
+        if (!c.live(id)) return;
+        await c.click();
+        check.classList.add('is-on');
+        row.classList.add('is-sel');
+        c.name(n('tb'), 'Table · row selected true');
+        await c.to(tabs[2]);
+        if (!c.live(id)) return;
+        await c.click();
+        tabs.forEach((t, i) => t.classList.toggle('is-on', i === 2));
+        c.name(n('ts'), 'Tabs · selected history');
+        await c.to(btn);
+        if (!c.live(id)) return;
+        btn.classList.add('is-hover');
+        c.name(n('bt'), 'Button · tone primary · hover');
+        await c.sleep(600);
+        btn.classList.add('is-press');
+        c.name(n('bt'), 'Button · tone primary · pressed');
+        await c.click();
+        await c.sleep(500);
+        btn.classList.remove('is-press', 'is-hover');
+        c.name(n('bt'), 'Button · tone primary · default');
+        await c.sleep(1200);
+      };
+
+      // 02 · variables
+      const coll = $$('[data-sv-coll]');
+      const rows = $$('[data-sv-row]');
+      const vbtn = $('[data-sv-btn]');
+      const vname = $('[data-sv-name]');
+      const states = ['default', 'hover', 'focus'];
+      const set2 = (done: boolean) => {
+        coll.forEach((x, k) => x.classList.toggle('is-on', done && k === 0));
+        rows.forEach((r) => r.classList.toggle('is-on', done));
+        vbtn.classList.remove('is-hover', 'is-focus');
+        vname.textContent = 'Button · tone primary · default';
+      };
+      const play2 = async (c: FilmCtx, id: number) => {
+        set2(false);
+        for (let k = 0; k < coll.length; k++) {
+          if (!c.live(id)) return;
+          coll.forEach((x, j) => x.classList.toggle('is-on', j === k));
+          await c.sleep(380);
+        }
+        coll.forEach((x, j) => x.classList.toggle('is-on', j === 0));
+        await c.sleep(500);
+        for (let i = 0; i < states.length; i++) {
+          if (!c.live(id)) return;
+          rows.forEach((r, k) => r.classList.toggle('is-on', k === i));
+          vbtn.classList.toggle('is-hover', states[i] === 'hover');
+          vbtn.classList.toggle('is-focus', states[i] === 'focus');
+          c.name(vname, `Button · tone primary · ${states[i]}`);
+          await c.sleep(1900);
+        }
+        if (!c.live(id)) return;
+        set2(true);
+        await c.sleep(1600);
+      };
+
+      // 03 · agent docs
+      const md = $$('[data-md]');
+      const lg = $$('[data-lg]');
+      const parts = $$('[data-qd-p]');
+      const mdFor: Record<number, number[]> = { 1: [0, 1], 2: [2, 3, 9] };
+      const partFor: Record<number, number[]> = { 2: [0, 1], 3: [2], 4: [3] };
+      const set3 = (done: boolean) => {
+        md.forEach((m) => m.classList.remove('is-on'));
+        lg.forEach((l) => l.classList.toggle('is-on', done));
+        parts.forEach((p) => p.classList.toggle('is-on', done));
+      };
+      const play3 = async (c: FilmCtx, id: number) => {
+        set3(false);
+        await c.sleep(400);
+        for (let i = 0; i < lg.length; i++) {
+          if (!c.live(id)) return;
+          lg[i].classList.add('is-on');
+          md.forEach((m, k) => m.classList.toggle('is-on', (mdFor[i] ?? []).includes(k)));
+          (partFor[i] ?? []).forEach((p) =>
+            parts.filter((el) => el.dataset.qdP === String(p)).forEach((el) => el.classList.add('is-on')),
+          );
+          await c.sleep(i === 0 ? 900 : 1300);
+        }
+        md.forEach((m) => m.classList.remove('is-on'));
+        await c.sleep(2000);
+      };
+
+      return [
+        { play: play1, set: set1, dur: 10 },
+        { play: play2, set: set2, dur: 10 },
+        { play: play3, set: set3, dur: 10 },
+      ];
+    }),
+  );
+</script>
+
