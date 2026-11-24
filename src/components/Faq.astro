@@ -52,7 +52,7 @@ const faqs = items;
   <div class="panel flex min-w-0 flex-[999_1_560px] flex-col">
     {
       faqs.map((f, i) => (
-        <details class="faq" open={i === 0}>
+        <details class="faq">
           <summary>
             <span class="font-mono text-caption font-medium text-muted">
               {String(i + 1).padStart(2, '0')}
