@@ -891,11 +891,11 @@ const slug = (k: string) =>
   .ch:focus-visible {
     outline-offset: -4px;
   }
+  /* no rule between a chapter's intro and its body (Goran, 24 Nov): one surface, spacing separates them */
   .ch {
     display: flex;
     flex-direction: column;
-    gap: 1px;
-    background: var(--color-line);
+    background: var(--color-surface);
   }
   .ch[hidden] {
     display: none;
