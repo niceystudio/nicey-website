@@ -80,6 +80,8 @@ export interface CaseStudy {
     overview: string[];
     facts: { term: string; detail: string }[];
     storyHeading: string;
+    /** another case study for the same client: the 'More for <client>' section before the CTA (SameClientA) */
+    related?: { slug: string; label: string };
     challenge: string[];
     results: string[];
   };
@@ -213,6 +215,7 @@ export const caseStudies: CaseStudy[] = [
         { term: 'The work', detail: 'Design system, tokens, component docs, AI agent skills' },
         { term: 'Result', detail: 'Lorem ipsum dolor sit amet' },
       ],
+      related: { slug: 'qbench-status-workflows', label: 'QBench status workflows' },
       storyHeading: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
       challenge: [
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
@@ -454,7 +457,8 @@ export const caseStudies: CaseStudy[] = [
       label: 'Get a free audit',
       action: 'audit',
     },
-    next: 'qbench-status-workflows',
+    // Emir 24 Nov: next follows the homepage order (QBench → Everbreed); status workflows is linked from The project card
+    next: 'everbreed',
   },
 
   {
@@ -487,6 +491,7 @@ export const caseStudies: CaseStudy[] = [
         { term: 'The work', detail: 'Product design: status workflows, single and bulk' },
         { term: 'Result', detail: 'Lorem ipsum dolor sit amet' },
       ],
+      related: { slug: 'qbench-design-system', label: 'QBench design system' },
       storyHeading: 'Lorem ipsum dolor sit amet, consectetur adipiscing.',
       challenge: [
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',

@@ -22,6 +22,7 @@ import CaseWork from './CaseWork.astro';
 import ScreensBandA from '../../directions/a/ScreensBandA.astro';
 import TogetherA from '../../directions/a/TogetherA.astro';
 import CaseStoryA from '../../directions/a/CaseStoryA.astro';
+import SameClientA from '../../directions/a/SameClientA.astro';
 import Decisions from './Decisions.astro';
 import Chapters from './Chapters.astro';
 import SectionHead from '../SectionHead.astro';
@@ -278,6 +279,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
         <Faq items={s.faq} heading="About this project" id="case-faq" />
       </div>
     )}
+    {project && s.client?.related && <SameClientA study={s} />}
   </main>
 
   {/* one CTA on every page: the homepage closing band, only the words change (Emir, 11 Nov) */}

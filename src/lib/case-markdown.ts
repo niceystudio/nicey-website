@@ -76,6 +76,7 @@ export function caseMarkdown(s: CaseStudy, url: string): string {
     for (const [h, ps] of [['Overview', c.overview], ['The challenge', c.challenge], ['The result', c.results]] as const) {
       out.push(`### ${h}`, '', ...ps.flatMap((p) => [p, '']));
     }
+    if (c.related) out.push(`## More for ${c.name}`, '', `- [${c.related.label}](${new URL(`/work/${c.related.slug}`, url).href})`, '');
   }
   if ((!s.proofViz || s.proofViz === 'aliases') && s.numbers.length) {
     out.push(`## ${s.numbersHeading}`, '', ...s.numbers.map((n) => `- **${n.value}** ${n.label}. ${n.meaning}`), '');

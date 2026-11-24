@@ -1,0 +1,85 @@
+---
+/**
+ * Direction A · "More for <client>" before the closing CTA (Emir 24 Nov: the Related row in the client card wasn't
+ * consistent; the other study for the same client gets its own small section instead). Shows only when the
+ * study has `client.related` — today QBench design system ↔ QBench status workflows; Everbreed has none.
+ * Same shape as the Next case study link at the end of the page (rule above and below, name, one line, arrow).
+ */
+import { caseHref, getCaseStudy, type CaseStudy } from '../../data/case-studies';
+
+interface Props {
+  study: CaseStudy;
+}
+const c = Astro.props.study.client!;
+const other = getCaseStudy(c.related!.slug);
+---
+
+<section aria-labelledby="same-head" class="container-page sca">
+  <span id="same-head" class="caption text-ink-2">More for {c.name}</span>
+  <a href={caseHref(other.slug)} class="sca-link">
+    <span class="sca-copy">
+      <span class="sca-name">{other.linkName}</span>
+      <span class="sca-line">{other.statement}</span>
+    </span>
+    <span class="sca-arr" aria-hidden="true">→</span>
+  </a>
+</section>
+
+<style>
+  .sca {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-block: 96px 32px;
+  }
+  @media (max-width: 767px) {
+    .sca {
+      padding-block: 64px 24px;
+    }
+  }
+  .sca-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 28px 32px;
+    border: 1px solid var(--a-rule);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    text-decoration: none;
+    transition: background-color 160ms var(--ease-out);
+  }
+  .sca-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+  }
+  .sca-name {
+    font-family: var(--font-pixel);
+    font-size: clamp(26px, 3vw, 36px);
+    line-height: 1.05;
+  }
+  .sca-line {
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--color-ink-2);
+  }
+  .sca-arr {
+    flex: none;
+    font-size: 28px;
+    transition: transform 200ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .sca-link:hover {
+      background: var(--color-page);
+    }
+    .sca-link:hover .sca-arr {
+      transform: translateX(4px);
+    }
+  }
+  .sca-link:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+</style>
