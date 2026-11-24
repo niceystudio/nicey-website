@@ -1,26 +1,14 @@
 ---
 /**
- * Direction A: "What we help with" as one window with file tabs (design-systems.md | product-design.md),
- * the included work as a directory tree, the visual in the right pane. Same copy as live.
- * Live notes below:
- * "What we help with": one service at a time behind a segment control (Emir, 12 Nov: the old two-column
- * layout showed too much at once). Each service is a row in `services` below; add a row and the segment
- * control and its panel appear (e.g. an animation service later). Every panel has the same shape:
- * text on the left (kicker, title, lede, what's included), one visual on a stage on the right.
- * Direction A: the 'Explore …' links are removed (Emir, 20 Nov: no destination pages yet).
+ * Direction A: "What we help with" (Goran, 24 Nov: "not sure about the tabs view here … it shows that we lack other services; we need to better
+ * organize a view here for two services" + "mockup used for Everbreed is not good, the UX around the CTA is a bad
+ * example"). The two services side by side, no tabs: Design systems wider (primary), Product design beside it
+ * (alongside). Each card: kicker, title, lede, included/ tree, then its visual on a stage at the bottom.
+ * Product design shows Everbreed's weekly care summary (one clear Continue button) instead of the weight log.
  */
 import QBenchWork from '../../components/case-study/QBenchWork.astro';
 
-type Visual = 'qbench' | 'phone';
-const services: {
-  id: string;
-  label: string;
-  kicker: string;
-  lede: string;
-  items: string[];
-  visual: Visual;
-  stage: string;
-}[] = [
+const services = [
   {
     id: 'design-systems',
     label: 'Design systems',
@@ -49,276 +37,169 @@ const services: {
 ];
 ---
 
-<section id="services" aria-labelledby="services-head" class="container-page sa-sec">
+<section id="services" aria-labelledby="services-head" class="container-page sc2-sec">
   <div class="flex flex-col gap-3.5">
     <span class="caption text-ink-2">What we help with</span>
     <h2 id="services-head" class="m-0 text-h2 max-w-[16ch]">Design systems first. Product design alongside.</h2>
   </div>
 
-  <div class="sa-win" data-svc>
-    <div class="sa-tabs" role="tablist" aria-label="Services">
-      {
-        services.map((s, i) => (
-          <button
-            type="button"
-            role="tab"
-            id={`svc-tab-${s.id}`}
-            aria-controls={`svc-${s.id}`}
-            aria-selected={i === 0 ? 'true' : 'false'}
-            tabindex={i === 0 ? 0 : -1}
-            data-svc-tab={s.id}
-          >
-            <span class="sa-tab-n">{String(i + 1).padStart(2, '0')}</span>
-            {s.id}.md
-            <span class="sa-tab-label">{s.label}</span>
-          </button>
-        ))
-      }
-      <span class="sa-tabs-rest" aria-hidden="true">services/</span>
-    </div>
+  <div class="sc2-grid">
     {
-      services.map((s, i) => (
-        <div class="sa-pane" role="tabpanel" id={`svc-${s.id}`} aria-labelledby={`svc-tab-${s.id}`} data-svc-pane={s.id} hidden={i !== 0}>
-          <div class="sa-text">
+      services.map((s) => (
+        <article class:list={['sc2-card', `sc2-card--${s.id}`]} aria-labelledby={`sc2-${s.id}`}>
+          <div class="sc2-text">
             <span class="caption text-ink-2">{s.kicker}</span>
-            <h3 class="sa-h m-0">{s.label}</h3>
-            <p class="m-0 text-body-lg text-pretty text-ink-2">{s.lede}</p>
-            <div class="sa-tree" aria-label="What's included">
-              <span class="sa-tree-root">included/</span>
+            <h3 id={`sc2-${s.id}`} class="sc2-h m-0">{s.label}</h3>
+            <p class="m-0 sc2-lede">{s.lede}</p>
+            <div class="sc2-tree" aria-label="What's included">
+              <span class="sc2-tree-root">included/</span>
               <ul>
                 {s.items.map((item, k) => (
                   <li>
-                    <span class="sa-branch" aria-hidden="true">{k === s.items.length - 1 ? '└──' : '├──'}</span>
+                    <span class="sc2-branch" aria-hidden="true">{k === s.items.length - 1 ? '└──' : '├──'}</span>
                     {item}
                   </li>
                 ))}
               </ul>
             </div>
           </div>
-          <figure class:list={['sa-stage a-grain m-0', s.stage]}>
+          <figure class:list={['sc2-stage a-grain m-0', s.stage]}>
             {s.visual === 'qbench' ? (
               <QBenchWork terminal bare />
             ) : (
-              <div class="sa-phone">
-                <video muted loop playsinline preload="none" poster="/work/everbreed/mobile-logweight.webp" aria-label="Everbreed student app: logging a weight, a typo caught before it saves" data-svc-video>
-                  <source src="/work/everbreed/mobile-logweight.webm" type="video/webm" />
+              <div class="sc2-phone">
+                <video muted loop playsinline preload="none" poster="/work/everbreed/mobile-care.webp" aria-label="Everbreed student app: the weekly care summary, seven days cared for, added to the Project Book" data-sc2-video>
+                  <source src="/work/everbreed/mobile-care.webm" type="video/webm" />
                 </video>
               </div>
             )}
           </figure>
-        </div>
+        </article>
       ))
     }
   </div>
 </section>
 
 <style>
-  .sa-sec {
+  .sc2-sec {
     display: flex;
     flex-direction: column;
     gap: 48px;
-    padding-top: var(--spacing-section); /* breathing room under the ASCII band (Emir 18 Nov) */
+    padding-top: var(--spacing-section);
     padding-bottom: var(--spacing-section);
   }
-  .sa-win {
+  /* design systems wider: it is the primary practice */
+  .sc2-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: 24px;
+    align-items: stretch;
+  }
+  @media (max-width: 1023px) {
+    .sc2-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  .sc2-card {
+    display: flex;
+    flex-direction: column;
     border: 1px solid var(--a-rule);
     background: var(--color-surface);
   }
-  .sa-tabs {
-    display: flex;
-    align-items: stretch;
-    border-bottom: 1px solid var(--a-rule);
-    background: var(--color-page);
-    font-family: var(--font-mono);
-    font-size: 12px;
-    letter-spacing: 0.04em;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  /* 320: tab 02 sat past the edge with no cue — stack the two tabs (20 Nov review) */
-  @media (max-width: 480px) {
-    .sa-tabs {
-      flex-direction: column;
-    }
-    .sa-tabs button {
-      border-right: 0 !important;
-      border-bottom: 1px solid var(--a-rule) !important; /* this block sits above the base button rule */
-    }
-    .sa-tabs button:last-child {
-      border-bottom: 0 !important;
-    }
-  }
-  .sa-tabs button {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    min-height: 48px;
-    padding: 0 18px;
-    border: 0;
-    border-right: 1px solid var(--a-rule);
-    background: transparent;
-    color: var(--color-ink-2);
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background-color 160ms var(--ease-out), color 160ms var(--ease-out);
-  }
-  .sa-tab-n {
-    color: var(--color-muted);
-  }
-  .sa-tab-label {
-    font-family: var(--font-sans);
-    font-size: 13px;
-    letter-spacing: 0;
-    color: var(--color-muted);
-  }
-  .sa-tabs button[aria-selected='true'] {
-    background: var(--color-surface);
-    color: var(--color-ink);
-    box-shadow: inset 0 2px 0 var(--a-block);
-    margin-bottom: -1px;
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .sa-tabs button[aria-selected='false']:hover {
-      color: var(--color-ink);
-      background: color-mix(in srgb, var(--color-surface) 60%, transparent);
-    }
-  }
-  .sa-tabs-rest {
-    margin-left: auto;
-    align-self: center;
-    padding: 0 16px;
-    color: var(--color-muted);
-  }
-  .sa-pane {
-    display: grid;
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  }
-  .sa-pane[hidden] {
-    display: none;
-  }
-  @media (max-width: 900px) {
-    .sa-pane {
-      grid-template-columns: 1fr;
-    }
-  }
-  .sa-text {
+  .sc2-text {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 18px;
-    padding: 44px 44px 40px;
+    gap: 16px;
+    padding: 40px 40px 36px;
+    flex: 1;
   }
-  .sa-h {
+  @media (max-width: 639px) {
+    .sc2-text {
+      padding: 28px 24px;
+    }
+  }
+  .sc2-h {
     font-family: var(--font-pixel);
     font-weight: 400;
     font-size: 40px;
     line-height: 1.05;
   }
-  .sa-tree {
+  .sc2-lede {
+    max-width: 44ch;
+    font-size: 17px;
+    line-height: 1.5;
+    color: var(--color-ink-2);
+    text-wrap: pretty;
+  }
+  .sc2-tree {
     width: 100%;
-    margin-top: 6px;
+    margin-top: 4px;
     font-family: var(--font-mono);
     font-size: 14px;
     line-height: 2;
   }
-  .sa-tree-root {
+  .sc2-tree-root {
     color: var(--color-accent);
   }
-  .sa-tree ul {
+  .sc2-tree ul {
     margin: 0;
     padding: 0;
     list-style: none;
   }
-  .sa-tree li {
+  .sc2-tree li {
     display: flex;
     gap: 10px;
-    color: var(--color-ink);
   }
-  .sa-branch {
+  .sc2-branch {
     color: var(--a-dim);
   }
-  .sa-stage {
+  /* both stages the same height so the two cards end on one line */
+  .sc2-stage {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 520px;
-    padding: 40px;
-    border-left: 1px solid var(--a-rule);
+    height: 440px;
+    padding: 32px;
+    border-top: 1px solid var(--a-rule);
     position: relative;
     isolation: isolate;
+    overflow: hidden;
   }
-  @media (max-width: 900px) {
-    .sa-stage {
-      border-left: 0;
-      border-top: 1px solid var(--a-rule);
-      min-height: 0;
+  @media (max-width: 639px) {
+    .sc2-stage {
+      height: auto;
       padding: 24px;
     }
   }
-  .sa-stage > :global(.qw) {
+  .sc2-stage > :global(.qw) {
     width: 100%;
   }
-  .sa-phone {
-    width: 190px; /* smaller so both panes stay at the stage's 520 min-height → no jump when switching tabs (Emir, 20 Nov) */
+  .sc2-phone {
+    width: 180px;
     aspect-ratio: 393 / 852;
     padding: 7px;
     border-radius: 34px;
     background: var(--color-band);
   }
-  .sa-phone video {
+  .sc2-phone video {
     display: block;
     width: 100%;
     height: 100%;
     border-radius: 27px;
     object-fit: cover;
-    background: #f1f3f5;
   }
 </style>
 
 <script>
-  document.querySelectorAll<HTMLElement>('[data-svc]').forEach((root) => {
-    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-svc-tab]'));
-    const panes = Array.from(root.querySelectorAll<HTMLElement>('[data-svc-pane]'));
-    const videos = Array.from(root.querySelectorAll<HTMLVideoElement>('[data-svc-video]'));
-    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    // the phone clip plays only while it is on screen
-    const io = new IntersectionObserver(
-      (es) =>
-        es.forEach((e) => {
-          const v = e.target as HTMLVideoElement;
-          if (e.isIntersecting && !reduced) {
-            v.preload = 'auto';
-            v.play().catch(() => {});
-          } else v.pause();
-        }),
-      { threshold: 0.5 },
-    );
-    const watch = () => videos.forEach((v) => (io.unobserve(v), io.observe(v)));
-
-    const pick = (i: number, focus = false) => {
-      tabs.forEach((t, k) => {
-        t.setAttribute('aria-selected', String(k === i));
-        t.tabIndex = k === i ? 0 : -1;
-      });
-      panes.forEach((p, k) => (p.hidden = k !== i));
-      if (focus) tabs[i].focus();
-      watch();
-    };
-    tabs.forEach((t, i) => {
-      t.addEventListener('click', () => pick(i));
-      t.addEventListener('keydown', (e) => {
-        const n = tabs.length;
-        let to = -1;
-        if (e.key === 'ArrowRight') to = (i + 1) % n;
-        else if (e.key === 'ArrowLeft') to = (i - 1 + n) % n;
-        else if (e.key === 'Home') to = 0;
-        else if (e.key === 'End') to = n - 1;
-        if (to < 0) return;
-        e.preventDefault();
-        pick(to, true);
-      });
-    });
-    watch();
-  });
+  // the phone clip plays only while it is on screen; reduced motion keeps the poster
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const io = new IntersectionObserver((es) =>
+    es.forEach((e) => {
+      const v = e.target as HTMLVideoElement;
+      if (e.isIntersecting && !reduced) v.play().catch(() => {});
+      else v.pause();
+    }),
+  );
+  document.querySelectorAll<HTMLVideoElement>('[data-sc2-video]').forEach((v) => io.observe(v));
 </script>
