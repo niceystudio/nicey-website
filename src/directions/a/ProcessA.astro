@@ -1,17 +1,18 @@
 ---
 /**
- * Direction A: "It starts with a free audit" (Emir 19 Nov, second pass). Reading order inside one .panel:
- *   1. the four steps (step titles only — time placeholders removed 20 Nov) beside the report as a terminal (ReportA)
- *   2. the action, last: Get a free audit — people read the process first, then click; next to it the quieter
- *      path for visitors not ready to share their file (copy the prompt).
+ * Direction A: "It starts with a free audit" — one panel, two paths (Emir + Goran, 24 Nov: two sections were misleading;
+ * same seven checks, done by us or by the visitor's own agent):
+ *   1. "We audit it for you": How it goes (4 steps) + Get a free audit on the report stage's bottom line, beside ReportA
+ *   2. "Or let your agent check it first": SelfCheckA — What you'll see + Copy prompt, beside the live example run
  * Typography: capitals only in the small section caption; everything else sentence case.
- * Removed: the CTA beside the headline, the "Free · read-only…" note, the legend that repeated the report tabs,
- * the auto-playing example run. Times stay [gaps] for Goran.
  */
 import SectionHead from '../../components/SectionHead.astro';
-import CopyPrompt from '../../components/CopyPrompt.astro';
 import ReportA from './ReportA.astro';
 import { links } from '../../data/links';
+
+import SelfCheckA from './SelfCheckA.astro';
+
+
 
 // time placeholders removed in A (Emir, 20 Nov: we don't need them). 20 Nov: caption "Free audit" (same as the header button; "Process" left the nav);
 // steps marked with → (How we work above is the only numbered process); the list fills the column beside the report
@@ -31,6 +32,9 @@ const steps = [
   <div class="panel pa-box">
     <div class="pa-body">
       <div class="pa-left">
+        <div class="pa-head">
+          <h3 class="pa-h m-0">We audit it for you</h3>
+        </div>
         <p class="pa-k m-0">How it goes</p>
         <ol class="pa-steps">
           {
@@ -42,6 +46,7 @@ const steps = [
             ))
           }
         </ol>
+        <a href={links.startAudit} class="pill pill-ink pill-lg pa-cta">Get a free audit</a>
       </div>
       <div class="pa-right">
         <p class="pa-k m-0">What you get</p>
@@ -49,15 +54,7 @@ const steps = [
       </div>
     </div>
 
-    <div class="pa-act">
-      <a href={links.startAudit} class="pill pill-ink pill-lg">Get a free audit</a>
-      <div class="pa-own">
-        <p class="m-0 pa-own-p">
-          Not ready to share your file? Let your agent run our seven checks, then bring the results to a call.
-        </p>
-        <CopyPrompt showFile={false} />
-      </div>
-    </div>
+    <SelfCheckA />
   </div>
 </section>
 
@@ -86,6 +83,23 @@ const steps = [
     min-width: 0;
   }
   /* small labels: sentence case, mono, muted — no capitals */
+  .pa-head {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+  .pa-h {
+    font-size: 24px;
+    line-height: 1.2;
+    font-weight: 400;
+    text-wrap: balance;
+  }
+  /* the button sits on the report stage's bottom line (Emir 24 Nov) */
+  .pa-cta {
+    align-self: flex-start;
+    margin-top: auto;
+  }
   .pa-k {
     font-family: var(--font-mono);
     font-size: 13px;
@@ -117,37 +131,7 @@ const steps = [
     color: var(--color-ink);
   }
   /* the action comes last, after the process */
-  .pa-act {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 20px 40px;
-    padding: 28px var(--spacing-cell-lg);
-  }
-  .pa-own {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 12px 20px;
-    flex: 1 1 420px;
-    padding-left: 40px;
-    border-left: 1px solid var(--a-rule);
-  }
-  .pa-own-p {
-    flex: 1 1 320px;
-    font-size: 15px;
-    line-height: 1.45;
-    color: var(--color-ink-2);
-    text-wrap: pretty;
-  }
   @media (max-width: 767px) {
     .pa-body,
-    .pa-act {
-      padding: 24px;
-    }
-    .pa-own {
-      padding-left: 0;
-      border-left: 0;
-    }
-  }
+      }
 </style>
