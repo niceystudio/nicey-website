@@ -1,0 +1,945 @@
+---
+/**
+ * The Everbreed case as a short film (shell: src/lib/film.ts + film.css). Emir 24 Nov: use the REAL Everbreed
+ * components and make the agent's screen pixel-perfect — so everything here is copied from the coded mobile
+ * prototype (Everbreed/Codes/everbreed-mobile-prototype: ui.tsx, fields.tsx, RabbitCard.tsx, taskKit.tsx,
+ * LogGrooming.tsx) with its DS Mobile v1.1 token values, Remix icons and the real Thunder photo.
+ *   01 Components — Chip, ChoiceCard, RadioCard, Button (disabled until the task is filled, as in the app) and the
+ *      RabbitCard, whose Daily Log Care strip fills today when the task is saved.
+ *   02 Tokens    — Figma ↔ code drift (53 → 0, matched by $figmaId), then $figmaId · $property · $codeSyntax.
+ *   03 Agents    — spec → rules → generate-screen → check-screen; the Log Grooming screen (Figma 953:22702) is
+ *      built at the phone's real 393 px and scaled down, so it is the app screen, not a sketch of it.
+ * [Code names of surface/hover and border/selected/default: confirm with Goran — same note as EverbreedHero.]
+ */
+import './film.css';
+
+const ICON: Record<string, string> = {
+  "quill": "M6.93912 14.0328C6.7072 14.6563 6.51032 15.2331 6.33421 15.8155C7.29345 15.1189 8.43544 14.6767 9.75193 14.5121C12.2652 14.198 14.4976 12.5385 15.6279 10.4537L14.1721 8.99888L15.5848 7.58417C15.9185 7.25004 16.2521 6.91614 16.5858 6.58248C17.0151 6.15312 17.5 5.35849 18.0129 4.2149C12.4197 5.08182 8.99484 8.50647 6.93912 14.0328ZM17 8.99739L18 9.99669C17 12.9967 14 15.9967 10 16.4967C7.33146 16.8303 5.66421 18.6636 4.99824 21.9967H3C4 15.9967 6 1.99669 21 1.99669C20.0009 4.99402 19.0018 6.99313 18.0027 7.99402C17.6662 8.33049 17.3331 8.66382 17 8.99739Z",
+  "check": "M9.9997 15.1709L19.1921 5.97852L20.6063 7.39273L9.9997 17.9993L3.63574 11.6354L5.04996 10.2212L9.9997 15.1709Z",
+  "scissors": "M12 13.4108L9.44618 15.9646C9.79807 16.5601 10 17.2548 10 17.9966C10 20.2057 8.20914 21.9966 6 21.9966C3.79086 21.9966 2 20.2057 2 17.9966C2 15.7874 3.79086 13.9966 6 13.9966C6.74181 13.9966 7.43645 14.1985 8.03197 14.5504L10.5858 11.9966L4.56497 5.97577C3.78392 5.19472 3.78392 3.92839 4.56497 3.14734L12 10.5824L19.435 3.14734C20.2161 3.92839 20.2161 5.19472 19.435 5.97577L13.4142 11.9966L15.968 14.5504C16.5635 14.1985 17.2582 13.9966 18 13.9966C20.2091 13.9966 22 15.7874 22 17.9966C22 20.2057 20.2091 21.9966 18 21.9966C15.7909 21.9966 14 20.2057 14 17.9966C14 17.2548 14.2019 16.5601 14.5538 15.9646L12 13.4108ZM6 19.9966C7.10457 19.9966 8 19.1012 8 17.9966C8 16.892 7.10457 15.9966 6 15.9966C4.89543 15.9966 4 16.892 4 17.9966C4 19.1012 4.89543 19.9966 6 19.9966ZM18 19.9966C19.1046 19.9966 20 19.1012 20 17.9966C20 16.892 19.1046 15.9966 18 15.9966C16.8954 15.9966 16 16.892 16 17.9966C16 19.1012 16.8954 19.9966 18 19.9966Z",
+  "search": "M18.031 16.6168L22.3137 20.8995L20.8995 22.3137L16.6168 18.031C15.0769 19.263 13.124 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2C15.968 2 20 6.032 20 11C20 13.124 19.263 15.0769 18.031 16.6168ZM16.0247 15.8748C17.2475 14.6146 18 12.8956 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18C12.8956 18 14.6146 17.2475 15.8748 16.0247L16.0247 15.8748Z",
+  "eye": "M12.0003 3C17.3924 3 21.8784 6.87976 22.8189 12C21.8784 17.1202 17.3924 21 12.0003 21C6.60812 21 2.12215 17.1202 1.18164 12C2.12215 6.87976 6.60812 3 12.0003 3ZM12.0003 19C16.2359 19 19.8603 16.052 20.7777 12C19.8603 7.94803 16.2359 5 12.0003 5C7.7646 5 4.14022 7.94803 3.22278 12C4.14022 16.052 7.7646 19 12.0003 19ZM12.0003 16.5C9.51498 16.5 7.50026 14.4853 7.50026 12C7.50026 9.51472 9.51498 7.5 12.0003 7.5C14.4855 7.5 16.5003 9.51472 16.5003 12C16.5003 14.4853 14.4855 16.5 12.0003 16.5ZM12.0003 14.5C13.381 14.5 14.5003 13.3807 14.5003 12C14.5003 10.6193 13.381 9.5 12.0003 9.5C10.6196 9.5 9.50026 10.6193 9.50026 12C9.50026 13.3807 10.6196 14.5 12.0003 14.5Z",
+  "back": "M10.8284 12.0007L15.7782 16.9504L14.364 18.3646L8 12.0007L14.364 5.63672L15.7782 7.05093L10.8284 12.0007Z",
+  "male": "M15.0491 8.53666L18.5858 5H14V3H22V11H20V6.41421L16.4633 9.95088C17.4274 11.2127 18 12.7895 18 14.5C18 18.6421 14.6421 22 10.5 22C6.35786 22 3 18.6421 3 14.5C3 10.3579 6.35786 7 10.5 7C12.2105 7 13.7873 7.57264 15.0491 8.53666ZM10.5 20C13.5376 20 16 17.5376 16 14.5C16 11.4624 13.5376 9 10.5 9C7.46243 9 5 11.4624 5 14.5C5 17.5376 7.46243 20 10.5 20Z"
+};
+
+const chapters = ['Components', 'Tokens', 'Agents'];
+const drift = [
+  { figma: 'text/primary', code: '--text-primary', type: 'match' },
+  { figma: 'surface/hover', code: '--surface-hover', type: 'figma' },
+  { figma: 'border/selected/default', code: '--border-selected-default', type: 'figma' },
+  { figma: '', code: 'bg-eb-neutral-subtle', type: 'repo' },
+  { figma: '', code: 'bg-eb-accent-red', type: 'repo' },
+];
+const fields = [
+  ['$figmaId', 'variable.id', 'identity across renames'],
+  ['$property', 'variable.scopes', 'the CSS property it paints'],
+  ['$codeSyntax', 'codeSyntax.WEB', 'the name code uses'],
+];
+const flow = [
+  ['01', 'Read the spec', 'handoff spec on the Figma canvas'],
+  ['02', 'Load the rules', 'design-conventions.md · allowed-components.json'],
+  ['03', 'generate-screen', 'library components and tokens only'],
+  ['04', 'check-screen', 'compared with the library'],
+];
+// LogGrooming.tsx
+const grooming = [
+  ['Brushed coat', 'quill'],
+  ['Checked for mats', 'check'],
+  ['Trimmed nails', 'scissors'],
+  ['Checked ears', 'search'],
+  ['Checked eyes and nose', 'eye'],
+  ['Checked feet', 'check'],
+];
+const week = [true, true, true, true, true, true, false];
+---
+
+<section aria-label="Everbreed in three short scenes" class="container-page cw" data-film="everbreed">
+  <div class="cw-bar" role="tablist" aria-label="Scenes">
+    {
+      chapters.map((c, i) => (
+        <button type="button" role="tab" aria-selected={i === 0 ? 'true' : 'false'} data-cw-ch={i}>
+          <span class="cw-ch-n">{String(i + 1).padStart(2, '0')}</span> {c}
+          <span class="cw-ch-fill" aria-hidden="true"></span>
+        </button>
+      ))
+    }
+  </div>
+
+  <div class="cw-stage a-grain ev-stage">
+    <!-- 01 · components (real prototype components, real sizes) -->
+    <div class="cw-scene" data-cw-scene="0">
+      <div class="ev-grid eb">
+        <div class="cw-tile ev-chips">
+          <div class="eb-row">
+            <span class="eb-chip">Thunder</span>
+            <span class="eb-chip">Today, Aug 16</span>
+          </div>
+          <span class="cw-name">Chip</span>
+        </div>
+        <div class="cw-tile ev-choice">
+          <div class="eb-choices">
+            {
+              grooming.slice(0, 2).map(([l, ic], i) => (
+                <span class="eb-choice" data-e-choice={i}>
+                  <span class="eb-disc"><Fragment set:html={`<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${ICON[ic]}"/></svg>`} /></span>
+                  <span class="eb-sm-m">{l}</span>
+                </span>
+              ))
+            }
+          </div>
+          <span class="cw-name" data-e-n="ch">ChoiceCard · selected false</span>
+        </div>
+        <div class="cw-tile ev-radio">
+          <span class="eb-radio" data-e-radio>
+            <span class="eb-radio-ic"><Fragment set:html={`<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${ICON.check}"/></svg>`} /></span>
+            <span class="eb-radio-txt">
+              <span class="eb-md-m">No concerns noticed</span>
+              <span class="eb-sm-r eb-ink2">Coat, skin, nails and ears look normal</span>
+            </span>
+            <span class="eb-radio-dot"><span></span></span>
+          </span>
+          <span class="cw-name" data-e-n="rd">RadioCard · on false</span>
+        </div>
+        <div class="cw-tile ev-card">
+          <div class="eb-rabbit">
+            <div class="eb-rabbit-top">
+              <img class="eb-photo" src="/work/everbreed/thunder.jpg" alt="" width="92" height="92" loading="lazy" decoding="async" />
+              <div class="eb-rabbit-info">
+                <div class="eb-col">
+                  <div class="eb-name-row">
+                    <span class="eb-h2">Thunder</span>
+                    <span class="eb-sex"><Fragment set:html={`<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${ICON.male}"/></svg>`} /></span>
+                  </div>
+                  <span class="eb-sm-m eb-ink2">Holland Lop · 4 months</span>
+                </div>
+                <span class="eb-badge">4.2 lbs — within target</span>
+              </div>
+            </div>
+            <div class="eb-strip">
+              <div class="eb-dots">{week.map((on, i) => <span class:list={['eb-dot', on && 'is-on']} data-e-dot={i}></span>)}</div>
+              <span class="eb-sm-m eb-ink2">Daily Log Care</span>
+            </div>
+          </div>
+          <span class="cw-name" data-e-n="rc">RabbitCard · state on progress</span>
+        </div>
+        <div class="cw-tile ev-bt">
+          <span class="eb-btn is-disabled" data-e-btn>Save grooming</span>
+          <span class="cw-name" data-e-n="bt">Button · primary · lg · disabled</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02 · tokens -->
+    <div class="cw-scene" data-cw-scene="1" hidden>
+      <div class="ev-tok">
+        <div class="cw-tile et-drift">
+          <div class="et-top">
+            <span class="q-label">Web · Figma ↔ code</span>
+            <span class="et-count" data-et-count>53 drifted</span>
+          </div>
+          <div class="et-head"><span>Figma</span><span></span><span>Repo</span></div>
+          {
+            drift.map((r, i) => (
+              <div class:list={['et-row', `is-${r.type}`]} data-et-row={i}>
+                <code>{r.figma || '—'}</code>
+                <span class="et-link">ID</span>
+                <code class="et-code">{r.code}</code>
+              </div>
+            ))
+          }
+          <span class="cw-name" data-et-name>17 only in Figma · 36 only in the repo</span>
+        </div>
+        <div class="cw-tile et-fields">
+          <span class="q-label">surface/hover · token JSON</span>
+          <div class="et-json">
+            <span class="et-brace">{'{'}</span>
+            {
+              fields.map(([k, v, why], i) => (
+                <div class="et-f" data-et-f={i}>
+                  <code>
+                    <span class="et-k">"{k}"</span>: <span class="et-v">{v}</span>
+                  </code>
+                  <span class="et-why">{why}</span>
+                </div>
+              ))
+            }
+            <span class="et-brace">{'}'}</span>
+          </div>
+          <span class="cw-name">302 / 302 tokens with a code name and a scope · 210 → 0 hand-written aliases</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 03 · agents -->
+    <div class="cw-scene" data-cw-scene="2" hidden>
+      <div class="ev-ag">
+        <div class="cw-tile ea-flow">
+          <span class="q-label">From spec to screen</span>
+          <ol class="ea-steps">
+            {
+              flow.map(([n, k, t], i) => (
+                <li data-ea-step={i}>
+                  <span class="ea-n">{n}</span>
+                  <span class="ea-k">{k}</span>
+                  <span class="ea-t">{t}</span>
+                </li>
+              ))
+            }
+          </ol>
+          <div class="ea-checks" data-ea-checks>
+            <span><b>0</b> raw colours</span>
+            <span><b>0</b> raw shadows</span>
+            <span><b>0</b> tokens missing a field</span>
+          </div>
+          <span class="cw-name" data-ea-name>Every pull request is checked</span>
+        </div>
+        <div class="cw-tile ea-phone-tile">
+          <!-- the Log Grooming screen at the phone's real 393 × 852, scaled to fit -->
+          <div class="ea-device">
+            <div class="ea-phone eb">
+              <div class="ea-status"><span>9:41</span><span class="ea-bat"></span></div>
+              <div class="ea-backbar">
+                <span class="ea-back"><Fragment set:html={`<svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${ICON.back}"/></svg>`} /></span>
+              </div>
+              <div class="ea-body">
+                <div class="ea-intro ea-p" data-ea-p="0">
+                  <div class="eb-row">
+                    <span class="eb-chip">Thunder</span>
+                    <span class="eb-chip">Today, Aug 16</span>
+                  </div>
+                  <span class="eb-h1">What grooming did you do for your rabbit?</span>
+                  <span class="eb-sm-r eb-ink3">Tap everything you did today.</span>
+                </div>
+                <div class="eb-choices eb-choices--6">
+                  {
+                    grooming.map(([l, ic], i) => (
+                      <span class:list={['eb-choice ea-p']} data-ea-p={i < 2 ? 1 : i < 4 ? 2 : 3}>
+                        <span class="eb-disc"><Fragment set:html={`<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${ICON[ic]}"/></svg>`} /></span>
+                        <span class="eb-sm-m">{l}</span>
+                      </span>
+                    ))
+                  }
+                </div>
+              </div>
+              <div class="ea-footer ea-p" data-ea-p="3">
+                <span class="eb-btn eb-btn--full is-disabled">Save grooming</span>
+                <span class="ea-home"></span>
+              </div>
+            </div>
+          </div>
+          <span class="cw-name" data-ea-out>Log Grooming 01 · 0 issues at the first check</span>
+        </div>
+      </div>
+    </div>
+
+    <svg class="cw-cursor" aria-hidden="true" width="22" height="22" viewBox="0 0 22 22"
+      ><path d="M3 2l15 8.2-6.6 1.6L8.6 18z" fill="#1f2a3d" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"></path></svg
+    >
+  </div>
+</section>
+
+<style>
+  .ev-stage {
+    background: #f1f3f5; /* Dashboard BG */
+  }
+  /* DS Mobile v1.1 values, copied from the prototype's index.css */
+  .eb {
+    --app: #f1f3f5;
+    --card: #ffffff;
+    --card-2: #f1f3f5;
+    --active: #e3f7ef;
+    --line: #e0e3e7;
+    --line-strong: #c6cbd1;
+    --line-active: #018f51;
+    --ink: #181a1c;
+    --ink-2: #464a50;
+    --ink-3: #6f747b;
+    --ink-muted: #979da5;
+    --ink-white: #f9fafb;
+    --btn: #02a05b;
+    --btn-stroke: #018f51;
+    --success: #017843;
+    --success-bg: #e3f7ef;
+    --info: #246da3;
+    --info-bg: #eaf6fd;
+    color: var(--ink);
+    font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-feature-settings: 'ss11' 1, 'calt' 0, 'liga' 0;
+    -webkit-font-smoothing: antialiased;
+  }
+  .eb-h1 { font-size: 24px; line-height: 32px; font-weight: 500; }
+  .eb-h2 { font-size: 20px; line-height: 28px; font-weight: 500; }
+  .eb-md-m { font-size: 16px; line-height: 24px; font-weight: 500; }
+  .eb-sm-m { font-size: 14px; line-height: 20px; font-weight: 500; }
+  .eb-sm-r { font-size: 14px; line-height: 20px; font-weight: 400; }
+  .eb-ink2 { color: var(--ink-2); }
+  .eb-ink3 { color: var(--ink-3); }
+  .eb-row { display: flex; gap: 8px; }
+  .eb-col { display: flex; flex-direction: column; }
+
+  /* Chip (ui.tsx) */
+  .eb-chip {
+    display: inline-flex;
+    align-items: center;
+    height: 32px;
+    padding: 0 16px;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    font-size: 12px;
+    line-height: 15px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  /* ChoiceCard (fields.tsx) + the green disc from LogGrooming.tsx */
+  .eb-choices {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .eb-choice {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--card);
+    text-align: center;
+    transition: border-color 200ms, background-color 200ms;
+  }
+  .eb-choice.is-on {
+    border-color: var(--line-active);
+    background: var(--active);
+  }
+  .eb-disc {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--success);
+    color: var(--ink-white);
+  }
+  /* RadioCard (DailyCare.tsx) */
+  .eb-radio {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--card);
+    transition: border-color 200ms, background-color 200ms;
+  }
+  .eb-radio.is-on {
+    border-color: var(--line-active);
+    background: var(--active);
+  }
+  .eb-radio-ic {
+    width: 44px;
+    height: 46px;
+    flex: none;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--card);
+  }
+  .eb-radio-txt {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .eb-radio-dot {
+    width: 20px;
+    height: 20px;
+    flex: none;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--line);
+    transition: background-color 200ms;
+  }
+  .eb-radio-dot span {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--card);
+    transition: width 300ms cubic-bezier(0.34, 1.56, 0.64, 1), height 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .eb-radio.is-on .eb-radio-dot {
+    background: var(--btn);
+  }
+  .eb-radio.is-on .eb-radio-dot span {
+    width: 10px;
+    height: 10px;
+  }
+  /* RabbitCard.tsx */
+  .eb-rabbit {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-top: 16px;
+    border-radius: 16px;
+    background: var(--card);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  .eb-rabbit-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0 16px;
+  }
+  .eb-photo {
+    width: 92px;
+    height: 92px;
+    flex: none;
+    border-radius: 12px;
+    object-fit: cover;
+    object-position: 45% center;
+    background: var(--line);
+  }
+  .eb-rabbit-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    min-width: 0;
+  }
+  .eb-name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .eb-sex {
+    width: 24px;
+    height: 24px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--info-bg);
+    color: var(--info);
+  }
+  .eb-badge {
+    display: inline-flex;
+    align-items: center;
+    height: 24px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: var(--success-bg);
+    color: var(--success);
+    font-size: 12px;
+    line-height: 15px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .eb-strip {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 0 0 16px 16px;
+    background: var(--card-2);
+    box-shadow: inset 0 1px 0 var(--line), inset 1px 0 0 var(--line), inset -1px 0 0 var(--line), inset 0 -1px 0 var(--line);
+  }
+  .eb-dots {
+    display: flex;
+    gap: 2px;
+  }
+  .eb-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--ink-muted);
+    transition: background-color 300ms, transform 300ms;
+  }
+  .eb-dot.is-on {
+    background: var(--btn);
+  }
+  .eb-dot.is-beat {
+    transform: scale(1.35);
+  }
+  /* Button primary lg (ui.tsx) */
+  .eb-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 48px;
+    padding: 0 20px;
+    border-radius: 12px;
+    background: var(--btn);
+    box-shadow: 0 0 0 1px var(--btn-stroke);
+    color: var(--ink-white);
+    font-size: 18px;
+    line-height: 24px;
+    font-weight: 500;
+    transition: opacity 200ms, transform 120ms;
+  }
+  .eb-btn.is-disabled {
+    opacity: 0.25;
+  }
+  .eb-btn.is-press {
+    transform: scale(0.98);
+  }
+  .eb-btn--full {
+    width: 100%;
+  }
+
+  /* 01 layout */
+  .ev-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-areas:
+      'chips chips chips chips chips card card card card card card card'
+      'choice choice choice choice choice card card card card card card card'
+      'radio radio radio radio radio bt bt bt bt bt bt bt';
+    gap: 16px;
+  }
+  @media (max-width: 1023px) {
+    .ev-grid {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: 'chips' 'choice' 'radio' 'card' 'bt';
+    }
+  }
+  .ev-chips { grid-area: chips; }
+  .ev-choice { grid-area: choice; }
+  .ev-radio { grid-area: radio; }
+  .ev-card { grid-area: card; justify-content: center; }
+  .ev-card > .cw-name { margin-top: 4px; }
+  .ev-bt { grid-area: bt; }
+  .ev-bt .eb-btn { align-self: flex-start; }
+
+  /* 02 */
+  .ev-tok {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: 16px;
+    min-height: 440px;
+  }
+  .et-drift,
+  .et-fields {
+    justify-content: flex-start;
+    gap: 10px;
+  }
+  .et-drift > .cw-name,
+  .et-fields > .cw-name {
+    margin-top: auto;
+  }
+  .et-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .et-count {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #fdecea;
+    color: #aa2e23;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    transition: background-color 250ms, color 250ms;
+  }
+  .et-count.is-zero {
+    background: #e3f7ef;
+    color: #017843;
+  }
+  .et-head,
+  .et-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 40px minmax(0, 1fr);
+    align-items: center;
+    gap: 6px;
+  }
+  .et-head {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: #6f747b;
+  }
+  .et-row code {
+    padding: 7px 9px;
+    border: 1px solid #e0e3e7;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    overflow-wrap: anywhere;
+    transition: opacity 300ms, border-color 300ms, background-color 300ms;
+  }
+  .et-link {
+    height: 20px;
+    display: grid;
+    place-items: center;
+    border-radius: 4px;
+    background: #e0e3e7;
+    color: #6f747b;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    opacity: 0.3;
+    transition: opacity 300ms, background-color 300ms, color 300ms;
+  }
+  .et-row.is-figma .et-code,
+  .et-row.is-repo .et-code {
+    color: #aa2e23;
+  }
+  .et-row.is-repo .et-code {
+    text-decoration: line-through;
+  }
+  .et-row.is-synced code,
+  .et-row.is-synced .et-code {
+    border-color: #93dcbe;
+    background: #f2faf6;
+    color: #015d34;
+    text-decoration: none;
+  }
+  .et-row.is-synced .et-link {
+    opacity: 1;
+    background: #02a05b;
+    color: #fff;
+  }
+  .et-row.is-gone {
+    opacity: 0.25;
+  }
+  .et-json {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px;
+    border-radius: 8px;
+    background: #1d2433;
+    color: #e6e9ef;
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+  .et-f {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px 8px 6px 18px;
+    border-radius: 4px;
+    opacity: 0.35;
+    transition: opacity 300ms, background-color 300ms;
+  }
+  .et-f.is-on {
+    opacity: 1;
+    background: rgba(147, 220, 190, 0.12);
+  }
+  .et-k {
+    color: #c8c2ef;
+  }
+  .et-v {
+    color: #93dcbe;
+  }
+  .et-why {
+    color: #8e97a8;
+    font-size: 11px;
+  }
+
+  /* 03 */
+  .ev-ag {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: 16px;
+    min-height: 440px;
+  }
+  .ea-flow {
+    justify-content: flex-start;
+    gap: 14px;
+  }
+  .ea-flow > .cw-name {
+    margin-top: auto;
+  }
+  .ea-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ea-steps li {
+    display: grid;
+    grid-template-columns: 28px 130px minmax(0, 1fr);
+    align-items: baseline;
+    gap: 8px;
+    padding: 10px 12px;
+    border: 1px solid #e0e3e7;
+    border-radius: 6px;
+    opacity: 0.4;
+    transition: opacity 300ms, border-color 300ms, background-color 300ms;
+  }
+  .ea-steps li.is-on {
+    opacity: 1;
+    border-color: #018f51;
+    background: #f2faf6;
+  }
+  .ea-n,
+  .ea-t {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: #6f747b;
+  }
+  .ea-k {
+    font-weight: 600;
+  }
+  .ea-checks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 300ms;
+  }
+  .ea-checks.is-on {
+    opacity: 1;
+  }
+  .ea-checks span {
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: #e3f7ef;
+    color: #017843;
+    font-size: 12px;
+  }
+  .ea-phone-tile {
+    align-items: center;
+  }
+  /* the device: 393 × 852 drawn at real size, scaled by --s */
+  .ea-device {
+    --s: 0.5;
+    width: calc((393px + 14px) * var(--s));
+    height: calc((852px + 14px) * var(--s));
+    flex: none;
+  }
+  .ea-phone {
+    position: relative;
+    width: 393px;
+    height: 852px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 7px solid #1f2329;
+    border-radius: 54px;
+    background: var(--app);
+    box-sizing: content-box;
+    transform: scale(var(--s));
+    transform-origin: 0 0;
+  }
+  .ea-status {
+    height: 54px;
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 32px 0 48px;
+    font-size: 17px;
+    font-weight: 600;
+  }
+  .ea-bat {
+    width: 27px;
+    height: 13px;
+    border-radius: 4px;
+    background: #000;
+  }
+  .ea-backbar {
+    height: 68px;
+    flex: none;
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+  }
+  .ea-back {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(248, 248, 248, 0.72);
+    box-shadow:
+      0 8px 15px rgba(0, 0, 0, 0.02),
+      0 0 0 0.5px #e8e8e8,
+      inset 0 1px 1px rgba(255, 255, 255, 0.9);
+  }
+  .ea-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 16px 16px 24px;
+  }
+  .ea-intro {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .ea-footer {
+    flex: none;
+    position: relative;
+    padding: 12px 16px 34px;
+    border-top: 1px solid var(--line);
+    background: var(--card);
+  }
+  .ea-home {
+    position: absolute;
+    left: 50%;
+    bottom: 8px;
+    width: 134px;
+    height: 5px;
+    margin-left: -67px;
+    border-radius: 3px;
+    background: #000;
+  }
+  .ea-p {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 300ms, transform 300ms;
+  }
+  .ea-p.is-in {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (max-width: 1023px) {
+    .ev-tok,
+    .ev-ag {
+      grid-template-columns: minmax(0, 1fr);
+      min-height: 0;
+    }
+  }
+</style>
+
+<script>
+  import { mountFilm, type FilmCtx } from '../../lib/film';
+
+  document.querySelectorAll<HTMLElement>('[data-film="everbreed"]').forEach((root) =>
+    mountFilm(root, (root) => {
+      const $ = (s: string) => root.querySelector<HTMLElement>(s)!;
+      const $$ = (s: string) => Array.from(root.querySelectorAll<HTMLElement>(s));
+
+      // 01 · components
+      const choices = $$('[data-e-choice]');
+      const radio = $('[data-e-radio]');
+      const btn = $('[data-e-btn]');
+      const today = $('[data-e-dot="6"]');
+      const n = (k: string) => $(`[data-e-n="${k}"]`);
+      const set1 = (done: boolean) => {
+        choices.forEach((c) => c.classList.toggle('is-on', done));
+        radio.classList.toggle('is-on', done);
+        btn.classList.toggle('is-disabled', !done);
+        btn.classList.remove('is-press');
+        today.classList.toggle('is-on', done);
+        today.classList.remove('is-beat');
+        n('ch').textContent = `ChoiceCard · selected ${done}`;
+        n('rd').textContent = `RadioCard · on ${done}`;
+        n('bt').textContent = done ? 'Button · primary · lg · default' : 'Button · primary · lg · disabled';
+        n('rc').textContent = done ? 'RabbitCard · Daily Log Care 7 / 7' : 'RabbitCard · state on progress';
+      };
+      const play1 = async (c: FilmCtx, id: number) => {
+        set1(false);
+        await c.sleep(500);
+        for (const ch of choices) {
+          await c.to(ch);
+          if (!c.live(id)) return;
+          await c.click();
+          ch.classList.add('is-on');
+          c.name(n('ch'), 'ChoiceCard · selected true');
+        }
+        await c.to(radio, 0.9);
+        if (!c.live(id)) return;
+        await c.click();
+        radio.classList.add('is-on');
+        c.name(n('rd'), 'RadioCard · on true');
+        btn.classList.remove('is-disabled');
+        c.name(n('bt'), 'Button · primary · lg · default');
+        await c.sleep(400);
+        await c.to(btn);
+        if (!c.live(id)) return;
+        btn.classList.add('is-press');
+        c.name(n('bt'), 'Button · primary · lg · pressed');
+        await c.click();
+        btn.classList.remove('is-press');
+        today.classList.add('is-on', 'is-beat');
+        c.name(n('rc'), 'RabbitCard · Daily Log Care 7 / 7');
+        await c.sleep(350);
+        today.classList.remove('is-beat');
+        await c.sleep(1800);
+      };
+
+      // 02 · tokens
+      const rows = $$('[data-et-row]');
+      const count = $('[data-et-count]');
+      const tname = $('[data-et-name]');
+      const fl = $$('[data-et-f]');
+      const set2 = (done: boolean) => {
+        rows.forEach((r) => {
+          const repo = r.classList.contains('is-repo');
+          r.classList.toggle('is-synced', done && !repo);
+          r.classList.toggle('is-gone', done && repo);
+        });
+        count.textContent = done ? '0 drifted' : '53 drifted';
+        count.classList.toggle('is-zero', done);
+        tname.textContent = done ? 'Matched by $figmaId · 0 drifted' : '17 only in Figma · 36 only in the repo';
+        fl.forEach((f) => f.classList.toggle('is-on', done));
+      };
+      const play2 = async (c: FilmCtx, id: number) => {
+        set2(false);
+        await c.sleep(1200);
+        const steps = [53, 40, 22, 9, 0];
+        for (let i = 0; i < rows.length; i++) {
+          if (!c.live(id)) return;
+          const r = rows[i];
+          if (r.classList.contains('is-repo')) r.classList.add('is-gone');
+          else r.classList.add('is-synced');
+          count.textContent = `${steps[i]} drifted`;
+          await c.sleep(550);
+        }
+        count.textContent = '0 drifted';
+        count.classList.add('is-zero');
+        c.name(tname, 'Matched by $figmaId · 0 drifted');
+        await c.sleep(500);
+        for (const f of fl) {
+          if (!c.live(id)) return;
+          f.classList.add('is-on');
+          await c.sleep(900);
+        }
+        await c.sleep(1800);
+      };
+
+      // 03 · agents
+      const st = $$('[data-ea-step]');
+      const parts = $$('[data-ea-p]');
+      const checks = $('[data-ea-checks]');
+      const out = $('[data-ea-out]');
+      const set3 = (done: boolean) => {
+        st.forEach((s) => s.classList.toggle('is-on', done));
+        parts.forEach((p) => p.classList.toggle('is-in', done));
+        checks.classList.toggle('is-on', done);
+        out.textContent = done ? 'Log Grooming 01 · 0 issues at the first check' : 'Log Grooming 01 · building…';
+      };
+      const play3 = async (c: FilmCtx, id: number) => {
+        set3(false);
+        await c.sleep(500);
+        for (let i = 0; i < st.length; i++) {
+          if (!c.live(id)) return;
+          st[i].classList.add('is-on');
+          if (i === 2) {
+            for (let p = 0; p < 4; p++) {
+              if (!c.live(id)) return;
+              parts.filter((el) => el.dataset.eaP === String(p)).forEach((el) => el.classList.add('is-in'));
+              await c.sleep(500);
+            }
+          } else await c.sleep(900);
+        }
+        checks.classList.add('is-on');
+        c.name(out, 'Log Grooming 01 · 0 issues at the first check');
+        await c.sleep(2400);
+      };
+
+      return [
+        { play: play1, set: set1, dur: 10 },
+        { play: play2, set: set2, dur: 9 },
+        { play: play3, set: set3, dur: 9 },
+      ];
+    }),
+  );
+</script>

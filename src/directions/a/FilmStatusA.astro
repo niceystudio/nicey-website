@@ -1,0 +1,747 @@
+---
+/**
+ * The status-workflows case as a short film, same shell as FilmQBenchA (src/lib/film.ts,
+ * film.css), in QBench's own look. Facts from the case study data:
+ *   01 Draw — like the real builder (Emir 24 Nov): the admin drags statuses from the sidebar onto the canvas,
+ *      then connects them handle to handle; each connection opens the move in a side panel; then publishes.
+ *   02 Move — wherever the change starts, the same two pages run: required fields, then signature · PIN · comment;
+ *      the move is recorded in history.
+ *   03 Bulk — many tests at once, with an honest answer: "6 tests can move to completed, 2 can't".
+ */
+import './film.css';
+
+const chapters = ['Draw', 'Move', 'Bulk'];
+const nodes = [
+  { id: 'draft', label: 'Draft', x: 40, y: 12 },
+  { id: 'ns', label: 'Not started', x: 40, y: 37 },
+  { id: 'ip', label: 'In progress', x: 40, y: 62 },
+  { id: 'done', label: 'Completed', x: 40, y: 87 },
+];
+// edges as plain lines between the node centres above
+const edges = [
+  { v: true, x: 40, y1: 12, y2: 37 },
+  { v: true, x: 40, y1: 37, y2: 62 },
+  { v: true, x: 40, y1: 62, y2: 87 },
+];
+const statuses = [
+  ['Draft', '#9aa3b2'],
+  ['Not started', '#6b7588'],
+  ['In progress', '#d99a06'],
+  ['Completed', '#1f9d5a'],
+  ['Cancelled', '#d64545'],
+];
+const sources = ['Order detail page', 'Test detail page', 'Test list page', 'Batch detail page', 'Publishing a report'];
+const tests = [
+  ['T-2201', 'Moisture', true],
+  ['T-2202', 'pH', true],
+  ['T-2203', 'Assay', false],
+  ['T-2204', 'Viscosity', true],
+  ['T-2205', 'Microbial', false],
+  ['T-2206', 'Density', true],
+  ['T-2207', 'Appearance', true],
+  ['T-2208', 'Odour', true],
+] as const;
+---
+
+<section aria-label="QBench status workflows in three short scenes" class="container-page cw" data-film="status">
+  <div class="cw-bar" role="tablist" aria-label="Scenes">
+    {
+      chapters.map((c, i) => (
+        <button type="button" role="tab" aria-selected={i === 0 ? 'true' : 'false'} data-cw-ch={i}>
+          <span class="cw-ch-n">{String(i + 1).padStart(2, '0')}</span> {c}
+          <span class="cw-ch-fill" aria-hidden="true"></span>
+        </button>
+      ))
+    }
+  </div>
+
+  <div class="cw-stage a-grain">
+    <!-- 01 · draw -->
+    <div class="cw-scene" data-cw-scene="0">
+      <div class="fd">
+        <div class="cw-tile fd-side">
+          <div class="fd-top">
+            <span class="q-label">Test approval</span>
+            <span class="fd-pub" data-fd-pub>Not published</span>
+          </div>
+          <span class="fd-k">Statuses</span>
+          <ul class="fd-list">
+            {
+              statuses.map(([s, c], i) => (
+                <li data-fd-st={i}>
+                  <span class="fd-dot" style={`background:${c}`}></span>
+                  {s}
+                </li>
+              ))
+            }
+          </ul>
+          <span class="cw-name" data-fd-name>Workflow · 0 moves</span>
+        </div>
+        <div class="cw-tile fd-canvas">
+          <div class="fd-tools">
+            <span class="q-btn q-btn--ghost fd-sm">+ Status</span>
+            <span class="q-btn q-btn--primary fd-sm" data-fd-publish>Publish workflow</span>
+          </div>
+          <div class="fd-board">
+            {
+              edges.map((e, i) => (
+                <span class="fd-edge fd-edge--v" data-fd-edge={i} style={`left:${e.x}%;top:calc(${e.y1}% + 14px);height:calc(${e.y2 - e.y1}% - 28px)`} />
+              ))
+            }
+            {
+              nodes.map((n, i) => (
+                <span class="fd-node" data-fd-node={i} style={`left:${n.x}%;top:${n.y}%`}>
+                  {n.label}
+                  <span class="fd-h" data-fd-h={i} aria-hidden="true"></span>
+                </span>
+              ))
+            }
+            <div class="fd-panel" data-fd-panel>
+              <span class="fd-k">Move</span>
+              <span class="fd-pmove" data-fd-pmove>Draft → Not started</span>
+              <span class="fd-pnote">Rules for this move: fields, signature, PIN</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <span class="fd-ghost" data-fd-ghost aria-hidden="true"><span class="fd-dot" data-fd-gdot></span><span data-fd-glabel></span></span>
+    </div>
+
+    <!-- 02 · move -->
+    <div class="cw-scene" data-cw-scene="1" hidden>
+      <div class="fm">
+        <div class="cw-tile fm-src">
+          <span class="fd-k">Starts from</span>
+          <ul class="fm-list">{sources.map((s, i) => <li data-fm-src={i}>{s}</li>)}</ul>
+          <span class="cw-name">Same steps from every surface</span>
+        </div>
+        <div class="cw-tile fm-modal">
+          <div class="fm-head">
+            <span class="q-label">Move to Completed</span>
+            <span class="fm-move"><span class="q-tag fm-ip">In progress</span> → <span class="q-tag q-tag--closed">Completed</span></span>
+          </div>
+          <div class="fm-steps"><span data-fm-step="0" class="is-on">1 · Required fields</span><span data-fm-step="1">2 · Sign</span></div>
+          <div class="fm-page" data-fm-page="0">
+            <span class="q-label">Result *</span>
+            <span class="q-input" data-fm-f="0"><span data-fm-v="0"></span></span>
+            <span class="q-label">Instrument *</span>
+            <span class="q-input" data-fm-f="1"><span data-fm-v="1"></span></span>
+          </div>
+          <div class="fm-page" data-fm-page="1" hidden>
+            <span class="q-label">E-signature *</span>
+            <span class="q-input" data-fm-f="2"><span data-fm-v="2"></span></span>
+            <span class="q-label">PIN *</span>
+            <span class="q-input" data-fm-f="3"><span data-fm-v="3"></span></span>
+            <span class="q-label">Comment</span>
+            <span class="q-input" data-fm-f="4"><span data-fm-v="4"></span></span>
+          </div>
+          <div class="fm-actions">
+            <span class="q-btn q-btn--ghost">Cancel</span>
+            <span class="q-btn q-btn--primary" data-fm-next>Next</span>
+          </div>
+          <div class="fm-history" data-fm-hist>
+            <span class="fd-k">History</span>
+            <span>In progress → Completed · signed · PIN · comment</span>
+          </div>
+          <span class="cw-name" data-fm-name>StatusChange · page 1 · required fields</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 03 · bulk -->
+    <div class="cw-scene" data-cw-scene="2" hidden>
+      <div class="fb">
+        <div class="cw-tile fb-table">
+          <div class="fb-top">
+            <span class="q-label">Selected tests · 8</span>
+            <span class="q-btn q-btn--primary fd-sm" data-fb-pub>Publish report</span>
+          </div>
+          <div class="q-table" role="presentation">
+            <div class="q-tr q-th"><span></span><span>Test</span><span>Name</span><span>Status</span></div>
+            {
+              tests.map(([t, n, ok], i) => (
+                <div class:list={['q-tr', !ok && 'fb-blocked']} data-fb-row={i} data-ok={ok ? '1' : '0'}>
+                  <span class="q-check is-on"></span>
+                  <span>{t}</span>
+                  <span>{n}</span>
+                  <span class="fb-st">
+                    <span class="q-tag fm-ip" data-fb-tag>In progress</span>
+                    {!ok && <span class="fb-lock">blocked by workflow</span>}
+                  </span>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+        <div class="fb-modal" data-fb-modal>
+          <span class="fb-title">6 tests can move to completed</span>
+          <p class="m-0">2 tests can’t, because of workflow rules. Go on with the 6, or review the blocked ones.</p>
+          <div class="fm-actions">
+            <span class="q-btn q-btn--ghost">Review blocked</span>
+            <span class="q-btn q-btn--primary" data-fb-go>Move 6 tests</span>
+          </div>
+        </div>
+        <span class="cw-name fb-name" data-fb-name>BulkStatusChange · 8 selected</span>
+      </div>
+    </div>
+
+    <svg class="cw-cursor" aria-hidden="true" width="22" height="22" viewBox="0 0 22 22"
+      ><path d="M3 2l15 8.2-6.6 1.6L8.6 18z" fill="#1f2a3d" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"></path></svg
+    >
+  </div>
+</section>
+
+<style>
+  /* 01 · draw */
+  .fd {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    gap: 16px;
+    min-height: 440px;
+  }
+  .fd-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .fd-pub {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #fdeceb;
+    color: #b42318;
+    font-size: 11px;
+    font-weight: 600;
+    transition: background-color 200ms, color 200ms;
+  }
+  .fd-pub.is-on {
+    background: #cdeadb;
+    color: #14532d;
+  }
+  .fd-k {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: #6b7588;
+  }
+  .fd-list,
+  .fm-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .fd-list li,
+  .fm-list li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border: 1px solid #e3e7ee;
+    border-radius: 6px;
+    transition: background-color 200ms, border-color 200ms;
+  }
+  .fd-list li.is-on,
+  .fm-list li.is-on {
+    border-color: #244d9e;
+    background: #eef3fc;
+  }
+  .fd-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+  .fd-side {
+    justify-content: flex-start;
+  }
+  .fd-side > .cw-name {
+    margin-top: auto;
+  }
+  .fd-canvas {
+    justify-content: flex-start;
+    gap: 12px;
+  }
+  .fd-tools {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+  .fd-sm {
+    min-height: 30px;
+    font-size: 12px;
+  }
+  .fd-board {
+    position: relative;
+    flex: 1;
+    min-height: 330px;
+    border-radius: 8px;
+    background:
+      radial-gradient(#d6dbe4 1px, transparent 1px) 0 0 / 16px 16px,
+      #f6f8fb;
+  }
+  .fd-edge {
+    position: absolute;
+    background: #5b6b86;
+    transition: transform 500ms ease-out;
+  }
+  .fd-edge--v {
+    width: 2px;
+    margin-left: -1px;
+    transform-origin: top;
+    transform: scaleY(0);
+  }
+  .fd-edge--h {
+    height: 2px;
+    margin-top: -1px;
+    transform-origin: left;
+    transform: scaleX(0);
+  }
+  .fd-edge.is-on {
+    transform: none;
+  }
+  .fd-node {
+    position: absolute;
+    transform: translate(-50%, -50%) scale(0.9);
+    padding: 6px 12px;
+    border: 1px solid #c9d0db;
+    border-radius: 6px;
+    background: #fff;
+    font-weight: 600;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 250ms, transform 250ms;
+  }
+  .fd-node.is-on {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+
+  .fd-h {
+    position: absolute;
+    left: 50%;
+    bottom: -5px;
+    width: 9px;
+    height: 9px;
+    margin-left: -4.5px;
+    border: 2px solid #244d9e;
+    border-radius: 50%;
+    background: #fff;
+  }
+  /* the last status has nothing to connect to */
+  [data-fd-node='3'] .fd-h {
+    display: none;
+  }
+  .fd-ghost {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 4;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border: 1px solid #244d9e;
+    border-radius: 6px;
+    background: #fff;
+    color: #1f2a3d;
+    font-family: Inter, system-ui, sans-serif;
+    font-size: 13px;
+    box-shadow: 0 6px 16px rgba(31, 42, 61, 0.18);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      transform 700ms cubic-bezier(0.45, 0, 0.2, 1),
+      opacity 150ms;
+  }
+  .fd-ghost.is-on {
+    opacity: 1;
+  }
+  .fd-panel {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 46%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 14px;
+    border: 1px solid #e3e7ee;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 4px 14px rgba(31, 42, 61, 0.08);
+    opacity: 0;
+    transform: translateX(8px);
+    transition: opacity 250ms, transform 250ms;
+  }
+  .fd-panel.is-on {
+    opacity: 1;
+    transform: none;
+  }
+  .fd-pmove {
+    font-weight: 600;
+  }
+  .fd-pnote {
+    font-size: 12px;
+    color: #6b7588;
+  }
+
+  /* 02 · move */
+  .fm {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    gap: 16px;
+    min-height: 440px;
+  }
+  .fm-src {
+    justify-content: flex-start;
+  }
+  .fm-src > .cw-name {
+    margin-top: auto;
+  }
+  .fm-modal {
+    justify-content: flex-start;
+    gap: 12px;
+  }
+  .fm-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .fm-move {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #6b7588;
+  }
+  .fm-ip {
+    background: #fdf0cf;
+    color: #7a5200;
+  }
+  .fm-steps {
+    display: flex;
+    gap: 18px;
+    border-bottom: 1px solid #e3e7ee;
+    font-weight: 500;
+    color: #6b7588;
+  }
+  .fm-steps span {
+    padding-bottom: 8px;
+    box-shadow: inset 0 -2px 0 transparent;
+  }
+  .fm-steps span.is-on {
+    color: #1f2a3d;
+    box-shadow: inset 0 -2px 0 #244d9e;
+  }
+  .fm-page {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .fm-page[hidden] {
+    display: none;
+  }
+  .fm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 10px;
+    border-top: 1px solid #eef1f5;
+  }
+  .fm-history {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    background: #f0f8f3;
+    color: #14532d;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 300ms;
+  }
+  .fm-history.is-on {
+    opacity: 1;
+  }
+  .fm-modal > .cw-name {
+    margin-top: auto;
+  }
+
+  /* 03 · bulk */
+  .fb {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 440px;
+  }
+  .fb-table {
+    justify-content: flex-start;
+    gap: 12px;
+  }
+  .fb-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .fb-table .q-tr {
+    min-height: 34px;
+  }
+  .fb-st {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+  .fb-lock {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: #b42318;
+  }
+  .fb-blocked {
+    background: #fff8f7;
+  }
+  .fb-modal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: min(420px, 90%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    border-radius: 10px;
+    background: #fff;
+    color: #1f2a3d;
+    font-family: Inter, system-ui, sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    box-shadow: 0 12px 40px rgba(31, 42, 61, 0.22);
+    opacity: 0;
+    transform: translate(-50%, -46%);
+    transition: opacity 250ms, transform 250ms;
+    pointer-events: none;
+  }
+  .fb-modal.is-on {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+  .fb-title {
+    font-size: 15px;
+    font-weight: 700;
+  }
+  .fb-name {
+    align-self: flex-start;
+  }
+
+  @media (max-width: 1023px) {
+    .fd,
+    .fm {
+      grid-template-columns: minmax(0, 1fr);
+      min-height: 0;
+    }
+  }
+</style>
+
+<script>
+  import { mountFilm, type FilmCtx } from '../../lib/film';
+
+  document.querySelectorAll<HTMLElement>('[data-film="status"]').forEach((root) =>
+    mountFilm(root, (root) => {
+      const $ = (s: string) => root.querySelector<HTMLElement>(s)!;
+      const $$ = (s: string) => Array.from(root.querySelectorAll<HTMLElement>(s));
+      const type = async (c: FilmCtx, id: number, el: HTMLElement, text: string, ms = 45) => {
+        for (let i = 1; i <= text.length; i++) {
+          if (!c.live(id)) return false;
+          el.textContent = text.slice(0, i);
+          await c.sleep(ms);
+        }
+        return true;
+      };
+
+      // 01 · draw — drag each status onto the canvas, then connect them handle to handle
+      const stage = root.querySelector<HTMLElement>('.cw-stage')!;
+      const sts = $$('[data-fd-st]');
+      const nodes = $$('[data-fd-node]');
+      const handles = $$('[data-fd-h]');
+      const edges = $$('[data-fd-edge]');
+      const pub = $('[data-fd-pub]');
+      const pubBtn = $('[data-fd-publish]');
+      const dname = $('[data-fd-name]');
+      const panel = $('[data-fd-panel]');
+      const pmove = $('[data-fd-pmove]');
+      const ghost = $('[data-fd-ghost]');
+      const glabel = $('[data-fd-glabel]');
+      const gdot = $('[data-fd-gdot]');
+      const labels = ['Draft', 'Not started', 'In progress', 'Completed'];
+      const place = (el: HTMLElement, at: Element, dx = 0, dy = 0) => {
+        const s0 = stage.getBoundingClientRect();
+        const r = at.getBoundingClientRect();
+        el.style.transform = `translate(${r.left - s0.left + dx}px, ${r.top - s0.top + dy}px)`;
+      };
+      const set1 = (done: boolean) => {
+        sts.forEach((x) => x.classList.remove('is-on'));
+        nodes.forEach((x) => x.classList.toggle('is-on', done));
+        edges.forEach((x) => x.classList.toggle('is-on', done));
+        ghost.classList.remove('is-on');
+        panel.classList.toggle('is-on', done);
+        pmove.textContent = 'In progress → Completed';
+        pub.classList.toggle('is-on', done);
+        pub.textContent = done ? 'Published' : 'Not published';
+        dname.textContent = done ? 'Workflow · 3 moves · published' : 'Workflow · 0 moves';
+      };
+      const play1 = async (c: FilmCtx, id: number) => {
+        set1(false);
+        await c.sleep(400);
+        // drag and drop
+        for (let k = 0; k < labels.length; k++) {
+          await c.to(sts[k], 0.3);
+          if (!c.live(id)) return;
+          await c.click();
+          sts[k].classList.add('is-on');
+          glabel.textContent = labels[k];
+          gdot.style.background = getComputedStyle(sts[k].querySelector('.fd-dot')!).backgroundColor;
+          ghost.style.transition = 'none';
+          place(ghost, sts[k]);
+          ghost.getBoundingClientRect();
+          ghost.style.transition = '';
+          ghost.classList.add('is-on');
+          place(ghost, nodes[k], -40, -16);
+          await c.to(nodes[k], 0.5, 0.5);
+          if (!c.live(id)) return;
+          ghost.classList.remove('is-on');
+          nodes[k].classList.add('is-on');
+          sts[k].classList.remove('is-on');
+          await c.sleep(200);
+        }
+        // connect handle to handle; each connection opens the move in the side panel
+        for (let k = 0; k < edges.length; k++) {
+          await c.to(handles[k], 0.5, 0.5);
+          if (!c.live(id)) return;
+          await c.click();
+          edges[k].classList.add('is-on');
+          await c.to(nodes[k + 1], 0.5, 0.3);
+          if (!c.live(id)) return;
+          pmove.textContent = `${labels[k]} → ${labels[k + 1]}`;
+          panel.classList.add('is-on');
+          c.name(dname, `Workflow · ${k + 1} move${k ? 's' : ''}`);
+          await c.sleep(700);
+        }
+        await c.to(pubBtn);
+        if (!c.live(id)) return;
+        await c.click();
+        pub.classList.add('is-on');
+        pub.textContent = 'Published';
+        c.name(dname, 'Workflow · 3 moves · published');
+        await c.sleep(1800);
+      };
+
+      // 02 · move
+      const src = $$('[data-fm-src]');
+      const steps = $$('[data-fm-step]');
+      const pages = $$('[data-fm-page]');
+      const f = $$('[data-fm-f]');
+      const v = $$('[data-fm-v]');
+      const next = $('[data-fm-next]');
+      const hist = $('[data-fm-hist]');
+      const mname = $('[data-fm-name]');
+      const vals = ['Pass', 'HPLC-02', 'Dr. L. Moreno', '••••', 'Checked against SOP-12'];
+      const page = (p: number) => {
+        pages.forEach((x, k) => (x.hidden = k !== p));
+        steps.forEach((x, k) => x.classList.toggle('is-on', k === p));
+        next.textContent = p === 0 ? 'Next' : 'Confirm';
+      };
+      const set2 = (done: boolean) => {
+        src.forEach((s, k) => s.classList.toggle('is-on', done && k === 0));
+        page(done ? 1 : 0);
+        v.forEach((x, k) => (x.textContent = done ? vals[k] : ''));
+        f.forEach((x) => x.classList.remove('is-focus'));
+        hist.classList.toggle('is-on', done);
+        mname.textContent = done ? 'StatusChange · recorded in history' : 'StatusChange · page 1 · required fields';
+      };
+      const play2 = async (c: FilmCtx, id: number) => {
+        set2(false);
+        for (let k = 0; k < src.length; k++) {
+          if (!c.live(id)) return;
+          src.forEach((s, j) => s.classList.toggle('is-on', j === k));
+          await c.sleep(420);
+        }
+        src.forEach((s, j) => s.classList.toggle('is-on', j === 0));
+        for (let k = 0; k < 5; k++) {
+          if (k === 2) {
+            await c.to(next);
+            if (!c.live(id)) return;
+            await c.click();
+            page(1);
+            c.name(mname, 'StatusChange · page 2 · signature · PIN · comment');
+            await c.sleep(300);
+          }
+          await c.to(f[k], 0.15);
+          if (!c.live(id)) return;
+          await c.click();
+          f.forEach((x, j) => x.classList.toggle('is-focus', j === k));
+          if (!(await type(c, id, v[k], vals[k], k === 3 ? 160 : 40))) return;
+        }
+        f.forEach((x) => x.classList.remove('is-focus'));
+        await c.to(next);
+        if (!c.live(id)) return;
+        await c.click();
+        hist.classList.add('is-on');
+        c.name(mname, 'StatusChange · recorded in history');
+        await c.sleep(2000);
+      };
+
+      // 03 · bulk
+      const rows = $$('[data-fb-row]');
+      const pubR = $('[data-fb-pub]');
+      const modal = $('[data-fb-modal]');
+      const go = $('[data-fb-go]');
+      const bname = $('[data-fb-name]');
+      const tag = (r: HTMLElement, done: boolean) => {
+        const t = r.querySelector<HTMLElement>('[data-fb-tag]')!;
+        const moved = done && r.dataset.ok === '1';
+        t.textContent = moved ? 'Completed' : 'In progress';
+        t.classList.toggle('q-tag--closed', moved);
+        t.classList.toggle('fm-ip', !moved);
+      };
+      const set3 = (done: boolean) => {
+        modal.classList.remove('is-on');
+        rows.forEach((r) => tag(r, done));
+        bname.textContent = done ? 'BulkStatusChange · 6 moved · 2 blocked' : 'BulkStatusChange · 8 selected';
+      };
+      const play3 = async (c: FilmCtx, id: number) => {
+        set3(false);
+        await c.sleep(600);
+        await c.to(pubR);
+        if (!c.live(id)) return;
+        await c.click();
+        modal.classList.add('is-on');
+        c.name(bname, 'BulkStatusChange · 6 can move · 2 blocked');
+        await c.sleep(1800);
+        await c.to(go);
+        if (!c.live(id)) return;
+        await c.click();
+        modal.classList.remove('is-on');
+        c.hideCursor();
+        for (const r of rows) {
+          if (!c.live(id)) return;
+          if (r.dataset.ok === '1') {
+            tag(r, true);
+            await c.sleep(220);
+          }
+        }
+        c.name(bname, 'BulkStatusChange · 6 moved · 2 blocked');
+        await c.sleep(2200);
+      };
+
+      return [
+        { play: play1, set: set1, dur: 17 },
+        { play: play2, set: set2, dur: 16 },
+        { play: play3, set: set3, dur: 9 },
+      ];
+    }),
+  );
+</script>
