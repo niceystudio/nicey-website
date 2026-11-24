@@ -1,0 +1,776 @@
+---
+/**
+ * Field playground — the brand pattern instrument.
+ *
+ * Generate, tune, and export the pixel-field pattern (the hero's drift
+ * field plus the ripple-rings and filled-drops modes from the cover set)
+ * without re-deriving anything: every control maps to a parameter of
+ * src/lib/pixel-field.ts, and every output is reproducible from its seed.
+ *
+ * Ported from babarogic/babarogic (src/pages/playground-b7x2k9.astro); the
+ * engine in src/lib/pixel-field.ts is shared verbatim between the two sites.
+ *
+ * Unlisted: not in the nav, noindex — a studio tool, not a page.
+ */
+import Base from '../../layouts/Base.astro';
+---
+
+<Base
+  title="Field playground — Nicey Studio"
+  description="Studio tool: generate and export the Nicey pixel-field pattern."
+  noindex
+>
+
+  <main class="lab">
+    <header class="lab-head">
+      <p class="mono lab-kicker">STUDIO TOOL</p>
+      <h1>Field playground</h1>
+      <p class="lab-sub">
+        The brand pattern, parameterized. Click the canvas to interact — waves in drift mode,
+        epicenter in rings mode, new circles in drops mode. Exports render at full resolution.
+      </p>
+    </header>
+
+    <div class="lab-grid">
+      <form class="panel" id="controls">
+        <fieldset>
+          <legend class="mono">PRESETS</legend>
+          <label>Preset
+            <select name="preset">
+              <option value="">—</option>
+              <optgroup label="Brand" id="preset-builtins"></optgroup>
+              <optgroup label="Saved" id="preset-saved"></optgroup>
+            </select>
+          </label>
+          <span class="row">
+            <input type="text" name="presetName" placeholder="Preset name" />
+            <button type="button" id="save-preset">Save</button>
+          </span>
+          <div class="row">
+            <button type="button" id="delete-preset">Delete saved</button>
+            <button type="button" id="reset-defaults">Reset all</button>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend class="mono">PATTERN</legend>
+          <label>Mode
+            <select name="mode">
+              <option value="drift" selected>Drift field</option>
+              <option value="rings">Ripple rings</option>
+              <option value="drops">Filled drops</option>
+            </select>
+          </label>
+          <label>Theme
+            <select name="theme">
+              <option value="light" selected>Light</option>
+              <option value="dark">Dark (site)</option>
+              <option value="glow">Dark (glow)</option>
+            </select>
+          </label>
+          <label>Background
+            <input type="color" name="bg" value="#f3f0e9" />
+          </label>
+          <label>Format
+            <select name="format">
+              <option value="1600x1200" selected>Contra cover · 1600×1200</option>
+              <option value="1280x720">YouTube · 1280×720</option>
+              <option value="1200x630">OG / link · 1200×630</option>
+              <option value="1080x1080">Square · 1080×1080</option>
+              <option value="1080x1350">Portrait · 1080×1350</option>
+              <option value="1500x500">X header · 1500×500</option>
+              <option value="1584x396">LinkedIn cover · 1584×396</option>
+              <option value="1200x1200">LinkedIn post · 1200×1200</option>
+            </select>
+          </label>
+          <label>Seed
+            <span class="row">
+              <input type="number" name="seed" value="101" step="1" />
+              <button type="button" id="dice" title="Random seed">🎲</button>
+            </span>
+          </label>
+          <label>Cell size <output>32</output>
+            <input type="range" name="cell" min="14" max="56" value="32" />
+          </label>
+          <label>Cell gap <output>1</output>
+            <input type="range" name="gap" min="0" max="10" value="1" />
+          </label>
+          <label>Wash <output>0.18</output>
+            <input type="range" name="shift" min="0.02" max="0.40" step="0.01" value="0.18" />
+          </label>
+          <label class="check"><input type="checkbox" name="featherOn" checked /> Fade edges</label>
+          <label class="check" data-only="drift"><input type="checkbox" name="animate" checked /> Animate (drift + waves)</label>
+        </fieldset>
+
+        <fieldset data-only="rings">
+          <legend class="mono">RINGS</legend>
+          <label>Ring spacing <output>95</output>
+            <input type="range" name="wavelength" min="50" max="220" value="95" />
+          </label>
+          <label>Reach <output>950</output>
+            <input type="range" name="decay" min="300" max="2000" step="10" value="950" />
+          </label>
+        </fieldset>
+
+        <fieldset data-only="drops">
+          <legend class="mono">DROPS</legend>
+          <label>Circles <output>6</output>
+            <input type="range" name="dropCount" min="1" max="12" value="6" />
+          </label>
+          <label>Largest <output>0.27</output>
+            <input type="range" name="dropMax" min="0.10" max="0.45" step="0.01" value="0.27" />
+          </label>
+          <button type="button" id="clear-drops">Clear added circles</button>
+        </fieldset>
+
+        <fieldset>
+          <legend class="mono">TEXT</legend>
+          <label class="check"><input type="checkbox" name="textOn" checked /> Show text</label>
+          <label>Label
+            <input type="text" name="label" value="NICEY STUDIO · DESIGN SYSTEMS" />
+          </label>
+          <label>Title
+            <input type="text" name="title" value="One system your designers, engineers and agents read the same way." />
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend class="mono">EXPORT</legend>
+          <div class="row">
+            <button type="button" id="png1">PNG 1×</button>
+            <button type="button" id="png2">PNG 2×</button>
+          </div>
+          <div class="row">
+            <button type="button" id="copy-svg">Copy SVG</button>
+            <button type="button" id="dl-svg">SVG file</button>
+          </div>
+          <p class="hint">SVG pastes into Figma as editable cells — add text there.</p>
+          <div class="row">
+            <button type="button" id="copy-json">Copy params</button>
+            <button type="button" id="load-json">Load params</button>
+          </div>
+        </fieldset>
+      </form>
+
+      <div class="stage">
+        <canvas id="field"></canvas>
+        <p class="mono stage-note" id="stage-note"></p>
+      </div>
+    </div>
+  </main>
+</Base>
+
+<style>
+  .lab { max-width: 1440px; margin: 0 auto; padding: 48px clamp(16px, 3vw, 40px) 96px; }
+  .mono { font-family: var(--font-mono); }
+  .lab-kicker { color: var(--color-muted); letter-spacing: 0.14em; font-size: 12px; margin: 0; }
+  .lab-head h1 { font-size: clamp(28px, 4vw, 40px); letter-spacing: -0.025em; margin: 10px 0 0; }
+  .lab-sub { color: var(--color-ink-2); max-width: 60ch; margin: 14px 0 0; line-height: 1.55; }
+
+  .lab-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 40px;
+    margin-top: 40px;
+    align-items: start;
+  }
+  @media (max-width: 860px) {
+    .lab-grid { grid-template-columns: 1fr; }
+  }
+
+  .panel { display: grid; gap: 20px; }
+  .panel fieldset {
+    border: 1px solid var(--color-line);
+    border-radius: 12px;
+    padding: 20px;
+    display: grid;
+    gap: 14px;
+  }
+  .panel legend { padding: 0 6px; color: var(--color-muted); letter-spacing: 0.12em; font-size: 12px; }
+  .panel label { display: grid; gap: 6px; font-size: 13px; color: var(--color-ink-2); }
+  .panel label.check { grid-template-columns: auto 1fr; align-items: center; gap: 8px; }
+  .panel output { float: right; color: var(--color-muted); font-variant-numeric: tabular-nums; }
+  .panel input[type='text'], .panel input[type='number'], .panel select {
+    font: inherit;
+    padding: 8px 10px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--color-surface) 40%, transparent);
+    color: var(--color-ink);
+    width: 100%;
+  }
+  .panel button {
+    font: inherit;
+    font-size: 13px;
+    padding: 8px 12px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--color-surface) 60%, transparent);
+    color: var(--color-ink);
+    cursor: pointer;
+  }
+  .panel button:hover { background: var(--color-surface); }
+  .row { display: flex; gap: 8px; }
+  .hint { font-size: 12px; color: var(--color-muted); margin: 0; line-height: 1.4; }
+  .row > * { flex: 1; }
+  .row > #dice { flex: 0 0 auto; }
+  [data-only] { display: none; }
+  [data-only].on { display: grid; }
+  label[data-only].on { display: grid; }
+
+  .stage { position: sticky; top: 24px; }
+  .stage canvas {
+    width: 100%;
+    height: auto;
+    display: block;
+    border: 1px solid var(--color-line);
+    border-radius: 12px;
+    cursor: crosshair;
+  }
+  .stage-note { margin-top: 10px; color: var(--color-muted); font-size: 12px; }
+</style>
+
+<script>
+  import {
+    createDrift,
+    colorAt,
+    waveAt,
+    feather,
+    ringCrest,
+    discFill,
+    mulberry32,
+    COVER_FEATHER,
+    HERO_RIPPLE,
+    LIGHT_PALETTE,
+    DARK_PALETTE,
+    GLOW_DARK_PALETTE,
+    type Palette,
+    type Ripple,
+    type DriftField,
+  } from '../../lib/pixel-field';
+
+  const PALETTES: Record<string, Palette> = {
+    light: LIGHT_PALETTE,
+    dark: DARK_PALETTE,
+    glow: GLOW_DARK_PALETTE,
+  };
+
+  // Per-mode gains validated in the cover set. Light fields need an alpha
+  // boost for the rings/drops modes; dark peaks carry their own contrast.
+  const MODE_GAIN = {
+    rings: {
+      light: { base: 0.05, noise: 0.18, gain: 1.1, alpha: 1.3 },
+      dark: { base: 0.14, noise: 0.34, gain: 1.0, alpha: 1.0 },
+    },
+    drops: {
+      light: { base: 0.05, noise: 0.16, gain: 1.0, alpha: 1.25 },
+      dark: { base: 0.05, noise: 0.16, gain: 1.0, alpha: 1.0 },
+    },
+  };
+
+  type Params = {
+    mode: 'drift' | 'rings' | 'drops';
+    theme: 'light' | 'dark' | 'glow';
+    /** Frame background — defaults to the theme's ground, freely overridable. */
+    bg: string;
+    w: number;
+    h: number;
+    seed: number;
+    cell: number;
+    /** px between cells — 0 fuses them into a solid field, 1 is the brand default. */
+    gap: number;
+    shift: number;
+    featherOn: boolean;
+    animate: boolean;
+    // rings
+    epicenter: { x: number; y: number };
+    wavelength: number;
+    decay: number;
+    // drops
+    dropCount: number;
+    dropMax: number;
+    extraDrops: { x: number; y: number; r: number }[];
+    // text
+    textOn: boolean;
+    label: string;
+    title: string;
+  };
+
+  function setup() {
+    const form = document.getElementById('controls') as HTMLFormElement | null;
+    const canvas = document.getElementById('field') as HTMLCanvasElement | null;
+    if (!form || !canvas || canvas.dataset.ready) return;
+    canvas.dataset.ready = '1';
+    const note = document.getElementById('stage-note')!;
+
+    const p: Params = {
+      mode: 'drift',
+      theme: 'light',
+      bg: LIGHT_PALETTE.bg,
+      w: 1600,
+      h: 1200,
+      seed: 101,
+      cell: 32,
+      gap: 1,
+      shift: 0.18,
+      featherOn: true,
+      animate: true,
+      epicenter: { x: 0.62, y: 0.42 },
+      wavelength: 95,
+      decay: 950,
+      dropCount: 6,
+      dropMax: 0.27,
+      extraDrops: [],
+      textOn: true,
+      label: 'NICEY STUDIO · DESIGN SYSTEMS',
+      title: 'One system your designers, engineers and agents read the same way.',
+    };
+
+    // ---- persistence & presets ----
+    const KEY_LAST = 'nicey-field:last';
+    const KEY_PRESETS = 'nicey-field:presets';
+    const DEFAULTS: Params = JSON.parse(JSON.stringify(p));
+    try {
+      const saved = localStorage.getItem(KEY_LAST);
+      if (saved) Object.assign(p, JSON.parse(saved));
+    } catch {}
+    const saveLast = () => {
+      try { localStorage.setItem(KEY_LAST, JSON.stringify(p)); } catch {}
+    };
+    const loadSaved = (): Record<string, Partial<Params>> => {
+      try { return JSON.parse(localStorage.getItem(KEY_PRESETS) || '{}'); } catch { return {}; }
+    };
+
+    // Validated brand recipes from the cover set. Applied over current state,
+    // so text and anything a patch doesn't mention carries through.
+    const BUILTINS: { id: string; name: string; patch: Partial<Params> }[] = [
+      { id: 'cover-drift-light', name: 'Cover · drift light', patch: { mode: 'drift', theme: 'light', bg: '#f3f0e9', w: 1600, h: 1200, seed: 101, cell: 36, gap: 1, shift: 0.18, featherOn: true } },
+      { id: 'cover-drift-dark', name: 'Cover · drift dark', patch: { mode: 'drift', theme: 'glow', bg: '#1e1d18', w: 1600, h: 1200, seed: 467, cell: 36, gap: 1, shift: 0.18, featherOn: true } },
+      { id: 'cover-rings-light', name: 'Cover · rings light', patch: { mode: 'rings', theme: 'light', bg: '#f3f0e9', w: 1600, h: 1200, seed: 701, cell: 36, gap: 1, shift: 0.18, epicenter: { x: 0.62, y: 0.42 }, wavelength: 95, decay: 950 } },
+      { id: 'cover-rings-dark', name: 'Cover · rings dark', patch: { mode: 'rings', theme: 'glow', bg: '#1e1d18', w: 1600, h: 1200, seed: 733, cell: 36, gap: 1, shift: 0.18, epicenter: { x: 0.4, y: 0.55 }, wavelength: 95, decay: 780 } },
+      { id: 'cover-drops-light', name: 'Cover · drops light', patch: { mode: 'drops', theme: 'light', bg: '#f3f0e9', w: 1600, h: 1200, seed: 811, cell: 36, gap: 1, shift: 0.18, dropCount: 6, dropMax: 0.27, extraDrops: [] } },
+      { id: 'cover-drops-dark', name: 'Cover · drops dark', patch: { mode: 'drops', theme: 'glow', bg: '#1e1d18', w: 1600, h: 1200, seed: 853, cell: 36, gap: 1, shift: 0.18, dropCount: 6, dropMax: 0.27, extraDrops: [] } },
+      { id: 'linkedin-cover', name: 'LinkedIn cover', patch: { mode: 'drift', theme: 'light', bg: '#f3f0e9', w: 1584, h: 396, seed: 211, cell: 22, gap: 1, shift: 0.18 } },
+      { id: 'linkedin-post', name: 'LinkedIn post', patch: { mode: 'drift', theme: 'light', bg: '#f3f0e9', w: 1200, h: 1200, seed: 229, cell: 28, gap: 1, shift: 0.18 } },
+      { id: 'site-dark', name: 'Site dark drift', patch: { mode: 'drift', theme: 'dark', bg: '#141410', w: 1600, h: 1200, seed: 101, cell: 36, gap: 1, shift: 0.18 } },
+    ];
+
+    let field: DriftField;
+    const ripples: Ripple[] = [];
+    const rebuildField = () => {
+      const rows = Math.min(14, Math.max(4, Math.round(10 * (p.h / p.w))));
+      field = createDrift({ cols: 10, rows, seed: p.seed });
+    };
+    rebuildField();
+
+    // Seeded satellite circles for drops mode; user clicks append to extraDrops.
+    const seededDrops = () => {
+      const r = mulberry32(p.seed + 1);
+      const out: { x: number; y: number; r: number; s: number }[] = [];
+      for (let i = 0; i < p.dropCount; i++) {
+        const frac = i === 0 ? p.dropMax : p.dropMax * (0.3 + r() * 0.55);
+        out.push({
+          x: 0.08 + r() * 0.84,
+          y: 0.1 + r() * 0.8,
+          r: frac * p.w,
+          s: Math.max(0.65, 1.05 - i * 0.08),
+        });
+      }
+      for (const d of p.extraDrops) out.push({ x: d.x, y: d.y, r: d.r, s: 0.9 });
+      return out;
+    };
+
+    const gains = (mode: 'rings' | 'drops') => MODE_GAIN[mode][p.theme === 'light' ? 'light' : 'dark'];
+
+    // Shared cell iterator — the single source of the per-cell math, consumed
+    // by the canvas renderer AND the SVG exporter so the two can never drift.
+    function forEachCell(
+      t: number,
+      emit: (x: number, y: number, size: number, c: [number, number, number, number], a: number) => void,
+    ) {
+      const { w: W, h: H } = p;
+      const pal = PALETTES[p.theme];
+      const CELL = p.cell;
+      const cols = Math.ceil(W / CELL);
+      const rows = Math.ceil(H / CELL);
+      const drops = p.mode === 'drops' ? seededDrops() : [];
+      const live = p.mode === 'drift' && p.animate && ripples.length > 0;
+      const size = Math.max(2, CELL - p.gap);
+
+      for (let cy = 0; cy < rows; cy++) {
+        for (let cx = 0; cx < cols; cx++) {
+          const px = cx * CELL + CELL / 2;
+          const py = cy * CELL + CELL / 2;
+          const n = field.sample(cx / cols, cy / rows, t);
+          let v: number;
+          let alphaBoost = 1;
+
+          if (p.mode === 'rings') {
+            const g = gains('rings');
+            const d = Math.hypot(px - p.epicenter.x * W, py - p.epicenter.y * H);
+            const crest = ringCrest(d, p.wavelength, (n - 0.5) * 0.8);
+            v = g.base + n * g.noise + crest * Math.exp(-d / p.decay) * g.gain;
+            alphaBoost = g.alpha;
+          } else if (p.mode === 'drops') {
+            const g = gains('drops');
+            let disc = 0;
+            for (const dr of drops) {
+              const d = Math.hypot(px - dr.x * W, py - dr.y * H) * (1 + (n - 0.5) * 0.3);
+              disc += discFill(d, dr.r) * dr.s;
+            }
+            v = g.base + n * g.noise + disc * g.gain;
+            alphaBoost = g.alpha;
+          } else {
+            v = n + (live ? waveAt(ripples, px, py, t) * 0.5 : 0);
+          }
+
+          const c = colorAt(pal.stops, v - p.shift);
+          const a = Math.min(1, c[3] * alphaBoost) * (p.featherOn ? feather(px / W, py / H, COVER_FEATHER) : 1);
+          if (a < 0.02) continue;
+          emit(cx * CELL, cy * CELL, size, c, a);
+        }
+      }
+    }
+
+    // One renderer for preview and export: `scale` multiplies resolution,
+    // all layout math stays in logical (1x) units.
+    function render(ctx: CanvasRenderingContext2D, scale: number, t: number) {
+      const { w: W, h: H } = p;
+      ctx.setTransform(scale, 0, 0, scale, 0, 0);
+      ctx.fillStyle = p.bg;
+      ctx.fillRect(0, 0, W, H);
+      forEachCell(t, (x, y, size, c, a) => {
+        ctx.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${a.toFixed(3)})`;
+        ctx.fillRect(x, y, size, size);
+      });
+      if (p.textOn) drawText(ctx, W, H, PALETTES[p.theme]);
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+    }
+
+    // Field as an SVG — every cell a real <rect>, editable after pasting into
+    // Figma. Text is intentionally left out: add it in Figma where it stays
+    // a text layer.
+    function svgString(): string {
+      const parts: string[] = [
+        `<svg xmlns="http://www.w3.org/2000/svg" width="${p.w}" height="${p.h}" viewBox="0 0 ${p.w} ${p.h}">`,
+        `<rect width="${p.w}" height="${p.h}" fill="${p.bg}"/>`,
+        `<g>`,
+      ];
+      forEachCell(0, (x, y, size, c, a) => {
+        parts.push(
+          `<rect x="${x}" y="${y}" width="${size}" height="${size}" fill="rgb(${c[0]},${c[1]},${c[2]})" fill-opacity="${a.toFixed(3)}"/>`,
+        );
+      });
+      parts.push('</g></svg>');
+      return parts.join('\n');
+    }
+
+    // Perceived lightness of the current background — text flips ink color
+    // on dark grounds regardless of which theme the field itself uses.
+    const bgIsDark = () => {
+      const n = parseInt(p.bg.slice(1), 16);
+      const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b < 128;
+    };
+
+    // Cover typography, scaled off the 1600px reference the covers use.
+    function drawText(ctx: CanvasRenderingContext2D, W: number, H: number, pal: Palette) {
+      const k = W / 1600;
+      const pad = Math.round(84 * k);
+      const dark = bgIsDark();
+      const ink = dark ? '#f3f0e9' : '#26251f';
+      const muted = dark ? '#b3ada0' : '#4d4a40';
+
+      const labelSize = Math.max(13, Math.round(26 * k));
+      ctx.font = `500 ${labelSize}px "Geist Variable", sans-serif`;
+      ctx.letterSpacing = `${(labelSize * 0.14).toFixed(1)}px`;
+      ctx.fillStyle = muted;
+      ctx.textBaseline = 'top';
+      ctx.fillText(p.label, pad, Math.round(pad * 1.2));
+      ctx.letterSpacing = '0px';
+
+      const size = Math.round(84 * k * (H / W > 0.9 ? 0.95 : 1));
+      ctx.font = `500 ${size}px "Geist Variable", sans-serif`;
+      ctx.letterSpacing = `${(-size * 0.025).toFixed(1)}px`;
+      ctx.fillStyle = ink;
+      const lineH = Math.round(size * 1.04);
+      const maxW = W - pad * 2;
+      const lines: string[] = [];
+      let line = '';
+      for (const word of p.title.split(' ')) {
+        const probe = line ? line + ' ' + word : word;
+        if (ctx.measureText(probe).width > maxW && line) {
+          lines.push(line);
+          line = word;
+        } else line = probe;
+      }
+      if (line) lines.push(line);
+      const top = H - Math.round(pad * 1.15) - lines.length * lineH;
+      lines.forEach((l, i) => ctx.fillText(l, pad, top + i * lineH));
+      ctx.letterSpacing = '0px';
+    }
+
+    const ctx = canvas.getContext('2d')!;
+    const draw = (t = 0) => render(ctx, 1, t);
+
+    const applySize = () => {
+      canvas.width = p.w;
+      canvas.height = p.h;
+      note.textContent = `${p.w}×${p.h} · seed ${p.seed} · ${p.mode} / ${p.theme}`;
+    };
+
+    // ---- animation (drift mode) ----
+    let running = false;
+    let autoWave = 0;
+    const emitWave = (x = 0.15 + Math.random() * 0.7, y = 0.15 + Math.random() * 0.7) => {
+      ripples.push({ x: x * p.w, y: y * p.h, t0: performance.now() / 1000 });
+      if (ripples.length > 6) ripples.shift();
+    };
+    const loop = (ms: number) => {
+      if (!running) return;
+      requestAnimationFrame(loop);
+      const t = ms / 1000;
+      while (ripples.length && t - ripples[0].t0 > HERO_RIPPLE.life) ripples.shift();
+      draw(t);
+    };
+    const setRunning = (on: boolean) => {
+      if (on === running) return;
+      running = on;
+      if (on) {
+        emitWave(0.62, 0.42); // something moves the moment animation starts
+        autoWave = window.setInterval(emitWave, 7000);
+        requestAnimationFrame(loop);
+      } else {
+        clearInterval(autoWave);
+        ripples.length = 0;
+        draw(0);
+      }
+    };
+
+    const update = (full = false) => {
+      if (full) rebuildField();
+      applySize();
+      form.querySelectorAll<HTMLElement>('[data-only]').forEach((el) => {
+        el.classList.toggle('on', el.dataset.only === p.mode);
+      });
+      setRunning(p.mode === 'drift' && p.animate);
+      if (!running) draw(0);
+      saveLast();
+    };
+
+    // ---- controls ----
+    const f = form.elements as any;
+
+    // Push params → form (presets, JSON load, first paint after restore).
+    const syncForm = () => {
+      f.mode.value = p.mode;
+      f.theme.value = p.theme;
+      f.bg.value = p.bg ?? PALETTES[p.theme].bg;
+      f.format.value = `${p.w}x${p.h}`;
+      f.seed.value = String(p.seed);
+      f.cell.value = String(p.cell);
+      f.gap.value = String(p.gap ?? 1);
+      f.shift.value = String(p.shift);
+      f.featherOn.checked = p.featherOn;
+      f.animate.checked = p.animate;
+      f.wavelength.value = String(p.wavelength);
+      f.decay.value = String(p.decay);
+      f.dropCount.value = String(p.dropCount);
+      f.dropMax.value = String(p.dropMax);
+      f.textOn.checked = p.textOn;
+      f.label.value = p.label;
+      f.title.value = p.title;
+      form.querySelectorAll('input[type=range]').forEach((r) => {
+        const out = r.closest('label')?.querySelector('output');
+        if (out) out.textContent = (r as HTMLInputElement).value;
+      });
+    };
+
+    form.addEventListener('input', () => {
+      p.mode = f.mode.value;
+      if (f.theme.value !== p.theme) {
+        // switching theme resets the ground to that theme's own
+        p.theme = f.theme.value;
+        p.bg = PALETTES[p.theme].bg;
+        f.bg.value = p.bg;
+      } else {
+        p.bg = f.bg.value;
+      }
+      const [w, h] = (f.format.value as string).split('x').map(Number);
+      const sizeChanged = w !== p.w || h !== p.h;
+      p.w = w;
+      p.h = h;
+      const seed = parseInt(f.seed.value, 10);
+      const seedChanged = !Number.isNaN(seed) && seed !== p.seed;
+      if (!Number.isNaN(seed)) p.seed = seed;
+      p.cell = Number(f.cell.value);
+      p.gap = Number(f.gap.value);
+      p.shift = Number(f.shift.value);
+      p.featherOn = f.featherOn.checked;
+      p.animate = f.animate.checked;
+      p.wavelength = Number(f.wavelength.value);
+      p.decay = Number(f.decay.value);
+      p.dropCount = Number(f.dropCount.value);
+      p.dropMax = Number(f.dropMax.value);
+      p.textOn = f.textOn.checked;
+      p.label = f.label.value;
+      p.title = f.title.value;
+      form.querySelectorAll('input[type=range]').forEach((r) => {
+        const out = r.closest('label')?.querySelector('output');
+        if (out) out.textContent = (r as HTMLInputElement).value;
+      });
+      update(seedChanged || sizeChanged);
+    });
+
+    document.getElementById('dice')!.addEventListener('click', () => {
+      f.seed.value = String(Math.floor(Math.random() * 100000));
+      form.dispatchEvent(new Event('input'));
+    });
+    document.getElementById('clear-drops')!.addEventListener('click', () => {
+      p.extraDrops = [];
+      draw(0);
+      saveLast();
+    });
+
+    // ---- presets ----
+    const builtinGroup = document.getElementById('preset-builtins')!;
+    const savedGroup = document.getElementById('preset-saved')!;
+    const refreshPresetOptions = () => {
+      builtinGroup.innerHTML = BUILTINS.map((b) => `<option value="b:${b.id}">${b.name}</option>`).join('');
+      savedGroup.innerHTML = Object.keys(loadSaved())
+        .map((n) => `<option value="s:${encodeURIComponent(n)}">${n}</option>`)
+        .join('');
+    };
+    refreshPresetOptions();
+
+    const applyPatch = (patch: Partial<Params>) => {
+      Object.assign(p, JSON.parse(JSON.stringify(patch)));
+      syncForm();
+      update(true);
+    };
+    (f.preset as HTMLSelectElement).addEventListener('change', () => {
+      const v = f.preset.value as string;
+      if (!v) return;
+      if (v.startsWith('b:')) {
+        const b = BUILTINS.find((x) => 'b:' + x.id === v);
+        if (b) applyPatch(b.patch);
+      } else {
+        const s = loadSaved()[decodeURIComponent(v.slice(2))];
+        if (s) applyPatch(s);
+      }
+    });
+    document.getElementById('save-preset')!.addEventListener('click', () => {
+      const name = (f.presetName.value as string).trim();
+      if (!name) {
+        note.textContent = 'Give the preset a name first.';
+        return;
+      }
+      const all = loadSaved();
+      all[name] = JSON.parse(JSON.stringify(p));
+      try { localStorage.setItem(KEY_PRESETS, JSON.stringify(all)); } catch {}
+      refreshPresetOptions();
+      f.preset.value = 's:' + encodeURIComponent(name);
+      note.textContent = `Saved preset "${name}".`;
+    });
+    document.getElementById('delete-preset')!.addEventListener('click', () => {
+      const v = f.preset.value as string;
+      if (!v.startsWith('s:')) {
+        note.textContent = 'Select a saved preset to delete.';
+        return;
+      }
+      const name = decodeURIComponent(v.slice(2));
+      const all = loadSaved();
+      delete all[name];
+      try { localStorage.setItem(KEY_PRESETS, JSON.stringify(all)); } catch {}
+      refreshPresetOptions();
+      f.preset.value = '';
+      note.textContent = `Deleted "${name}".`;
+    });
+    document.getElementById('reset-defaults')!.addEventListener('click', () => {
+      try { localStorage.removeItem(KEY_LAST); } catch {}
+      applyPatch(DEFAULTS);
+      f.preset.value = '';
+      note.textContent = 'Back to defaults.';
+    });
+
+    canvas.addEventListener('pointerdown', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * p.w;
+      const y = ((e.clientY - rect.top) / rect.height) * p.h;
+      if (p.mode === 'drift' && p.animate) {
+        ripples.push({ x, y, t0: performance.now() / 1000 });
+        if (ripples.length > 6) ripples.shift();
+      } else if (p.mode === 'rings') {
+        p.epicenter = { x: x / p.w, y: y / p.h };
+        draw(0);
+        saveLast();
+      } else if (p.mode === 'drops') {
+        p.extraDrops.push({ x: x / p.w, y: y / p.h, r: 0.12 * p.w });
+        draw(0);
+        saveLast();
+      }
+    });
+
+    // ---- export ----
+    const exportPng = (scale: number) => {
+      const out = document.createElement('canvas');
+      out.width = p.w * scale;
+      out.height = p.h * scale;
+      render(out.getContext('2d')!, scale, 0);
+      out.toBlob((blob) => {
+        if (!blob) return;
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `nicey-field-${p.mode}-${p.theme}-${p.w}x${p.h}-s${p.seed}${scale > 1 ? '@' + scale + 'x' : ''}.png`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }, 'image/png');
+    };
+    document.getElementById('png1')!.addEventListener('click', () => exportPng(1));
+    document.getElementById('png2')!.addEventListener('click', () => exportPng(2));
+
+    document.getElementById('copy-svg')!.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(svgString());
+        note.textContent = 'SVG copied — paste directly into Figma.';
+      } catch {
+        note.textContent = 'Clipboard blocked — use "SVG file" instead.';
+      }
+    });
+    document.getElementById('dl-svg')!.addEventListener('click', () => {
+      const blob = new Blob([svgString()], { type: 'image/svg+xml' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `nicey-field-${p.mode}-${p.theme}-${p.w}x${p.h}-s${p.seed}.svg`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+
+    document.getElementById('copy-json')!.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(JSON.stringify(p, null, 2));
+        note.textContent = 'Params copied to clipboard.';
+      } catch {
+        note.textContent = 'Clipboard blocked by the browser.';
+      }
+    });
+    document.getElementById('load-json')!.addEventListener('click', () => {
+      const raw = prompt('Paste params JSON:');
+      if (!raw) return;
+      try {
+        applyPatch(JSON.parse(raw));
+      } catch {
+        note.textContent = 'Could not parse that JSON.';
+      }
+    });
+
+    // first paint after fonts so canvas text uses Geist; the form reflects
+    // whatever state was restored from the last session
+    syncForm();
+    applySize();
+    update(true);
+    document.fonts?.ready.then(() => { if (!running) draw(0); });
+  }
+
+  setup();
+</script>
