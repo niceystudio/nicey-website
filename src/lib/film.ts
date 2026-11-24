@@ -9,7 +9,8 @@ export interface FilmCtx {
   sleep: (ms: number) => Promise<void>;
   /** where `to` would put the cursor tip, relative to the stage */
   point: (el: Element, dx?: number, dy?: number) => { x: number; y: number };
-  to: (el: Element, dx?: number, dy?: number) => Promise<void>;
+  /** move the cursor tip onto `el`; `carry` moves another element along with it (a dragged item), offset from the tip */
+  to: (el: Element, dx?: number, dy?: number, carry?: { el: HTMLElement; ox: number; oy: number }) => Promise<void>;
   click: () => Promise<void>;
   hideCursor: () => void;
   live: (id: number) => boolean;
@@ -34,6 +35,19 @@ export function mountFilm(root: HTMLElement, scenesFor: (root: HTMLElement) => F
   let cur = Math.min(Math.max(Number(new URLSearchParams(location.search).get('scene')) - 1 || 0, 0), scenes.length - 1);
 
   const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+  let last = { x: 0, y: 0 };
+  // ?trace=1: record where the cursor tip really is every 40 ms (review only)
+  if (new URLSearchParams(location.search).has('trace')) {
+    const pts: string[] = [];
+    const t0 = performance.now();
+    setInterval(() => {
+      const s0 = stage.getBoundingClientRect();
+      const r = cursor.getBoundingClientRect();
+      const on = getComputedStyle(cursor).opacity;
+      pts.push(`${Math.round(performance.now() - t0)},${Math.round(r.left - s0.left)},${Math.round(r.top - s0.top)},${on},${cur}`);
+      root.dataset.trace = pts.join(';');
+    }, 40);
+  }
   const ctx: FilmCtx = {
     sleep,
     live: (id) => id === run,
@@ -43,19 +57,26 @@ export function mountFilm(root: HTMLElement, scenesFor: (root: HTMLElement) => F
       const r = el.getBoundingClientRect();
       return { x: r.left - s.left + r.width * dx, y: r.top - s.top + r.height * dy };
     },
-    to: async (el, dx = 0.5, dy = 0.55) => {
+    to: async (el, dx = 0.5, dy = 0.55, carry) => {
       const { x, y } = ctx.point(el, dx, dy);
       // first move after the cursor was hidden: appear a short way off the target and glide in,
       // instead of flying in from the stage corner or from the last scene's spot
       if (!cursor.classList.contains('is-shown')) {
         cursor.style.transition = 'none';
-        cursor.style.transform = `translate(${x + 56}px, ${y + 40}px)`;
+        cursor.style.translate = `${x + 56}px ${y + 40}px`;
+        last = { x: x + 56, y: y + 40 };
         cursor.getBoundingClientRect();
         cursor.style.transition = '';
         cursor.classList.add('is-shown');
       }
-      cursor.style.transform = `translate(${x}px, ${y}px)`;
-      await sleep(760);
+      // travel time grows with the distance (short hops quick, trips across the stage unhurried)
+      const d = Math.hypot(x - last.x, y - last.y);
+      const ms = Math.round(Math.min(1100, Math.max(420, 380 + d * 0.75)));
+      stage.style.setProperty('--move', `${ms}ms`);
+      cursor.style.translate = `${x}px ${y}px`;
+      if (carry) carry.el.style.translate = `${x + carry.ox}px ${y + carry.oy}px`;
+      last = { x, y };
+      await sleep(ms + 60);
     },
     click: async () => {
       cursor.classList.remove('is-click');

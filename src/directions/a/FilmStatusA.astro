@@ -352,7 +352,7 @@ const tests = [
     opacity: 0;
     pointer-events: none;
     transition:
-      transform 700ms cubic-bezier(0.45, 0, 0.2, 1),
+      translate var(--move, 700ms) cubic-bezier(0.45, 0, 0.2, 1),
       opacity 150ms;
   }
   .fd-ghost.is-on {
@@ -577,11 +577,8 @@ const tests = [
       const glabel = $('[data-fd-glabel]');
       const gdot = $('[data-fd-gdot]');
       const labels = ['Draft', 'Not started', 'In progress', 'Completed'];
-      // the dragged chip hangs just under the cursor tip, so the two move as one
-      const place = (c: FilmCtx, at: Element, dx: number, dy: number) => {
-        const { x, y } = c.point(at, dx, dy);
-        ghost.style.transform = `translate(${x - 18}px, ${y - 14}px)`;
-      };
+      // the dragged chip hangs just under the cursor tip and travels with it (ctx.to's `carry`)
+      const carry = { el: ghost, ox: -18, oy: -14 };
       const set1 = (done: boolean) => {
         sts.forEach((x) => x.classList.remove('is-on'));
         nodes.forEach((x) => x.classList.toggle('is-on', done));
@@ -604,13 +601,13 @@ const tests = [
           sts[k].classList.add('is-on');
           glabel.textContent = labels[k];
           gdot.style.background = getComputedStyle(sts[k].querySelector('.fd-dot')!).backgroundColor;
+          const p0 = c.point(sts[k], 0.3, 0.55);
           ghost.style.transition = 'none';
-          place(c, sts[k], 0.3, 0.55);
+          ghost.style.translate = `${p0.x + carry.ox}px ${p0.y + carry.oy}px`;
           ghost.getBoundingClientRect();
           ghost.style.transition = '';
           ghost.classList.add('is-on');
-          place(c, nodes[k], 0.5, 0.5);
-          await c.to(nodes[k], 0.5, 0.5);
+          await c.to(nodes[k], 0.5, 0.5, carry);
           if (!c.live(id)) return;
           ghost.classList.remove('is-on');
           nodes[k].classList.add('is-on');
@@ -738,8 +735,8 @@ const tests = [
       };
 
       return [
-        { play: play1, set: set1, dur: 18 },
-        { play: play2, set: set2, dur: 14 },
+        { play: play1, set: set1, dur: 17 },
+        { play: play2, set: set2, dur: 13 },
         { play: play3, set: set3, dur: 8 },
       ];
     }),
