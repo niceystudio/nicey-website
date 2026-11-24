@@ -2,11 +2,13 @@
  * The engine behind the case-study films (src/directions/a/Film*.astro): a chapter bar over one stage, scenes that
  * play one after another while the stage is on screen, a cursor that moves to elements and clicks.
  * Each scene gives `play` (the animation; it checks `ctx.live(id)` between steps so a newer run can take over),
- * `set` (jump to its start or finished state) and `dur` (seconds, for the chapter's fill bar).
+ * `set` (jump to its start or finished state) and `dur` (seconds, for the chapter's fill bar — measured play length, keep in sync when a scene changes).
  * Reduced motion: every scene shows its finished state, the chapters switch scenes, no cursor.
  */
 export interface FilmCtx {
   sleep: (ms: number) => Promise<void>;
+  /** where `to` would put the cursor tip, relative to the stage */
+  point: (el: Element, dx?: number, dy?: number) => { x: number; y: number };
   to: (el: Element, dx?: number, dy?: number) => Promise<void>;
   click: () => Promise<void>;
   hideCursor: () => void;
@@ -36,11 +38,23 @@ export function mountFilm(root: HTMLElement, scenesFor: (root: HTMLElement) => F
     sleep,
     live: (id) => id === run,
     hideCursor: () => cursor.classList.remove('is-shown'),
-    to: async (el, dx = 0.5, dy = 0.55) => {
+    point: (el, dx = 0.5, dy = 0.55) => {
       const s = stage.getBoundingClientRect();
       const r = el.getBoundingClientRect();
-      cursor.classList.add('is-shown');
-      cursor.style.transform = `translate(${r.left - s.left + r.width * dx}px, ${r.top - s.top + r.height * dy}px)`;
+      return { x: r.left - s.left + r.width * dx, y: r.top - s.top + r.height * dy };
+    },
+    to: async (el, dx = 0.5, dy = 0.55) => {
+      const { x, y } = ctx.point(el, dx, dy);
+      // first move after the cursor was hidden: appear a short way off the target and glide in,
+      // instead of flying in from the stage corner or from the last scene's spot
+      if (!cursor.classList.contains('is-shown')) {
+        cursor.style.transition = 'none';
+        cursor.style.transform = `translate(${x + 56}px, ${y + 40}px)`;
+        cursor.getBoundingClientRect();
+        cursor.style.transition = '';
+        cursor.classList.add('is-shown');
+      }
+      cursor.style.transform = `translate(${x}px, ${y}px)`;
       await sleep(760);
     },
     click: async () => {

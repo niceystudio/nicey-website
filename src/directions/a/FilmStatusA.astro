@@ -577,10 +577,10 @@ const tests = [
       const glabel = $('[data-fd-glabel]');
       const gdot = $('[data-fd-gdot]');
       const labels = ['Draft', 'Not started', 'In progress', 'Completed'];
-      const place = (el: HTMLElement, at: Element, dx = 0, dy = 0) => {
-        const s0 = stage.getBoundingClientRect();
-        const r = at.getBoundingClientRect();
-        el.style.transform = `translate(${r.left - s0.left + dx}px, ${r.top - s0.top + dy}px)`;
+      // the dragged chip hangs just under the cursor tip, so the two move as one
+      const place = (c: FilmCtx, at: Element, dx: number, dy: number) => {
+        const { x, y } = c.point(at, dx, dy);
+        ghost.style.transform = `translate(${x - 18}px, ${y - 14}px)`;
       };
       const set1 = (done: boolean) => {
         sts.forEach((x) => x.classList.remove('is-on'));
@@ -605,11 +605,11 @@ const tests = [
           glabel.textContent = labels[k];
           gdot.style.background = getComputedStyle(sts[k].querySelector('.fd-dot')!).backgroundColor;
           ghost.style.transition = 'none';
-          place(ghost, sts[k]);
+          place(c, sts[k], 0.3, 0.55);
           ghost.getBoundingClientRect();
           ghost.style.transition = '';
           ghost.classList.add('is-on');
-          place(ghost, nodes[k], -40, -16);
+          place(c, nodes[k], 0.5, 0.5);
           await c.to(nodes[k], 0.5, 0.5);
           if (!c.live(id)) return;
           ghost.classList.remove('is-on');
@@ -738,9 +738,9 @@ const tests = [
       };
 
       return [
-        { play: play1, set: set1, dur: 17 },
-        { play: play2, set: set2, dur: 16 },
-        { play: play3, set: set3, dur: 9 },
+        { play: play1, set: set1, dur: 18 },
+        { play: play2, set: set2, dur: 14 },
+        { play: play3, set: set3, dur: 8 },
       ];
     }),
   );
