@@ -1,6 +1,7 @@
 ---
 /**
  * "Copy prompt for your agent" (idea 2 from the 11 Nov research, Clerk; placed in the free-audit section, 12 Nov).
+ * 24 Nov (Emir): a secondary button (pill-outline) instead of the dashed chip.
  * One click puts a prompt on the clipboard that points the visitor's own coding agent at /ai-ready.md.
  */
 import { aiReadyPrompt } from '../lib/ai-ready';
@@ -14,7 +15,7 @@ const prompt = aiReadyPrompt(Astro.site ?? new URL('https://nicey-website.vercel
 ---
 
 <div class="cp">
-  <button type="button" class="cp-btn" data-copy-prompt={prompt}>
+  <button type="button" class="cp-btn pill pill-outline pill-lg" data-copy-prompt={prompt}>
     <svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"
       ><rect x="5" y="5" width="9" height="9" rx="2"></rect><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"></path></svg
     >
@@ -34,31 +35,12 @@ const prompt = aiReadyPrompt(Astro.site ?? new URL('https://nicey-website.vercel
     font-family: var(--font-mono);
     font-size: var(--text-caption);
   }
+  /* the site's secondary button (pill-outline, same size as Get a free audit), with the copy icon (Emir 24 Nov) */
   .cp-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    min-height: 36px;
-    padding: 0 14px;
-    border: 1px dashed var(--color-line-strong);
-    border-radius: var(--radius-pill);
-    background: transparent;
-    color: var(--color-ink);
-    font: inherit;
+    gap: 10px;
     cursor: pointer;
-    transition: transform 160ms var(--ease-out), background-color 160ms var(--ease-out), border-color 160ms var(--ease-out);
-  }
-  .cp-btn:active {
-    transform: scale(0.97);
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .cp-btn:hover {
-      background: var(--color-surface-hover);
-      border-style: solid;
-    }
   }
   .cp-btn.is-done {
-    border-style: solid;
     border-color: var(--color-ink);
   }
   .cp-file {
