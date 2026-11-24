@@ -158,15 +158,17 @@ const data = Array.from({ length: ROWS }, (_, i) => {
     border-block: 1px solid var(--a-rule);
   }
   /* ---------- the control bar ---------- */
+  /* centred under the band and a size up, so it reads as the control it is (feedback 24 Nov) */
   .ab-bar {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 12px 28px;
+    justify-content: center;
+    gap: 12px 36px;
     padding: 14px var(--spacing-gutter, 24px);
     border-top: 1px solid var(--a-rule);
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: 13px;
   }
   .ab-k {
     color: var(--color-ink);
@@ -175,7 +177,7 @@ const data = Array.from({ length: ROWS }, (_, i) => {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 12px 28px;
+    gap: 12px 36px;
   }
   .ab-toggle {
     display: none;
@@ -224,15 +226,15 @@ const data = Array.from({ length: ROWS }, (_, i) => {
   .ab-ctl {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
   }
   .ab-ctl-k {
     margin-right: 4px;
     color: var(--color-muted);
   }
   .ab-sw {
-    width: 22px;
-    height: 22px;
+    width: 28px;
+    height: 28px;
     padding: 0;
     border: 1px solid transparent;
     background: var(--sw);
@@ -245,7 +247,7 @@ const data = Array.from({ length: ROWS }, (_, i) => {
     padding: 3px;
   }
   .ab-st {
-    padding: 3px 8px;
+    padding: 6px 12px;
     border: 1px solid var(--a-rule);
     background: transparent;
     color: var(--color-ink-2);
@@ -305,7 +307,7 @@ const data = Array.from({ length: ROWS }, (_, i) => {
     padding-left: 16px;
   }
   .ab-labels .ab-scale-k {
-    padding-left: 20px;
+    text-align: center;
   }
   .ab-stage {
     --ab-scale-w: 300px;
@@ -350,15 +352,20 @@ const data = Array.from({ length: ROWS }, (_, i) => {
   }
 
   /* ---------- scale: products drawn only from the tokens ---------- */
+  /* centred in its column, like the chooser (feedback 24 Nov) */
   .ab-scale {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
     gap: 8px;
-    padding: 2px 24px 0 20px;
+    padding: 0 24px;
     border-left: 1px solid var(--a-rule);
     white-space: normal;
   }
   .ab-app {
+    width: 100%;
+    max-width: 236px;
     display: grid;
     grid-template-columns: 64px minmax(0, 1fr);
     align-items: center;
