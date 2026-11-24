@@ -11,7 +11,7 @@ import { links } from '../../data/links';
 <section class="ha">
   <div class="container-page ha-in">
     <h1 class="ha-h m-0">
-      <span class="ha-line">Designing the</span>
+      <span class="ha-line">Designing</span>
       <span class="ha-line">systems that</span>
       <span class="ha-line ha-line--accent">scale products.</span>
     </h1>
@@ -21,10 +21,8 @@ import { links } from '../../data/links';
         edit your file.
       </p>
       <div class="ha-ctas">
-        <a href="#audit" class="pill pill-ink pill-lg">
-          Get a free audit
-        </a>
-        <a href={links.bookCall} class="pill pill-outline pill-lg">
+        {/* Goran 24 Nov: one action here — Get a free audit is already in the nav */}
+        <a href={links.bookCall} class="pill pill-ink pill-lg" target="_blank" rel="noopener">
           Book a call
         </a>
       </div>
