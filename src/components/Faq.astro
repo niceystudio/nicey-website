@@ -69,14 +69,14 @@ const faqs = items;
 
 <style>
   .faq {
-    padding: 0 32px;
+    padding: 0 var(--spacing-lg);
   }
   .faq summary {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: var(--spacing-sm);
     min-height: 76px;
-    padding-block: 12px;
+    padding-block: var(--spacing-xs);
     font-size: var(--text-faq);
     line-height: var(--text-faq--line-height);
     letter-spacing: var(--text-faq--letter-spacing);
@@ -85,7 +85,7 @@ const faqs = items;
   /* the row is the target: let the ring wrap the whole summary */
   .faq summary:focus-visible {
     margin-inline: -24px;
-    padding-inline: 24px;
+    padding-inline: var(--spacing-md);
   }
   .faq-ind {
     font-family: var(--font-mono);
@@ -104,14 +104,14 @@ const faqs = items;
       padding: 0 20px;
     }
     .faq summary {
-      gap: 12px;
+      gap: var(--spacing-xs);
     }
     .faq p {
       padding-left: 0;
     }
     .faq summary:focus-visible {
       margin-inline: -16px;
-      padding-inline: 16px;
+      padding-inline: var(--spacing-sm);
     }
   }
 </style>

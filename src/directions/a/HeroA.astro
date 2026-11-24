@@ -35,8 +35,8 @@ import PixelFieldA from './PixelFieldA.astro';
   .ha {
     position: relative;
     overflow: hidden;
-    padding-top: 96px;
-    padding-bottom: 64px;
+    padding-top: var(--spacing-3xl);
+    padding-bottom: var(--spacing-2xl);
   }
   /* the pixel field sits on the right half and fades out towards the headline */
   .ha :global(.ha-field) {
@@ -61,7 +61,7 @@ import PixelFieldA from './PixelFieldA.astro';
     flex-wrap: wrap;
     align-items: flex-end;
     justify-content: space-between;
-    gap: 28px 48px;
+    gap: 28px var(--spacing-xl);
   }
   @media (max-width: 1023px) {
     .ha {

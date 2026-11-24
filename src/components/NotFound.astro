@@ -85,13 +85,13 @@ const cells: { x: number; y: number }[] = [];
     width: 100%;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: 48px;
+    gap: var(--spacing-xl);
     align-items: center;
   }
   @media (min-width: 1024px) {
     .nf-a {
       grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-      gap: 64px;
+      gap: var(--spacing-2xl);
     }
   }
   .nf-blocks {

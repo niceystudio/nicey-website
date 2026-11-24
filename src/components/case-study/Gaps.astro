@@ -13,7 +13,7 @@ const parts = Astro.props.text.split(/(\[[^\]]+\])/).filter(Boolean);
 
 <style>
   .copy-gap {
-    padding: 0 4px;
+    padding: 0 var(--spacing-3xs);
     border: 1px dashed var(--color-dashed);
     border-radius: 4px;
     color: var(--color-ink-2);

@@ -71,7 +71,7 @@ const steps = [
   .pa-body {
     display: grid;
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    gap: 48px;
+    gap: var(--spacing-xl);
     padding: var(--spacing-cell-lg);
   }
   @media (max-width: 1023px) {
@@ -84,7 +84,7 @@ const steps = [
   .pa-right {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: var(--spacing-sm);
     min-width: 0;
   }
   /* no rules between the steps (Goran, 23 Nov: too many lines) — spacing alone separates them */
@@ -93,14 +93,14 @@ const steps = [
     flex-direction: column;
     gap: 20px;
     margin: 0;
-    padding: 8px 0 0;
+    padding: var(--spacing-2xs) 0 0;
     list-style: none;
   }
   .pa-steps li {
     display: grid;
     grid-template-columns: 32px minmax(0, 1fr);
     align-items: baseline;
-    gap: 12px;
+    gap: var(--spacing-xs);
   }
   .pa-n {
     font-family: var(--font-mono);
@@ -124,7 +124,7 @@ const steps = [
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 12px 20px;
+    gap: var(--spacing-xs) 20px;
     flex: 1 1 420px;
     padding-left: 40px;
     border-left: 1px solid var(--a-rule);
@@ -139,7 +139,7 @@ const steps = [
   @media (max-width: 767px) {
     .pa-body,
     .pa-act {
-      padding: 24px;
+      padding: var(--spacing-md);
     }
     .pa-own {
       padding-left: 0;

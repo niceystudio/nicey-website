@@ -1,7 +1,7 @@
 ---
 /**
  * Machine view of a case study (idea from parallel.ai, applied to the whole page).
- * The switch lives in the footer base line (SiteFooter, [data-mv] buttons; key m also toggles).
+ * Toggled with the m key ([data-mv] buttons, if a page adds them, switch it too).
  * Machine hides the designed page and shows the plain Markdown an agent reads,
  * the same text that is served at /work/<slug>.md. State lives in ?view=machine.
  */
@@ -44,13 +44,13 @@ const fmEnd = lines.indexOf('---', 1);
     display: none;
   }
   .mv-in {
-    padding-block: 24px 72px;
+    padding-block: var(--spacing-md) 72px;
   }
   .mv-head {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 8px 20px;
+    gap: var(--spacing-2xs) 20px;
     padding: 14px 18px;
     border: 1px solid var(--color-line-strong);
     border-bottom: 0;
@@ -68,13 +68,13 @@ const fmEnd = lines.indexOf('---', 1);
   .mv-actions {
     margin-left: auto;
     display: flex;
-    gap: 8px;
+    gap: var(--spacing-2xs);
   }
   .mv-btn {
     display: inline-flex;
     align-items: center;
     min-height: 32px;
-    padding: 0 12px;
+    padding: 0 var(--spacing-xs);
     border: 1px solid var(--color-line-strong);
     border-radius: var(--radius-pill);
     background: transparent;
@@ -98,7 +98,7 @@ const fmEnd = lines.indexOf('---', 1);
   }
   .mv-doc {
     margin: 0;
-    padding: 24px 18px 32px;
+    padding: var(--spacing-md) 18px var(--spacing-lg);
     border: 1px solid var(--color-line-strong);
     border-radius: 0 0 var(--radius-panel) var(--radius-panel);
     background: var(--color-surface);

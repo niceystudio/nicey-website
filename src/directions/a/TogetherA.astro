@@ -78,7 +78,7 @@ const { together, changed } = Astro.props;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    margin-top: 12px;
+    margin-top: var(--spacing-xs);
     padding: 20px 22px;
     border: 1px dashed var(--color-dashed);
     background: var(--color-page);
@@ -86,7 +86,7 @@ const { together, changed } = Astro.props;
   .tg-k {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--spacing-2xs);
     font-family: var(--font-mono);
     font-size: var(--text-caption);
     color: var(--color-ink-2);

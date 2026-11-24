@@ -39,7 +39,7 @@ import HowDiagramB from './HowDiagramB.astro';
     display: flex;
     flex-direction: column;
     gap: 18px;
-    margin-bottom: 48px;
+    margin-bottom: var(--spacing-xl);
   }
   /* one container, no rules inside: the steps are separated by space alone */
   /* one container, no rules inside: the steps are separated by space alone */
@@ -50,9 +50,9 @@ import HowDiagramB from './HowDiagramB.astro';
   .ho-steps {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 8px 0;
+    gap: var(--spacing-2xs) 0;
     margin: 0;
-    padding: 8px;
+    padding: var(--spacing-2xs);
     list-style: none;
     border: 1px solid var(--a-rule);
     background: var(--color-surface);
@@ -60,17 +60,17 @@ import HowDiagramB from './HowDiagramB.astro';
   .ho-step {
     display: flex;
     flex-direction: column;
-    padding: 24px;
+    padding: var(--spacing-md);
   }
   .ho-num {
-    margin-bottom: 24px;
+    margin-bottom: var(--spacing-md);
     font-family: var(--font-pixel);
     font-size: 20px;
     line-height: 1;
     color: var(--color-accent);
   }
   .ho-name {
-    margin-bottom: 8px;
+    margin-bottom: var(--spacing-2xs);
     font-family: var(--font-pixel);
     font-weight: 400;
     font-size: 27px;

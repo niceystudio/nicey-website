@@ -116,7 +116,7 @@ const rows: Row[] = [
     display: flex;
     flex-wrap: wrap;
     align-items: flex-start;
-    gap: 16px 40px;
+    gap: var(--spacing-sm) 40px;
     padding: 36px var(--spacing-cell);
     background: var(--color-surface);
     color: var(--color-ink);
@@ -371,7 +371,7 @@ const rows: Row[] = [
     display: grid !important;
     grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.4fr) 32px;
     align-items: center !important;
-    gap: 12px 32px;
+    gap: var(--spacing-xs) var(--spacing-lg);
   }
   .wka-head {
     padding: 10px 28px;
@@ -445,7 +445,7 @@ const rows: Row[] = [
     }
     .wka :global(.work-row) {
       grid-template-columns: minmax(0, 1fr) 24px;
-      padding: 24px 12px !important;
+      padding: var(--spacing-md) var(--spacing-xs) !important;
     }
     /* name and arrow on the first line, what we did under the name */
     .wka :global(.work-row) > :global(span:nth-child(2)) {

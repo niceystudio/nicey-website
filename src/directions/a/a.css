@@ -100,9 +100,6 @@
     background: var(--color-accent-solid);
     color: var(--color-on-accent-solid) !important;
   }
-  .dir-a .head-link:hover .head-count {
-    color: inherit;
-  }
 }
 
 /* the header's own scoped styles win on specificity; these must too */
@@ -116,30 +113,10 @@
   letter-spacing: 0 !important;
 }
 
-/* the footer's animated wordmark isn't used in A */
-.dir-a .site-foot-markwrap {
-  display: none;
-}
-
-/* nav count "(5)" hidden in A — reads like code (Emir 18 Nov) */
-.dir-a .head-count {
-  display: none !important;
-}
-
-/* Human | Machine switch removed in A (Emir 19 Nov: not needed here; the .md twin stays linked) */
-.dir-a .view-switch {
-  display: none !important;
-}
-
-/* ---------- The nav in A (Emir, 20 Nov — approved from the test) ----------
- * "Process" goes: the Free audit button already leads to that section, and it read like "How we work". The section's
- * caption is "Free audit" (same as the button). Four links with ~30px between words instead of ~16px. */
-.dir-a .site-head .head-link[href$='#audit'],
-.dir-a .site-head .menu-link[href$='#audit'] {
-  display: none !important;
-}
+/* ---------- The nav in A (Emir, 20 Nov) ----------
+ * Four links ("Process" left the nav: the Free audit button already leads there), ~30px between words. */
 .dir-a .site-head .head-links {
-  gap: 16px;
+  gap: var(--spacing-sm);
 }
 
 /* ---------- terminal windows ----------

@@ -159,7 +159,7 @@ const tabList = [
   .qw-cap {
     display: flex;
     align-items: baseline;
-    gap: 12px;
+    gap: var(--spacing-xs);
     margin-top: 14px;
     font-size: var(--text-body-sm);
     line-height: 1.5;
@@ -187,7 +187,7 @@ const tabList = [
       gap: 10px;
     }
     .qw-stage--bare .qw-field {
-      padding: 12px;
+      padding: var(--spacing-xs);
       font-size: var(--text-caption-sm);
     }
   }
@@ -208,7 +208,7 @@ const tabList = [
   .qw-states {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 12px;
+    gap: var(--spacing-xs);
   }
   .qw-state {
     display: flex;
@@ -229,7 +229,7 @@ const tabList = [
     display: flex;
     flex-direction: column;
     gap: 6px;
-    padding: 16px;
+    padding: var(--spacing-sm);
     border-radius: 10px;
     /* the product's cards: warm grey in both themes, so they stand out from the white stage; fields stay white */
     background: #f3f0e9;
@@ -260,7 +260,7 @@ const tabList = [
     font-weight: 600;
   }
   .qw-input {
-    padding: 8px 10px;
+    padding: var(--spacing-2xs) 10px;
     background: #fff;
     border: 1px solid #cbd5e1;
     border-radius: 6px;

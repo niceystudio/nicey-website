@@ -162,8 +162,8 @@ const data = Array.from({ length: ROWS }, (_, i) => {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 12px 28px;
-    padding: 14px var(--spacing-gutter, 24px);
+    gap: var(--spacing-xs) 28px;
+    padding: 14px var(--spacing-gutter, var(--spacing-md));
     border-top: 1px solid var(--a-rule);
     font-family: var(--font-mono);
     font-size: var(--text-caption);
@@ -175,7 +175,7 @@ const data = Array.from({ length: ROWS }, (_, i) => {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 12px 28px;
+    gap: var(--spacing-xs) 28px;
   }
   .ab-toggle {
     display: none;
@@ -227,7 +227,7 @@ const data = Array.from({ length: ROWS }, (_, i) => {
     gap: 6px;
   }
   .ab-ctl-k {
-    margin-right: 4px;
+    margin-right: var(--spacing-3xs);
     color: var(--color-muted);
   }
   .ab-sw {
@@ -245,7 +245,7 @@ const data = Array.from({ length: ROWS }, (_, i) => {
     padding: 3px;
   }
   .ab-st {
-    padding: 3px 8px;
+    padding: 3px var(--spacing-2xs);
     border: 1px solid var(--a-rule);
     background: transparent;
     color: var(--color-ink-2);
@@ -294,7 +294,7 @@ const data = Array.from({ length: ROWS }, (_, i) => {
   }
   .ab-labels span:first-child {
     text-align: right;
-    padding-right: 16px;
+    padding-right: var(--spacing-sm);
   }
   /* the middle label sits over the block: same 36ch box as the block, in the band's own mono size */
   .ab-labels span:nth-child(2) {
@@ -302,7 +302,7 @@ const data = Array.from({ length: ROWS }, (_, i) => {
     padding-left: 0.5ch;
   }
   .ab-labels span:nth-child(3) {
-    padding-left: 16px;
+    padding-left: var(--spacing-sm);
   }
   .ab-labels .ab-scale-k {
     padding-left: 20px;
@@ -353,8 +353,8 @@ const data = Array.from({ length: ROWS }, (_, i) => {
   .ab-scale {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    padding: 2px 24px 0 20px;
+    gap: var(--spacing-2xs);
+    padding: 2px var(--spacing-md) 0 20px;
     border-left: 1px solid var(--a-rule);
     white-space: normal;
   }
@@ -386,7 +386,7 @@ const data = Array.from({ length: ROWS }, (_, i) => {
   .ab-app-body {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--spacing-2xs);
   }
   .ab-in {
     flex: 1;

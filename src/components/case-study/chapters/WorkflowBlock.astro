@@ -1,0 +1,146 @@
+---
+/**
+ * Status-workflow blocks: surfaces, the status graph, order, everywhere, bulk.
+ * One case-study block, rendered inside a chapter by Chapters.astro. Styles: chapters/chapters.css.
+ */
+import type { ChapterBlock } from '../../../data/case-studies';
+
+interface Props {
+  block: ChapterBlock;
+}
+const { block: b } = Astro.props;
+
+// 02 · Model: place each status in a column by its distance from the first one
+function layout(edges: { from: string; to: string }[]) {
+  const depth = new Map<string, number>();
+  depth.set(edges[0].from, 0);
+  for (let k = 0; k < edges.length; k++)
+    for (const e of edges) if (depth.has(e.from) && !depth.has(e.to)) depth.set(e.to, depth.get(e.from)! + 1);
+  const cols = new Map<number, string[]>();
+  depth.forEach((d, n) => cols.set(d, [...(cols.get(d) ?? []), n]));
+  const W = 560, H = 200, maxD = Math.max(...depth.values());
+  const pos = new Map<string, { x: number; y: number }>();
+  cols.forEach((names, d) =>
+    names.forEach((n, i) => pos.set(n, { x: 70 + (d * (W - 140)) / Math.max(1, maxD), y: (H * (i + 1)) / (names.length + 1) })),
+  );
+  return { pos, W, H };
+}
+---
+{b.kind === 'surfaces' && (
+  <>
+    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+    <ul class="ch-surf">
+      {b.items.map((it, k) => (
+        <li style={`--i:${k}`}>
+          <span class="ch-surf-n font-mono text-caption text-ink-2">{String(k + 1).padStart(2, '0')}</span>
+          <span class="text-body-lg">{it.name}</span>
+          <span class="ch-surf-how caption-sm">{it.how}</span>
+        </li>
+      ))}
+    </ul>
+  </>
+)}
+
+{b.kind === 'graph' && (() => {
+  const g = layout(b.edges);
+  return (
+    <div class="ch-graph" data-graph>
+      <div class="flex flex-col gap-3">
+        <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+        <svg viewBox={`0 0 ${g.W} ${g.H}`} class="ch-graph-svg" aria-hidden="true">
+          {b.edges.map((e, k) => {
+            const a = g.pos.get(e.from)!, z = g.pos.get(e.to)!;
+            return <path data-edge={k} class:list={[k === b.edges.length - 2 && 'is-on']} d={`M${a.x + 58} ${a.y} C ${a.x + 120} ${a.y}, ${z.x - 120} ${z.y}, ${z.x - 58} ${z.y}`} />;
+          })}
+          {[...g.pos].map(([n, p]) => (
+            <g>
+              <rect x={p.x - 58} y={p.y - 16} width="116" height="32" rx="16" />
+              <text x={p.x} y={p.y + 4} text-anchor="middle">{n}</text>
+            </g>
+          ))}
+        </svg>
+      </div>
+      <div class="flex flex-col gap-2">
+        <p class="caption-sm m-0 text-ink-2">Pick a move</p>
+        <div role="group" aria-label="Pick a move" class="ch-pick">
+          {b.edges.map((e, k) => (
+            <button type="button" class="press" data-edge-pick={k} data-rules={e.rules.join('|')} aria-pressed={k === b.edges.length - 2 ? 'true' : 'false'}>
+              {e.from} → {e.to}
+            </button>
+          ))}
+        </div>
+        <p class="caption-sm m-0 mt-3 text-ink-2">Rules on this move</p>
+        <ul class="ch-chips" data-graph-rules aria-live="polite">
+          {b.edges[b.edges.length - 2].rules.map((r) => <li>{r}</li>)}
+        </ul>
+      </div>
+    </div>
+  );
+})()}
+
+{b.kind === 'order' && (
+  <div class="ch-order">
+    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+    <ol class="ch-order-list">
+      {b.steps.map((st, k) => (
+        <li style={`--i:${k}`}>
+          <span class="ch-order-n" aria-hidden="true">{k + 1}</span>
+          <span class="flex flex-col gap-1">
+            <span class="text-body-lg">{st.name}</span>
+            <span class="text-body-sm text-ink-2">{st.text}</span>
+          </span>
+        </li>
+      ))}
+    </ol>
+  </div>
+)}
+
+{b.kind === 'everywhere' && (
+  <div class="ch-every" data-every>
+    <div class="flex flex-col gap-2">
+      <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+      <div role="group" aria-label="Pick where the change starts" class="ch-pick">
+        {b.surfaces.map((sf, k) => (
+          <button type="button" class="press" data-every-pick={k} data-note={sf.note} aria-pressed={k === 0 ? 'true' : 'false'}>
+            {sf.name}
+          </button>
+        ))}
+      </div>
+      <p class="m-0 mt-2 text-body text-ink-2" data-every-note aria-live="polite">{b.surfaces[0].note}</p>
+    </div>
+    <div class="ch-ui">
+      <div class="ch-modal" data-every-modal aria-hidden="true">
+        <span class="ch-modal-t">Complete required actions</span>
+        <span class="ch-modal-move"><b>In progress</b> → <b>Completed</b></span>
+        <span class="ch-modal-steps"><i class="is-on">1 · Required fields</i><i>2 · Signature</i></span>
+        <span class="ch-modal-body"><span>Turnaround *</span><span>Assigned technician *</span></span>
+        <span class="ch-modal-btn">Next</span>
+      </div>
+    </div>
+  </div>
+)}
+
+{b.kind === 'bulk' && (
+  <div class="ch-bulk" data-bulk>
+    <div class="flex flex-col gap-2">
+      <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+      <div role="group" aria-label="Pick an outcome" class="ch-pick">
+        {b.outcomes.map((o, k) => (
+          <button type="button" class="press" data-bulk-pick={k} aria-pressed={k === 1 ? 'true' : 'false'}>
+            {o.label}
+          </button>
+        ))}
+      </div>
+    </div>
+    <div class="ch-bulk-stage ch-ui">
+      {b.outcomes.map((o, k) => (
+        <div class="ch-modal ch-modal--bulk" data-bulk-card={k} hidden={k !== 1}>
+          <span class="ch-bars" data-o={k} aria-hidden="true"><i /><i /></span>
+          <span class="ch-modal-t">{o.title}</span>
+          <span class="text-body-sm">{o.text}</span>
+          <span class="ch-modal-btn">{o.cta}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
