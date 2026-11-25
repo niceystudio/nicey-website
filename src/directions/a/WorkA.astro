@@ -75,6 +75,9 @@ const rows: Row[] = [
 
 <section id="work" aria-labelledby="work-head" class="container-page flex flex-col pb-section wka">
   <SectionHead id="work-head" caption="Work" class="mb-12">Systems and products we have built</SectionHead>
+  <!-- one container for the column heads and the rows: it owns the rule and the corner radius, so a rounder radius
+       (Change one token) wraps the whole list (24 Nov) -->
+  <div class="wka-box">
   <div class="wka-head" aria-hidden="true"><span>client</span><span>what we did</span><span></span></div>
   <ul class="panel flex flex-col wka-list">
     {
@@ -104,6 +107,7 @@ const rows: Row[] = [
       ))
     }
   </ul>
+  </div>
   {/* hover preview: one floating frame for the whole list, follows the cursor */}
   <div class="wp" data-wp-box aria-hidden="true">
     <canvas class="wp-canvas" data-wp-canvas></canvas>
@@ -373,10 +377,13 @@ const rows: Row[] = [
     align-items: center !important;
     gap: var(--spacing-xs) var(--spacing-lg);
   }
+  .wka-box {
+    overflow: hidden;
+    border: 1px solid var(--a-rule);
+    border-radius: var(--radius-panel);
+  }
   .wka-head {
     padding: var(--spacing-xs) var(--spacing-lg);
-    border-top: 1px solid var(--a-rule);
-    border-bottom: 1px solid var(--a-rule);
     font-family: var(--font-mono);
     font-size: var(--text-caption-sm);
     letter-spacing: 0.14em;
@@ -385,7 +392,7 @@ const rows: Row[] = [
   }
   .wka-list {
     border: 0 !important;
-    border-bottom: 1px solid var(--a-rule) !important;
+    border-radius: 0 !important;
     gap: 0 !important;
     background: transparent !important;
   }
