@@ -11,6 +11,8 @@
  *   cx/cy  epicentre for rings/drop, 0..1 of the box
  *
  * Colours follow the theme (light pastels on cream, deep tints after dark) and repaint on a theme flip.
+ * TEST (Emir 24 Nov, like the old footer wordmark): cells under the cursor light up in a brand pastel, then
+ * settle back into the field. The canvas keeps pointer-events: none; it listens on the window instead.
  */
 interface Props {
   mode?: 'drift' | 'rings' | 'drop';
@@ -77,6 +79,10 @@ const { mode = 'drift', fade = 'edges', still = false, seed = 7, cx = 0.8, cy = 
     const animated = mode === 'drift' && !d.still && !reduced;
 
     let W = 0, H = 0, cols = 0, rows = 0, dpr = 1;
+    // hover: per-cell flash strength (1 → 0) and the pastel it flashed to
+    let flash = new Float32Array(0);
+    let flashC = new Uint8Array(0);
+    let flashing = false;
     const field = createDrift({ cols: 10, rows: 5, seed });
 
     // alpha multiplier toward the faded edges (px distances, so it reads the same at any size)
@@ -126,6 +132,14 @@ const { mode = 'drift', fade = 'edges', still = false, seed = 7, cx = 0.8, cy = 
           // cells above the island level fuse (full size), the rest keep a 1px seam
           const size = v > 0.32 ? CELL : CELL - 1;
           ctx.fillRect(x * CELL, y * CELL, size, size);
+          const f = flash[y * cols + x];
+          if (f > 0.02) {
+            // the flash is always the light pastels, so it reads on cream and after dark
+            const st = LIGHT_PALETTE.stops[flashC[y * cols + x]];
+            ctx.globalAlpha = Math.min(1, f * Math.max(a, 0.5) * (isDark() ? 0.75 : 1.1));
+            ctx.fillStyle = `rgb(${st[0]},${st[1]},${st[2]})`;
+            ctx.fillRect(x * CELL, y * CELL, CELL - 1, CELL - 1);
+          }
         }
       ctx.globalAlpha = 1;
     };
@@ -140,6 +154,8 @@ const { mode = 'drift', fade = 'edges', still = false, seed = 7, cx = 0.8, cy = 
       canvas.height = H * dpr;
       cols = Math.ceil(W / CELL);
       rows = Math.ceil(H / CELL);
+      flash = new Float32Array(cols * rows);
+      flashC = new Uint8Array(cols * rows);
       draw(performance.now() / 1000);
     };
     resize();
@@ -148,6 +164,46 @@ const { mode = 'drift', fade = 'edges', still = false, seed = 7, cx = 0.8, cy = 
       attributes: true,
       attributeFilter: ['data-theme'],
     });
+
+    // hover: light the cells near the cursor, then let them fade back (runs only while something is lit)
+    if (!reduced) {
+      const settle = () => {
+        let any = false;
+        for (let i = 0; i < flash.length; i++)
+          if (flash[i] > 0) {
+            flash[i] = flash[i] < 0.03 ? 0 : flash[i] * 0.94;
+            if (flash[i] > 0) any = true;
+          }
+        draw(performance.now() / 1000);
+        if (any) requestAnimationFrame(settle);
+        else flashing = false;
+      };
+      addEventListener(
+        'pointermove',
+        (e) => {
+          const r = canvas.getBoundingClientRect();
+          const x = e.clientX - r.left, y = e.clientY - r.top;
+          if (x < 0 || y < 0 || x > r.width || y > r.height) return;
+          const reach = CELL * 2.2;
+          const cx = Math.floor(x / CELL), cy = Math.floor(y / CELL);
+          const span = Math.ceil(reach / CELL);
+          for (let yy = Math.max(0, cy - span); yy <= Math.min(rows - 1, cy + span); yy++)
+            for (let xx = Math.max(0, cx - span); xx <= Math.min(cols - 1, cx + span); xx++) {
+              const dx = xx * CELL + CELL / 2 - x, dy = yy * CELL + CELL / 2 - y;
+              const i = yy * cols + xx;
+              if (dx * dx + dy * dy < reach * reach && flash[i] < 0.5) {
+                flash[i] = 1;
+                flashC[i] = 1 + Math.floor(Math.random() * 5); // one of the five pastels
+              }
+            }
+          if (!flashing) {
+            flashing = true;
+            requestAnimationFrame(settle);
+          }
+        },
+        { passive: true },
+      );
+    }
 
     if (!animated) return;
     let visible = false;
