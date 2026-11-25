@@ -1,59 +1,90 @@
 /**
- * "Change one token": the choices the floating switcher (src/components/ui/TokenSwitcher.astro) offers. A choice
- * overrides the matching tokens from src/styles/global.css on :root, so every page, every component and /brand
- * follow at once. The first entry of each list is the shipped value (no override).
+ * "Change the style": the styles the floating switcher (src/components/ui/TokenSwitcher.astro) offers. A style is a
+ * handful of token values (display face, accent, corners) that override the ones from src/styles/global.css on :root,
+ * so every page, every component and /brand follow at once. No component is edited. The first style is the shipped
+ * one (no override).
+ *
+ * 25 Nov: styles replaced the separate accent and corner pickers, and brought typography with them.
  */
 
-export interface Accent {
+export interface Style {
   id: string;
   label: string;
-  /** the accent on the light page; white text stays readable on it */
-  light: string;
-  /** the accent after dark: lighter, dark text on it */
-  dark: string;
-}
-
-export interface Radius {
-  id: string;
-  label: string;
+  /** one line on what the style is, shown under its name */
+  note: string;
+  /** --font-display: headlines, names, figures */
+  font: { name: string; stack: string };
+  /** --color-accent on the light page (white text stays readable on it) and after dark (lighter, dark text on it) */
+  accent: { light: string; dark: string };
   /** --radius-panel, --radius-code, --radius-chip, --radius-pill, --radius-swatch */
-  panel: string;
-  code: string;
-  chip: string;
-  pill: string;
-  swatch: string;
+  radius: { panel: string; code: string; chip: string; pill: string; swatch: string };
 }
 
-export const accents: Accent[] = [
-  { id: 'violet', label: 'Violet', light: '#6b5fbe', dark: '#a79bea' },
-  { id: 'blue', label: 'Blue', light: '#2f5fd0', dark: '#8fb0ff' },
-  { id: 'green', label: 'Green', light: '#2c7a57', dark: '#7fcfa6' },
-  { id: 'orange', label: 'Orange', light: '#b9541f', dark: '#f0a070' },
-  { id: 'pink', label: 'Pink', light: '#b0407a', dark: '#ee8fc0' },
+export const styles: Style[] = [
+  {
+    id: 'terminal',
+    label: 'Terminal',
+    note: 'Pixel, violet, square',
+    font: { name: 'Geist Pixel', stack: "'Geist Pixel', 'Geist Mono Variable', ui-monospace, monospace" },
+    accent: { light: '#6b5fbe', dark: '#a79bea' },
+    radius: { panel: '0px', code: '0px', chip: '0px', pill: '0px', swatch: '0px' },
+  },
+  {
+    id: 'product',
+    label: 'Product',
+    note: 'Sans, blue, round',
+    font: { name: 'Geist Sans', stack: "'Geist Variable', 'Geist Fallback', ui-sans-serif, system-ui, sans-serif" },
+    accent: { light: '#2f5fd0', dark: '#8fb0ff' },
+    radius: { panel: '16px', code: '12px', chip: '999px', pill: '999px', swatch: '4px' },
+  },
+  {
+    id: 'editorial',
+    label: 'Editorial',
+    note: 'Serif, green, soft',
+    font: { name: 'Instrument Serif', stack: "'Instrument Serif', 'Iowan Old Style', Georgia, serif" },
+    accent: { light: '#2c7a57', dark: '#7fcfa6' },
+    radius: { panel: '8px', code: '6px', chip: '4px', pill: '4px', swatch: '2px' },
+  },
 ];
 
-export const radii: Radius[] = [
-  { id: 'sharp', label: 'Sharp', panel: '0px', code: '0px', chip: '0px', pill: '0px', swatch: '0px' },
-  { id: 'soft', label: 'Soft', panel: '8px', code: '6px', chip: '4px', pill: '4px', swatch: '2px' },
-  { id: 'round', label: 'Round', panel: '16px', code: '12px', chip: '999px', pill: '999px', swatch: '4px' },
-];
+export const styleById = (id?: string | null): Style => styles.find((s) => s.id === id) ?? styles[0];
 
-/** the CSS that applies one accent: on :root, and the lighter one after dark */
-export const accentCss = (a: Accent) =>
-  `:root{--color-accent:${a.light};--color-accent-solid:${a.light}}:root[data-theme='dark']{--color-accent:${a.dark}}`;
+/** the CSS that applies one style: on :root, and the lighter accent after dark */
+export const styleCss = (s: Style) =>
+  `:root{--font-display:${s.font.stack};--color-accent:${s.accent.light};--color-accent-solid:${s.accent.light};` +
+  `--radius-panel:${s.radius.panel};--radius-code:${s.radius.code};--radius-chip:${s.radius.chip};` +
+  `--radius-pill:${s.radius.pill};--radius-swatch:${s.radius.swatch}}` +
+  `:root[data-theme='dark']{--color-accent:${s.accent.dark}}`;
 
-/** the CSS that applies one corner style to every radius token */
-export const radiusCss = (r: Radius) =>
-  `:root{--radius-panel:${r.panel};--radius-code:${r.code};--radius-chip:${r.chip};--radius-pill:${r.pill};--radius-swatch:${r.swatch}}`;
+/** what goes in <style id="token-override">; empty for the shipped style */
+export const overrideCss = (id?: string | null): string => {
+  const s = styleById(id);
+  return s.id === styles[0].id ? '' : styleCss(s);
+};
 
-/** what goes in <style id="token-override">; empty for the shipped defaults */
-export function overrideCss(accentId?: string, radiusId?: string): string {
-  const a = accents.find((x) => x.id === accentId);
-  const r = radii.find((x) => x.id === radiusId);
-  return (a && a.id !== accents[0].id ? accentCss(a) : '') + (r && r.id !== radii[0].id ? radiusCss(r) : '');
+export interface Edit {
+  /** token name as the system writes it, e.g. font.display */
+  token: string;
+  from: string;
+  to: string;
+}
+
+/**
+ * What an agent would edit to go from one style to another: one row per token that really differs.
+ * `dark` picks which accent value to show (the one on screen).
+ */
+export function edits(from: Style, to: Style, dark = false): Edit[] {
+  const out: Edit[] = [];
+  if (from.font.name !== to.font.name) out.push({ token: 'font.display', from: from.font.name, to: to.font.name });
+  const a = (s: Style) => (dark ? s.accent.dark : s.accent.light);
+  if (a(from) !== a(to)) out.push({ token: 'color.accent', from: a(from), to: a(to) });
+  (Object.keys(to.radius) as (keyof Style['radius'])[]).forEach((k) => {
+    if (from.radius[k] !== to.radius[k]) out.push({ token: `radius.${k}`, from: from.radius[k], to: to.radius[k] });
+  });
+  return out;
 }
 
 /** where a visitor's choice is remembered (this browser only) */
-export const STORAGE_KEY = 'nicey-tokens';
-/** fired on window after a change, with { accent, radius } — the band re-reads its rows on it */
+export const STORAGE_KEY = 'nicey-style';
+/** fired on window after a change, with { style } — the band re-reads its rows on it */
 export const CHANGE_EVENT = 'nicey:tokens';

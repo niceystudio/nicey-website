@@ -36,7 +36,7 @@
 /* ---------- type ---------- */
 .dir-a .text-h2,
 .dir-a h2.text-h2 {
-  font-family: var(--font-pixel);
+  font-family: var(--font-display);
   font-weight: 400;
   letter-spacing: -0.01em;
   line-height: 1.04;
@@ -51,7 +51,7 @@
   letter-spacing: 0.12em;
 }
 .dir-a .text-work {
-  font-family: var(--font-pixel);
+  font-family: var(--font-display);
   font-weight: 400;
   letter-spacing: 0;
 }
@@ -67,7 +67,7 @@
   backdrop-filter: blur(6px);
 }
 .dir-a .site-head .head-nav > a:first-child {
-  font-family: var(--font-pixel);
+  font-family: var(--font-display);
   font-weight: 400;
   font-size: 26px;
   letter-spacing: 0;
@@ -76,14 +76,14 @@
 .dir-a .text-h3-card,
 .dir-a .text-title,
 .dir-a .text-faq {
-  font-family: var(--font-pixel);
+  font-family: var(--font-display);
   font-weight: 400;
   letter-spacing: 0;
 }
 
 /* footer wordmark in the pixel face too */
 .dir-a footer a[href='/']:not(.pill) {
-  font-family: var(--font-pixel);
+  font-family: var(--font-display);
   font-weight: 400;
 }
 
@@ -114,7 +114,7 @@
   text-transform: none !important;
 }
 .dir-a .site-head .head-nav > a:first-child {
-  font-family: var(--font-pixel) !important;
+  font-family: var(--font-display) !important;
   font-weight: 400 !important;
   letter-spacing: 0 !important;
 }

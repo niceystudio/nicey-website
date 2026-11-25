@@ -47,7 +47,7 @@ const px = (v: string) => (/^\d+px$/.test(v) ? Number(v.replace('px', '')) : 0);
           Every value here is read from <code>src/styles/global.css</code> and every component is the real one. Change
           a token or a component and it changes here, on every page that uses it, and in what agents read.
         </p>
-        <p class="m-0 label-mono">Try it: “Change one token”, bottom right, repaints this page and every other.</p>
+        <p class="m-0 label-mono">Try it: “Change the style”, bottom right, repaints this page and every other.</p>
         <div class="br-links">
           <Button href="/brand.md" variant="secondary" size="sm">brand.md</Button>
           <Button href="/tokens.json" variant="secondary" size="sm">tokens.json</Button>
@@ -305,7 +305,7 @@ const px = (v: string) => (/^\d+px$/.test(v) ? Number(v.replace('px', '')) : 0);
     padding-block: var(--spacing-3xl) var(--spacing-2xl);
   }
   .br-h1 {
-    font-family: var(--font-pixel);
+    font-family: var(--font-display);
     font-weight: 400;
     font-size: var(--text-h1);
     line-height: 1;
@@ -334,7 +334,7 @@ const px = (v: string) => (/^\d+px$/.test(v) ? Number(v.replace('px', '')) : 0);
     border-top: 1px solid var(--color-rule);
   }
   .br-h3 {
-    font-family: var(--font-pixel);
+    font-family: var(--font-display);
     font-weight: 400;
     font-size: var(--text-h3-card);
     line-height: 1.1;

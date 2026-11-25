@@ -1,56 +1,53 @@
 ---
 /**
- * "Change one token", floating bottom right on every page (24 Nov). Pick an accent or a corner style and the whole
- * site follows: the choice overrides the matching tokens in src/styles/global.css on :root, so every component,
- * every page and /brand change at once — the point of an agent-ready system: one edit, everything in step.
+ * "Change the style", floating bottom right on every page (24 Nov; styles 25 Nov). Pick one of three styles and the
+ * whole site follows: a style overrides a handful of tokens from src/styles/global.css on :root (display face, accent,
+ * corners), so every component, every page and /brand change at once and no component is edited — the point of an
+ * agent-ready system.
  *
- * Choices: src/data/token-presets.ts. The choice is remembered in this browser (localStorage) and applied before
- * first paint by Base.astro, so pages don't flash the default. After a change it fires `nicey:tokens` on window
+ * Styles: src/data/token-presets.ts. The panel logs the change the way an agent would report it: the command, one row
+ * per token edited (from → to), and the count. The choice is remembered in this browser (localStorage) and applied
+ * before first paint by Base.astro, so pages don't flash the default. After a change it fires `nicey:tokens` on window
  * (the homepage band re-reads its rows on it) and says what changed in a live region.
  * Keyboard: the button opens the panel and focus moves into it; Escape or the close button returns focus.
  */
-import { accents, radii } from '../../data/token-presets';
+import { styles } from '../../data/token-presets';
 ---
 
 <div class="ts" data-ts>
   <div class="ts-panel" id="ts-panel" role="dialog" aria-modal="false" aria-labelledby="ts-title" hidden data-ts-panel>
     <div class="ts-head">
-      <p id="ts-title" class="ts-title m-0">Change one token</p>
+      <p id="ts-title" class="ts-title m-0">Change the style</p>
       <button type="button" class="ts-close" aria-label="Close" data-ts-close>
         <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" /></svg>
       </button>
     </div>
-    <p class="ts-lede m-0">One edit in the system. Every page, component and agent export follows.</p>
+    <p class="ts-lede m-0">Three styles, one system. Each is a few token edits. No component changes.</p>
 
-    <div class="ts-group" role="group" aria-labelledby="ts-accent-k">
-      <span id="ts-accent-k" class="ts-k">color.accent</span>
-      <div class="ts-row">
-        {
-          accents.map((a, i) => (
-            <button
-              type="button"
-              class="ts-sw"
-              style={`--sw:${a.light}`}
-              aria-label={a.label}
-              aria-pressed={i === 0 ? 'true' : 'false'}
-              data-accent={a.id}
-            />
-          ))
-        }
-      </div>
+    <div class="ts-cards" role="group" aria-label="Style">
+      {
+        styles.map((s, i) => (
+          <button
+            type="button"
+            class="ts-card"
+            style={`--f:${s.font.stack};--sw-l:${s.accent.light};--sw-d:${s.accent.dark};--r:${s.radius.pill};--rc:${s.radius.code}`}
+            aria-pressed={i === 0 ? 'true' : 'false'}
+            data-style={s.id}
+          >
+            <span class="ts-card-view" aria-hidden="true">
+              <span class="ts-card-aa">Aa</span>
+              <span class="ts-card-bar" />
+            </span>
+            <span class="ts-card-name">{s.label}</span>
+            <span class="ts-card-note">{s.note}</span>
+          </button>
+        ))
+      }
     </div>
 
-    <div class="ts-group" role="group" aria-labelledby="ts-radius-k">
-      <span id="ts-radius-k" class="ts-k">radius</span>
-      <div class="ts-row">
-        {
-          radii.map((r, i) => (
-            <button type="button" class="ts-st" style={`--r:${r.chip}`} aria-pressed={i === 0 ? 'true' : 'false'} data-radius={r.id}>
-              {r.label}
-            </button>
-          ))
-        }
-      </div>
+    <!-- the agent's report of the last change; written by the script below -->
+    <div class="term ts-log" aria-hidden="true">
+      <pre class="term-body" data-ts-log></pre>
     </div>
 
     <div class="ts-foot">
@@ -62,7 +59,7 @@ import { accents, radii } from '../../data/token-presets';
 
   <button type="button" class="ts-btn" aria-expanded="false" aria-controls="ts-panel" data-ts-open>
     <span class="ts-icon" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-    <span class="ts-btn-label">Change one token</span>
+    <span class="ts-btn-label">Change the style</span>
   </button>
 </div>
 
@@ -105,7 +102,7 @@ import { accents, radii } from '../../data/token-presets';
       border-color: var(--color-ink);
     }
   }
-  /* a 2×2 of system pieces: the accent and the corner style you picked, live */
+  /* a 2×2 of system pieces: the accent and the corners of the live style */
   .ts-icon {
     display: grid;
     grid-template-columns: repeat(2, 8px);
@@ -146,7 +143,9 @@ import { accents, radii } from '../../data/token-presets';
     display: flex;
     flex-direction: column;
     gap: var(--spacing-sm);
-    width: min(320px, calc(100vw - 2 * var(--spacing-sm)));
+    width: min(380px, calc(100vw - 2 * var(--spacing-sm)));
+    max-height: calc(100dvh - 48px - 3 * var(--spacing-md));
+    overflow-y: auto;
     padding: var(--spacing-md);
     border: 1px solid var(--color-line-strong);
     border-radius: var(--radius-panel);
@@ -175,7 +174,7 @@ import { accents, radii } from '../../data/token-presets';
     gap: var(--spacing-xs);
   }
   .ts-title {
-    font-family: var(--font-pixel);
+    font-family: var(--font-display);
     font-size: var(--text-h3-card);
     line-height: 1.1;
   }
@@ -200,69 +199,118 @@ import { accents, radii } from '../../data/token-presets';
     line-height: 1.5;
     color: var(--color-ink-2);
   }
-  .ts-group {
-    display: flex;
-    flex-direction: column;
+  /* three cards: each previews its own face, accent and corner, whatever style is live */
+  .ts-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--spacing-2xs);
   }
-  .ts-k {
-    font-family: var(--font-mono);
-    font-size: var(--text-caption);
-    color: var(--color-muted);
-  }
-  .ts-row {
+  .ts-card {
+    --sw: var(--sw-l);
     display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-3xs);
-  }
-  /* swatches: a 40px target around a 28px swatch, the picked one ringed in ink */
-  .ts-sw {
-    display: grid;
-    place-items: center;
-    width: var(--hit-min);
-    height: var(--hit-min);
-    padding: 0;
-    border: 0;
-    background: transparent;
-    cursor: pointer;
-  }
-  .ts-sw::before {
-    content: '';
-    width: 28px;
-    height: 28px;
-    border: 1px solid transparent;
-    border-radius: var(--radius-swatch);
-    background: var(--sw);
-    background-clip: content-box;
-  }
-  .ts-sw[aria-pressed='true']::before {
-    padding: 3px;
-    border-color: var(--color-ink);
-  }
-  .ts-st {
-    min-height: var(--hit-min);
-    padding: 0 var(--spacing-sm);
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--spacing-3xs);
+    padding-bottom: var(--spacing-2xs);
     border: 1px solid var(--color-line-strong);
-    border-radius: var(--r);
+    border-radius: var(--radius-code);
     background: transparent;
-    color: var(--color-ink-2);
-    font-family: var(--font-mono);
-    font-size: var(--text-caption);
+    color: var(--color-ink);
+    text-align: left;
     cursor: pointer;
     transition:
-      background-color 160ms var(--ease-out),
-      color 160ms var(--ease-out),
-      border-color 160ms var(--ease-out);
+      border-color 160ms var(--ease-out),
+      transform 160ms var(--ease-out);
   }
-  .ts-st[aria-pressed='true'] {
+  :global(:root[data-theme='dark']) .ts-card {
+    --sw: var(--sw-d);
+  }
+  .ts-card:active {
+    transform: scale(var(--scale-press));
+  }
+  .ts-card[aria-pressed='true'] {
     border-color: var(--color-ink);
-    background: var(--color-ink);
-    color: var(--color-page);
+    box-shadow: inset 0 0 0 1px var(--color-ink);
   }
   @media (hover: hover) and (pointer: fine) {
-    .ts-st[aria-pressed='false']:hover {
+    .ts-card[aria-pressed='false']:hover {
       border-color: var(--color-ink-2);
-      color: var(--color-ink);
+    }
+  }
+  .ts-card-view {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--spacing-2xs);
+    height: 72px;
+    margin-bottom: var(--spacing-3xs);
+    padding: var(--spacing-2xs);
+    border-radius: min(var(--rc), 8px);
+    background: var(--color-page);
+  }
+  .ts-card-aa {
+    font-family: var(--f);
+    font-size: 28px;
+    line-height: 1;
+  }
+  .ts-card-bar {
+    width: 32px;
+    height: 10px;
+    border-radius: var(--r);
+    background: var(--sw);
+  }
+  .ts-card-name {
+    padding-inline: var(--spacing-3xs);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    font-weight: 500;
+  }
+  .ts-card-note {
+    padding-inline: var(--spacing-3xs);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption-sm);
+    line-height: 1.35;
+    color: var(--color-muted);
+  }
+  /* the agent's report: the shared terminal window, flat inside the panel, tall enough that it never resizes */
+  .ts-log {
+    flex: none;
+    box-shadow: none;
+  }
+  .ts-log .term-body {
+    min-height: calc(6 * 1.6em + 2 * var(--spacing-xs));
+    padding: var(--spacing-xs);
+    font-size: var(--text-caption-sm);
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  /* rows are written by the script, so they are styled from outside the component's scope */
+  .ts-log :global(.ts-l) {
+    display: grid;
+    grid-template-columns: 2ch 13ch minmax(0, 1fr);
+  }
+  .ts-log :global(.ts-l > :first-child:last-child) {
+    grid-column: 1 / -1;
+  }
+  .ts-log :global(.ts-dim) {
+    color: var(--color-term-muted);
+  }
+  .ts-log :global(.ts-acc) {
+    color: var(--color-term-accent);
+  }
+  .ts-log :global(.ts-ok) {
+    color: var(--color-term-ok);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .ts-log :global(.ts-l) {
+      animation: ts-line 200ms var(--ease-out);
+    }
+  }
+  @keyframes ts-line {
+    from {
+      opacity: 0;
+      transform: translateY(2px);
     }
   }
   .ts-foot {
@@ -298,7 +346,7 @@ import { accents, radii } from '../../data/token-presets';
 </style>
 
 <script>
-  import { accents, radii, overrideCss, STORAGE_KEY, CHANGE_EVENT } from '../../data/token-presets';
+  import { styles, styleById, overrideCss, edits, STORAGE_KEY, CHANGE_EVENT } from '../../data/token-presets';
 
   const root = document.querySelector<HTMLElement>('[data-ts]');
   if (root) {
@@ -306,15 +354,15 @@ import { accents, radii } from '../../data/token-presets';
     const open = root.querySelector<HTMLButtonElement>('[data-ts-open]')!;
     const close = root.querySelector<HTMLButtonElement>('[data-ts-close]')!;
     const live = root.querySelector<HTMLElement>('[data-ts-live]')!;
-    const swatches = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-accent]'));
-    const styles = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-radius]'));
+    const log = root.querySelector<HTMLElement>('[data-ts-log]')!;
+    const cards = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-style]'));
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const read = (): { accent: string; radius: string } => {
+    const read = (): string => {
       try {
-        const v = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}');
-        return { accent: v.accent ?? accents[0].id, radius: v.radius ?? radii[0].id };
+        return styleById(JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}').style).id;
       } catch {
-        return { accent: accents[0].id, radius: radii[0].id };
+        return styles[0].id;
       }
     };
     let state = read();
@@ -328,32 +376,93 @@ import { accents, radii } from '../../data/token-presets';
       }
       return el;
     };
-    const paint = () => {
-      swatches.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.accent === state.accent)));
-      styles.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.radius === state.radius)));
+    const paint = () => cards.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.style === state)));
+    const isDark = () => document.documentElement.dataset.theme === 'dark';
+
+    // ---------- the log: what an agent would report ----------
+    // a line is plain text, or mark + token + value in three columns
+    type Line = { text: string; tone?: 'dim' | 'ok' } | { mark: string; key: string; value: string };
+    let timers: number[] = [];
+    const span = (text: string, cls = '') => Object.assign(document.createElement('span'), { textContent: text, className: cls });
+    const write = (lines: Line[]) => {
+      timers.forEach((t) => window.clearTimeout(t));
+      timers = [];
+      log.textContent = '';
+      log.classList.toggle('term-cursor', !reduced);
+      lines.forEach((line, i) => {
+        const add = () => {
+          const row = span('', 'ts-l');
+          if ('text' in line) {
+            if (line.tone) row.classList.add(`ts-${line.tone}`);
+            row.append(span(line.text));
+          } else row.append(span(line.mark, 'ts-acc'), span(line.key), span(line.value));
+          log.append(row);
+          if (i === lines.length - 1) log.classList.remove('term-cursor');
+        };
+        if (reduced) add();
+        else timers.push(window.setTimeout(add, i * 110));
+      });
     };
-    const apply = (next: { accent: string; radius: string }) => {
+    // the five radius tokens move together: one row, the distinct values in order
+    const list = (xs: string[]) => Array.from(new Set(xs)).join(' / ');
+    const status = () => {
+      const s = styleById(state);
+      write([
+        { text: '$ nicey status' },
+        { mark: ' ', key: 'style', value: s.id + (s.id === styles[0].id ? ' (shipped)' : '') },
+        { mark: ' ', key: 'font.display', value: s.font.name },
+        { mark: ' ', key: 'color.accent', value: isDark() ? s.accent.dark : s.accent.light },
+        { mark: ' ', key: 'radius.*', value: list(Object.values(s.radius)) },
+        { text: 'pick a style to see the edit', tone: 'dim' },
+      ]);
+    };
+    const report = (fromId: string, toId: string) => {
+      const to = styleById(toId);
+      const all = edits(styleById(fromId), to, isDark());
+      const radius = all.filter((e) => e.token.startsWith('radius.'));
+      const rows: Line[] = all
+        .filter((e) => !e.token.startsWith('radius.'))
+        .map((e) => ({ mark: '~', key: e.token, value: `${e.from} → ${e.to}` }));
+      if (radius.length)
+        rows.push({
+          mark: '~',
+          key: `radius.* ×${radius.length}`,
+          value: `${list(radius.map((e) => e.from))} → ${list(radius.map((e) => e.to))}`,
+        });
+      write([
+        { text: `$ nicey apply ${to.id}` },
+        ...rows,
+        { text: `✓ ${all.length} tokens edited · 0 components touched`, tone: 'ok' },
+        { text: 'every page re-read the system', tone: 'dim' },
+      ]);
+      return all.length;
+    };
+
+    const apply = (next: string) => {
+      if (next === state) return;
+      const prev = state;
       state = next;
-      styleEl().textContent = overrideCss(state.accent, state.radius);
+      styleEl().textContent = overrideCss(state);
       try {
-        if (state.accent === accents[0].id && state.radius === radii[0].id) localStorage.removeItem(STORAGE_KEY);
-        else localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        if (state === styles[0].id) localStorage.removeItem(STORAGE_KEY);
+        else localStorage.setItem(STORAGE_KEY, JSON.stringify({ style: state }));
       } catch {}
       paint();
-      const a = accents.find((x) => x.id === state.accent)!;
-      const r = radii.find((x) => x.id === state.radius)!;
-      live.textContent = `${a.label} accent, ${r.label.toLowerCase()} corners. Every page updated.`;
-      window.dispatchEvent(new CustomEvent(CHANGE_EVENT, { detail: { ...state } }));
+      const n = report(prev, state);
+      const s = styleById(state);
+      live.textContent = `${s.label} style: ${s.font.name} headlines, ${n} tokens edited, no components touched. Every page updated.`;
+      window.dispatchEvent(new CustomEvent(CHANGE_EVENT, { detail: { style: state } }));
     };
 
     const setOpen = (on: boolean, focus = true) => {
       panel.hidden = !on;
       open.setAttribute('aria-expanded', String(on));
-      if (on && focus) (swatches.find((b) => b.getAttribute('aria-pressed') === 'true') ?? swatches[0]).focus();
+      if (on && focus) (cards.find((b) => b.getAttribute('aria-pressed') === 'true') ?? cards[0]).focus();
       if (!on && focus) open.focus();
     };
 
     paint();
+    status();
     open.addEventListener('click', () => setOpen(panel.hasAttribute('hidden')));
     close.addEventListener('click', () => setOpen(false));
     root.addEventListener('keydown', (e) => {
@@ -365,8 +474,7 @@ import { accents, radii } from '../../data/token-presets';
     document.addEventListener('pointerdown', (e) => {
       if (!panel.hasAttribute('hidden') && !root.contains(e.target as Node)) setOpen(false, false);
     });
-    swatches.forEach((b) => b.addEventListener('click', () => apply({ ...state, accent: b.dataset.accent! })));
-    styles.forEach((b) => b.addEventListener('click', () => apply({ ...state, radius: b.dataset.radius! })));
-    root.querySelector('[data-ts-reset]')!.addEventListener('click', () => apply({ accent: accents[0].id, radius: radii[0].id }));
+    cards.forEach((b) => b.addEventListener('click', () => apply(b.dataset.style!)));
+    root.querySelector('[data-ts-reset]')!.addEventListener('click', () => apply(styles[0].id));
   }
 </script>
