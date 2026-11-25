@@ -3,11 +3,12 @@
  * Direction A: the brand pixel field (after babarogic.com's PixelField), on the shared engine in
  * src/lib/pixel-field.ts. Fills its positioned parent; decorative only (aria-hidden, no pointer events).
  *
- *   mode   drift  — slow drifting value noise (animated unless `still`; static under reduced motion)
- *          rings  — water-drop rings around an epicentre (static)
- *          drop   — one filled, wobbled disc (static)
+ *   mode   drift  — slow drifting value noise
+ *          rings  — water-drop rings around an epicentre, rippling slowly outward
+ *          drop   — one filled, wobbled disc that breathes
+ *   still  draw one frame and stop (every mode animates by default; reduced motion always gets the still frame)
  *   fade   which edges dissolve: 'left' (hero: fades out towards the copy), 'edges' (all four), 'none'
- *   seed   the static modes are seeded, so a panel always draws the same pattern
+ *   seed   seeded, so a panel always starts from the same pattern
  *   cx/cy  epicentre for rings/drop, 0..1 of the box
  *
  * Colours follow the theme (light pastels on cream, deep tints after dark) and repaint on a theme flip.
@@ -76,7 +77,8 @@ const { mode = 'drift', fade = 'edges', still = false, seed = 7, cx = 0.8, cy = 
     const epiX = Number(d.cx ?? 0.8);
     const epiY = Number(d.cy ?? 0.5);
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const animated = mode === 'drift' && !d.still && !reduced;
+    // every mode moves (24 Nov: the panel fields behind the terminals were still); `still` or reduced motion stop it
+    const animated = !d.still && !reduced;
 
     let W = 0, H = 0, cols = 0, rows = 0, dpr = 1;
     // hover: per-cell flash strength (1 → 0) and the pastel it flashed to
@@ -94,29 +96,39 @@ const { mode = 'drift', fade = 'edges', still = false, seed = 7, cx = 0.8, cy = 
         const fy = Math.min(1, py / 60, (H - py) / 90);
         return fx * smooth(Math.max(0, fy));
       }
-      // a still panel field only softens its rim; it has little room around the window it sits behind
-      const e = animated ? 70 : 24;
+      // a panel-sized field only softens its rim; it has little room around the window it sits behind
+      const e = isPanel() ? 24 : 70;
       const f = Math.min(px / e, (W - px) / e, py / e, (H - py) / e, 1);
       return smooth(Math.max(0, f));
     };
 
+    // a field behind a window (not the hero): fuller, so it reads around the window's edges
+    const isPanel = () => Math.min(W, H) < 640;
+
     const value = (px: number, py: number, t: number) => {
       const nx = px / W, ny = py / H;
+      // the noise under every mode drifts slowly; at t = 0 it is the seeded still frame
+      const n = field.sample(nx, ny, t * 0.35);
       if (mode === 'rings') {
         const dist = Math.hypot(px - epiX * W, py - epiY * H);
-        const warp = (field.sample(nx, ny, 0) - 0.5) * 0.8;
-        return ringCrest(dist, 64, warp) * Math.exp(-dist / (Math.max(W, H) * 0.7)) + 0.12;
+        const warp = (n - 0.5) * 0.8;
+        // rings ripple outward: one wavelength every ~8s
+        return ringCrest(dist, 64, warp - t * 0.12) * Math.exp(-dist / (Math.max(W, H) * 0.7)) + 0.12;
       }
       if (mode === 'drop') {
-        const r = Math.min(W, H) * 0.55;
-        const dist = Math.hypot(px - epiX * W, py - epiY * H) * (1 + (field.sample(nx, ny, 0) - 0.5) * 0.3);
-        return discFill(dist, r) * 0.95 + field.sample(nx, ny, 0) * 0.15;
+        // the drop breathes: ±6% of its radius over ~9s
+        const r = Math.min(W, H) * 0.55 * (1 + 0.06 * Math.sin(t * 0.7));
+        const dist = Math.hypot(px - epiX * W, py - epiY * H) * (1 + (n - 0.5) * 0.3);
+        return discFill(dist, r) * 0.95 + n * 0.15;
       }
-      // the live hero sits a little lower (more cream between islands); a still field is fuller, it has to read at a glance
-      return field.sample(nx, ny, t) - (animated ? 0.18 : 0.02);
+      // the hero sits a little lower (more cream between islands); a panel field is fuller
+      return field.sample(nx, ny, t) - (isPanel() ? 0.02 : 0.18);
     };
 
-    const draw = (t: number) => {
+    const t0 = performance.now() / 1000;
+    const draw = (now: number) => {
+      // time since this field started, so the still frame and the first animated frame are the same picture
+      const t = animated ? now - t0 : 0;
       const stops = (isDark() ? DARK_PALETTE : LIGHT_PALETTE).stops;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, W, H);
@@ -211,7 +223,7 @@ const { mode = 'drift', fade = 'edges', still = false, seed = 7, cx = 0.8, cy = 
     let last = 0;
     const loop = (ms: number) => {
       requestAnimationFrame(loop);
-      if (!visible || document.hidden || ms - last < 100) return; // 10fps is plenty for a slow drift
+      if (!visible || document.hidden || ms - last < 100) return; // 10fps is plenty for slow motion
       last = ms;
       draw(ms / 1000);
     };

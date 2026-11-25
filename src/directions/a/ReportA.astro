@@ -53,7 +53,7 @@ const pages = [
 ---
 
 <div class="ra-stage">
-  <PixelFieldA mode="drift" still seed={11} />
+  <PixelFieldA mode="drift" seed={11} />
   <Terminal class="ra" src="audit-report.md · example" tabsLabel="Report pages" data-ra>
     <Fragment slot="tabs">
       {
@@ -73,7 +73,7 @@ const pages = [
 </div>
 
 <style>
-  /* the stage: a still pixel field behind the window (the window itself is the shared Terminal) */
+  /* the stage: a slowly drifting pixel field behind the window (the window itself is the shared Terminal) */
   .ra-stage {
     position: relative;
     isolation: isolate;

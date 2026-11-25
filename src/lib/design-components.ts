@@ -60,8 +60,8 @@ export const components: Component[] = [
   {
     name: 'PixelFieldA',
     file: 'src/directions/a/PixelFieldA.astro',
-    what: 'The brand pattern: soft pastel cells. Animated in the hero, still behind windows.',
-    api: ["mode: 'drift' | 'rings' | 'drop'", "fade: 'left' | 'edges' | 'none'", 'still, seed, cx, cy, cell'],
+    what: 'The brand pattern: soft pastel cells that move slowly (drift, rippling rings, a breathing drop); cells under the cursor light up. Still under reduced motion.',
+    api: ["mode: 'drift' | 'rings' | 'drop'", "fade: 'left' | 'edges' | 'none'", 'still: one frame, no motion', 'seed, cx, cy, cell'],
   },
   {
     name: 'Faq',
