@@ -132,18 +132,20 @@ const data = Array.from({ length: ROWS }, (_, i) => {
   .ab-l > span {
     flex: none;
   }
+  /* the system column is a quiet tint of the accent (25 Nov: the solid block pulled the eye from the hero CTAs);
+     the row being read is a step stronger, so the motion still reads */
   .ab-b {
     width: 36ch;
     padding: 0 0.5ch;
-    background: var(--ab-accent);
-    color: var(--ab-on);
+    background: color-mix(in srgb, var(--ab-accent) 12%, transparent);
+    color: var(--color-ink);
     transition:
       background-color 240ms var(--ease-out),
       color 240ms var(--ease-out);
   }
   .ab-b.is-reading {
-    background: var(--color-ink);
-    color: var(--color-page);
+    background: color-mix(in srgb, var(--ab-accent) 28%, transparent);
+    color: var(--color-ink);
   }
   .ab-r {
     overflow: hidden;
