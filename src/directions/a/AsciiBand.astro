@@ -1,13 +1,13 @@
 ---
 /**
- * Direction A: the drift → system → agents → scale band (after Supabase Select 26). It is the Zero Drift story:
+ * Direction A: the drift → system → agents band (after Supabase Select 26). It is the Zero Drift story:
  *   drift   the values a drifted product really carries, flowing in (dim, unordered)
  *   system  the token names they collapse into (real QBench V2 tokens), on the accent block
  *   agents  what a coding agent reads from them, and that it reads them fine
- *   scale   the products built on the system: mini screens drawn only from the same tokens
- * It follows the site's own tokens (24 Nov): the block and the scale screens read --color-accent and --radius-chip, so
+ * It follows the site's own tokens (24 Nov): the block reads --color-accent, so
  * the floating "Change one token" switcher (src/components/ui/TokenSwitcher.astro) re-colours this band with the rest
- * of the site. On each change the agents re-read every row and report "synced", and the screens follow in a cascade.
+ * of the site. On each change the agents re-read every row and report "synced". (The scale column of mini screens was
+ * removed 25 Nov: the whole site now shows the change.)
  * The band is decorative (aria-hidden); the switcher says in words what changed. Reduced motion: no scrolling.
  */
 const drift = ['purple-2', 'purpleLight2', 'brand/purple/30', 'col-7', 'violet-final', '#6b5fbe', '#7266c4', '#665ab8'];
@@ -23,7 +23,6 @@ const tokens = [
 ];
 const reads = ['input.md', 'tokens.json', 'Input.fig', 'button.md', 'field.md', 'select.md', 'library.json', 'theme.css'];
 
-const products = ['LIMS', 'Mobile', 'Admin'];
 
 const ROWS = 8;
 const B = 36;
@@ -57,7 +56,7 @@ const data = Array.from({ length: ROWS }, (_, i) => {
 <section class="ab" aria-hidden="true" data-ab>
   <div class="ab-stage a-grain">
     <div class="ab-labels">
-      <span>drift</span><span>system</span><span>agents</span><span class="ab-scale-k">scale</span>
+      <span>drift</span><span>system</span><span>agents</span>
     </div>
     <div class="ab-grid">
       <div class="ab-rows">
@@ -75,27 +74,6 @@ const data = Array.from({ length: ROWS }, (_, i) => {
           ))
         }
       </div>
-      <div class="ab-scale">
-        {
-          products.map((p, i) => (
-            <div class="ab-app" style={`--d:${i}`}>
-              <div class="ab-app-top">
-                <span class="ab-dot" />
-                <span class="ab-app-name">{p}</span>
-              </div>
-              <div class="ab-app-body">
-                <span class="ab-in" />
-                <span class="ab-chips">
-                  <span class="ab-chip" />
-                  <span class="ab-chip is-on" />
-                  <span class="ab-chip" />
-                </span>
-                <span class="ab-btn">Save</span>
-              </div>
-            </div>
-          ))
-        }
-      </div>
     </div>
   </div>
 </section>
@@ -105,7 +83,6 @@ const data = Array.from({ length: ROWS }, (_, i) => {
   .ab {
     --ab-accent: var(--color-accent);
     --ab-on: var(--color-on-accent);
-    --ab-r: var(--radius-chip);
     position: relative;
     width: 100%;
     border-block: 1px solid var(--a-rule);
@@ -127,7 +104,6 @@ const data = Array.from({ length: ROWS }, (_, i) => {
     grid-template-columns: minmax(0, 0.9fr) auto minmax(0, 1fr);
   }
   .ab-labels {
-    grid-template-columns: minmax(0, 0.9fr) auto minmax(0, 1fr) var(--ab-scale-w);
     margin-bottom: var(--spacing-xs);
     font-size: var(--text-caption-sm);
     letter-spacing: 0.14em;
@@ -145,16 +121,6 @@ const data = Array.from({ length: ROWS }, (_, i) => {
   }
   .ab-labels span:nth-child(3) {
     padding-left: var(--spacing-sm);
-  }
-  .ab-labels .ab-scale-k {
-    text-align: center;
-  }
-  .ab-stage {
-    --ab-scale-w: 300px;
-  }
-  .ab-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) var(--ab-scale-w);
   }
   /* the left run hugs the block: it overflows towards the page edge, not into the block */
   .ab-l {
@@ -191,89 +157,6 @@ const data = Array.from({ length: ROWS }, (_, i) => {
     color: var(--ab-accent);
   }
 
-  /* ---------- scale: products drawn only from the tokens ---------- */
-  /* centred in its column, like the chooser (feedback 24 Nov) */
-  .ab-scale {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--spacing-2xs);
-    padding: 0 var(--spacing-md);
-    border-left: 1px solid var(--a-rule);
-    white-space: normal;
-  }
-  .ab-app {
-    width: 100%;
-    max-width: 236px;
-    display: grid;
-    grid-template-columns: 64px minmax(0, 1fr);
-    align-items: center;
-    gap: var(--spacing-xs);
-    height: 52px;
-    padding: 0 var(--spacing-xs);
-    border: 1px solid var(--a-rule);
-    border-radius: min(var(--ab-r), 8px);
-    background: var(--color-surface);
-    transition: border-radius 260ms var(--ease-out) calc(var(--d) * 90ms);
-  }
-  .ab-app-top {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: var(--text-caption-sm);
-    color: var(--color-ink-2);
-  }
-  .ab-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: var(--ab-r);
-    background: var(--ab-accent);
-  }
-  .ab-app-body {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-2xs);
-  }
-  .ab-in {
-    flex: 1;
-    height: 20px;
-    border: 1px solid var(--a-rule);
-    border-radius: var(--ab-r);
-    background: var(--color-page);
-  }
-  .ab-chips {
-    display: flex;
-    gap: 3px;
-  }
-  .ab-chip {
-    width: 10px;
-    height: 10px;
-    border: 1px solid var(--a-rule);
-    border-radius: var(--ab-r);
-  }
-  .ab-chip.is-on {
-    border-color: var(--ab-accent);
-    background: var(--ab-accent);
-  }
-  .ab-btn {
-    padding: 3px var(--spacing-2xs);
-    border-radius: var(--ab-r);
-    background: var(--ab-accent);
-    color: var(--ab-on);
-    font-size: var(--text-caption-sm);
-    line-height: 1.3;
-  }
-  /* the change cascades: each screen follows a beat after the one above */
-  .ab-dot,
-  .ab-in,
-  .ab-chip,
-  .ab-btn {
-    transition:
-      background-color 260ms var(--ease-out) calc(var(--d) * 90ms + 120ms),
-      border-color 260ms var(--ease-out) calc(var(--d) * 90ms + 120ms),
-      border-radius 260ms var(--ease-out) calc(var(--d) * 90ms + 120ms);
-  }
   @media (prefers-reduced-motion: reduce) {
     .ab *,
     .ab *::before {
@@ -281,15 +164,6 @@ const data = Array.from({ length: ROWS }, (_, i) => {
     }
   }
 
-  @media (max-width: 1023px) {
-    .ab-stage {
-      --ab-scale-w: 0px;
-    }
-    .ab-scale,
-    .ab-scale-k {
-      display: none;
-    }
-  }
   @media (max-width: 720px) {
     .ab-stage {
       font-size: var(--text-caption);
