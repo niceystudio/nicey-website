@@ -1,0 +1,38 @@
+---
+/**
+ * The terminal window: the dark window the audit report and the QBench reader live in.
+ * Styles: the `.term*` rules in src/styles/global.css (tokens --color-term-*, --shadow-window).
+ *
+ *   <Terminal src="audit-report.md">
+ *     <Fragment slot="tabs">…buttons with class="term-tab" role="tab"…</Fragment>
+ *     <pre class="term-body term-cursor">…</pre>
+ *   </Terminal>
+ *
+ * The bar always has the three pixel lights; tabs and the file name are optional.
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div'> {
+  /** file name on the right of the bar */
+  src?: string;
+  /** accessible name for the tab list, when there are tabs */
+  tabsLabel?: string;
+}
+const { src, tabsLabel, class: cls, ...rest } = Astro.props;
+const hasTabs = Astro.slots.has('tabs');
+---
+
+<div class:list={['term', cls]} {...rest}>
+  <div class="term-bar">
+    {
+      hasTabs && (
+        <div class="term-tabs" role="tablist" aria-label={tabsLabel}>
+          <slot name="tabs" />
+        </div>
+      )
+    }
+    <slot name="bar" />
+    {src && <span class="term-src">{src}</span>}
+  </div>
+  <slot />
+</div>

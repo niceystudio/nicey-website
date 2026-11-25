@@ -56,33 +56,33 @@ const blocks = [
   .cst {
     display: flex;
     flex-direction: column;
-    gap: 48px;
-    padding-block: 64px 48px;
+    gap: var(--spacing-xl);
+    padding-block: var(--spacing-2xl) var(--spacing-xl);
   }
   .cst-body {
     display: grid;
     grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
-    gap: 64px;
+    gap: var(--spacing-2xl);
     align-items: start;
   }
   @media (max-width: 1023px) {
     .cst-body {
       grid-template-columns: minmax(0, 1fr);
-      gap: 40px;
+      gap: var(--spacing-xl);
     }
   }
   @media (max-width: 767px) {
     .cst {
-      padding-block: 48px 24px;
-      gap: 32px;
+      padding-block: var(--spacing-xl) var(--spacing-md);
+      gap: var(--spacing-lg);
     }
   }
   /* the client card: surface box, 1px rule, label over value; stays in view while the text scrolls */
   .cst-card {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    padding: 28px;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg);
     border: 1px solid var(--a-rule);
     background: var(--color-surface);
   }
@@ -100,7 +100,7 @@ const blocks = [
   .cst-facts {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: var(--spacing-sm);
   }
   .cst-facts > div {
     display: flex;
@@ -109,23 +109,23 @@ const blocks = [
   }
   .cst-facts dt {
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: var(--text-caption);
     color: var(--color-muted);
   }
   .cst-facts dd {
-    font-size: 15px;
+    font-size: var(--text-body-sm);
     line-height: 1.45;
   }
   .cst-text {
     display: flex;
     flex-direction: column;
-    gap: 40px;
+    gap: var(--spacing-xl);
     max-width: 68ch;
   }
   .cst-block {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: var(--spacing-sm);
   }
   .cst-h {
     font-size: 22px;
@@ -133,7 +133,7 @@ const blocks = [
     font-weight: 400;
   }
   .cst-p {
-    font-size: 16px;
+    font-size: var(--text-body);
     line-height: 1.6;
     color: var(--color-ink-2);
     text-wrap: pretty;

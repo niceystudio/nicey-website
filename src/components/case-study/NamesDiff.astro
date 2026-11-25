@@ -96,11 +96,11 @@ const figs = JSON.stringify({ before, after });
   .nd-copy {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: var(--spacing-sm);
     padding: var(--spacing-cell);
   }
   .nd-figure {
-    margin: 12px 0 0;
+    margin: var(--spacing-xs) 0 0;
     font-family: var(--font-pixel);
     font-size: clamp(64px, 7vw, 112px);
     line-height: 0.9;
@@ -119,7 +119,7 @@ const figs = JSON.stringify({ before, after });
   }
   .nd-note {
     max-width: 40ch;
-    font-size: 15px;
+    font-size: var(--text-body-sm);
     line-height: 1.5;
     color: var(--color-ink-2);
     text-wrap: pretty;
@@ -133,11 +133,11 @@ const figs = JSON.stringify({ before, after });
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    padding: 8px 10px 8px 18px;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-2xs) var(--spacing-xs) var(--spacing-2xs) var(--spacing-sm);
     border-bottom: 1px solid var(--color-line);
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: var(--text-caption);
     color: var(--color-ink);
   }
   .nd-tabs {
@@ -145,18 +145,18 @@ const figs = JSON.stringify({ before, after });
     border: 1px solid var(--color-line-strong);
   }
   .nd-tabs button {
-    min-height: 32px;
-    padding: 0 12px;
+    min-height: var(--hit-min);
+    padding: 0 var(--spacing-xs);
     border: 0;
     background: transparent;
     color: var(--color-ink-2);
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: var(--text-caption);
     cursor: pointer;
     transition: transform 160ms var(--ease-out);
   }
   .nd-tabs button:active {
-    transform: scale(0.97);
+    transform: scale(var(--scale-press));
   }
   .nd-tabs button[aria-pressed='true'] {
     background: var(--a-block, var(--color-accent));
@@ -165,9 +165,9 @@ const figs = JSON.stringify({ before, after });
   .nd-body {
     flex: 1;
     margin: 0;
-    padding: 28px 26px;
+    padding: var(--spacing-lg) var(--spacing-md);
     font-family: var(--font-mono);
-    font-size: 14px;
+    font-size: var(--text-label);
     line-height: 2;
     white-space: pre;
     overflow-x: auto;
@@ -215,14 +215,14 @@ const figs = JSON.stringify({ before, after });
   /* phones: the value moves under its name (20 Nov review: values ran past the edge) */
   @media (max-width: 560px) {
     .nd-body {
-      padding: 20px 16px;
-      font-size: 12px;
+      padding: var(--spacing-md) var(--spacing-sm);
+      font-size: var(--text-caption);
       line-height: 1.8;
     }
     .nd-body :global(.nd-val) {
       display: block;
       padding-left: 2ch;
-      margin-bottom: 4px;
+      margin-bottom: var(--spacing-3xs);
     }
   }
 </style>

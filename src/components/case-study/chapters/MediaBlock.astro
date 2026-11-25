@@ -1,0 +1,52 @@
+---
+/**
+ * Media blocks: before/after comparison, images.
+ * One case-study block, rendered inside a chapter by Chapters.astro. Styles: chapters/chapters.css.
+ */
+import type { ChapterBlock } from '../../../data/case-studies';
+
+interface Props {
+  block: ChapterBlock;
+}
+const { block: b } = Astro.props;
+---
+{b.kind === 'compare' && (
+  <table class="ch-table ch-compare">
+    <thead>
+      <tr>
+        <th scope="col" class="caption-sm">
+          <span class="sr-only">Measure</span>
+        </th>
+        <th scope="col" class="caption-sm">
+          Before
+        </th>
+        <th scope="col" class="caption-sm">
+          After
+        </th>
+        <th scope="col" class="caption-sm">
+          <span class="sr-only">What it counts</span>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {b.rows.map((r) => (
+        <tr>
+          <th scope="row" class="text-body-lg font-normal">
+            {r.label}
+          </th>
+          <td class="ch-before tabular-nums">{r.before}</td>
+          <td class="ch-after tabular-nums">{r.after}</td>
+          <td class="text-body text-ink-2">{r.note}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+)}
+
+{b.kind === 'images' && (
+  <div class="ch-images">
+    {b.images.map((im) => (
+      <img class="img-outline" src={im.src} alt={im.alt} width={im.width} height={im.height} loading="lazy" decoding="async" />
+    ))}
+  </div>
+)}

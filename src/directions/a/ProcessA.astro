@@ -9,6 +9,8 @@
 import SectionHead from '../../components/SectionHead.astro';
 import ReportA from './ReportA.astro';
 import { links } from '../../data/links';
+import Button from '../../components/ui/Button.astro';
+import Label from '../../components/ui/Label.astro';
 
 import SelfCheckA from './SelfCheckA.astro';
 
@@ -35,7 +37,7 @@ const steps = [
         <div class="pa-head">
           <h3 class="pa-h m-0">We audit it for you</h3>
         </div>
-        <p class="pa-k m-0">How it goes</p>
+        <Label variant="mono" as="p">How it goes</Label>
         <ol class="pa-steps">
           {
             steps.map((s) => (
@@ -46,10 +48,10 @@ const steps = [
             ))
           }
         </ol>
-        <a href={links.startAudit} class="pill pill-ink pill-lg pa-cta">Get a free audit</a>
+        <Button href={links.startAudit} class="pa-cta">Get a free audit</Button>
       </div>
       <div class="pa-right">
-        <p class="pa-k m-0">What you get</p>
+        <Label variant="mono" as="p">What you get</Label>
         <ReportA />
       </div>
     </div>
@@ -66,31 +68,30 @@ const steps = [
   .pa-body {
     display: grid;
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    gap: 48px;
+    gap: var(--spacing-xl);
     padding: var(--spacing-cell-lg);
   }
   @media (max-width: 1023px) {
     .pa-body {
       grid-template-columns: minmax(0, 1fr);
-      gap: 40px;
+      gap: var(--spacing-xl);
     }
   }
   .pa-left,
   .pa-right {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: var(--spacing-sm);
     min-width: 0;
   }
-  /* small labels: sentence case, mono, muted — no capitals */
   .pa-head {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    margin-bottom: 20px;
+    gap: var(--spacing-2xs);
+    margin-bottom: var(--spacing-md);
   }
   .pa-h {
-    font-size: 24px;
+    font-size: var(--text-h3-card);
     line-height: 1.2;
     font-weight: 400;
     text-wrap: balance;
@@ -100,29 +101,24 @@ const steps = [
     align-self: flex-start;
     margin-top: auto;
   }
-  .pa-k {
-    font-family: var(--font-mono);
-    font-size: 13px;
-    color: var(--color-muted);
-  }
   /* no rules between the steps (Goran, 23 Nov: too many lines) — spacing alone separates them */
   .pa-steps {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: var(--spacing-md);
     margin: 0;
-    padding: 8px 0 0;
+    padding: var(--spacing-2xs) 0 0;
     list-style: none;
   }
   .pa-steps li {
     display: grid;
     grid-template-columns: 32px minmax(0, 1fr);
     align-items: baseline;
-    gap: 12px;
+    gap: var(--spacing-xs);
   }
   .pa-n {
     font-family: var(--font-mono);
-    font-size: 13px;
+    font-size: var(--text-code);
     color: var(--color-ink-2);
   }
   .pa-title {
@@ -132,6 +128,8 @@ const steps = [
   }
   /* the action comes last, after the process */
   @media (max-width: 767px) {
-    .pa-body,
-      }
+    .pa-body {
+      padding: var(--spacing-md);
+    }
+  }
 </style>

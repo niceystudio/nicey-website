@@ -7,8 +7,11 @@
  * Figma file read-only, checks the seven pillars one by one, then lists what to fix first and points to a call.
  * Example only: statuses, no invented counts. It plays once when it scrolls in, again on Replay or on Copy prompt.
  * Reduced motion / no JS: the finished run is already in the markup.
+ * 25 Nov (design system merge): the window is the shared terminal (.term / .term-bar, terminal tokens) and it sits
+ * on an animated pixel field like the other two windows.
  */
 import CopyPrompt from '../../components/CopyPrompt.astro';
+import PixelFieldA from './PixelFieldA.astro';
 import { aiReadyPrompt, PILLARS } from '../../lib/ai-ready';
 import { links } from '../../data/links';
 
@@ -53,9 +56,10 @@ const gets = [
       </div>
     </div>
 
-    <div class="sc-stage a-grain bg-sage">
-      <div class="scr" data-scr={JSON.stringify(script)} data-md-skip>
-        <div class="scr-bar">
+    <div class="sc-stage">
+      <PixelFieldA mode="drift" seed={17} />
+      <div class="scr term" data-scr={JSON.stringify(script)} data-md-skip>
+        <div class="scr-bar term-bar">
           <span>your agent · example run</span>
           <button type="button" class="scr-replay" data-scr-replay>Replay</button>
         </div>
@@ -84,26 +88,26 @@ const gets = [
     border-top: 1px solid var(--a-rule);
     display: grid;
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    gap: 48px;
+    gap: var(--spacing-xl);
     padding: var(--spacing-cell-lg);
     align-items: stretch;
   }
   @media (max-width: 1023px) {
     .sc-box {
       grid-template-columns: minmax(0, 1fr);
-      gap: 36px;
+      gap: var(--spacing-lg);
     }
   }
   @media (max-width: 767px) {
     .sc-box {
-      padding: 24px;
+      padding: var(--spacing-md);
     }
   }
   /* top-aligned like the audit row; Copy prompt sits on the stage's bottom line (Emir 24 Nov) */
   .sc-left {
     display: flex;
     flex-direction: column;
-    gap: 28px;
+    gap: var(--spacing-lg);
   }
   .sc-act {
     margin-top: auto;
@@ -121,9 +125,9 @@ const gets = [
   }
   /* same small label as the audit row (.pa-k) */
   .sc-k {
-    margin-bottom: 12px;
+    margin-bottom: var(--spacing-xs);
     font-family: var(--font-mono);
-    font-size: 13px;
+    font-size: var(--text-code);
     color: var(--color-muted);
   }
   .sc-gets ul {
@@ -132,12 +136,12 @@ const gets = [
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: var(--spacing-xs);
   }
   .sc-gets li {
     display: flex;
-    gap: 10px;
-    font-size: 15px;
+    gap: var(--spacing-xs);
+    font-size: var(--text-body-sm);
     line-height: 1.45;
   }
   .sc-gets li > span:first-child {
@@ -147,19 +151,23 @@ const gets = [
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
+    gap: var(--spacing-xs);
   }
   .sc-stage {
     min-width: 0;
     display: flex;
     align-items: center;
-    padding: 40px;
+    padding: var(--spacing-xl);
     position: relative;
     isolation: isolate;
   }
+  .sc-stage > .scr {
+    position: relative;
+    z-index: 1;
+  }
   @media (max-width: 639px) {
     .sc-stage {
-      padding: 16px;
+      padding: var(--spacing-sm);
     }
   }
 </style>
@@ -170,37 +178,29 @@ const gets = [
     width: 100%;
     display: flex;
     flex-direction: column;
-    background: #26251f;
-    color: #f3f0e9;
     font-family: var(--font-mono);
-    font-size: 13px;
+    font-size: var(--text-code);
     line-height: 1.7;
     overflow: hidden;
   }
+  /* the bar is the shared .term-bar (lights, rule, mono caption); only its right inset differs */
   .scr-bar {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 6px 8px 6px 18px;
-    border-bottom: 1px solid rgba(243, 240, 233, 0.12);
-    color: #b6b1a3;
-    font-size: 12px;
-    letter-spacing: 0.02em;
+    padding-right: var(--spacing-2xs);
   }
   .scr-replay {
     margin-left: auto;
     min-height: 32px;
-    padding: 0 12px;
+    padding: 0 var(--spacing-xs);
     border: 0;
     border-radius: 6px;
-    background: rgba(243, 240, 233, 0.08);
-    color: #f3f0e9;
+    background: rgb(243 240 233 / 0.08);
+    color: var(--color-term-ink);
     font: inherit;
     cursor: pointer;
     transition: background-color 160ms var(--ease-out), transform 160ms var(--ease-out);
   }
   .scr-replay:active {
-    transform: scale(0.96);
+    transform: scale(var(--scale-press));
   }
   .scr-replay:focus-visible {
     outline: 2px solid var(--color-focus);
@@ -208,13 +208,13 @@ const gets = [
   }
   @media (hover: hover) and (pointer: fine) {
     .scr-replay:hover {
-      background: rgba(243, 240, 233, 0.14);
+      background: rgb(243 240 233 / 0.14);
     }
   }
   /* one height; the run scrolls inside it */
   .scr-out {
     height: 360px;
-    padding: 16px 18px;
+    padding: var(--spacing-sm) var(--spacing-sm);
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-width: thin;
@@ -230,36 +230,36 @@ const gets = [
   }
   .scr-l b {
     font-weight: 400;
-    color: #b6b1a3;
+    color: var(--color-term-muted);
   }
   .scr-l.is-you {
-    color: #d9d2ef;
-    margin-bottom: 8px;
+    color: var(--color-term-accent);
+    margin-bottom: var(--spacing-2xs);
   }
   .scr-l.is-dim {
-    color: #b6b1a3;
+    color: var(--color-term-muted);
   }
   .scr-row {
     display: flex;
     justify-content: space-between;
-    gap: 12px;
-    padding-left: 14px;
+    gap: var(--spacing-xs);
+    padding-left: var(--spacing-sm);
   }
   .scr-st {
-    color: #b6b1a3;
+    color: var(--color-term-muted);
     white-space: nowrap;
   }
   .scr-st.is-pass {
-    color: #cbdac4;
+    color: var(--color-term-ok);
   }
   .scr-st.is-partial {
-    color: #f2e6bc;
+    color: var(--color-term-warn);
   }
   .scr-st.is-fail {
-    color: #e8805c;
+    color: var(--color-term-fail);
   }
   .scr-l a {
-    color: #f3f0e9;
+    color: var(--color-term-ink);
     text-underline-offset: 3px;
   }
   .scr-paste {
@@ -268,17 +268,17 @@ const gets = [
     padding: 0 6px;
     border-radius: 4px;
     background: rgba(217, 210, 239, 0.18);
-    color: #d9d2ef;
-    font-size: 11px;
+    color: var(--color-term-accent);
+    font-size: var(--text-caption-sm);
   }
   .scr-spin {
     display: inline-block;
     width: 1ch;
-    color: #cbdac4;
+    color: var(--color-term-ok);
   }
   .scr-cursor::after {
     content: '▍';
-    color: #cbdac4;
+    color: var(--color-term-ok);
     animation: scr-blink 1s steps(1) infinite;
   }
   @keyframes scr-blink {
@@ -288,11 +288,11 @@ const gets = [
   }
   @media (max-width: 639px) {
     .scr {
-      font-size: 12px;
+      font-size: var(--text-caption);
     }
     .scr-out {
       height: 320px;
-      padding: 12px 14px;
+      padding: var(--spacing-xs) var(--spacing-sm);
     }
   }
 </style>

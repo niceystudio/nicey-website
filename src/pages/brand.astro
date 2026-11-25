@@ -1,0 +1,600 @@
+---
+/**
+ * /brand — the design system on one page: every token and every shared component, side by side.
+ * Nothing here is a copy. Tokens are parsed from src/styles/global.css (src/lib/design-tokens.ts); components are
+ * the real ones from src/components/ui, with their usage counted from the source (src/lib/design-components.ts).
+ * Change a token or a component and this page, every page that uses it, /brand.md and /tokens.json change together.
+ */
+import '../directions/a/a.css';
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import SectionHead from '../components/SectionHead.astro';
+import Button from '../components/ui/Button.astro';
+import Label from '../components/ui/Label.astro';
+import Terminal from '../components/ui/Terminal.astro';
+import Tabs from '../components/ui/Tabs.astro';
+import PixelFieldA from '../directions/a/PixelFieldA.astro';
+import { byGroup, colorFamilies, tokens } from '../lib/design-tokens';
+import { components, usedIn } from '../lib/design-components';
+
+const colors = byGroup('color');
+const families = colorFamilies.map((f) => ({ ...f, items: colors.filter((c) => f.match.test(c.name)) }));
+const text = byGroup('text');
+const fonts = byGroup('font');
+const spacing = byGroup('spacing');
+const radius = byGroup('radius');
+const shadows = byGroup('shadow');
+const ease = byGroup('ease');
+const file = (name: string) => components.find((c) => c.name === name)?.file;
+const use = Object.fromEntries(components.map((c) => [c.name, usedIn(c)]));
+const px = (v: string) => (/^\d+px$/.test(v) ? Number(v.replace('px', '')) : 0);
+---
+
+<Base
+  title="Brand · Nicey design system"
+  description="Every token and shared component of the Nicey site on one page, read from the same source the site uses."
+  markdownHref="/brand.md"
+  noindex
+>
+  <div class="dir-a">
+    <Header variant="case" />
+    <main id="main" tabindex="-1" class="br">
+      <section class="container-page br-intro">
+        <Label variant="section">Brand</Label>
+        <h1 class="m-0 br-h1">The system, all of it.</h1>
+        <p class="m-0 br-lede">
+          Every value here is read from <code>src/styles/global.css</code> and every component is the real one. Change
+          a token or a component and it changes here, on every page that uses it, and in what agents read.
+        </p>
+        <p class="m-0 label-mono">Try it: “Change one token”, bottom right, repaints this page and every other.</p>
+        <div class="br-links">
+          <Button href="/brand.md" variant="secondary" size="sm">brand.md</Button>
+          <Button href="/tokens.json" variant="secondary" size="sm">tokens.json</Button>
+          <span class="label-mono">{tokens.length} tokens · {components.length} components</span>
+        </div>
+      </section>
+
+      {/* ---------- colour ---------- */}
+      <section class="container-page br-sec" aria-labelledby="br-color">
+        <SectionHead id="br-color" caption="Colour">Colour</SectionHead>
+        {
+          families.map((f) => (
+            <div class="br-group">
+              <div class="br-group-head">
+                <h3 class="m-0 br-h3">{f.title}</h3>
+                <p class="m-0 label-mono">{f.note}</p>
+              </div>
+              <ul class="br-swatches">
+                {f.items.map((c) => (
+                  <li class="br-sw">
+                    <span class="br-chip" style={`background:var(${c.name})`} />
+                    <code class="br-name">{c.name}</code>
+                    <span class="br-val">
+                      {c.value}
+                      {c.dark && <span class="br-dark"> · dark {c.dark}</span>}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </section>
+
+      {/* ---------- type ---------- */}
+      <section class="container-page br-sec" aria-labelledby="br-type">
+        <SectionHead id="br-type" caption="Typography">Typography</SectionHead>
+        <ul class="br-fonts">
+          {
+            fonts.map((f) => (
+              <li class="br-font">
+                <span class="br-font-sample" style={`font-family:var(${f.name})`}>
+                  Aa
+                </span>
+                <code class="br-name">{f.name}</code>
+                <span class="br-val">{f.value.split(',')[0]}</span>
+              </li>
+            ))
+          }
+        </ul>
+        <ul class="br-type">
+          {
+            text.map((t) => (
+              <li class="br-type-row">
+                <div class="br-type-meta">
+                  <code class="br-name">{t.name}</code>
+                  <span class="br-val">
+                    {t.value}
+                    {t.lineHeight && ` / ${t.lineHeight}`}
+                  </span>
+                </div>
+                {/* the real utility class too, so the face the site pairs with it (pixel for h2, names…) shows here */}
+                <span
+                  class:list={['br-type-sample', `text-${t.name.replace('--text-', '')}`]}
+                  style={`font-size:var(${t.name});line-height:${t.lineHeight ?? 1.2};letter-spacing:${t.letterSpacing ?? 'normal'}`}
+                >
+                  Systems agents read
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      {/* ---------- space, shape, elevation, motion ---------- */}
+      <section class="container-page br-sec" aria-labelledby="br-space">
+        <SectionHead id="br-space" caption="Spacing">Spacing</SectionHead>
+        <ul class="br-space">
+          {
+            spacing.map((s) => (
+              <li class="br-space-row">
+                <code class="br-name">{s.name}</code>
+                <span class="br-val">{s.value}</span>
+                <span class="br-bar" style={`width:var(${s.name})`} />
+              </li>
+            ))
+          }
+        </ul>
+        <p class="m-0 label-mono br-foot">
+          The 3xs–3xl scale sits on the 4/8px grid. Section, gutter and cell are layout roles; they shrink on small
+          screens.
+        </p>
+      </section>
+
+      <section class="container-page br-sec" aria-labelledby="br-shape">
+        <SectionHead id="br-shape" caption="Shape · elevation · motion">Radius, shadow, easing</SectionHead>
+        <div class="br-tiles">
+          {
+            radius.map((r) => (
+              <div class="br-tile">
+                <span class="br-shape" style={`border-radius:var(${r.name})`} />
+                <code class="br-name">{r.name}</code>
+                <span class="br-val">{r.value}</span>
+              </div>
+            ))
+          }
+          {
+            shadows.map((s) => (
+              <div class="br-tile">
+                <span class="br-shape br-shape--lift" style={`box-shadow:var(${s.name})`} />
+                <code class="br-name">{s.name}</code>
+                <span class="br-val">{s.name === '--shadow-window' ? 'windows only' : 'quiet lift'}</span>
+              </div>
+            ))
+          }
+          {
+            ease.map((e) => (
+              <div class="br-tile">
+                <span class="br-ease" style={`--e:var(${e.name})`}>
+                  <i />
+                </span>
+                <code class="br-name">{e.name}</code>
+                <span class="br-val">{e.value}</span>
+              </div>
+            ))
+          }
+        </div>
+        <p class="m-0 label-mono br-foot">Square everywhere (Direction A). Only windows cast a shadow.</p>
+      </section>
+
+      {/* ---------- components ---------- */}
+      <section class="container-page br-sec" aria-labelledby="br-comp">
+        <SectionHead id="br-comp" caption="Components">Components</SectionHead>
+
+        <article class="br-comp">
+          <header class="br-comp-head">
+            <h3 class="m-0 br-h3">Button</h3>
+            <code class="br-val">{file('Button')}</code>
+          </header>
+          <div class="br-demo">
+            <Button href="#br-comp">Primary</Button>
+            <Button href="#br-comp" variant="secondary">Secondary</Button>
+            <Button href="#br-comp" size="sm">Primary sm</Button>
+            <Button href="#br-comp" variant="secondary" size="sm">Secondary sm</Button>
+          </div>
+          <div class="br-demo br-demo--band">
+            <Button href="#br-comp" variant="on-band">On band</Button>
+            <Button href="#br-comp" variant="on-band-outline">On band outline</Button>
+          </div>
+          <p class="m-0 br-used">Used in {use.Button.length} files: {use.Button.join(' · ')}</p>
+        </article>
+
+        <article class="br-comp">
+          <header class="br-comp-head">
+            <h3 class="m-0 br-h3">Label</h3>
+            <code class="br-val">{file('Label')}</code>
+          </header>
+          <div class="br-demo br-demo--col">
+            <Label variant="section">section · a caption with the path prefix</Label>
+            <Label variant="caption">caption · a kicker</Label>
+            <Label variant="meta">meta · design system + product · lims</Label>
+            <Label variant="mono">mono · How it goes</Label>
+          </div>
+          <p class="m-0 br-used">Used in {use.Label.length} files: {use.Label.join(' · ')}</p>
+        </article>
+
+        <article class="br-comp">
+          <header class="br-comp-head">
+            <h3 class="m-0 br-h3">SectionHead</h3>
+            <code class="br-val">{file('SectionHead')}</code>
+          </header>
+          <div class="br-demo br-demo--col">
+            <SectionHead id="br-demo-head" caption="Section caption">A section heading.</SectionHead>
+          </div>
+          <p class="m-0 br-used">Used in {use.SectionHead.length} files: {use.SectionHead.join(' · ')}</p>
+        </article>
+
+        <article class="br-comp">
+          <header class="br-comp-head">
+            <h3 class="m-0 br-h3">Tabs</h3>
+            <code class="br-val">src/components/ui/Tabs.astro · src/lib/tabs.ts</code>
+          </header>
+          <div class="br-tabs" data-br-tabs>
+            <Tabs label="Example tabs" fill>
+              <button type="button" role="tab" class="tab" aria-selected="true" tabindex="0"><span class="tab-k">01</span>Audit</button>
+              <button type="button" role="tab" class="tab" aria-selected="false" tabindex="-1"><span class="tab-k">02</span>Tokens</button>
+              <button type="button" role="tab" class="tab" aria-selected="false" tabindex="-1"><span class="tab-k">03</span>Agents build</button>
+            </Tabs>
+          </div>
+          <p class="m-0 br-used">Used in {use.Tabs.length} files: {use.Tabs.join(' · ')} · behaviour also in ReportA, QBenchWork, Decisions</p>
+        </article>
+
+        <article class="br-comp">
+          <header class="br-comp-head">
+            <h3 class="m-0 br-h3">Terminal</h3>
+            <code class="br-val">{file('Terminal')}</code>
+          </header>
+          <div class="br-demo br-demo--stage">
+            <PixelFieldA mode="rings" seed={3} cx={0.8} cy={0.4} />
+            <Terminal src="button.md" tabsLabel="Example tabs" class="br-term">
+              <Fragment slot="tabs">
+                <button type="button" role="tab" class="term-tab" aria-selected="true">Figma</button>
+                <button type="button" role="tab" class="term-tab" aria-selected="false">Tokens</button>
+                <button type="button" role="tab" class="term-tab" aria-selected="false">Agent</button>
+              </Fragment>
+              <pre class="term-body term-cursor"><span class="term-ps">$</span> nicey read Button{'\n'}<span class="term-note"># one component, read the same way by people and agents</span>{'\n\n'}variant   primary | secondary{'\n'}size      sm | lg</pre>
+            </Terminal>
+          </div>
+          <p class="m-0 br-used">Used in {use.Terminal.length} files: {use.Terminal.join(' · ')} · plus the QBench reader (term classes)</p>
+        </article>
+
+        <article class="br-comp">
+          <header class="br-comp-head">
+            <h3 class="m-0 br-h3">PixelField</h3>
+            <code class="br-val">{file('PixelFieldA')}</code>
+          </header>
+          <div class="br-fields">
+            <div class="br-field"><PixelFieldA mode="drift" seed={11} /><span class="label-mono">drift</span></div>
+            <div class="br-field"><PixelFieldA mode="rings" seed={5} cx={0.7} /><span class="label-mono">rings</span></div>
+            <div class="br-field"><PixelFieldA mode="drop" seed={9} cx={0.6} /><span class="label-mono">drop</span></div>
+          </div>
+          <p class="m-0 br-used">Used in {use.PixelFieldA.length} files: {use.PixelFieldA.join(' · ')}</p>
+        </article>
+
+        <article class="br-comp">
+          <header class="br-comp-head">
+            <h3 class="m-0 br-h3">Panel and chip</h3>
+            <code class="br-val">src/styles/global.css · .panel .chip</code>
+          </header>
+          <ul class="panel br-panel">
+            <li>Cell</li>
+            <li>Cell</li>
+            <li>Cell</li>
+          </ul>
+          <div class="br-demo">
+            <span class="chip">color.accent</span>
+            <span class="chip">border/default</span>
+          </div>
+        </article>
+      </section>
+    </main>
+    <SiteFooter mdHref="/brand.md" directionA />
+  </div>
+</Base>
+
+<style>
+  .br {
+    padding-bottom: var(--spacing-section);
+  }
+  .br-intro {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+    padding-block: var(--spacing-3xl) var(--spacing-2xl);
+  }
+  .br-h1 {
+    font-family: var(--font-pixel);
+    font-weight: 400;
+    font-size: var(--text-h1);
+    line-height: 1;
+  }
+  .br-lede {
+    max-width: 60ch;
+    font-size: var(--text-body-lg);
+    line-height: var(--text-body-lg--line-height);
+    color: var(--color-ink-2);
+  }
+  .br-lede code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+  }
+  .br-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-xs) var(--spacing-sm);
+  }
+  .br-sec {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+    padding-block: var(--spacing-2xl);
+    border-top: 1px solid var(--color-rule);
+  }
+  .br-h3 {
+    font-family: var(--font-pixel);
+    font-weight: 400;
+    font-size: var(--text-h3-card);
+    line-height: 1.1;
+  }
+  .br-name {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--color-ink);
+  }
+  .br-val {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--color-muted);
+    overflow-wrap: anywhere;
+  }
+  .br-dark {
+    color: var(--color-muted);
+  }
+  .br-foot {
+    max-width: 70ch;
+  }
+
+  /* colour */
+  .br-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  .br-group-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--spacing-2xs) var(--spacing-sm);
+  }
+  .br-swatches {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--spacing-sm);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .br-sw {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3xs);
+  }
+  .br-chip {
+    height: 72px;
+    margin-bottom: var(--spacing-2xs);
+    border: 1px solid var(--color-rule);
+  }
+
+  /* type */
+  .br-fonts {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--spacing-sm);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .br-font {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3xs);
+    padding: var(--spacing-md);
+    border: 1px solid var(--color-rule);
+    background: var(--color-surface);
+  }
+  .br-font-sample {
+    margin-bottom: var(--spacing-2xs);
+    font-size: 56px;
+    line-height: 1;
+  }
+  .br-type {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .br-type-row {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    align-items: baseline;
+    gap: var(--spacing-md);
+    padding-block: var(--spacing-sm);
+    border-top: 1px solid var(--color-rule);
+  }
+  .br-type-meta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3xs);
+  }
+  .br-type-sample {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  /* spacing */
+  .br-space {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .br-space-row {
+    display: grid;
+    grid-template-columns: 200px 64px minmax(0, 1fr);
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding-block: var(--spacing-2xs);
+  }
+  .br-bar {
+    height: 16px;
+    max-width: 100%;
+    background: var(--color-accent);
+  }
+
+  /* shape, elevation, motion */
+  .br-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: var(--spacing-md);
+  }
+  .br-tile {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3xs);
+  }
+  .br-shape {
+    width: 100%;
+    height: 96px;
+    margin-bottom: var(--spacing-2xs);
+    border: 1px solid var(--color-rule);
+    background: var(--color-surface);
+  }
+  .br-shape--lift {
+    border-color: transparent;
+  }
+  .br-ease {
+    position: relative;
+    height: 96px;
+    margin-bottom: var(--spacing-2xs);
+    border: 1px solid var(--color-rule);
+    background: var(--color-surface);
+  }
+  .br-ease i {
+    position: absolute;
+    left: 12px;
+    top: 40px;
+    width: 16px;
+    height: 16px;
+    background: var(--color-accent);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .br-ease i {
+      animation: br-move 1.6s var(--e) infinite alternate;
+    }
+  }
+  @keyframes br-move {
+    to {
+      left: calc(100% - 28px);
+    }
+  }
+
+  /* components */
+  .br-comp {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg);
+    border: 1px solid var(--color-rule);
+    background: var(--color-surface);
+  }
+  .br-comp-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--spacing-2xs) var(--spacing-md);
+  }
+  .br-demo {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
+  .br-demo--col {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .br-demo--band {
+    padding: var(--spacing-md);
+    background: var(--color-band);
+  }
+  .br-demo--stage {
+    position: relative;
+    isolation: isolate;
+    justify-content: center;
+    padding: var(--spacing-xl) var(--spacing-md);
+  }
+  .br-demo--stage > :global(.term) {
+    position: relative;
+    z-index: 1;
+    width: min(560px, 100%);
+  }
+  .br-used {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--color-muted);
+    overflow-wrap: anywhere;
+  }
+  .br-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-sm);
+  }
+  .br-field {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    height: 160px;
+    padding: var(--spacing-xs);
+    border: 1px solid var(--color-rule);
+  }
+  .br-field > .label-mono {
+    position: relative;
+    z-index: 1;
+  }
+  .br-panel {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .br-panel > li {
+    padding: var(--spacing-md);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--color-ink-2);
+  }
+
+  @media (max-width: 767px) {
+    .br-type-row,
+    .br-space-row {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--spacing-2xs);
+    }
+    .br-comp {
+      padding: var(--spacing-md);
+    }
+  }
+  .br-tabs {
+    border: 1px solid var(--color-rule);
+  }
+</style>
+
+<script>
+  import { selectTab, tabKeys } from '../lib/tabs';
+  document.querySelectorAll<HTMLElement>('[data-br-tabs]').forEach((root) => {
+    const tabs = Array.from(root.querySelectorAll<HTMLElement>('[role="tab"]'));
+    tabs.forEach((t, i) => t.addEventListener('click', () => selectTab(tabs, i)));
+    tabKeys(tabs, (i) => selectTab(tabs, i));
+  });
+</script>

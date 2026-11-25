@@ -5,6 +5,7 @@
  */
 import Base from '../layouts/Base.astro';
 import Header from './Header.astro';
+import Button from './ui/Button.astro';
 
 interface Props {
   /** the 404 in a design direction ('a' → .dir-a). Emir 19 Nov. */
@@ -47,8 +48,8 @@ const cells: { x: number; y: number }[] = [];
               feeling. It's most of our work.
             </p>
             <div class="flex flex-wrap gap-2.5">
-              <a href={home} class="pill pill-ink pill-lg">Back to the homepage</a>
-              <a href={`${home}#audit`} class="pill pill-outline pill-lg">Get a free audit</a>
+              <Button href={home}>Back to the homepage</Button>
+              <Button href={`${home}#audit`} variant="secondary">Get a free audit</Button>
             </div>
             {!direction && <span class="font-mono text-caption text-ink-2">Psst: the blocks move if you poke them.</span>}
           </div>
@@ -62,7 +63,7 @@ const cells: { x: number; y: number }[] = [];
     min-height: calc(100svh - 80px);
     display: flex;
     align-items: center;
-    padding-block: 72px;
+    padding-block: var(--spacing-2xl);
   }
   .nf-h {
     margin: 0;
@@ -76,7 +77,7 @@ const cells: { x: number; y: number }[] = [];
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 22px;
+    gap: var(--spacing-md);
   }
 
 
@@ -84,13 +85,13 @@ const cells: { x: number; y: number }[] = [];
     width: 100%;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: 48px;
+    gap: var(--spacing-xl);
     align-items: center;
   }
   @media (min-width: 1024px) {
     .nf-a {
       grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-      gap: 64px;
+      gap: var(--spacing-2xl);
     }
   }
   .nf-blocks {

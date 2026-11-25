@@ -46,8 +46,8 @@ const faqs = items;
   class="container-page flex flex-wrap items-start gap-x-[72px] gap-y-10 pb-section"
 >
   <div class="flex flex-[1_1_300px] flex-col gap-3.5">
-    <span class="caption text-ink-2">{caption}</span>
-    <h2 id={`${id}-head`} class="m-0 text-h2">{heading}</h2>
+    <span class="caption a-path text-ink-2">{caption}</span>
+    <h2 id={`${id}-head`} class="m-0 text-h2"><span class="h-print">{heading}</span></h2>
   </div>
   <div class="panel flex min-w-0 flex-[999_1_560px] flex-col">
     {
@@ -69,14 +69,14 @@ const faqs = items;
 
 <style>
   .faq {
-    padding: 0 32px;
+    padding: 0 var(--spacing-lg);
   }
   .faq summary {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: var(--spacing-sm);
     min-height: 76px;
-    padding-block: 12px;
+    padding-block: var(--spacing-xs);
     font-size: var(--text-faq);
     line-height: var(--text-faq--line-height);
     letter-spacing: var(--text-faq--letter-spacing);
@@ -85,11 +85,11 @@ const faqs = items;
   /* the row is the target: let the ring wrap the whole summary */
   .faq summary:focus-visible {
     margin-inline: -24px;
-    padding-inline: 24px;
+    padding-inline: var(--spacing-md);
   }
   .faq-ind {
     font-family: var(--font-mono);
-    font-size: 18px;
+    font-size: var(--text-lede);
     line-height: 1;
     color: var(--color-ink-2);
   }
@@ -101,17 +101,17 @@ const faqs = items;
   }
   @media (max-width: 479px) {
     .faq {
-      padding: 0 20px;
+      padding: 0 var(--spacing-md);
     }
     .faq summary {
-      gap: 12px;
+      gap: var(--spacing-xs);
     }
     .faq p {
       padding-left: 0;
     }
     .faq summary:focus-visible {
       margin-inline: -16px;
-      padding-inline: 16px;
+      padding-inline: var(--spacing-sm);
     }
   }
 </style>

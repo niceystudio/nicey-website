@@ -6,6 +6,9 @@
  * 20 Nov (Emir: consistent with the design-systems.md terminal in "What we help with"): the same coloured stage with the
  * same dark window inside — soft-filled tabs, file name on the right, mono reading, blinking cursor (QBenchWork values).
  */
+import PixelFieldA from './PixelFieldA.astro';
+import Terminal from '../../components/ui/Terminal.astro';
+
 const pillars = ['Figma inspect', 'Agentic readiness', 'Conventions', 'Component API', 'Zero drift'];
 const bars = [9, 4, 7, 6, 3];
 /* sample values for the example report (match the bars, out of 100) */
@@ -49,141 +52,65 @@ const pages = [
 ];
 ---
 
-<div class="ra-stage a-grain bg-lavender">
-  <div class="ra" data-ra>
-    <div class="ra-bar">
-      <div class="ra-tabs" role="tablist" aria-label="Report pages">
-        {
-          pages.map((p, i) => (
-            <button type="button" role="tab" aria-selected={i === 0 ? 'true' : 'false'} data-ra-tab={i}>
-              {p.tab}
-            </button>
-          ))
-        }
-      </div>
-      <span class="ra-src">audit-report.md · example</span>
-    </div>
+<div class="ra-stage">
+  <PixelFieldA mode="drift" seed={11} />
+  <Terminal class="ra" src="audit-report.md · example" tabsLabel="Report pages" data-ra>
+    <Fragment slot="tabs">
+      {
+        pages.map((p, i) => (
+          <button type="button" role="tab" class="term-tab" aria-selected={i === 0 ? 'true' : 'false'} data-ra-tab={i}>
+            {p.tab}
+          </button>
+        ))
+      }
+    </Fragment>
     {
       pages.map((p, i) => (
-        <pre class="ra-page" role="tabpanel" tabindex="0" aria-label={`audit report: ${p.tab}`} hidden={i !== 0} data-ra-page={i}><span class="ra-cmd"><span class="ra-ps">$</span> {p.cmd}</span>{'\n'}<span class="ra-note"># {p.note}</span>{'\n\n'}{p.lines.join('\n')}</pre>
+        <pre class="term-body term-cursor ra-page" role="tabpanel" tabindex="0" aria-label={`audit report: ${p.tab}`} hidden={i !== 0} data-ra-page={i}><span><span class="term-ps">$</span> {p.cmd}</span>{'\n'}<span class="term-note"># {p.note}</span>{'\n\n'}{p.lines.join('\n')}</pre>
       ))
     }
-  </div>
+  </Terminal>
 </div>
 
 <style>
-  /* the stage: same as the design-systems.md pane in "What we help with" */
+  /* the stage: a slowly drifting pixel field behind the window (the window itself is the shared Terminal) */
   .ra-stage {
-    width: 100%;
-    height: 100%;
+    position: relative;
+    isolation: isolate;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 40px;
-    position: relative;
-    isolation: isolate;
+    width: 100%;
+    height: 100%;
+    padding: var(--spacing-xl);
   }
-  /* the window: same values as QBenchWork's terminal */
-  .ra {
+  .ra-stage > :global(.term) {
+    position: relative;
+    z-index: 1;
     width: 100%;
     min-height: 340px;
-    display: flex;
-    flex-direction: column;
-    background: #26251f;
-    color: #f3f0e9;
-    overflow: hidden;
-  }
-  .ra-bar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 6px 12px;
-    padding: 6px 18px;
-    border-bottom: 1px solid rgba(243, 240, 233, 0.12);
-    font-family: var(--font-mono);
-    font-size: 12px;
-    letter-spacing: 0.02em;
-    color: #b6b1a3;
-  }
-  .ra-tabs {
-    display: flex;
-    flex-wrap: wrap; /* 320: "fix first" was clipped (20 Nov review) */
-    gap: 2px;
-  }
-  .ra-tabs button {
-    min-height: 32px;
-    padding: 0 12px;
-    border: 0;
-    background: transparent;
-    color: #b6b1a3;
-    font: inherit;
-    letter-spacing: inherit;
-    white-space: nowrap;
-    cursor: pointer;
-    transition: background-color 160ms var(--ease-out), color 160ms var(--ease-out), transform 160ms var(--ease-out);
-  }
-  .ra-tabs button:active {
-    transform: scale(0.97);
-  }
-  .ra-tabs button[aria-selected='true'] {
-    background: rgba(243, 240, 233, 0.12);
-    color: #f3f0e9;
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .ra-tabs button:hover {
-      color: #f3f0e9;
-    }
-  }
-  .ra-src {
-    margin-left: auto;
   }
   .ra-page {
-    flex: 1;
-    margin: 0;
-    padding: 16px 18px;
-    font-family: var(--font-mono);
-    font-size: 13px;
-    line-height: 1.7;
     white-space: pre;
     overflow-x: auto;
-    color: #f3f0e9;
-  }
-  .ra-page::after {
-    content: '▍';
-    color: #cbdac4;
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .ra-page::after {
-      animation: ra-blink 1s steps(1) infinite;
-    }
-  }
-  @keyframes ra-blink {
-    50% {
-      opacity: 0;
-    }
-  }
-  .ra-ps {
-    color: #d9d2ef;
-  }
-  .ra-note {
-    color: #b6b1a3;
   }
   .ra-page[hidden] {
     display: none;
   }
   @media (max-width: 900px) {
     .ra-stage {
-      padding: 20px;
+      padding: var(--spacing-md);
     }
   }
   @media (max-width: 480px) {
     .ra-stage {
-      padding: 8px;
+      padding: var(--spacing-2xs);
     }
   }
 </style>
 
 <script>
+  import { selectTab, tabKeys } from '../../lib/tabs';
   document.querySelectorAll<HTMLElement>('[data-ra]').forEach((root) => {
     const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-ra-tab]'));
     const pages = Array.from(root.querySelectorAll<HTMLElement>('[data-ra-page]'));
@@ -192,9 +119,15 @@ const pages = [
     let took = false;
     const show = (k: number) => {
       i = k;
-      tabs.forEach((t, n) => t.setAttribute('aria-selected', String(n === k)));
+      selectTab(tabs, k);
       pages.forEach((p, n) => (p.hidden = n !== k));
     };
+    selectTab(tabs, 0);
+    tabKeys(tabs, (n) => {
+      took = true;
+      window.clearInterval(timer);
+      show(n);
+    });
     tabs.forEach((t, n) =>
       t.addEventListener('click', () => {
         took = true;

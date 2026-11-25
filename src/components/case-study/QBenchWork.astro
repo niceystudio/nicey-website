@@ -84,7 +84,7 @@ const tabList = [
 ---
 
 <figure class:list={['qw m-0', terminal && 'qw--terminal']} data-qw data-states={JSON.stringify(states.map((s) => s.read))} data-readers={tabs ? JSON.stringify(readers) : undefined}>
-  <div class:list={['qw-stage', bare ? 'qw-stage--bare' : 'bg-lavender']}>
+  <div class:list={['qw-stage', bare && 'qw-stage--bare']}>
     {!terminal && (
     <div class="qw-states" role="group" aria-label="Input states">
       {
@@ -110,31 +110,31 @@ const tabList = [
     )}
     <!-- no aria-live here: it types every 16 ms and tours on its own; a picked state is announced in [data-qw-live] (20 Nov review) -->
     <p class="sr-only" aria-live="polite" data-qw-live></p>
-    <div class="qw-agent" data-md-skip>
+    <div class="qw-agent term" data-md-skip>
       {
         tabs ? (
-          <div class="qw-agent-bar qw-tabs-bar">
-            <div class="qw-tabs" role="tablist" aria-label="Who is reading">
+          <div class="qw-agent-bar term-bar">
+            <div class="qw-tabs term-tabs" role="tablist" aria-label="Who is reading">
               {tabList.map((t, i) => (
-                <button type="button" role="tab" class="qw-tab" data-tab={t.id} aria-selected={(terminal ? i === 0 : i === 2) ? 'true' : 'false'}>
+                <button type="button" role="tab" class="qw-tab term-tab" data-tab={t.id} aria-selected={(terminal ? i === 0 : i === 2) ? 'true' : 'false'}>
                   {t.label}
                 </button>
               ))}
             </div>
-            <span class="qw-agent-src" data-src>
+            <span class="qw-agent-src term-src" data-src>
               {tabList[terminal ? 0 : 2].src}
             </span>
           </div>
         ) : (
-          <div class="qw-agent-bar">
+          <div class="qw-agent-bar term-bar">
             <span class="qw-dot" aria-hidden="true" />
             <span>agent · reading</span>
             <span class="qw-agent-k">Input</span>
-            <span class="qw-agent-src">library.json</span>
+            <span class="qw-agent-src term-src">library.json</span>
           </div>
         )
       }
-      <pre class="qw-agent-out" data-out>{tabs ? readers[0][terminal ? 'figma' : 'agent'].join('\n') : states[0].read.join('\n')}</pre>
+      <pre class="qw-agent-out term-body term-cursor" data-out>{tabs ? readers[0][terminal ? 'figma' : 'agent'].join('\n') : states[0].read.join('\n')}</pre>
     </div>
   </div>
   {
@@ -148,18 +148,19 @@ const tabList = [
 </figure>
 
 <style>
+  /* 24 Nov: the Direction A look lives here now (it was an override layer in a-case.css): sentence-case mono labels,
+     the stage on the surface in a 1px rule, the picked state in accent text, the window is the shared Terminal */
   .qw-mono {
     font-family: var(--font-mono);
     font-size: var(--text-caption-sm);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    letter-spacing: 0.02em;
   }
   /* label and sentence share one baseline, the sentence wraps under itself (case study only) */
   .qw-cap {
     display: flex;
     align-items: baseline;
-    gap: 12px;
-    margin-top: 14px;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-sm);
     font-size: var(--text-body-sm);
     line-height: 1.5;
     color: var(--color-ink-2);
@@ -168,9 +169,12 @@ const tabList = [
     flex: none;
     font-family: var(--font-mono);
     font-size: var(--text-caption-sm);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    letter-spacing: 0.02em;
     color: var(--color-muted);
+  }
+  .qw-cap-k::before {
+    content: '//\00a0';
+    color: var(--color-accent);
   }
   .qw-stage--bare {
     width: 100%;
@@ -180,30 +184,36 @@ const tabList = [
   @media (max-width: 600px) {
     .qw-stage--bare .qw-states {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
+      gap: var(--spacing-xs);
     }
     .qw-stage--bare .qw-field {
-      padding: 12px;
-      font-size: 11px;
+      padding: var(--spacing-xs);
+      font-size: var(--text-caption-sm);
     }
   }
   .qw-stage {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    padding: 36px;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg);
+    border: 1px solid var(--color-rule);
     border-radius: var(--radius-panel);
-    color: #26251f;
+    background: var(--color-surface);
+    color: var(--color-ink);
+  }
+  .qw-stage--bare {
+    border: 0;
+    background: transparent;
   }
   .qw-states {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 12px;
+    gap: var(--spacing-xs);
   }
   .qw-state {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: var(--spacing-xs);
     padding: 0;
     border: 0;
     background: none;
@@ -213,32 +223,27 @@ const tabList = [
     cursor: pointer;
   }
   .qw-state-n {
-    color: #4d4a40;
+    color: var(--color-ink-2);
   }
   .qw-field {
     display: flex;
     flex-direction: column;
     gap: 6px;
-    padding: 16px;
+    padding: var(--spacing-sm);
     border-radius: 10px;
-    background: #fff;
+    /* the product's cards: warm grey in both themes, so they stand out from the white stage; fields stay white */
+    background: #f3f0e9;
     color: #1f2a3d;
-    font-size: 12px;
+    font-size: var(--text-caption);
     outline: 2px solid transparent;
     outline-offset: 3px;
   }
   .qw-state[aria-pressed='true'] .qw-field {
-    outline-color: #26251f;
+    outline-color: var(--color-ink);
   }
+  /* the picked state: accent text only (Emir 19 Nov: no fill, no underline) */
   .qw-state[aria-pressed='true'] .qw-state-n {
-    color: #26251f;
-  }
-  /* the lavender stage is dark at night: the state labels go light so they stay readable */
-  :global([data-theme='dark']) .qw-state-n {
-    color: rgba(243, 240, 233, 0.55);
-  }
-  :global([data-theme='dark']) .qw-state[aria-pressed='true'] .qw-state-n {
-    color: #f3f0e9;
+    color: var(--color-accent);
   }
   .qw-state:focus-visible {
     outline: none;
@@ -255,7 +260,8 @@ const tabList = [
     font-weight: 600;
   }
   .qw-input {
-    padding: 8px 10px;
+    padding: var(--spacing-2xs) var(--spacing-xs);
+    background: #fff;
     border: 1px solid #cbd5e1;
     border-radius: 6px;
   }
@@ -280,102 +286,33 @@ const tabList = [
     color: #c0392b;
   }
 
-  .qw-agent {
-    border-radius: 12px;
-    background: #26251f;
-    color: #f3f0e9;
-    overflow: hidden;
-  }
-  .qw-agent-bar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 6px 12px;
-    padding: 12px 18px;
-    border-bottom: 1px solid rgba(243, 240, 233, 0.12);
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: #b6b1a3;
-  }
+  /* the window is the shared terminal (.term* in global.css); only what is QBench's own stays here */
   .qw-dot {
     width: 7px;
     height: 7px;
-    border-radius: 50%;
-    background: #cbdac4;
+    background: var(--color-accent);
   }
   .qw-agent-k {
-    color: #d9d2ef;
-  }
-  .qw-agent-src {
-    margin-left: auto;
+    color: var(--color-term-accent);
   }
   /* the agent reading is the longest of the three: keep the panel that tall on every tab */
-  .qw[data-readers] .qw-agent-out {
-    min-height: calc(13 * 1.7em + 32px);
-  }
-  .qw-tabs-bar {
-    padding-block: 6px;
-  }
-  .qw-tabs {
-    display: flex;
-    gap: 2px;
-  }
-  .qw-tab {
-    min-height: 32px;
-    padding: 0 12px;
-    border: 0;
-    border-radius: 999px;
-    background: transparent;
-    color: #b6b1a3;
-    font: inherit;
-    cursor: pointer;
-    transition: background-color 160ms var(--ease-out), color 160ms var(--ease-out), transform 160ms var(--ease-out);
-  }
-  .qw-tab:active {
-    transform: scale(0.97);
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .qw-tab[aria-selected='false']:hover {
-      color: #f3f0e9;
-      background: rgba(243, 240, 233, 0.06);
-    }
-  }
-  .qw-tab[aria-selected='true'] {
-    background: rgba(243, 240, 233, 0.12);
-    color: #f3f0e9;
-  }
   .qw-agent-out {
     min-height: calc(4 * 1.7em + 32px);
-    margin: 0;
-    padding: 16px 18px;
-    font-family: var(--font-mono);
-    font-size: 13px;
-    line-height: 1.7;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
   }
-  .qw-agent-out::after {
-    content: '▍';
-    color: #cbdac4;
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .qw-agent-out::after {
-      animation: qw-blink 1s steps(1) infinite;
-    }
-  }
-  @keyframes qw-blink {
-    50% {
-      opacity: 0;
-    }
+  .qw[data-readers] .qw-agent-out {
+    min-height: calc(13 * 1.7em + 32px);
   }
   @media (max-width: 600px) {
     .qw-stage {
-      padding: 20px;
+      padding: var(--spacing-md);
     }
   }
 </style>
 
 <script>
+  import { selectTab, tabKeys } from '../../lib/tabs';
   function mount(root: HTMLElement) {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     const plain: string[][] = JSON.parse(root.dataset.states ?? '[]');
@@ -417,7 +354,7 @@ const tabList = [
 
     const showTab = (id: string) => {
       tab = id;
-      tabEls.forEach((x) => x.setAttribute('aria-selected', String(x.dataset.tab === id)));
+      selectTab(tabEls, tabEls.findIndex((x) => x.dataset.tab === id));
       if (srcEl) srcEl.textContent = SRC[tab];
       read(current);
     };
@@ -441,6 +378,14 @@ const tabList = [
         showTab(t.dataset.tab!);
       });
     });
+    if (tabEls.length) {
+      selectTab(tabEls, Math.max(0, tabEls.findIndex((x) => x.getAttribute('aria-selected') === 'true')));
+      tabKeys(tabEls, (i) => {
+        userTook = true;
+        window.clearInterval(tour);
+        showTab(tabEls[i].dataset.tab!);
+      });
+    }
 
     buttons.forEach((b) => {
       const i = Number(b.dataset.i);

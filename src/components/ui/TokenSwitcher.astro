@@ -1,0 +1,372 @@
+---
+/**
+ * "Change one token", floating bottom right on every page (24 Nov). Pick an accent or a corner style and the whole
+ * site follows: the choice overrides the matching tokens in src/styles/global.css on :root, so every component,
+ * every page and /brand change at once — the point of an agent-ready system: one edit, everything in step.
+ *
+ * Choices: src/data/token-presets.ts. The choice is remembered in this browser (localStorage) and applied before
+ * first paint by Base.astro, so pages don't flash the default. After a change it fires `nicey:tokens` on window
+ * (the homepage band re-reads its rows on it) and says what changed in a live region.
+ * Keyboard: the button opens the panel and focus moves into it; Escape or the close button returns focus.
+ */
+import { accents, radii } from '../../data/token-presets';
+---
+
+<div class="ts" data-ts>
+  <div class="ts-panel" id="ts-panel" role="dialog" aria-modal="false" aria-labelledby="ts-title" hidden data-ts-panel>
+    <div class="ts-head">
+      <p id="ts-title" class="ts-title m-0">Change one token</p>
+      <button type="button" class="ts-close" aria-label="Close" data-ts-close>
+        <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" /></svg>
+      </button>
+    </div>
+    <p class="ts-lede m-0">One edit in the system. Every page, component and agent export follows.</p>
+
+    <div class="ts-group" role="group" aria-labelledby="ts-accent-k">
+      <span id="ts-accent-k" class="ts-k">color.accent</span>
+      <div class="ts-row">
+        {
+          accents.map((a, i) => (
+            <button
+              type="button"
+              class="ts-sw"
+              style={`--sw:${a.light}`}
+              aria-label={a.label}
+              aria-pressed={i === 0 ? 'true' : 'false'}
+              data-accent={a.id}
+            />
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="ts-group" role="group" aria-labelledby="ts-radius-k">
+      <span id="ts-radius-k" class="ts-k">radius</span>
+      <div class="ts-row">
+        {
+          radii.map((r, i) => (
+            <button type="button" class="ts-st" style={`--r:${r.chip}`} aria-pressed={i === 0 ? 'true' : 'false'} data-radius={r.id}>
+              {r.label}
+            </button>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="ts-foot">
+      <button type="button" class="ts-reset" data-ts-reset>Reset</button>
+      <span class="ts-note">Remembered in this browser</span>
+    </div>
+    <p class="sr-only" aria-live="polite" data-ts-live></p>
+  </div>
+
+  <button type="button" class="ts-btn" aria-expanded="false" aria-controls="ts-panel" data-ts-open>
+    <span class="ts-icon" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <span class="ts-btn-label">Change one token</span>
+  </button>
+</div>
+
+<style>
+  .ts {
+    position: fixed;
+    right: var(--spacing-md);
+    bottom: var(--spacing-md);
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--spacing-xs);
+  }
+  /* ---------- the button ---------- */
+  .ts-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    min-height: 48px;
+    padding: 0 var(--spacing-sm) 0 14px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-pill);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    letter-spacing: 0.04em;
+    box-shadow: var(--shadow-window);
+    cursor: pointer;
+    transition:
+      border-color 160ms var(--ease-out),
+      transform 160ms var(--ease-out);
+  }
+  .ts-btn:active {
+    transform: scale(var(--scale-press));
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .ts-btn:hover {
+      border-color: var(--color-ink);
+    }
+  }
+  /* a 2×2 of system pieces: the accent and the corner style you picked, live */
+  .ts-icon {
+    display: grid;
+    grid-template-columns: repeat(2, 8px);
+    gap: 3px;
+  }
+  .ts-icon i {
+    width: 8px;
+    height: 8px;
+    border-radius: var(--radius-swatch);
+    background: var(--color-ink);
+  }
+  .ts-icon i:first-child {
+    background: var(--color-accent);
+  }
+  @media (max-width: 639px) {
+    .ts {
+      right: var(--spacing-sm);
+      bottom: var(--spacing-sm);
+    }
+    /* phone: the icon alone, still a 48px target; the label stays for screen readers */
+    .ts-btn {
+      width: 48px;
+      padding: 0;
+      justify-content: center;
+    }
+    .ts-btn-label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+  }
+
+  /* ---------- the panel ---------- */
+  .ts-panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    width: min(320px, calc(100vw - 2 * var(--spacing-sm)));
+    padding: var(--spacing-md);
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-panel);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    box-shadow: var(--shadow-window);
+  }
+  .ts-panel[hidden] {
+    display: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .ts-panel:not([hidden]) {
+      animation: ts-in 180ms var(--ease-out);
+    }
+  }
+  @keyframes ts-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+  .ts-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-xs);
+  }
+  .ts-title {
+    font-family: var(--font-pixel);
+    font-size: var(--text-h3-card);
+    line-height: 1.1;
+  }
+  .ts-close {
+    display: grid;
+    place-items: center;
+    width: var(--hit-min);
+    height: var(--hit-min);
+    margin-right: calc(-1 * var(--spacing-xs));
+    border: 0;
+    background: transparent;
+    color: var(--color-ink-2);
+    cursor: pointer;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .ts-close:hover {
+      color: var(--color-ink);
+    }
+  }
+  .ts-lede {
+    font-size: var(--text-body-sm);
+    line-height: 1.5;
+    color: var(--color-ink-2);
+  }
+  .ts-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2xs);
+  }
+  .ts-k {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--color-muted);
+  }
+  .ts-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-3xs);
+  }
+  /* swatches: a 40px target around a 28px swatch, the picked one ringed in ink */
+  .ts-sw {
+    display: grid;
+    place-items: center;
+    width: var(--hit-min);
+    height: var(--hit-min);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+  .ts-sw::before {
+    content: '';
+    width: 28px;
+    height: 28px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-swatch);
+    background: var(--sw);
+    background-clip: content-box;
+  }
+  .ts-sw[aria-pressed='true']::before {
+    padding: 3px;
+    border-color: var(--color-ink);
+  }
+  .ts-st {
+    min-height: var(--hit-min);
+    padding: 0 var(--spacing-sm);
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--r);
+    background: transparent;
+    color: var(--color-ink-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    cursor: pointer;
+    transition:
+      background-color 160ms var(--ease-out),
+      color 160ms var(--ease-out),
+      border-color 160ms var(--ease-out);
+  }
+  .ts-st[aria-pressed='true'] {
+    border-color: var(--color-ink);
+    background: var(--color-ink);
+    color: var(--color-page);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .ts-st[aria-pressed='false']:hover {
+      border-color: var(--color-ink-2);
+      color: var(--color-ink);
+    }
+  }
+  .ts-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-xs);
+    padding-top: var(--spacing-2xs);
+    border-top: 1px solid var(--color-rule);
+  }
+  .ts-reset {
+    min-height: var(--hit-min);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+  .ts-note {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption-sm);
+    color: var(--color-muted);
+  }
+  @media print {
+    .ts {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import { accents, radii, overrideCss, STORAGE_KEY, CHANGE_EVENT } from '../../data/token-presets';
+
+  const root = document.querySelector<HTMLElement>('[data-ts]');
+  if (root) {
+    const panel = root.querySelector<HTMLElement>('[data-ts-panel]')!;
+    const open = root.querySelector<HTMLButtonElement>('[data-ts-open]')!;
+    const close = root.querySelector<HTMLButtonElement>('[data-ts-close]')!;
+    const live = root.querySelector<HTMLElement>('[data-ts-live]')!;
+    const swatches = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-accent]'));
+    const styles = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-radius]'));
+
+    const read = (): { accent: string; radius: string } => {
+      try {
+        const v = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}');
+        return { accent: v.accent ?? accents[0].id, radius: v.radius ?? radii[0].id };
+      } catch {
+        return { accent: accents[0].id, radius: radii[0].id };
+      }
+    };
+    let state = read();
+
+    const styleEl = () => {
+      let el = document.getElementById('token-override') as HTMLStyleElement | null;
+      if (!el) {
+        el = document.createElement('style');
+        el.id = 'token-override';
+        document.head.appendChild(el);
+      }
+      return el;
+    };
+    const paint = () => {
+      swatches.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.accent === state.accent)));
+      styles.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.radius === state.radius)));
+    };
+    const apply = (next: { accent: string; radius: string }) => {
+      state = next;
+      styleEl().textContent = overrideCss(state.accent, state.radius);
+      try {
+        if (state.accent === accents[0].id && state.radius === radii[0].id) localStorage.removeItem(STORAGE_KEY);
+        else localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch {}
+      paint();
+      const a = accents.find((x) => x.id === state.accent)!;
+      const r = radii.find((x) => x.id === state.radius)!;
+      live.textContent = `${a.label} accent, ${r.label.toLowerCase()} corners. Every page updated.`;
+      window.dispatchEvent(new CustomEvent(CHANGE_EVENT, { detail: { ...state } }));
+    };
+
+    const setOpen = (on: boolean, focus = true) => {
+      panel.hidden = !on;
+      open.setAttribute('aria-expanded', String(on));
+      if (on && focus) (swatches.find((b) => b.getAttribute('aria-pressed') === 'true') ?? swatches[0]).focus();
+      if (!on && focus) open.focus();
+    };
+
+    paint();
+    open.addEventListener('click', () => setOpen(panel.hasAttribute('hidden')));
+    close.addEventListener('click', () => setOpen(false));
+    root.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !panel.hasAttribute('hidden')) {
+        e.preventDefault();
+        setOpen(false);
+      }
+    });
+    document.addEventListener('pointerdown', (e) => {
+      if (!panel.hasAttribute('hidden') && !root.contains(e.target as Node)) setOpen(false, false);
+    });
+    swatches.forEach((b) => b.addEventListener('click', () => apply({ ...state, accent: b.dataset.accent! })));
+    styles.forEach((b) => b.addEventListener('click', () => apply({ ...state, radius: b.dataset.radius! })));
+    root.querySelector('[data-ts-reset]')!.addEventListener('click', () => apply({ accent: accents[0].id, radius: radii[0].id }));
+  }
+</script>

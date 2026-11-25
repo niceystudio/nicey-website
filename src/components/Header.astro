@@ -1,7 +1,7 @@
 ---
 import { links } from '../data/links';
 import ThemeToggle from './ThemeToggle.astro';
-import { caseStudies } from '../data/case-studies';
+import Button from './ui/Button.astro';
 
 interface Props {
   /** 'case': pages other than the homepage, so section links point back to it */
@@ -17,10 +17,8 @@ const base = variant === 'case' ? home : '';
 // Later, with service pages: Design systems · Product design · Work · About.
 const nav = [
   { id: 'services', label: 'Services' },
-  // count clients, like the Work list (both QBench studies share one row)
-  { id: 'work', label: 'Work', count: new Set(caseStudies.map((c) => c.name)).size },
+  { id: 'work', label: 'Work' },
   { id: 'how', label: 'How we work' },
-  { id: 'audit', label: 'Process' },
   { id: 'faq', label: 'FAQ' },
 ].map((n) => ({ ...n, href: `${base}#${n.id}` }));
 const audit = variant === 'case' ? `${home}#audit` : '#audit';
@@ -31,7 +29,7 @@ const audit = variant === 'case' ? `${home}#audit` : '#audit';
   <nav aria-label="Main" class="head-nav container-page py-4">
     <a
       href={home === '/' ? links.home : home}
-      class="text-[22px] leading-none font-semibold tracking-[-0.04em] text-ink no-underline"
+      class="hit text-[22px] leading-none font-semibold tracking-[-0.04em] text-ink no-underline"
       >nicey<span class="text-accent">.</span></a
     >
     <!-- desktop: everything on one row -->
@@ -41,18 +39,17 @@ const audit = variant === 'case' ? `${home}#audit` : '#audit';
         nav.map((item) => (
           <a href={item.href} class="head-link">
             {item.label}
-            {item.count && <span class="head-count">({item.count})</span>}
           </a>
         ))
       }
     </div>
     <div class="head-row head-end items-center gap-2 text-body-sm">
-      <a href={audit} class="pill pill-ink px-[18px] py-3">Free audit</a>
+      <Button href={audit} size="sm">Free audit</Button>
       <ThemeToggle />
     </div>
     <!-- phone: Free audit stays visible, the rest sits behind the menu button (Emir, 12 Nov) -->
     <div class="head-compact items-center justify-end gap-2">
-      <a href={audit} class="pill pill-ink px-[18px] py-3 text-body-sm">Free audit</a>
+      <Button href={audit} size="sm">Free audit</Button>
       <button
         type="button"
         class="menu-btn"
@@ -108,7 +105,7 @@ const audit = variant === 'case' ? `${home}#audit` : '#audit';
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    gap: 24px;
+    gap: var(--spacing-md);
   }
   .head-end {
     justify-self: end;
@@ -117,17 +114,14 @@ const audit = variant === 'case' ? `${home}#audit` : '#audit';
     align-items: center;
     gap: 2px;
   }
-  .head-count {
-    color: var(--color-muted);
-  }
   /* nav links: a soft pill on hover, ink when pressed */
   .head-link {
     position: relative;
     display: inline-flex;
     align-items: center;
-    gap: 7px;
+    gap: var(--spacing-2xs);
     min-height: 40px;
-    padding: 0 12px;
+    padding: 0 var(--spacing-xs);
     color: var(--color-ink-2);
     font-family: var(--font-mono);
     font-size: var(--text-caption);
@@ -143,7 +137,7 @@ const audit = variant === 'case' ? `${home}#audit` : '#audit';
     }
   }
   .head-link:active {
-    transform: scale(0.97);
+    transform: scale(var(--scale-press));
     color: var(--color-ink);
   }
   .head-row {
@@ -239,8 +233,8 @@ const audit = variant === 'case' ? `${home}#audit` : '#audit';
   .menu-link {
     display: flex;
     align-items: baseline;
-    gap: 12px;
-    padding-block: 16px;
+    gap: var(--spacing-xs);
+    padding-block: var(--spacing-sm);
     font-size: 22px;
     font-weight: 500;
     letter-spacing: -0.02em;

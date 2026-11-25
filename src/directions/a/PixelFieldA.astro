@@ -1,0 +1,205 @@
+---
+/**
+ * Direction A: the brand pixel field (after babarogic.com's PixelField), on the shared engine in
+ * src/lib/pixel-field.ts. Fills its positioned parent; decorative only (aria-hidden, no pointer events).
+ *
+ *   mode   drift  — slow drifting value noise
+ *          rings  — water-drop rings around an epicentre, rippling slowly outward
+ *          drop   — one filled, wobbled disc that breathes
+ *   still  draw one frame and stop (every mode animates by default; reduced motion always gets the still frame)
+ *   fade   which edges dissolve: 'left' (hero: fades out towards the copy), 'edges' (all four), 'none'
+ *   seed   seeded, so a panel always starts from the same pattern
+ *   cx/cy  epicentre for rings/drop, 0..1 of the box
+ *
+ * Colours follow the theme (light pastels on cream, deep tints after dark) and repaint on a theme flip.
+ * Click anywhere over a field and a ripple runs out from that point, lifting the cells it passes (the original
+ * babarogic.com behaviour; 25 Nov: replaces the hover flash). The canvas keeps pointer-events: none and listens on
+ * the window, so links and buttons on top still work. No ripples under reduced motion.
+ */
+interface Props {
+  mode?: 'drift' | 'rings' | 'drop';
+  fade?: 'left' | 'edges' | 'none';
+  still?: boolean;
+  seed?: number;
+  cx?: number;
+  cy?: number;
+  /** cell size in px */
+  cell?: number;
+  class?: string;
+}
+const { mode = 'drift', fade = 'edges', still = false, seed = 7, cx = 0.8, cy = 0.5, cell = 14, class: cls } = Astro.props;
+---
+
+<div class:list={['pf', cls]} aria-hidden="true">
+  <canvas
+    data-pf
+    data-mode={mode}
+    data-fade={fade}
+    data-still={still ? '1' : undefined}
+    data-seed={seed}
+    data-cx={cx}
+    data-cy={cy}
+    data-cell={cell}></canvas>
+</div>
+
+<style>
+  .pf {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .pf canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+</style>
+
+<script>
+  import { LIGHT_PALETTE, DARK_PALETTE, createDrift, colorAt, cssColor, ringCrest, discFill, smooth, waveAt, HERO_RIPPLE, type Ripple } from '../../lib/pixel-field';
+
+  const isDark = () => {
+    const t = document.documentElement.dataset.theme;
+    return t ? t === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  };
+
+  document.querySelectorAll<HTMLCanvasElement>('[data-pf]').forEach((canvas) => {
+    if (canvas.dataset.ready) return;
+    canvas.dataset.ready = '1';
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const d = canvas.dataset;
+    const mode = d.mode ?? 'drift';
+    const fade = d.fade ?? 'edges';
+    const seed = Number(d.seed) || 7;
+    const CELL = Number(d.cell) || 14;
+    const epiX = Number(d.cx ?? 0.8);
+    const epiY = Number(d.cy ?? 0.5);
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // every mode moves (24 Nov: the panel fields behind the terminals were still); `still` or reduced motion stop it
+    const animated = !d.still && !reduced;
+
+    let W = 0, H = 0, cols = 0, rows = 0, dpr = 1;
+    // click ripples, in canvas px, timed on the performance clock in seconds
+    const ripples: Ripple[] = [];
+    const MAX_RIPPLES = 6;
+    const RIPPLE_GAIN = 0.5; // how much a passing wave lifts a cell's value
+    const field = createDrift({ cols: 10, rows: 5, seed });
+
+    // alpha multiplier toward the faded edges (px distances, so it reads the same at any size)
+    const edge = (px: number, py: number) => {
+      if (fade === 'none') return 1;
+      if (fade === 'left') {
+        // the hero: solid on the right, gone by ~55% of the width, plus a soft top and bottom
+        const fx = smooth(Math.min(1, Math.max(0, (px / W - 0.12) / 0.5)));
+        const fy = Math.min(1, py / 60, (H - py) / 90);
+        return fx * smooth(Math.max(0, fy));
+      }
+      // a panel-sized field only softens its rim; it has little room around the window it sits behind
+      const e = isPanel() ? 24 : 70;
+      const f = Math.min(px / e, (W - px) / e, py / e, (H - py) / e, 1);
+      return smooth(Math.max(0, f));
+    };
+
+    // a field behind a window (not the hero): fuller, so it reads around the window's edges
+    const isPanel = () => Math.min(W, H) < 640;
+
+    const value = (px: number, py: number, t: number) => {
+      const nx = px / W, ny = py / H;
+      // the noise under every mode drifts slowly; at t = 0 it is the seeded still frame
+      const n = field.sample(nx, ny, t * 0.35);
+      if (mode === 'rings') {
+        const dist = Math.hypot(px - epiX * W, py - epiY * H);
+        const warp = (n - 0.5) * 0.8;
+        // rings ripple outward: one wavelength every ~8s
+        return ringCrest(dist, 64, warp - t * 0.12) * Math.exp(-dist / (Math.max(W, H) * 0.7)) + 0.12;
+      }
+      if (mode === 'drop') {
+        // the drop breathes: ±6% of its radius over ~9s
+        const r = Math.min(W, H) * 0.55 * (1 + 0.06 * Math.sin(t * 0.7));
+        const dist = Math.hypot(px - epiX * W, py - epiY * H) * (1 + (n - 0.5) * 0.3);
+        return discFill(dist, r) * 0.95 + n * 0.15;
+      }
+      // the hero sits a little lower (more cream between islands); a panel field is fuller
+      return field.sample(nx, ny, t) - (isPanel() ? 0.02 : 0.18);
+    };
+
+    const t0 = performance.now() / 1000;
+    const draw = (now: number) => {
+      // time since this field started, so the still frame and the first animated frame are the same picture
+      const t = animated ? now - t0 : 0;
+      const stops = (isDark() ? DARK_PALETTE : LIGHT_PALETTE).stops;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+      const half = CELL / 2;
+      for (let y = 0; y < rows; y++)
+        for (let x = 0; x < cols; x++) {
+          const px = x * CELL + half, py = y * CELL + half;
+          const a = edge(px, py);
+          if (a <= 0.01) continue;
+          let v = value(px, py, t);
+          if (ripples.length) v += waveAt(ripples, px, py, now, HERO_RIPPLE) * RIPPLE_GAIN;
+          ctx.globalAlpha = a;
+          ctx.fillStyle = cssColor(colorAt(stops, v));
+          // cells above the island level fuse (full size), the rest keep a 1px seam
+          const size = v > 0.32 ? CELL : CELL - 1;
+          ctx.fillRect(x * CELL, y * CELL, size, size);
+        }
+      ctx.globalAlpha = 1;
+    };
+
+    const resize = () => {
+      const r = canvas.getBoundingClientRect();
+      W = Math.max(1, Math.round(r.width));
+      H = Math.max(1, Math.round(r.height));
+      // draw at the screen's density so the cells stay crisp squares
+      dpr = Math.min(2, devicePixelRatio || 1);
+      canvas.width = W * dpr;
+      canvas.height = H * dpr;
+      cols = Math.ceil(W / CELL);
+      rows = Math.ceil(H / CELL);
+      draw(performance.now() / 1000);
+    };
+    resize();
+    new ResizeObserver(resize).observe(canvas);
+    new MutationObserver(() => draw(performance.now() / 1000)).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+
+    if (reduced) return;
+    let visible = false;
+    new IntersectionObserver((e) => (visible = e[0].isIntersecting)).observe(canvas);
+
+    // click: a ripple from that point (canvas-relative), if the click landed over this field
+    addEventListener(
+      'pointerdown',
+      (e) => {
+        if (!e.isPrimary || e.button !== 0) return;
+        const r = canvas.getBoundingClientRect();
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        if (x < 0 || y < 0 || x > r.width || y > r.height) return;
+        ripples.push({ x, y, t0: performance.now() / 1000 });
+        if (ripples.length > MAX_RIPPLES) ripples.shift();
+      },
+      { passive: true },
+    );
+
+    // one loop: 10fps for the slow motion, 30fps while a ripple runs; idle (no drawing) when still and calm
+    let last = 0;
+    const loop = (ms: number) => {
+      requestAnimationFrame(loop);
+      if (!visible || document.hidden) return;
+      const now = ms / 1000;
+      while (ripples.length && now - ripples[0].t0 > HERO_RIPPLE.life) ripples.shift();
+      const live = ripples.length > 0;
+      if (!animated && !live) return;
+      if (ms - last < 1000 / (live ? 30 : 10)) return;
+      last = ms;
+      draw(now);
+    };
+    requestAnimationFrame(loop);
+  });
+</script>

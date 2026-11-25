@@ -55,7 +55,7 @@ const { together, changed } = Astro.props;
     display: grid;
     grid-row: span 3;
     grid-template-rows: subgrid;
-    row-gap: 20px;
+    row-gap: var(--spacing-md);
     padding: var(--spacing-cell-lg);
   }
   .tg-cell + .tg-cell {
@@ -77,23 +77,23 @@ const { together, changed } = Astro.props;
   .tg-card {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin-top: 12px;
-    padding: 20px 22px;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-xs);
+    padding: var(--spacing-md) var(--spacing-md);
     border: 1px dashed var(--color-dashed);
     background: var(--color-page);
   }
   .tg-k {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--spacing-2xs);
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: var(--text-caption);
     color: var(--color-ink-2);
   }
   .tg-k span {
     font-family: var(--font-pixel);
-    font-size: 18px;
+    font-size: var(--text-lede);
     line-height: 1;
     color: var(--color-accent);
   }

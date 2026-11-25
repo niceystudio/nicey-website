@@ -1,0 +1,264 @@
+---
+/**
+ * Design-system blocks: figures, rows, token maps, ramps, alias chains, Figma ↔ code, docs, flows, checks, audits, meters, states.
+ * One case-study block, rendered inside a chapter by Chapters.astro. Styles: chapters/chapters.css.
+ */
+import type { ChapterBlock } from '../../../data/case-studies';
+
+interface Props {
+  block: ChapterBlock;
+}
+const { block: b } = Astro.props;
+---
+{b.kind === 'stats' && (
+  <ul class="ch-stats">
+    {b.items.map((it) => (
+      <li>
+        <span class="caption-sm text-ink-2">{it.label}</span>
+        <span class="ch-fig">{it.value}</span>
+        {it.seenAt && <span class="caption-sm text-ink-2">{it.seenAt}</span>}
+        <span class="text-body text-pretty">{it.caption}</span>
+      </li>
+    ))}
+  </ul>
+)}
+
+{b.kind === 'rows' && (
+  <>
+    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+    <dl class="ch-rows">
+      {b.rows.map((r) => (
+        <div>
+          <dt class:list={['text-body-lg', r.label.startsWith('$') && 'ch-rows-code']}>{r.label}</dt>
+          <dd class="m-0 text-body tabular-nums text-ink-2">{r.value}</dd>
+        </div>
+      ))}
+    </dl>
+  </>
+)}
+
+{b.kind === 'map' && (
+  <>
+    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+    <ul class="ch-map">
+      {b.rows.map((r) => (
+        <li>
+          {r.swatch && (
+            <span
+              aria-hidden="true"
+              class:list={['ch-sw', `ch-sw--${r.swatch.kind}`]}
+              style={r.swatch.hex ? `--sw:#${r.swatch.hex}` : undefined}
+            >
+              {r.swatch.kind === 'text' ? 'Aa' : null}
+            </span>
+          )}
+          <code class="ch-code">{r.from}</code>
+          <span aria-hidden="true" class="text-ink-2">
+            →
+          </span>
+          <span class="sr-only">maps to</span>
+          <code class="ch-code ch-code--accent">{r.to}</code>
+        </li>
+      ))}
+    </ul>
+  </>
+)}
+
+{b.kind === 'ramp' && (
+  <>
+    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+    <ol class="ch-ramp">
+      {b.swatches.map((w) => (
+        <li class:list={[w.feeds && 'ch-ramp--feeds']} data-step={w.step}>
+          <span aria-hidden="true" class="ch-swatch" style={`background:#${w.hex}`} />
+          <span class="text-body-sm tabular-nums">{w.step}</span>
+          <span class="caption-sm text-ink-2">{w.hex}</span>
+        </li>
+      ))}
+    </ol>
+    <p class="m-0 text-body text-ink-2">{b.note}</p>
+  </>
+)}
+
+{b.kind === 'chain' && (
+  <>
+    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+    <ul class="ch-chain">
+      {b.links.map((l) => (
+        <li data-from={l.from.split('/').pop()}>
+          <span class="flex items-center gap-2.5">
+            {l.hex && <span aria-hidden="true" class="ch-sw ch-sw--color" style={`--sw:#${l.hex}`} />}
+            <code class="ch-code">{l.from}</code>
+          </span>
+          <span class="flex items-baseline gap-2">
+            <span aria-hidden="true" class="text-ink-2">
+              ↳
+            </span>
+            <code class="ch-code ch-code--accent">{l.token}</code>
+          </span>
+          <span class="caption-sm text-ink-2">{l.state}</span>
+        </li>
+      ))}
+    </ul>
+  </>
+)}
+
+{b.kind === 'sync' && (
+  <>
+    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+    <div class="ch-sync">
+      {(['before', 'after'] as const).map((side) => (
+        <div class:list={['ch-sync-pane', `is-${side}`]}>
+          <p class="ch-sync-k m-0">
+            {side === 'before' ? 'Before · Figma ≠ code' : 'After · Figma = code'}
+          </p>
+          <div class="ch-sync-head" aria-hidden="true">
+            <span>Figma</span>
+            <span />
+            <span>Code</span>
+          </div>
+          <ul>
+            {b.rows.map((r) => (
+              <li>
+                <code>{r.figma}</code>
+                <span aria-hidden="true" class="ch-sync-mark">
+                  {side === 'before' ? '✕' : '='}
+                </span>
+                <span class="sr-only">{side === 'before' ? 'in code:' : 'reads in code as'}</span>
+                <code class="ch-sync-code">{side === 'before' ? r.before : r.after}</code>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </>
+)}
+
+{b.kind === 'docs' && (
+  <>
+    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+    <ul class="ch-docs">
+      {b.items.map((d) => (
+        <li>
+          <span class="text-h3-card">{d.name}</span>
+          <div class="flex flex-col gap-1.5">
+            <span class="text-body">{d.purpose}</span>
+            <span class="text-body-sm">
+              <span class="caption-sm text-ink-2">Use for</span> {d.useFor}
+            </span>
+            <span class="text-body-sm">
+              <span class="caption-sm text-ink-2">Not for</span> {d.notFor}{' '}
+              <code class="ch-code ch-code--hot">{d.instead}</code>
+            </span>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </>
+)}
+
+{b.kind === 'flow' && (
+  <>
+    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+    <ol class="ch-run">
+      {b.steps.map((st, k) => (
+        <li style={`--i:${k}`}>
+          <span class="ch-run-mark" aria-hidden="true">
+            {k === b.steps.length - 1 ? '→' : '✓'}
+          </span>
+          <span class="ch-run-body">
+            <span class="ch-run-name">
+              <span class="ch-run-n">{st.n}</span> {st.name}
+            </span>
+            <span class="ch-run-text">{st.text}</span>
+          </span>
+        </li>
+      ))}
+      <li class="ch-run-cursor" style={`--i:${b.steps.length}`} aria-hidden="true">
+        <span class="ch-run-mark">_</span>
+      </li>
+    </ol>
+  </>
+)}
+
+{b.kind === 'checks' && (
+  <>
+    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+    <div class="ch-checks">
+      <p class="m-0 flex flex-wrap items-center justify-between gap-2">
+        <span class="text-body-lg">{b.subject}</span>
+        <span class="ch-pass caption-sm">{b.status}</span>
+      </p>
+      <ul>
+        {b.items.map((it) => (
+          <li>
+            <span class="ch-fig-sm">{it.value}</span>
+            <span class="text-body">{it.label}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </>
+)}
+
+{b.kind === 'audit' && (
+  <div class="ch-audit" data-audit>
+    <div class="ch-audit-head">
+      <span class="caption-sm text-ink-2">{b.title}</span>
+      <span class="ch-audit-count font-mono text-caption">
+        Scanning <b data-count={b.layers}>{b.layers.toLocaleString('en')}</b> variants
+      </span>
+    </div>
+    <dl class="ch-meters ch-meters--scan">
+      {b.items.map((m, k) => (
+        <div style={`--i:${k}`}>
+          <dt class="text-body">{m.label}</dt>
+          <dd class="m-0 text-body tabular-nums">{m.value}</dd>
+          <span aria-hidden="true" class="ch-meter">
+            <span style={`width:${parseFloat(m.value)}%`} />
+          </span>
+        </div>
+      ))}
+    </dl>
+  </div>
+)}
+
+{b.kind === 'meters' && (
+  <>
+    <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+    <dl class="ch-meters">
+      {b.items.map((m) => (
+        <div>
+          <dt class="text-body">{m.label}</dt>
+          <dd class="m-0 text-body tabular-nums">{m.value}</dd>
+          <span aria-hidden="true" class="ch-meter">
+            <span style={`width:${parseFloat(m.value)}%`} />
+          </span>
+        </div>
+      ))}
+    </dl>
+  </>
+)}
+
+{b.kind === 'states' && (
+  <div class="ch-live" data-live>
+    <div class="ch-live-demo" data-live-demo data-state="0" aria-hidden="true">
+      <span class="ch-live-label">Batch ID</span>
+      <span class="ch-live-field">BT-2026-0412</span>
+      <span class="ch-live-err">Batch ID already exists</span>
+      <span class="ch-live-btn">Create CAPA</span>
+    </div>
+    <div class="flex flex-col gap-2">
+      <p class="caption-sm m-0 text-ink-2">{b.title}</p>
+      <div role="group" aria-label="Pick a state" class="ch-live-list">
+        {b.rows.map((r, k) => (
+          <button type="button" class="press" data-live-pick={k} aria-pressed={k === 0 ? 'true' : 'false'}>
+            <span class="text-body">{r.state}</span>
+            <code class="ch-code ch-code--accent">{r.token}</code>
+          </button>
+        ))}
+      </div>
+    </div>
+  </div>
+)}

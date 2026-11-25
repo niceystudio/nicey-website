@@ -29,6 +29,8 @@ import FilmEverbreedA from '../../directions/a/FilmEverbreedA.astro';
 import Decisions from './Decisions.astro';
 import Chapters from './Chapters.astro';
 import SectionHead from '../SectionHead.astro';
+import Button from '../ui/Button.astro';
+import Label from '../ui/Label.astro';
 import MachineView from './MachineView.astro';
 import { caseMarkdown } from '../../lib/case-markdown';
 import SiteFooter from '../SiteFooter.astro';
@@ -165,9 +167,9 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
               </h2>
               <p class="m-0 text-body text-on-band-2">{s.lead.text}</p>
             </div>
-            <a href={`${home}#audit`} class="pill bg-on-band px-[22px] text-body text-band">
+            <Button href={`${home}#audit`} variant="on-band">
               {s.lead.cta}
-            </a>
+            </Button>
           </div>
         </section>
       )
@@ -288,22 +290,23 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     {project && s.client?.related && <SameClientA study={s} />}
   </main>
 
-  {/* one CTA on every page: the homepage closing band, only the words change (Emir, 11 Nov) */}
-  <section aria-labelledby="cs-cta-head" class:list={['cs-cta bg-band text-on-band', ctaLook === 'closing' && 'closing']} data-human>
+  {/* one CTA on every page, on the shared pieces: section label, h2, Button (24 Nov: the closing band styles left with
+      the homepage band, so this is built from the system instead of restyled per direction) */}
+  <section aria-labelledby="cs-cta-head" class="cs-cta" data-human>
     <div class="container-page flex flex-col items-start gap-6 py-section">
-      <span class="caption text-on-band-2">{s.cta.action === 'audit' ? 'Free audit · read-only' : 'Work with us'}</span>
-      <h2 id="cs-cta-head" class="m-0 max-w-[16ch] text-h1">{s.cta.heading}</h2>
-      <p class="m-0 max-w-[40ch] text-sub text-on-band-2">{s.cta.text}</p>
+      <Label variant="section">{s.cta.action === 'audit' ? 'Free audit · read-only' : 'Work with us'}</Label>
+      <h2 id="cs-cta-head" class="m-0 max-w-[16ch] text-h2"><span class="h-print">{s.cta.heading}</span></h2>
+      <p class="m-0 max-w-[40ch] text-sub text-ink-2">{s.cta.text}</p>
       <div class="mt-4 flex flex-wrap gap-2.5">
         {s.cta.action === 'audit' ? (
           <>
-            <a href={`${home}#audit`} class="pill pill-lg bg-on-band text-band">Get a free audit</a>
-            <a href={links.bookCall} class="pill pill-lg border border-on-band px-[23px] py-[15px] text-on-band">Book a call</a>
+            <Button href={`${home}#audit`}>Get a free audit</Button>
+            <Button href={links.bookCall} variant="secondary">Book a call</Button>
           </>
         ) : (
           <>
-            <a href={links.bookCall} class="pill pill-lg bg-on-band text-band">Book a call</a>
-            <a href={`${home}#audit`} class="pill pill-lg border border-on-band px-[23px] py-[15px] text-on-band">Get a free audit</a>
+            <Button href={links.bookCall}>Book a call</Button>
+            <Button href={`${home}#audit`} variant="secondary">Get a free audit</Button>
           </>
         )}
       </div>
@@ -370,18 +373,18 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
   .cs-hero {
     display: flex;
     flex-direction: column;
-    gap: 24px;
-    padding-block: var(--cs-lg) 56px;
+    gap: var(--spacing-md);
+    padding-block: var(--cs-lg) var(--spacing-2xl);
   }
   .cs-hero-top {
     display: flex;
     flex-direction: column;
-    gap: 40px;
+    gap: var(--spacing-xl);
   }
   .cs-hero-copy {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: var(--spacing-md);
     min-width: 0;
   }
   @media (min-width: 1100px) {
@@ -389,13 +392,13 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       align-items: center;
-      gap: 56px;
+      gap: var(--spacing-2xl);
     }
   }
   .cs-hero-opt {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: var(--spacing-md);
   }
   .cs-hero-opt[hidden] {
     display: none;
@@ -406,7 +409,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     font-weight: 500;
   }
   .cs-hero-points {
-    margin: 4px 0 0;
+    margin: var(--spacing-3xs) 0 0;
     display: flex;
     flex-direction: column;
     border-top: 1px solid var(--color-line-strong);
@@ -414,8 +417,8 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
   .cs-hero-points > div {
     display: grid;
     grid-template-columns: 112px minmax(0, 1fr);
-    gap: 16px;
-    padding: 12px 0;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-xs) 0;
     border-bottom: 1px solid var(--color-line);
   }
   .cs-hero-points dt {
@@ -424,28 +427,28 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
   @media (max-width: 479px) {
     .cs-hero-points > div {
       grid-template-columns: 1fr;
-      gap: 4px;
+      gap: var(--spacing-3xs);
     }
   }
   .cs-hero-context {
-    margin: 0 0 12px;
+    margin: 0 0 var(--spacing-xs);
     font-family: var(--font-mono);
     font-size: var(--text-caption);
     line-height: 1.5;
     color: var(--color-ink-2);
   }
   .cs-facts {
-    margin: 8px 0 0;
+    margin: var(--spacing-2xs) 0 0;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-    padding-top: 20px;
+    gap: var(--spacing-md);
+    padding-top: var(--spacing-md);
     border-top: 1px solid var(--color-line-strong);
   }
   .cs-facts > div {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: var(--spacing-3xs);
   }
 
   .cs-lead {
@@ -465,7 +468,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     align-items: center;
     justify-content: center;
     aspect-ratio: 4 / 3;
-    padding: 16px;
+    padding: var(--spacing-sm);
     border-radius: var(--radius-panel);
     text-align: center;
   }
@@ -478,8 +481,8 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 12px 32px;
-    padding: 28px 32px;
+    gap: var(--spacing-xs) var(--spacing-lg);
+    padding: var(--spacing-lg) var(--spacing-lg);
     border-radius: var(--radius-panel);
     /* the accent ring is under 3:1 on the band */
     --color-focus: var(--color-on-band);
@@ -488,8 +491,8 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
   .cs-num {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 28px;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-lg);
     container-type: inline-size;
   }
   .cs-num-fig {
@@ -502,7 +505,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     white-space: nowrap;
   }
   .cs-num-meaning {
-    padding-top: 10px;
+    padding-top: var(--spacing-xs);
     border-top: 1px solid var(--color-line);
     font-size: var(--text-body);
     line-height: 1.45;
@@ -513,10 +516,10 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 12px 24px;
+    gap: var(--spacing-xs) var(--spacing-md);
   }
   .cs-step {
-    padding: 8px 14px;
+    padding: var(--spacing-2xs) var(--spacing-sm);
     border-radius: var(--radius-pill);
     background: var(--color-ink);
     color: var(--color-on-ink);
@@ -524,7 +527,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     line-height: var(--text-label--line-height);
   }
   .cs-step--open {
-    padding: 7px 13px;
+    padding: var(--spacing-2xs) var(--spacing-xs);
     background: transparent;
     border: 1px dashed var(--color-ink);
     color: var(--color-ink);
@@ -534,14 +537,14 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
-    gap: 8px 24px;
-    padding: 24px 28px;
+    gap: var(--spacing-2xs) var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
   }
 
   .cs-split {
     display: flex;
     flex-wrap: wrap;
-    gap: 24px 64px;
+    gap: var(--spacing-md) var(--spacing-2xl);
   }
   .cs-split-head {
     flex: 1 1 260px;
@@ -559,16 +562,16 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
   .cs-did > li {
     display: grid;
     grid-template-columns: 48px minmax(0, 1fr);
-    gap: 16px;
-    padding: 18px 0;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) 0;
     border-bottom: 1px solid var(--color-line);
   }
 
   .cs-agentic {
     display: flex;
     flex-direction: column;
-    gap: 24px;
-    padding: 40px;
+    gap: var(--spacing-md);
+    padding: var(--spacing-xl);
     border-radius: var(--radius-panel);
   }
   .cs-agentic-list {
@@ -577,13 +580,13 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     list-style: none;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
-    gap: 12px;
+    gap: var(--spacing-xs);
   }
   .cs-agentic-list > li {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    padding: 22px;
+    gap: var(--spacing-2xs);
+    padding: var(--spacing-md);
     border-radius: var(--radius-code);
     background: color-mix(in srgb, var(--color-on-band) 8%, transparent);
   }
@@ -604,7 +607,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
 
   .cs-collect {
     margin: 0;
-    padding: 18px 20px;
+    padding: var(--spacing-sm) var(--spacing-md);
     border: 1px dashed var(--color-dashed);
     border-radius: var(--radius-panel);
     font-size: var(--text-body);
@@ -623,7 +626,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
   .cs :global(.cs-figs) {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
-    gap: 16px;
+    gap: var(--spacing-sm);
   }
 
   .cs-foot {
@@ -637,16 +640,16 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     padding-bottom: 0;
   }
   .cs-cta {
-    --color-focus: var(--color-on-band);
     margin-top: var(--spacing-section);
+    border-block: 1px solid var(--color-rule);
   }
   /* the next case study is a second path, not a second card: an open row between two lines */
   .cs-next {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 24px 40px;
-    padding-block: 32px;
+    gap: var(--spacing-md) var(--spacing-xl);
+    padding-block: var(--spacing-lg);
     border-top: 1px solid var(--color-line-strong);
     border-bottom: 1px solid var(--color-line-strong);
     color: var(--color-ink);
@@ -655,7 +658,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
   .cs-next-copy {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: var(--spacing-xs);
     min-width: 0;
   }
   .cs-next-name {
@@ -674,19 +677,19 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     flex: none;
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: var(--spacing-md);
   }
   .cs-more {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    gap: 12px 24px;
-    padding-top: 18px;
+    gap: var(--spacing-xs) var(--spacing-md);
+    padding-top: var(--spacing-sm);
   }
   .cs-more-link {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--spacing-2xs);
     min-height: 44px;
     color: var(--color-ink-2);
     font-size: var(--text-body-sm);
@@ -712,12 +715,12 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     width: 48px;
     height: 48px;
     border: 1px solid var(--color-line-strong);
-    border-radius: 50%;
+    border-radius: var(--radius-pill);
     font-size: 20px;
     transition: transform 200ms var(--ease-out), background-color 200ms var(--ease-out), color 200ms var(--ease-out);
   }
   .cs-next:active .cs-next-arrow {
-    transform: scale(0.95);
+    transform: scale(var(--scale-press));
   }
   @media (hover: hover) and (pointer: fine) {
     .cs-next:hover .cs-next-name {
@@ -730,7 +733,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     }
     /* pressing while hovered keeps the nudge (it jumped back 6px) */
     .cs-next:active .cs-next-arrow {
-      transform: translateX(6px) scale(0.97);
+      transform: translateX(6px) scale(var(--scale-press));
     }
   }
   /* reduced motion: no sideways nudge on hover; colour and underline still show it (20 Nov review) */
@@ -751,14 +754,14 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
   @media (max-width: 479px) {
     .cs-audit,
     .cs-agentic {
-      padding: 24px;
+      padding: var(--spacing-md);
     }
     .cs-num {
-      padding: 24px;
+      padding: var(--spacing-md);
     }
     .cs-did > li {
       grid-template-columns: 32px minmax(0, 1fr);
-      gap: 12px;
+      gap: var(--spacing-xs);
     }
   }
 </style>

@@ -53,10 +53,12 @@ const steps = [
   }
   .sh-card {
     overflow: hidden;
-    border: 1px solid var(--color-line-strong);
+    border: 1px solid var(--color-ink);
     border-radius: var(--radius-panel);
     background: var(--color-surface);
     color: var(--color-ink);
+    /* A's window: ink rule, accent offset shadow (24 Nov: folded in from a-case.css) */
+    box-shadow: 6px 6px 0 color-mix(in srgb, var(--color-accent) 70%, transparent);
   }
   .sh-bar {
     display: flex;
@@ -65,14 +67,13 @@ const steps = [
     gap: 12px;
     min-height: 48px;
     padding: 8px 18px;
-    border-bottom: 1px solid var(--color-line);
+    border-bottom: 1px solid var(--color-ink);
   }
   .sh-mono,
   .sh-k {
     font-family: var(--font-mono);
     font-size: var(--text-caption-sm);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    letter-spacing: 0.02em;
     color: var(--color-ink-2);
   }
   .sh-live {
@@ -83,7 +84,6 @@ const steps = [
   .sh-live i {
     width: 7px;
     height: 7px;
-    border-radius: 50%;
     background: var(--color-accent);
   }
   .sh-stage {
@@ -109,18 +109,20 @@ const steps = [
     border-radius: var(--radius-pill);
     background: transparent;
     color: var(--color-ink-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
     font: inherit;
     font-size: var(--text-body-sm);
     cursor: pointer;
     transition: transform 160ms var(--ease-out), background-color 200ms var(--ease-out), color 200ms var(--ease-out);
   }
   .sh-chip:active {
-    transform: scale(0.97);
+    transform: scale(var(--scale-press));
   }
   .sh-chip[aria-pressed='true'] {
-    background: var(--color-ink);
-    border-color: var(--color-ink);
-    color: var(--color-on-ink);
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: var(--color-on-accent);
   }
   .sh-steps {
     margin: 0;
@@ -152,7 +154,6 @@ const steps = [
     height: 14px;
     margin-top: 2px;
     border: 2px solid var(--color-line-strong);
-    border-radius: 50%;
     background: var(--color-surface);
     transition: background-color 200ms var(--ease-out), border-color 200ms var(--ease-out);
   }
@@ -166,6 +167,9 @@ const steps = [
   .sh-steps > li.is-on .sh-dot {
     border-color: var(--color-accent);
     background: var(--color-accent);
+  }
+  .sh-mono:first-child {
+    color: var(--color-ink);
   }
 </style>
 

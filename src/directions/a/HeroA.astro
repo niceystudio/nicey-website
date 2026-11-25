@@ -1,14 +1,18 @@
 ---
 /**
- * Direction A hero (Select layout). The headline is set like the Supabase Select logotype: pixel capitals printed on
- * blocks, the last line on the accent. Below it one ruled row: the lede on the headline's left edge, the two keys
+ * Direction A hero (Select layout). The headline loads like the Supabase Select logotype: pixel capitals printed on
+ * blocks, the last line on the accent — then the blocks fade and it rests as plain pixel text (Goran, 25 Nov; the
+ * section headings below keep the printed blocks, .h-print). Reduced motion: plain text from the start. Below it one ruled row: the lede on the headline's left edge, the two keys
  * flush with the container's right edge, both sitting on the same bottom line (Emir 19 Nov: text and buttons were
  * not aligned). The "Selected work" strip moved out of the hero into its own band (SelectedA) after the ASCII band.
  */
 import { links } from '../../data/links';
+import Button from '../../components/ui/Button.astro';
+import PixelFieldA from './PixelFieldA.astro';
 ---
 
 <section class="ha">
+  <PixelFieldA mode="drift" fade="left" class="ha-field" />
   <div class="container-page ha-in">
     <h1 class="ha-h m-0">
       <span class="ha-line">Designing</span>
@@ -22,9 +26,7 @@ import { links } from '../../data/links';
       </p>
       <div class="ha-ctas">
         {/* Goran 24 Nov: one action here — Get a free audit is already in the nav */}
-        <a href={links.bookCall} class="pill pill-ink pill-lg" target="_blank" rel="noopener">
-          Book a call
-        </a>
+        <Button href={links.bookCall} target="_blank" rel="noopener">Book a call</Button>
       </div>
     </div>
   </div>
@@ -32,13 +34,27 @@ import { links } from '../../data/links';
 
 <style>
   .ha {
-    padding-top: 96px;
-    padding-bottom: 64px;
+    position: relative;
+    overflow: hidden;
+    padding-top: var(--spacing-3xl);
+    padding-bottom: var(--spacing-2xl);
+  }
+  /* the pixel field sits on the right half and fades out towards the headline */
+  .ha :global(.ha-field) {
+    left: 38%;
+  }
+  @media (max-width: 767px) {
+    .ha :global(.ha-field) {
+      left: 0;
+      opacity: 0.6;
+    }
   }
   .ha-in {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
-    gap: 56px;
+    gap: var(--spacing-2xl);
   }
   /* under the headline: the lede, then the one action right below it on the same left edge
      (Emir 24 Nov: the button sat too far from the text at the right edge) */
@@ -46,14 +62,14 @@ import { links } from '../../data/links';
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 28px;
+    gap: var(--spacing-lg);
   }
   @media (max-width: 1023px) {
     .ha {
-      padding-top: 56px;
+      padding-top: var(--spacing-2xl);
     }
     .ha-in {
-      gap: 40px;
+      gap: var(--spacing-xl);
     }
   }
   .ha-h {
@@ -63,21 +79,18 @@ import { links } from '../../data/links';
     gap: 6px;
     font-family: var(--font-pixel);
     font-weight: 400;
-    font-size: clamp(32px, 7.6vw, 112px);
+    font-size: clamp(28px, 7.6vw, 112px); /* 28px floor: "SCALE PRODUCTS." fits a 320px screen */
     line-height: 1;
     letter-spacing: 0;
     text-transform: uppercase;
   }
+  /* at rest: plain pixel text (the padding stays, so the letters don't shift when the blocks go) */
   .ha-line {
     display: inline-block;
     white-space: nowrap;
     padding: 0.06em 0.14em 0.02em;
-    background: var(--color-ink);
-    color: var(--color-page);
-  }
-  .ha-line--accent {
-    background: var(--a-block);
-    color: var(--a-on-block);
+    border-radius: var(--radius-code);
+    color: var(--color-ink);
   }
   .ha-lede {
     max-width: 44ch;
@@ -90,18 +103,47 @@ import { links } from '../../data/links';
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 10px;
+    gap: var(--spacing-xs);
   }
-  /* the headline prints line by line on first view */
+  /* on load: each line prints in on its block, holds, then the block fades and the text stays */
   @media (prefers-reduced-motion: no-preference) {
     .ha-line {
-      animation: ha-print 520ms steps(6, end) both;
+      animation:
+        ha-print 520ms steps(6, end) both,
+        ha-block 1900ms var(--ease-out) both;
+    }
+    .ha-line--accent {
+      animation:
+        ha-print 520ms steps(6, end) both,
+        ha-block-accent 1900ms var(--ease-out) both;
     }
     .ha-line:nth-child(2) {
       animation-delay: 140ms;
     }
     .ha-line:nth-child(3) {
       animation-delay: 280ms;
+    }
+  }
+  @keyframes ha-block {
+    0%,
+    65% {
+      background-color: var(--color-ink);
+      color: var(--color-page);
+    }
+    100% {
+      background-color: transparent;
+      color: var(--color-ink);
+    }
+  }
+  @keyframes ha-block-accent {
+    0%,
+    65% {
+      background-color: var(--color-accent);
+      color: var(--color-on-accent);
+    }
+    100% {
+      background-color: transparent;
+      color: var(--color-ink);
     }
   }
   @keyframes ha-print {

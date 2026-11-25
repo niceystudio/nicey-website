@@ -5,8 +5,13 @@
  * example"). The two services side by side, no tabs: Design systems wider (primary), Product design beside it
  * (alongside). Each card: kicker, title, lede, included/ tree, then its visual on a stage at the bottom.
  * Product design shows Everbreed's weekly care summary (one clear Continue button) instead of the weight log.
+ * 25 Nov (design system merge): the opener is SectionHead, and each visual sits on an animated pixel field (rings
+ * behind design systems, a drop behind product design) instead of a flat pastel stage.
  */
 import QBenchWork from '../../components/case-study/QBenchWork.astro';
+import SectionHead from '../../components/SectionHead.astro';
+import PixelFieldA from './PixelFieldA.astro';
+import Label from '../../components/ui/Label.astro';
 
 const services = [
   {
@@ -23,7 +28,8 @@ const services = [
       'Free audit to start',
     ],
     visual: 'qbench',
-    stage: 'bg-lavender',
+    field: 'rings' as const,
+    seed: 5,
   },
   {
     id: 'product-design',
@@ -32,23 +38,23 @@ const services = [
     lede: 'Complex workflows designed on the system we build, so new screens ship consistent from day one.',
     items: ['Product and UX design', 'Design engineering', 'AI workflows in delivery'],
     visual: 'phone',
-    stage: 'bg-peach',
+    field: 'drop' as const,
+    seed: 9,
   },
 ];
 ---
 
 <section id="services" aria-labelledby="services-head" class="container-page sc2-sec">
-  <div class="flex flex-col gap-3.5">
-    <span class="caption text-ink-2">What we help with</span>
-    <h2 id="services-head" class="m-0 text-h2 max-w-[16ch]">Design systems first. Product design alongside.</h2>
-  </div>
+  <SectionHead id="services-head" caption="What we help with" headingClass="max-w-[22ch]">
+    Design systems first. Product design alongside.
+  </SectionHead>
 
   <div class="sc2-grid">
     {
       services.map((s) => (
         <article class:list={['sc2-card', `sc2-card--${s.id}`]} aria-labelledby={`sc2-${s.id}`}>
           <div class="sc2-text">
-            <span class="caption text-ink-2">{s.kicker}</span>
+            <Label variant="caption">{s.kicker}</Label>
             <h3 id={`sc2-${s.id}`} class="sc2-h m-0">{s.label}</h3>
             <p class="m-0 sc2-lede">{s.lede}</p>
             <div class="sc2-tree" aria-label="What's included">
@@ -63,7 +69,8 @@ const services = [
               </ul>
             </div>
           </div>
-          <figure class:list={['sc2-stage a-grain m-0', s.stage]}>
+          <figure class="sc2-stage m-0">
+            <PixelFieldA mode={s.field} seed={s.seed} cx={0.72} cy={0.5} />
             {s.visual === 'qbench' ? (
               <QBenchWork terminal bare />
             ) : (
@@ -84,7 +91,7 @@ const services = [
   .sc2-sec {
     display: flex;
     flex-direction: column;
-    gap: 48px;
+    gap: var(--spacing-xl);
     padding-top: var(--spacing-section);
     padding-bottom: var(--spacing-section);
   }
@@ -92,7 +99,7 @@ const services = [
   .sc2-grid {
     display: grid;
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    gap: 24px;
+    gap: var(--spacing-md);
     align-items: stretch;
   }
   @media (max-width: 1023px) {
@@ -110,13 +117,13 @@ const services = [
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 16px;
-    padding: 40px 40px 36px;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-xl) var(--spacing-xl) var(--spacing-lg);
     flex: 1;
   }
   @media (max-width: 639px) {
     .sc2-text {
-      padding: 28px 24px;
+      padding: var(--spacing-lg) var(--spacing-md);
     }
   }
   .sc2-h {
@@ -127,7 +134,7 @@ const services = [
   }
   .sc2-lede {
     max-width: 44ch;
-    font-size: 17px;
+    font-size: var(--text-cta);
     line-height: 1.5;
     color: var(--color-ink-2);
     text-wrap: pretty;
@@ -136,7 +143,7 @@ const services = [
     width: 100%;
     margin-top: 4px;
     font-family: var(--font-mono);
-    font-size: 14px;
+    font-size: var(--text-label);
     line-height: 2;
   }
   .sc2-tree-root {
@@ -149,7 +156,7 @@ const services = [
   }
   .sc2-tree li {
     display: flex;
-    gap: 10px;
+    gap: var(--spacing-xs);
   }
   .sc2-branch {
     color: var(--a-dim);
@@ -160,7 +167,7 @@ const services = [
     align-items: center;
     justify-content: center;
     height: 440px;
-    padding: 32px;
+    padding: var(--spacing-lg);
     border-top: 1px solid var(--a-rule);
     position: relative;
     isolation: isolate;
@@ -169,8 +176,13 @@ const services = [
   @media (max-width: 639px) {
     .sc2-stage {
       height: auto;
-      padding: 24px;
+      padding: var(--spacing-md);
     }
+  }
+  .sc2-stage > :global(.qw),
+  .sc2-stage > .sc2-phone {
+    position: relative;
+    z-index: 1;
   }
   .sc2-stage > :global(.qw) {
     width: 100%;
@@ -178,7 +190,7 @@ const services = [
   .sc2-phone {
     width: 180px;
     aspect-ratio: 393 / 852;
-    padding: 7px;
+    padding: var(--spacing-2xs);
     border-radius: 34px;
     background: var(--color-band);
   }

@@ -29,20 +29,20 @@ const other = getCaseStudy(c.related!.slug);
   .sca {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    padding-block: 96px 32px;
+    gap: var(--spacing-sm);
+    padding-block: var(--spacing-3xl) var(--spacing-lg);
   }
   @media (max-width: 767px) {
     .sca {
-      padding-block: 64px 24px;
+      padding-block: var(--spacing-2xl) var(--spacing-md);
     }
   }
   .sca-link {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 24px;
-    padding: 28px 32px;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg) var(--spacing-lg);
     border: 1px solid var(--a-rule);
     background: var(--color-surface);
     color: var(--color-ink);
@@ -52,7 +52,7 @@ const other = getCaseStudy(c.related!.slug);
   .sca-copy {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--spacing-2xs);
     min-width: 0;
   }
   .sca-name {
@@ -61,7 +61,7 @@ const other = getCaseStudy(c.related!.slug);
     line-height: 1.05;
   }
   .sca-line {
-    font-size: 16px;
+    font-size: var(--text-body);
     line-height: 1.5;
     color: var(--color-ink-2);
   }
