@@ -224,28 +224,38 @@ const data = Array.from({ length: ROWS }, (_, i) => {
   .ab-ctl {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 2px;
   }
   .ab-ctl-k {
     margin-right: var(--spacing-3xs);
     color: var(--color-muted);
   }
+  /* a 40px button (the hit area) around a 22px swatch (what you see) */
   .ab-sw {
+    display: grid;
+    place-items: center;
+    width: var(--hit-min);
+    height: var(--hit-min);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+  .ab-sw::before {
+    content: '';
     width: 22px;
     height: 22px;
-    padding: 0;
     border: 1px solid transparent;
     background: var(--sw);
     background-clip: content-box;
-    outline-offset: 2px;
-    cursor: pointer;
   }
-  .ab-sw[aria-pressed='true'] {
+  .ab-sw[aria-pressed='true']::before {
     border-color: var(--color-ink);
     padding: 3px;
   }
   .ab-st {
-    padding: 3px var(--spacing-2xs);
+    min-height: var(--hit-min);
+    padding: 0 var(--spacing-xs);
     border: 1px solid var(--a-rule);
     background: transparent;
     color: var(--color-ink-2);

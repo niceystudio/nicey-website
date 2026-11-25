@@ -36,7 +36,7 @@ const count = Math.max(slots.length, galleries.length);
               </div>
               {g ? (
                 <button type="button" class="sb-open" data-sb-open={i} aria-label={`Open ${label}: ${g.images.length} images`}>
-                  <img class="sb-img" src={(g.cover ?? g.images[0]).src} alt="" width={(g.cover ?? g.images[0]).width} height={(g.cover ?? g.images[0]).height} loading="lazy" decoding="async" />
+                  <img class="sb-img img-outline" src={(g.cover ?? g.images[0]).src} alt="" width={(g.cover ?? g.images[0]).width} height={(g.cover ?? g.images[0]).height} loading="lazy" decoding="async" />
                   <span class="sb-count" aria-hidden="true">
                     1 / {g.images.length}
                     <svg viewBox="0 0 16 16" width="12" height="12">
@@ -66,7 +66,7 @@ const count = Math.max(slots.length, galleries.length);
             </button>
             <button type="button" class="sbx-btn sbx-x" data-sbx-close aria-label="Close">
               <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
-                <path d="M3 3l10 10M13 3 3 13" stroke="currentColor" stroke-width="1.6" />
+                <path d="M3 3l10 10M13 3 3 13" stroke="currentColor" stroke-width="1.5" />
               </svg>
             </button>
           </div>
@@ -74,12 +74,12 @@ const count = Math.max(slots.length, galleries.length);
         <div class="sbx-track" data-sbx-track />
         <button type="button" class="sbx-nav sbx-prev" data-sbx-prev aria-label="Previous image">
           <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
-            <path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.6" />
+            <path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.5" />
           </svg>
         </button>
         <button type="button" class="sbx-nav sbx-next" data-sbx-next aria-label="Next image">
           <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
-            <path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6" />
+            <path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5" />
           </svg>
         </button>
         <script type="application/json" data-sbx-data set:html={JSON.stringify(galleries)} />
@@ -245,7 +245,7 @@ const count = Math.max(slots.length, galleries.length);
   }
   .sbx-btn:active,
   .sbx-nav:active {
-    transform: scale(0.97);
+    transform: scale(var(--scale-press));
   }
   @media (hover: hover) and (pointer: fine) {
     .sbx-btn:hover,

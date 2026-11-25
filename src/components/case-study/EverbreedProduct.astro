@@ -105,12 +105,12 @@ const clip = (id: string) => ({ src: `${base}/mobile-${id}.webm`, poster: `${bas
     <div class="ep-desk-stack" data-stagger>
       <div class="ep-browser ep-browser--back">
         <span class="ep-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-        <img src={`${base}/desktop-photos.jpg`} width="2160" height="1712" loading="lazy" decoding="async"
+        <img class="img-outline" src={`${base}/desktop-photos.jpg`} width="2160" height="1712" loading="lazy" decoding="async"
           alt="Everbreed Project Book on desktop, Photos section: photos from completed tasks grouped by care check, grooming, animal ID, fair submission, showmanship practice, feed label and fair results." />
       </div>
       <div class="ep-browser ep-browser--front">
         <span class="ep-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-        <img src={`${base}/desktop-care.jpg`} width="2160" height="2045" loading="lazy" decoding="async"
+        <img class="img-outline" src={`${base}/desktop-care.jpg`} width="2160" height="2045" loading="lazy" decoding="async"
           alt="Everbreed Project Book on desktop, Care & Health section: weekly care log consistency, grooming notes, health observations and a treatment record." />
       </div>
     </div>
@@ -217,7 +217,7 @@ const clip = (id: string) => ({ src: `${base}/mobile-${id}.webm`, poster: `${bas
     transition: transform 160ms var(--ease-out);
   }
   .ep-pause:active {
-    transform: scale(0.97);
+    transform: scale(var(--scale-press));
   }
 
   /* desktop screens, layered */

@@ -145,7 +145,7 @@ const figs = JSON.stringify({ before, after });
     border: 1px solid var(--color-line-strong);
   }
   .nd-tabs button {
-    min-height: 32px;
+    min-height: var(--hit-min);
     padding: 0 var(--spacing-xs);
     border: 0;
     background: transparent;
@@ -156,7 +156,7 @@ const figs = JSON.stringify({ before, after });
     transition: transform 160ms var(--ease-out);
   }
   .nd-tabs button:active {
-    transform: scale(0.97);
+    transform: scale(var(--scale-press));
   }
   .nd-tabs button[aria-pressed='true'] {
     background: var(--a-block, var(--color-accent));

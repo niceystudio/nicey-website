@@ -21,7 +21,7 @@ import { statusSteps as steps } from './status-steps';
         steps.map((s, i) => (
           <div class:list={['ss-screen', i === 0 && 'is-on']} data-ss-screen={i}>
             {s.src ? (
-              <img src={s.src} alt={s.alt} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />
+              <img class="img-outline" src={s.src} alt={s.alt} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />
             ) : (
               <span class="placeholder ss-ph">[Screen {s.n} · {s.title}]</span>
             )}
@@ -143,7 +143,7 @@ import { statusSteps as steps } from './status-steps';
     transition: border-color 160ms var(--ease-out), transform 160ms var(--ease-out);
   }
   .ss-step:active {
-    transform: scale(0.97);
+    transform: scale(var(--scale-press));
   }
   .ss-step.is-on {
     border-top-color: var(--color-accent);

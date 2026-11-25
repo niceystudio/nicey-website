@@ -705,7 +705,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     transition: transform 200ms var(--ease-out), background-color 200ms var(--ease-out), color 200ms var(--ease-out);
   }
   .cs-next:active .cs-next-arrow {
-    transform: scale(0.95);
+    transform: scale(var(--scale-press));
   }
   @media (hover: hover) and (pointer: fine) {
     .cs-next:hover .cs-next-name {
@@ -718,7 +718,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
     }
     /* pressing while hovered keeps the nudge (it jumped back 6px) */
     .cs-next:active .cs-next-arrow {
-      transform: translateX(6px) scale(0.97);
+      transform: translateX(6px) scale(var(--scale-press));
     }
   }
   /* reduced motion: no sideways nudge on hover; colour and underline still show it (20 Nov review) */

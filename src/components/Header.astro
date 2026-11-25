@@ -29,7 +29,7 @@ const audit = variant === 'case' ? `${home}#audit` : '#audit';
   <nav aria-label="Main" class="head-nav container-page py-4">
     <a
       href={home === '/' ? links.home : home}
-      class="text-[22px] leading-none font-semibold tracking-[-0.04em] text-ink no-underline"
+      class="hit text-[22px] leading-none font-semibold tracking-[-0.04em] text-ink no-underline"
       >nicey<span class="text-accent">.</span></a
     >
     <!-- desktop: everything on one row -->
@@ -137,7 +137,7 @@ const audit = variant === 'case' ? `${home}#audit` : '#audit';
     }
   }
   .head-link:active {
-    transform: scale(0.97);
+    transform: scale(var(--scale-press));
     color: var(--color-ink);
   }
   .head-row {

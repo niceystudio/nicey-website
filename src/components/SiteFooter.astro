@@ -43,7 +43,7 @@ const contact = [
     <div class="flex max-w-[36ch] flex-col gap-4">
       <a
         href={links.home}
-        class="text-[22px] leading-none font-semibold tracking-[-0.04em] text-ink no-underline"
+        class="hit self-start text-[22px] leading-none font-semibold tracking-[-0.04em] text-ink no-underline"
         >nicey<span class="text-accent">.</span></a
       >
       <p class="m-0 text-body-sm text-pretty text-ink-2">
@@ -57,10 +57,10 @@ const contact = [
         cols.map((c) => (
           <div class="flex flex-col gap-3">
             <h2 class="caption-sm m-0 text-ink-2">{c.head}</h2>
-            <ul class="m-0 flex list-none flex-col gap-2 p-0">
+            <ul class="m-0 flex list-none flex-col p-0">
               {c.items.map((it) => (
                 <li>
-                  <a href={it.href} class="text-body-sm text-ink no-underline hover:underline">
+                  <a href={it.href} class="foot-link text-body-sm text-ink no-underline hover:underline">
                     {it.label}
                   </a>
                 </li>
@@ -73,10 +73,10 @@ const contact = [
         {contact.map((c) => (
           <div class="flex flex-col gap-3">
             <h2 class="caption-sm m-0 text-ink-2">{c.head}</h2>
-            <ul class="m-0 flex list-none flex-col gap-2 p-0">
+            <ul class="m-0 flex list-none flex-col p-0">
               {c.items.map((it) => (
                 <li>
-                  <a href={it.href} class="text-body-sm text-ink no-underline hover:underline">
+                  <a href={it.href} class="foot-link text-body-sm text-ink no-underline hover:underline">
                     {it.label}
                   </a>
                 </li>
@@ -90,7 +90,7 @@ const contact = [
   <div class="container-page site-foot-base">
     <p class="caption-sm m-0 text-ink-2">© {year} Nicey Studio · Design systems people and agents read the same way</p>
     <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
-      <a href="#main" class="caption-sm text-ink-2 no-underline hover:underline">Back to top <span class="arr-up" aria-hidden="true">↑</span></a>
+      <a href="#main" class="foot-link caption-sm text-ink-2 no-underline hover:underline">Back to top <span class="arr-up" aria-hidden="true">↑</span></a>
     </div>
   </div>
 </footer>
@@ -120,6 +120,12 @@ const contact = [
     .site-foot-cols {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+  }
+  /* every footer link is a 40px target: the rows touch, the text keeps its spacing */
+  .foot-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--hit-min);
   }
   .site-foot-base {
     display: flex;

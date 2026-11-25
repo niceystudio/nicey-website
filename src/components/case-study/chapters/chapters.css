@@ -141,7 +141,7 @@
     transition: transform 160ms var(--ease-out), background-color 200ms var(--ease-out);
   }
   .ch-wrap .chs-btn:active:not([aria-disabled='true']) {
-    transform: scale(0.97);
+    transform: scale(var(--scale-press));
   }
   .ch-wrap .chs-btn--next {
     border-color: var(--color-ink);
@@ -1157,7 +1157,7 @@
     @keyframes ch-pop {
       from {
         opacity: 0;
-        transform: scale(0.97);
+        transform: scale(var(--scale-press));
       }
     }
   }

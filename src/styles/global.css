@@ -195,6 +195,12 @@
   --radius-swatch: 0px;
   --radius-pill: 0px;
 
+  /* interaction (make-interfaces-feel-better): every control is at least this tall to hit, presses scale to this,
+     images get this hairline so they keep their edge on any surface */
+  --hit-min: 40px;
+  --scale-press: 0.96;
+  --color-image-outline: oklch(0 0 0 / 0.1);
+
   /* elevation: windows lift off the page; nothing else casts a shadow */
   --shadow-sm: 0 1px 2px rgb(38 37 31 / 0.08);
   --shadow-window: 0 2px 4px rgb(38 37 31 / 0.12), 0 28px 56px -28px rgb(38 37 31 / 0.55);
@@ -251,6 +257,7 @@
     --color-stone: #33312a;
     /* a step darker than the page, so the closing band still reads */
     --color-band: #0c0c09;
+    --color-image-outline: oklch(1 0 0 / 0.1);
     --color-on-band: #ece7db;
     --color-on-band-2: #b6b1a3;
   }
@@ -299,6 +306,12 @@
   h2,
   h3 {
     text-wrap: balance;
+  }
+  p,
+  li,
+  dd,
+  figcaption {
+    text-wrap: pretty;
   }
   ::selection {
     background: var(--color-accent);
@@ -677,7 +690,7 @@
   /* press feedback: the button confirms it heard the click */
   .pill:active,
   .press:active {
-    transform: scale(0.97);
+    transform: scale(var(--scale-press));
   }
   .press {
     transition: transform 160ms var(--ease-out);
@@ -785,6 +798,19 @@
   /* checked and clear: every cell in the accent */
   .units--ok > i {
     background: var(--color-accent);
+  }
+
+  /* a link or control that is smaller than a finger: grow its box to the minimum hit height, text unchanged */
+  .hit {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--hit-min);
+  }
+  /* a hairline on screenshots and photos, pure black (white after dark) at 10%, so they keep their edge on any
+     surface without picking up its tint */
+  .img-outline {
+    outline: 1px solid var(--color-image-outline);
+    outline-offset: -1px;
   }
 
   .sr-only {

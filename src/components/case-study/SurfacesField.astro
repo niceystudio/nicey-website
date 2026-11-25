@@ -126,7 +126,7 @@ const NOTE_AFTER = 'Now every place follows one workflow. People get the same st
     border-radius: var(--radius-pill);
   }
   .sf-seg button {
-    min-height: 38px;
+    min-height: var(--hit-min);
     padding: 0 var(--spacing-sm);
     border: 0;
     border-radius: var(--radius-pill);
@@ -138,7 +138,7 @@ const NOTE_AFTER = 'Now every place follows one workflow. People get the same st
     transition: transform 160ms var(--ease-out);
   }
   .sf-seg button:active {
-    transform: scale(0.97);
+    transform: scale(var(--scale-press));
   }
   .sf-seg button[aria-pressed='true'] {
     background: var(--color-ink);

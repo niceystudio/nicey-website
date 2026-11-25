@@ -18,7 +18,7 @@ const loading = eager ? 'eager' : 'lazy';
 
 <div class:list={['shot', { 'shot--wide': wide, 'shot--themed': !!shot.dark }]}>
   <img
-    class="shot-light"
+    class="shot-light img-outline"
     src={shot.light}
     alt={alt}
     width={shot.width}
@@ -29,7 +29,7 @@ const loading = eager ? 'eager' : 'lazy';
   {
     shot.dark && (
       <img
-        class="shot-dark"
+        class="shot-dark img-outline"
         src={shot.dark}
         alt={alt}
         width={shot.width}

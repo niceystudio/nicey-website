@@ -15,13 +15,13 @@ const prompt = aiReadyPrompt(Astro.site ?? new URL('https://nicey-website.vercel
 
 <div class="cp">
   <button type="button" class="cp-btn" data-copy-prompt={prompt}>
-    <svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"
+    <svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"
       ><rect x="5" y="5" width="9" height="9" rx="2"></rect><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"></path></svg
     >
     <span data-copy-label>Copy prompt for your agent</span>
   </button>
   {/* hidden in A, but it comes back if copying fails: the way to recover (20 Nov review) */}
-  <a href="/ai-ready.md" class="cp-file" hidden={!showFile} data-copy-file>/ai-ready.md</a>
+  <a href="/ai-ready.md" class="hit cp-file" hidden={!showFile} data-copy-file>/ai-ready.md</a>
   <span class="sr-only" aria-live="polite" data-copy-live></span>
 </div>
 
@@ -38,7 +38,7 @@ const prompt = aiReadyPrompt(Astro.site ?? new URL('https://nicey-website.vercel
     display: inline-flex;
     align-items: center;
     gap: var(--spacing-2xs);
-    min-height: 36px;
+    min-height: var(--hit-min);
     padding: 0 var(--spacing-sm);
     border: 1px dashed var(--color-line-strong);
     border-radius: var(--radius-pill);
@@ -49,7 +49,7 @@ const prompt = aiReadyPrompt(Astro.site ?? new URL('https://nicey-website.vercel
     transition: transform 160ms var(--ease-out), background-color 160ms var(--ease-out), border-color 160ms var(--ease-out);
   }
   .cp-btn:active {
-    transform: scale(0.97);
+    transform: scale(var(--scale-press));
   }
   @media (hover: hover) and (pointer: fine) {
     .cp-btn:hover {
