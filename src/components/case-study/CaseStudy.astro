@@ -280,7 +280,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
   <section aria-labelledby="cs-cta-head" class="cs-cta" data-human>
     <div class="container-page flex flex-col items-start gap-6 py-section">
       <Label variant="section">{s.cta.action === 'audit' ? 'Free audit · read-only' : 'Work with us'}</Label>
-      <h2 id="cs-cta-head" class="m-0 max-w-[16ch] text-h2">{s.cta.heading}</h2>
+      <h2 id="cs-cta-head" class="m-0 max-w-[16ch] text-h2"><span class="h-print">{s.cta.heading}</span></h2>
       <p class="m-0 max-w-[40ch] text-sub text-ink-2">{s.cta.text}</p>
       <div class="mt-4 flex flex-wrap gap-2.5">
         {s.cta.action === 'audit' ? (

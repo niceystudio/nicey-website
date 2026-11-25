@@ -1,7 +1,8 @@
 ---
 /**
- * Direction A hero (Select layout). The headline is set like the Supabase Select logotype: pixel capitals printed on
- * blocks, the last line on the accent. Below it one ruled row: the lede on the headline's left edge, the two keys
+ * Direction A hero (Select layout). The headline loads like the Supabase Select logotype: pixel capitals printed on
+ * blocks, the last line on the accent — then the blocks fade and it rests as plain pixel text (Goran, 25 Nov; the
+ * section headings below keep the printed blocks, .h-print). Reduced motion: plain text from the start. Below it one ruled row: the lede on the headline's left edge, the two keys
  * flush with the container's right edge, both sitting on the same bottom line (Emir 19 Nov: text and buttons were
  * not aligned). The "Selected work" strip moved out of the hero into its own band (SelectedA) after the ASCII band.
  */
@@ -78,21 +79,18 @@ import PixelFieldA from './PixelFieldA.astro';
     gap: 6px;
     font-family: var(--font-pixel);
     font-weight: 400;
-    font-size: clamp(32px, 7.6vw, 112px);
+    font-size: clamp(28px, 7.6vw, 112px); /* 28px floor: "SCALE PRODUCTS." fits a 320px screen */
     line-height: 1;
     letter-spacing: 0;
     text-transform: uppercase;
   }
+  /* at rest: plain pixel text (the padding stays, so the letters don't shift when the blocks go) */
   .ha-line {
     display: inline-block;
     white-space: nowrap;
     padding: 0.06em 0.14em 0.02em;
-    background: var(--color-ink);
-    color: var(--color-page);
-  }
-  .ha-line--accent {
-    background: var(--a-block);
-    color: var(--a-on-block);
+    border-radius: var(--radius-code);
+    color: var(--color-ink);
   }
   .ha-lede {
     max-width: 44ch;
@@ -107,16 +105,45 @@ import PixelFieldA from './PixelFieldA.astro';
     align-items: center;
     gap: var(--spacing-xs);
   }
-  /* the headline prints line by line on first view */
+  /* on load: each line prints in on its block, holds, then the block fades and the text stays */
   @media (prefers-reduced-motion: no-preference) {
     .ha-line {
-      animation: ha-print 520ms steps(6, end) both;
+      animation:
+        ha-print 520ms steps(6, end) both,
+        ha-block 1900ms var(--ease-out) both;
+    }
+    .ha-line--accent {
+      animation:
+        ha-print 520ms steps(6, end) both,
+        ha-block-accent 1900ms var(--ease-out) both;
     }
     .ha-line:nth-child(2) {
       animation-delay: 140ms;
     }
     .ha-line:nth-child(3) {
       animation-delay: 280ms;
+    }
+  }
+  @keyframes ha-block {
+    0%,
+    65% {
+      background-color: var(--color-ink);
+      color: var(--color-page);
+    }
+    100% {
+      background-color: transparent;
+      color: var(--color-ink);
+    }
+  }
+  @keyframes ha-block-accent {
+    0%,
+    65% {
+      background-color: var(--color-accent);
+      color: var(--color-on-accent);
+    }
+    100% {
+      background-color: transparent;
+      color: var(--color-ink);
     }
   }
   @keyframes ha-print {

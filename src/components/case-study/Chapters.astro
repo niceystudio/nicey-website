@@ -38,7 +38,7 @@ const slug = (k: string) =>
   {scroll ? (
     <div class="ch-rail">
       <span class="caption text-ink-2">{head?.caption ?? 'What we did'}</span>
-      <h2 id="chapters-head" class="m-0 text-h2 text-balance">{head?.heading ?? 'What we did, step by step'}</h2>
+      <h2 id="chapters-head" class="m-0 text-h2 text-balance"><span class="h-print">{head?.heading ?? 'What we did, step by step'}</span></h2>
       <ol class="ch-rail-list">
         {chapters.map((c) => {
           const [num, ...rest] = c.kicker.split(' · ');

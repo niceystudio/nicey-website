@@ -800,6 +800,17 @@
     background: var(--color-accent);
   }
 
+  /* A heading printed on blocks, line by line, like the hero headline: wrap the heading's text in
+     <span class="h-print"> (SectionHead does it). The block takes the window radius, so "Change one token" rounds it. */
+  .h-print {
+    padding: 0.04em 0.16em;
+    border-radius: var(--radius-code);
+    background: var(--color-ink);
+    color: var(--color-page);
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+
   /* a link or control that is smaller than a finger: grow its box to the minimum hit height, text unchanged */
   .hit {
     display: inline-flex;

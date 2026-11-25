@@ -11,5 +11,5 @@ const { id, caption, class: className, headingClass } = Astro.props;
 
 <div class:list={['flex flex-col gap-3.5', className]}>
   <span class="caption a-path text-ink-2">{caption}</span>
-  <h2 id={id} class:list={['m-0 text-h2', headingClass]}><slot /></h2>
+  <h2 id={id} class:list={['m-0 text-h2', headingClass]}><span class="h-print"><slot /></span></h2>
 </div>

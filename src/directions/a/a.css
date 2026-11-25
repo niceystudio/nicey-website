@@ -41,6 +41,12 @@
   letter-spacing: -0.01em;
   line-height: 1.04;
 }
+/* section headings read like the hero (25 Nov): pixel capitals printed on ink blocks, line by line (.h-print) */
+.dir-a h2.text-h2:has(.h-print) {
+  letter-spacing: 0;
+  line-height: 1.32;
+  text-transform: uppercase;
+}
 .dir-a .caption {
   letter-spacing: 0.12em;
 }
