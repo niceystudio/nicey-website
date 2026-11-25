@@ -64,6 +64,8 @@
   --color-term-muted: #b6b1a3;
   --color-term-accent: #d9d2ef;
   --color-term-ok: #cbdac4;
+  --color-term-warn: #f2e6bc;
+  --color-term-fail: #e8805c;
   --color-term-rule: rgb(243 240 233 / 0.12);
   --color-term-light: rgb(243 240 233 / 0.22);
 

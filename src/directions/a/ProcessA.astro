@@ -1,19 +1,20 @@
 ---
 /**
- * Direction A: "It starts with a free audit" (Emir 19 Nov, second pass). Reading order inside one .panel:
- *   1. the four steps (step titles only — time placeholders removed 20 Nov) beside the report as a terminal (ReportA)
- *   2. the action, last: Get a free audit — people read the process first, then click; next to it the quieter
- *      path for visitors not ready to share their file (copy the prompt).
+ * Direction A: "It starts with a free audit" — one panel, two paths (Emir + Goran, 24 Nov: two sections were misleading;
+ * same seven checks, done by us or by the visitor's own agent):
+ *   1. "We audit it for you": How it goes (4 steps) + Get a free audit on the report stage's bottom line, beside ReportA
+ *   2. "Or let your agent check it first": SelfCheckA — What you'll see + Copy prompt, beside the live example run
  * Typography: capitals only in the small section caption; everything else sentence case.
- * Removed: the CTA beside the headline, the "Free · read-only…" note, the legend that repeated the report tabs,
- * the auto-playing example run. Times stay [gaps] for Goran.
  */
 import SectionHead from '../../components/SectionHead.astro';
-import CopyPrompt from '../../components/CopyPrompt.astro';
 import ReportA from './ReportA.astro';
 import { links } from '../../data/links';
 import Button from '../../components/ui/Button.astro';
 import Label from '../../components/ui/Label.astro';
+
+import SelfCheckA from './SelfCheckA.astro';
+
+
 
 // time placeholders removed in A (Emir, 20 Nov: we don't need them). 20 Nov: caption "Free audit" (same as the header button; "Process" left the nav);
 // steps marked with → (How we work above is the only numbered process); the list fills the column beside the report
@@ -33,6 +34,9 @@ const steps = [
   <div class="panel pa-box">
     <div class="pa-body">
       <div class="pa-left">
+        <div class="pa-head">
+          <h3 class="pa-h m-0">We audit it for you</h3>
+        </div>
         <Label variant="mono" as="p">How it goes</Label>
         <ol class="pa-steps">
           {
@@ -44,6 +48,7 @@ const steps = [
             ))
           }
         </ol>
+        <Button href={links.startAudit} class="pa-cta">Get a free audit</Button>
       </div>
       <div class="pa-right">
         <Label variant="mono" as="p">What you get</Label>
@@ -51,15 +56,7 @@ const steps = [
       </div>
     </div>
 
-    <div class="pa-act">
-      <Button href={links.startAudit}>Get a free audit</Button>
-      <div class="pa-own">
-        <p class="m-0 pa-own-p">
-          Not ready to share your file? Let your agent run our seven checks, then bring the results to a call.
-        </p>
-        <CopyPrompt showFile={false} />
-      </div>
-    </div>
+    <SelfCheckA />
   </div>
 </section>
 
@@ -87,6 +84,23 @@ const steps = [
     gap: var(--spacing-sm);
     min-width: 0;
   }
+  .pa-head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2xs);
+    margin-bottom: var(--spacing-md);
+  }
+  .pa-h {
+    font-size: var(--text-h3-card);
+    line-height: 1.2;
+    font-weight: 400;
+    text-wrap: balance;
+  }
+  /* the button sits on the report stage's bottom line (Emir 24 Nov) */
+  .pa-cta {
+    align-self: flex-start;
+    margin-top: auto;
+  }
   /* no rules between the steps (Goran, 23 Nov: too many lines) — spacing alone separates them */
   .pa-steps {
     display: flex;
@@ -113,37 +127,9 @@ const steps = [
     color: var(--color-ink);
   }
   /* the action comes last, after the process */
-  .pa-act {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--spacing-md) var(--spacing-xl);
-    padding: var(--spacing-lg) var(--spacing-cell-lg);
-  }
-  .pa-own {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--spacing-xs) var(--spacing-md);
-    flex: 1 1 420px;
-    padding-left: var(--spacing-xl);
-    border-left: 1px solid var(--a-rule);
-  }
-  .pa-own-p {
-    flex: 1 1 320px;
-    font-size: var(--text-body-sm);
-    line-height: 1.45;
-    color: var(--color-ink-2);
-    text-wrap: pretty;
-  }
   @media (max-width: 767px) {
-    .pa-body,
-    .pa-act {
+    .pa-body {
       padding: var(--spacing-md);
-    }
-    .pa-own {
-      padding-left: 0;
-      border-left: 0;
     }
   }
 </style>

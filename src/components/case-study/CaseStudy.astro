@@ -21,6 +21,11 @@ import AliasesField from './AliasesField.astro';
 import CaseWork from './CaseWork.astro';
 import ScreensBandA from '../../directions/a/ScreensBandA.astro';
 import TogetherA from '../../directions/a/TogetherA.astro';
+import CaseStoryA from '../../directions/a/CaseStoryA.astro';
+import SameClientA from '../../directions/a/SameClientA.astro';
+import FilmQBenchA from '../../directions/a/FilmQBenchA.astro';
+import FilmStatusA from '../../directions/a/FilmStatusA.astro';
+import FilmEverbreedA from '../../directions/a/FilmEverbreedA.astro';
 import Decisions from './Decisions.astro';
 import Chapters from './Chapters.astro';
 import SectionHead from '../SectionHead.astro';
@@ -55,8 +60,16 @@ interface Props {
   workFirst?: boolean;
   togetherA?: boolean;
   railA?: boolean;
+  /** direction A (Goran's feedback, 24 Nov): the client card + the written story after the screens band (CaseStoryA);
+   *  the hero stays as it was (Emir); needs `study.client` */
+  projectA?: boolean;
+  /** Emir 24 Nov (after Bitovi): the case-study film instead of the screens band. The gallery (ScreensBandA +
+   *  study.screensA) stays in the code: drop this prop to go back to it. */
+  filmA?: boolean;
+  noindex?: boolean;
 }
-const { study: s, direction, noFacts = false, namesLook, ctaLook, chaptersA = false, layoutA = false, workFirst = false, togetherA = false, railA = false } = Astro.props;
+const { study: s, direction, noFacts = false, namesLook, ctaLook, chaptersA = false, layoutA = false, workFirst = false, togetherA = false, railA = false, projectA = false, filmA = false, noindex = false } = Astro.props;
+const project = projectA && !!s.client;
 const together = layoutA || togetherA;
 const chapters = chaptersA && s.chapters && s.slug === 'qbench-design-system' ? qbenchChaptersA(s.chapters) : s.chapters;
 /** the homepage these links go back to: the site, or the direction's review homepage */
@@ -96,7 +109,7 @@ const jsonLd = { '@context': 'https://schema.org', '@graph': faqLd ? [article, f
 const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https://nicey-website.vercel.app').href);
 ---
 
-<Base title={`${s.linkName} case study · Nicey`} description={s.lede} markdownHref={mdHref} jsonLd={jsonLd} >
+<Base title={`${s.linkName} case study · Nicey`} description={s.lede} markdownHref={mdHref} jsonLd={jsonLd} noindex={noindex} >
   <div class:list={[direction && `dir-${direction}`]} data-rail-a={railA ? '' : undefined}>
   <Header variant="case" home={home} />
   <main id="main" tabindex="-1" class="cs" data-human>
@@ -132,7 +145,8 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
       </div>
     </section>
 
-    {(layoutA || s.screensA) && <ScreensBandA name={s.name} galleries={s.screensA} />}
+    {project && <CaseStoryA study={s} />}
+    {filmA ? (s.slug === 'qbench-design-system' ? <FilmQBenchA /> : s.slug === 'everbreed' ? <FilmEverbreedA /> : <FilmStatusA />) : (layoutA || s.screensA) && <ScreensBandA name={s.name} galleries={s.screensA} />}
     {workFirst && <CaseWork study={s} direction={direction} />}
 
     {
@@ -273,6 +287,7 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https:
         <Faq items={s.faq} heading="About this project" id="case-faq" />
       </div>
     )}
+    {project && s.client?.related && <SameClientA study={s} />}
   </main>
 
   {/* one CTA on every page, on the shared pieces: section label, h2, Button (24 Nov: the closing band styles left with

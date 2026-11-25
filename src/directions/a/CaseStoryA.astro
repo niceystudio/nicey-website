@@ -1,0 +1,141 @@
+---
+/**
+ * Direction A · "The project", right after the hero, before the screens band (Emir 24 Nov: context before proof) (Goran, 24 Nov: add context about the client + more text
+ * for SEO; Emir: keep the hero as it was, put the client info somewhere else). Layout after the Sisyphus example:
+ * the client card on the left (sticky on wide screens), the written story on the right — overview, the challenge,
+ * the result. Lorem ipsum where the copy and facts aren't known yet. Content: `study.client`.
+ */
+import SectionHead from '../../components/SectionHead.astro';
+import type { CaseStudy } from '../../data/case-studies';
+
+interface Props {
+  study: CaseStudy;
+}
+const c = Astro.props.study.client!;
+const blocks = [
+  { h: 'Overview', ps: c.overview },
+  { h: 'The challenge', ps: c.challenge },
+  { h: 'The result', ps: c.results },
+];
+---
+
+<section aria-labelledby="story-head" class="container-page cst">
+  <SectionHead id="story-head" caption="The project" headingClass="max-w-[22ch]">
+    {c.storyHeading}
+  </SectionHead>
+
+  <div class="cst-body">
+    <aside class="cst-card" aria-label={`About ${c.name}`}>
+      <p class="cst-client m-0">{c.name}</p>
+      <dl class="cst-facts m-0">
+        {
+          c.facts.map((f) => (
+            <div>
+              <dt>{f.term}</dt>
+              <dd class="m-0">{f.detail}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </aside>
+
+    <div class="cst-text">
+      {
+        blocks.map((b) => (
+          <div class="cst-block">
+            <h3 class="cst-h m-0">{b.h}</h3>
+            {b.ps.map((p) => <p class="cst-p m-0">{p}</p>)}
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .cst {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+    padding-block: var(--spacing-2xl) var(--spacing-xl);
+  }
+  .cst-body {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    gap: var(--spacing-2xl);
+    align-items: start;
+  }
+  @media (max-width: 1023px) {
+    .cst-body {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--spacing-xl);
+    }
+  }
+  @media (max-width: 767px) {
+    .cst {
+      padding-block: var(--spacing-xl) var(--spacing-md);
+      gap: var(--spacing-lg);
+    }
+  }
+  /* the client card: surface box, 1px rule, label over value; stays in view while the text scrolls */
+  .cst-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg);
+    border: 1px solid var(--a-rule);
+    background: var(--color-surface);
+  }
+  @media (min-width: 1024px) {
+    .cst-card {
+      position: sticky;
+      top: 104px;
+    }
+  }
+  .cst-client {
+    font-family: var(--font-pixel);
+    font-size: 28px;
+    line-height: 1;
+  }
+  .cst-facts {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  .cst-facts > div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .cst-facts dt {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--color-muted);
+  }
+  .cst-facts dd {
+    font-size: var(--text-body-sm);
+    line-height: 1.45;
+  }
+  .cst-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+    max-width: 68ch;
+  }
+  .cst-block {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  .cst-h {
+    font-size: 22px;
+    line-height: 1.25;
+    font-weight: 400;
+  }
+  .cst-p {
+    font-size: var(--text-body);
+    line-height: 1.6;
+    color: var(--color-ink-2);
+    text-wrap: pretty;
+  }
+</style>
