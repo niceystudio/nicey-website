@@ -25,7 +25,8 @@ const reads = ['input.md', 'tokens.json', 'Input.fig', 'button.md', 'field.md', 
 
 
 const ROWS = 8;
-const B = 36;
+// the block width in characters: fits the longest row ("07  component/input/surface/default ■") with one dot
+const B = 38;
 const glyphs = ['→', '→', '→', '·', '·', '↓', '↑', '·'];
 // deterministic, so the server render and the first frame match
 let seed = 7;
@@ -114,9 +115,9 @@ const data = Array.from({ length: ROWS }, (_, i) => {
     text-align: right;
     padding-right: var(--spacing-sm);
   }
-  /* the middle label sits over the block: same 36ch box as the block, in the band's own mono size */
+  /* the middle label sits over the block: same 38ch box as the block, in the band's own mono size */
   .ab-labels span:nth-child(2) {
-    width: calc(36ch * 15 / 11);
+    width: calc(38ch * 15 / 11);
     padding-left: 0.5ch;
   }
   .ab-labels span:nth-child(3) {
@@ -135,7 +136,7 @@ const data = Array.from({ length: ROWS }, (_, i) => {
   /* the system column is a quiet tint of the accent (25 Nov: the solid block pulled the eye from the hero CTAs);
      the row being read is a step stronger, so the motion still reads */
   .ab-b {
-    width: 36ch;
+    width: 38ch;
     padding: 0 0.5ch;
     background: color-mix(in srgb, var(--ab-accent) 12%, transparent);
     color: var(--color-ink);
@@ -171,7 +172,7 @@ const data = Array.from({ length: ROWS }, (_, i) => {
       font-size: var(--text-caption);
     }
     .ab-labels span:nth-child(2) {
-      width: calc(36ch * 12 / 11);
+      width: calc(38ch * 12 / 11);
     }
   }
 </style>
