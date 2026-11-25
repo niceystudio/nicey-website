@@ -66,7 +66,7 @@ export const components: Component[] = [
   {
     name: 'PixelFieldA',
     file: 'src/directions/a/PixelFieldA.astro',
-    what: 'The brand pattern: soft pastel cells that move slowly (drift, rippling rings, a breathing drop); cells under the cursor light up. Still under reduced motion.',
+    what: 'The brand pattern: soft pastel cells that move slowly (drift, rippling rings, a breathing drop); a click sends a ripple through it. Still, with no ripples, under reduced motion.',
     api: ["mode: 'drift' | 'rings' | 'drop'", "fade: 'left' | 'edges' | 'none'", 'still: one frame, no motion', 'seed, cx, cy, cell'],
   },
   {
