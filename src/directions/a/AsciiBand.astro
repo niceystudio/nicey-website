@@ -5,10 +5,10 @@
  *   system  the token names they collapse into (real QBench V2 tokens), on the accent block
  *   agents  what a coding agent reads from them, and that it reads them fine
  *   scale   the products built on the system: mini screens drawn only from the same tokens
- * "Change one token" (23 Nov): pick an accent and a corner style. The block re-colours, the agents re-read every
- * row and report "synced", and the screens on the right follow in a cascade — when the system is right, a change
- * is one edit, not a hunt. The controls sit under the band (Goran, 23 Nov) and are real buttons; the band itself is
- * decorative (aria-hidden), and a screen-reader-only live region says in words what changed. Reduced motion: no scrolling, the change applies at once.
+ * It follows the site's own tokens (24 Nov): the block and the scale screens read --color-accent and --radius-chip, so
+ * the floating "Change one token" switcher (src/components/ui/TokenSwitcher.astro) re-colours this band with the rest
+ * of the site. On each change the agents re-read every row and report "synced", and the screens follow in a cascade.
+ * The band is decorative (aria-hidden); the switcher says in words what changed. Reduced motion: no scrolling.
  */
 const drift = ['purple-2', 'purpleLight2', 'brand/purple/30', 'col-7', 'violet-final', '#6b5fbe', '#7266c4', '#665ab8'];
 const tokens = [
@@ -23,19 +23,6 @@ const tokens = [
 ];
 const reads = ['input.md', 'tokens.json', 'Input.fig', 'button.md', 'field.md', 'select.md', 'library.json', 'theme.css'];
 
-// the accent choices: each keeps white text readable on the block
-const accents = [
-  { id: 'violet', label: 'Violet', hex: '#6b5fbe' },
-  { id: 'blue', label: 'Blue', hex: '#2f5fd0' },
-  { id: 'green', label: 'Green', hex: '#2c7a57' },
-  { id: 'orange', label: 'Orange', hex: '#b9541f' },
-  { id: 'pink', label: 'Pink', hex: '#b0407a' },
-];
-const styles = [
-  { id: 'sharp', label: 'Sharp', r: '0px' },
-  { id: 'soft', label: 'Soft', r: '4px' },
-  { id: 'round', label: 'Round', r: '999px' },
-];
 const products = ['LIMS', 'Mobile', 'Admin'];
 
 const ROWS = 8;
@@ -67,8 +54,8 @@ const data = Array.from({ length: ROWS }, (_, i) => {
 });
 ---
 
-<section class="ab" aria-label="Change one token" data-ab style={`--ab-accent:${accents[0].hex};--ab-r:${styles[0].r}`}>
-  <div class="ab-stage a-grain" aria-hidden="true">
+<section class="ab" aria-hidden="true" data-ab>
+  <div class="ab-stage a-grain">
     <div class="ab-labels">
       <span>drift</span><span>system</span><span>agents</span><span class="ab-scale-k">scale</span>
     </div>
@@ -111,175 +98,18 @@ const data = Array.from({ length: ROWS }, (_, i) => {
       </div>
     </div>
   </div>
-  <div class="ab-bar">
-    <p class="ab-k ab-k--wide m-0">Change one token</p>
-    <!-- on a phone the controls fold under one button (Goran, 23 Nov) -->
-    <button type="button" class="ab-toggle" aria-expanded="false" aria-controls="ab-ctls" data-ab-toggle>
-      Change one token <span class="ab-toggle-i" aria-hidden="true">+</span>
-    </button>
-    <div class="ab-ctls" id="ab-ctls">
-    <div class="ab-ctl" role="group" aria-label="color.accent">
-      <span class="ab-ctl-k" aria-hidden="true">color.accent</span>
-      {
-        accents.map((a, i) => (
-          <button
-            type="button"
-            class="ab-sw"
-            style={`--sw:${a.hex}`}
-            aria-label={a.label}
-            aria-pressed={i === 0 ? 'true' : 'false'}
-            data-accent={a.hex}
-            data-name={a.label}
-          />
-        ))
-      }
-    </div>
-    <div class="ab-ctl" role="group" aria-label="radius">
-      <span class="ab-ctl-k" aria-hidden="true">radius</span>
-      {
-        styles.map((s, i) => (
-          <button type="button" class="ab-st" aria-pressed={i === 0 ? 'true' : 'false'} data-radius={s.r} data-name={s.label}>
-            {s.label}
-          </button>
-        ))
-      }
-    </div>
-    </div>
-    <p class="sr-only" aria-live="polite" data-live></p>
-  </div>
-
 </section>
 
 <style>
+  /* the band's colour and corners are the site's: change the token and this follows */
   .ab {
-    --ab-on: #fff;
+    --ab-accent: var(--color-accent);
+    --ab-on: var(--color-on-accent);
+    --ab-r: var(--radius-chip);
     position: relative;
     width: 100%;
     border-block: 1px solid var(--a-rule);
   }
-  /* ---------- the control bar ---------- */
-  /* centred under the band and a size up, so it reads as the control it is (feedback 24 Nov) */
-  .ab-bar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: var(--spacing-xs) var(--spacing-lg);
-    padding: var(--spacing-sm) var(--spacing-gutter, var(--spacing-md));
-    border-top: 1px solid var(--a-rule);
-    font-family: var(--font-mono);
-    font-size: var(--text-code);
-  }
-  .ab-k {
-    color: var(--color-ink);
-  }
-  .ab-ctls {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--spacing-xs) var(--spacing-lg);
-  }
-  .ab-toggle {
-    display: none;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    min-height: 40px;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    color: var(--color-ink);
-    font: inherit;
-    cursor: pointer;
-  }
-  .ab-toggle-i {
-    font-size: var(--text-body);
-    line-height: 1;
-    transition: transform 200ms var(--ease-out);
-  }
-  .ab-toggle[aria-expanded='true'] .ab-toggle-i {
-    transform: rotate(45deg);
-  }
-  .ab-toggle:focus-visible {
-    outline: 2px solid var(--color-ink);
-    outline-offset: 2px;
-  }
-  @media (max-width: 767px) {
-    .ab-k--wide {
-      display: none;
-    }
-    .ab-toggle {
-      display: flex;
-    }
-    .ab-ctls {
-      display: none;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: var(--spacing-sm);
-      width: 100%;
-      padding-bottom: 6px;
-    }
-    .ab-bar.is-open .ab-ctls {
-      display: flex;
-    }
-  }
-  .ab-ctl {
-    display: flex;
-    align-items: center;
-    gap: 0;
-  }
-  .ab-ctl-k {
-    margin-right: var(--spacing-3xs);
-    color: var(--color-muted);
-  }
-  /* a 40px button (the hit area) around a 22px swatch (what you see) */
-  .ab-sw {
-    display: grid;
-    place-items: center;
-    width: var(--hit-min);
-    height: var(--hit-min);
-    padding: 0;
-    border: 0;
-    background: transparent;
-    cursor: pointer;
-  }
-  .ab-sw::before {
-    content: '';
-    width: 28px;
-    height: 28px;
-    border: 1px solid transparent;
-    background: var(--sw);
-    background-clip: content-box;
-  }
-  .ab-sw[aria-pressed='true']::before {
-    border-color: var(--color-ink);
-    padding: 3px;
-  }
-  .ab-st {
-    min-height: var(--hit-min);
-    padding: 0 var(--spacing-xs);
-    border: 1px solid var(--a-rule);
-    background: transparent;
-    color: var(--color-ink-2);
-    font: inherit;
-    cursor: pointer;
-  }
-  .ab-st[aria-pressed='true'] {
-    border-color: var(--color-ink);
-    background: var(--color-ink);
-    color: var(--color-page);
-  }
-  .ab-sw:focus-visible,
-  .ab-st:focus-visible {
-    outline: 2px solid var(--color-ink);
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .ab-st:not([aria-pressed='true']):hover {
-      border-color: var(--color-ink-2);
-      color: var(--color-ink);
-    }
-  }
-
   /* ---------- the band ---------- */
   .ab-stage {
     overflow: hidden;
@@ -471,6 +301,7 @@ const data = Array.from({ length: ROWS }, (_, i) => {
 </style>
 
 <script>
+  import { CHANGE_EVENT } from '../../data/token-presets';
   document.querySelectorAll<HTMLElement>('[data-ab]').forEach((band) => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const rows = Array.from(band.querySelectorAll<HTMLElement>('.ab-row')).map((row) => ({
@@ -480,16 +311,6 @@ const data = Array.from({ length: ROWS }, (_, i) => {
       ok: row.querySelector<HTMLElement>('[data-ok]')!,
       speed: Number(row.dataset.speed) || 1,
     }));
-    const live = band.querySelector<HTMLElement>('[data-live]')!;
-    const toggle = band.querySelector<HTMLButtonElement>('[data-ab-toggle]');
-    toggle?.addEventListener('click', () => {
-      const open = toggle.getAttribute('aria-expanded') !== 'true';
-      toggle.setAttribute('aria-expanded', String(open));
-      toggle.closest('.ab-bar')!.classList.toggle('is-open', open);
-    });
-    let accentName = 'Violet';
-    let radiusName = 'Sharp';
-
     let tick = 0;
     let reading = 0;
     let sweep = -1; // row the post-change sweep is on; -1 when idle
@@ -526,39 +347,15 @@ const data = Array.from({ length: ROWS }, (_, i) => {
       } else if (tick % 14 === 0) setReading((reading + 1) % rows.length);
     };
 
-    const announce = () => {
-      live.textContent = `${accentName}, ${radiusName.toLowerCase()} — 1 token changed, ${rows.length} rows re-read, 3 products updated`;
-    };
-    const changed = () => {
-      announce();
+    // a token changed anywhere on the site: the agents re-read every row
+    window.addEventListener(CHANGE_EVENT, () => {
       if (reduced) {
         rows.forEach((x) => ((x.ok.textContent = 'synced'), x.ok.classList.add('is-synced')));
+        window.setTimeout(() => rows.forEach((x) => ((x.ok.textContent = 'ok'), x.ok.classList.remove('is-synced'))), 2200);
         return;
       }
       sweep = 0;
-    };
-
-    const press = (group: string, btn: HTMLButtonElement) => {
-      band.querySelectorAll<HTMLButtonElement>(group).forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
-    };
-    band.querySelectorAll<HTMLButtonElement>('[data-accent]').forEach((btn) =>
-      btn.addEventListener('click', () => {
-        if (btn.getAttribute('aria-pressed') === 'true') return;
-        press('[data-accent]', btn);
-        band.style.setProperty('--ab-accent', btn.dataset.accent!);
-        accentName = btn.dataset.name!;
-        changed();
-      }),
-    );
-    band.querySelectorAll<HTMLButtonElement>('[data-radius]').forEach((btn) =>
-      btn.addEventListener('click', () => {
-        if (btn.getAttribute('aria-pressed') === 'true') return;
-        press('[data-radius]', btn);
-        band.style.setProperty('--ab-r', btn.dataset.radius!);
-        radiusName = btn.dataset.name!;
-        changed();
-      }),
-    );
+    });
 
     if (reduced) return;
     new IntersectionObserver((es) => {
