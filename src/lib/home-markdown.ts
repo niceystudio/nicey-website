@@ -12,6 +12,8 @@ import HowA from '../directions/a/HowA.astro';
 import ProcessA from '../directions/a/ProcessA.astro';
 import Faq from '../components/Faq.astro';
 import BookCallA from '../directions/a/BookCallA.astro';
+import ArticleA from '../directions/a/ArticleA.astro';
+import { homeArticle } from '../data/articles/home';
 import { htmlToMarkdown } from './html-markdown';
 
 const sections = [HeroA, SelectedA, ServicesA, WorkA, HowA, ProcessA, Faq, BookCallA];
@@ -20,6 +22,7 @@ export async function homeMarkdown(base: URL): Promise<string> {
   const container = await AstroContainer.create();
   const parts: string[] = [];
   for (const s of sections) parts.push(htmlToMarkdown(await container.renderToString(s), base));
+  parts.push(htmlToMarkdown(await container.renderToString(ArticleA, { props: { article: homeArticle } }), base));
   return [
     '---',
     'title: Nicey Studio',

@@ -1,0 +1,607 @@
+---
+/**
+ * Direction A: a service page's content (/design-systems, /product-design; Goran 26 Nov). Data: src/data/service-pages.ts.
+ *   hero → included/ index (the homepage card's tree, each line a link) → one section per included line
+ *   → numbers (design systems) → work → steps → FAQ → call band → article (ArticleA)
+ * The page shell (Base, header, footer) is ServicePageA; the Markdown twin renders this component alone.
+ * Media are MediaSlot placeholders with the suggested asset until the real files exist.
+ */
+import type { ServicePage } from '../../data/service-pages';
+import { publishedCaseStudies, caseHref } from '../../data/case-studies';
+import { links } from '../../data/links';
+import Button from '../../components/ui/Button.astro';
+import Label from '../../components/ui/Label.astro';
+import SectionHead from '../../components/SectionHead.astro';
+import MediaSlot from '../../components/MediaSlot.astro';
+import Faq from '../../components/Faq.astro';
+import PixelFieldA from './PixelFieldA.astro';
+import BookCallA from './BookCallA.astro';
+import ArticleA from './ArticleA.astro';
+
+interface Props {
+  page: ServicePage;
+}
+const { page: p } = Astro.props;
+const branch = (i: number, n: number) => (i === n - 1 ? '└──' : '├──');
+const covers: Record<string, string> = {
+  'qbench-design-system': '/work/qbench/doc-cover.webp',
+  'qbench-status-workflows': '/work/qbench/status/01-draw.webp',
+  everbreed: '/work/everbreed/doc-cover.webp',
+};
+const work = p.work.slugs
+  .map((slug) => publishedCaseStudies.find((c) => c.slug === slug))
+  .filter((c): c is NonNullable<typeof c> => !!c);
+const other = p.slug === 'design-systems'
+  ? { href: '/product-design', label: 'Product design', line: 'Complex workflows designed on the system, with AI in the loop.' }
+  : { href: '/design-systems', label: 'Design systems', line: 'Audit, tokens, components and AI-ready documentation.' };
+---
+
+<section class="sv-hero" aria-labelledby="sv-h1">
+  {/* drift, as on the homepage hero: rings and drop are panel modes (with fade="left" they threw in colorAt) */}
+  <PixelFieldA mode="drift" fade="left" seed={p.slug === 'design-systems' ? 5 : 9} class="sv-field" />
+  <div class="container-page sv-hero-in">
+    <Label variant="section">{p.caption}</Label>
+    <h1 id="sv-h1" class="sv-h1 m-0">
+      {p.h1.map((line, i) => <span class:list={['sv-line', i === p.h1.length - 1 && 'sv-line--accent']}>{line}</span>)}
+    </h1>
+    <p class="sv-lede m-0">{p.lede}</p>
+    <div class="sv-ctas">
+      <Button href="/#audit">Get a free audit</Button>
+      <Button href={links.bookCall} variant="secondary" target="_blank" rel="noopener">
+        Book a call<span class="sr-only"> (opens in a new tab)</span>
+      </Button>
+    </div>
+  </div>
+</section>
+
+<div class="container-page sv-hero-media">
+  <MediaSlot {...p.heroMedia} />
+</div>
+
+<section id="included" aria-labelledby="sv-index-head" class="container-page sv-sec">
+  <div class="sv-index">
+    <div class="sv-index-head">
+      <SectionHead id="sv-index-head" caption={p.index.caption} headingClass="max-w-[16ch]">{p.index.heading}</SectionHead>
+      <p class="sv-intro m-0">{p.index.intro}</p>
+    </div>
+    <nav class="sv-tree" aria-label={`${p.caption}: what's included`}>
+      <span class="sv-tree-root" aria-hidden="true">included/</span>
+      <ul>
+        {
+          p.offers.map((o, i) => (
+            <li>
+              <span class="sv-branch" aria-hidden="true">{branch(i, p.offers.length)}</span>
+              <a href={`#${o.id}`} class="sv-tree-link">
+                <span>{o.name}</span>
+                <span class="sv-tree-arrow" aria-hidden="true">↓</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</section>
+
+<div class="container-page sv-offers">
+  {
+    p.offers.map((o, i) => (
+      <section id={o.id} aria-labelledby={`${o.id}-h`} class:list={['sv-offer', o.media.some((m) => m.ratio === '9 / 16') && o.media.length > 1 && 'sv-offer--tall']}>
+        <div class="sv-offer-text">
+          <p class="sv-offer-path m-0" aria-hidden="true">
+            <span class="sv-offer-n">{String(i + 1).padStart(2, '0')}</span> included/{o.id}
+          </p>
+          <Label variant="caption" as="p">{o.name}</Label>
+          <h2 id={`${o.id}-h`} class="sv-offer-h m-0">{o.headline}</h2>
+          <p class="sv-offer-lede m-0">{o.lede}</p>
+          {o.body.map((t) => <p class="sv-offer-p m-0">{t}</p>)}
+          <div class="sv-get">
+            <Label variant="mono" as="p">You get</Label>
+            <ul>
+              {o.youGet.map((g) => (
+                <li>
+                  <span class="sv-get-mark" aria-hidden="true">→</span>
+                  {g}
+                </li>
+              ))}
+            </ul>
+          </div>
+          {o.proof && (
+            <p class="sv-proof m-0">
+              <span class="sv-proof-v">{o.proof.value}</span>
+              <span class="sv-proof-c">
+                {o.proof.caption}{' '}
+                {o.proof.href && (
+                  <a href={o.proof.href} class="sv-proof-l">Seen at {o.proof.source}</a>
+                )}
+              </span>
+            </p>
+          )}
+          {o.cta && <Button href={o.cta.href} class="sv-offer-cta">{o.cta.label}</Button>}
+        </div>
+        <div class="sv-offer-media">
+          {o.media.map((m) => <MediaSlot {...m} />)}
+        </div>
+      </section>
+    ))
+  }
+</div>
+
+{
+  p.numbers && (
+    <section aria-labelledby="sv-num-head" class="container-page sv-sec">
+      <SectionHead id="sv-num-head" caption={p.numbers.caption} headingClass="max-w-[18ch]">{p.numbers.heading}</SectionHead>
+      <dl class="panel sv-nums">
+        {p.numbers.items.map((n) => (
+          <div class="sv-num">
+            <dt class="sv-num-v">{n.value}</dt>
+            <dd class="sv-num-l m-0">{n.label}</dd>
+          </div>
+        ))}
+      </dl>
+      <a href={p.numbers.link.href} class="sv-more">{p.numbers.link.label} →</a>
+    </section>
+  )
+}
+
+<section aria-labelledby="sv-steps-head" class="container-page sv-sec">
+  <SectionHead id="sv-steps-head" caption={p.steps.caption} headingClass="max-w-[20ch]">{p.steps.heading}</SectionHead>
+  <ol class="panel sv-steps">
+    {
+      p.steps.items.map((s) => (
+        <li class="sv-step">
+          <span class="sv-step-n">{s.num}</span>
+          <span class="sv-step-name">{s.name}</span>
+          <span class="sv-step-t">{s.text}</span>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<section aria-labelledby="sv-work-head" class="container-page sv-sec">
+  <SectionHead id="sv-work-head" caption={p.work.caption} headingClass="max-w-[18ch]">{p.work.heading}</SectionHead>
+  <ul class="sv-work">
+    {
+      work.map((c) => (
+        <li>
+          <a href={caseHref(c.slug)} class="sv-card">
+            <img src={covers[c.slug]} alt="" class="sv-card-img" width="1600" height="1000" loading="lazy" decoding="async" />
+            <span class="sv-card-text">
+              <span class="caption-sm text-ink-2">{c.kicker}</span>
+              <span class="sv-card-name">{c.linkName}</span>
+              <span class="sv-card-st">{c.statement}</span>
+              <span class="sv-card-go" aria-hidden="true">Read the case study →</span>
+            </span>
+          </a>
+        </li>
+      ))
+    }
+    <li>
+      <a href={other.href} class="sv-card sv-card--other">
+        <span class="sv-card-text">
+          <span class="caption-sm text-ink-2">Also from Nicey</span>
+          <span class="sv-card-name">{other.label}</span>
+          <span class="sv-card-st">{other.line}</span>
+          <span class="sv-card-go" aria-hidden="true">See the service →</span>
+        </span>
+      </a>
+    </li>
+  </ul>
+</section>
+
+<Faq items={p.faq.items} heading={p.faq.heading} />
+<BookCallA />
+<ArticleA article={p.article} />
+
+<style>
+  /* ---------- hero ---------- */
+  .sv-hero {
+    position: relative;
+    overflow: hidden;
+    padding-top: var(--spacing-3xl);
+    padding-bottom: var(--spacing-2xl);
+  }
+  .sv-hero :global(.sv-field) {
+    left: 42%;
+  }
+  @media (max-width: 767px) {
+    .sv-hero :global(.sv-field) {
+      left: 0;
+      opacity: 0.5;
+    }
+  }
+  .sv-hero-in {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+  }
+  .sv-h1 {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(28px, 6.2vw, 92px);
+    line-height: 1;
+    text-transform: uppercase;
+  }
+  .sv-line {
+    padding: 0.06em 0.14em 0.02em;
+    margin-left: -0.14em;
+  }
+  .sv-line--accent {
+    color: var(--color-accent);
+  }
+  .sv-lede {
+    max-width: 56ch;
+    font-size: var(--text-body-lg);
+    line-height: 1.5;
+    color: var(--color-ink-2);
+  }
+  .sv-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-2xs);
+  }
+  .sv-hero-media {
+    padding-bottom: var(--spacing-section);
+  }
+
+  /* ---------- sections ---------- */
+  .sv-sec {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+    padding-bottom: var(--spacing-section);
+  }
+  .sv-index {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--spacing-xl);
+  }
+  @media (min-width: 1024px) {
+    .sv-index {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      align-items: end;
+    }
+  }
+  .sv-index-head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+  .sv-intro {
+    max-width: 44ch;
+    font-size: var(--text-cta);
+    line-height: 1.5;
+    color: var(--color-ink-2);
+  }
+  .sv-tree {
+    padding: var(--spacing-lg);
+    border: 1px solid var(--color-rule);
+    background: var(--color-surface);
+    font-family: var(--font-mono);
+    font-size: var(--text-cta);
+    line-height: 1.5;
+  }
+  .sv-tree-root {
+    color: var(--color-accent);
+  }
+  .sv-tree ul {
+    margin: var(--spacing-2xs) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .sv-tree li {
+    display: flex;
+    gap: var(--spacing-xs);
+  }
+  .sv-branch {
+    color: var(--color-dim);
+    line-height: var(--hit-min);
+  }
+  .sv-tree-link {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    min-height: var(--hit-min);
+    color: var(--color-ink);
+    text-decoration: none;
+    border-bottom: 1px dashed transparent;
+  }
+  .sv-tree-arrow {
+    color: var(--color-muted);
+    transition: transform 160ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .sv-tree-link:hover {
+      border-bottom-color: var(--color-dashed);
+    }
+    .sv-tree-link:hover .sv-tree-arrow {
+      color: var(--color-accent);
+      transform: translateY(2px);
+    }
+  }
+
+  /* ---------- one section per included line ---------- */
+  .sv-offers {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: var(--spacing-section);
+  }
+  .sv-offer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--spacing-xl);
+    padding-block: var(--spacing-2xl);
+    border-top: 1px solid var(--color-rule);
+  }
+  .sv-offer:last-child {
+    border-bottom: 1px solid var(--color-rule);
+  }
+  @media (min-width: 1024px) {
+    .sv-offer {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: var(--spacing-2xl);
+      align-items: start;
+    }
+    .sv-offer-media {
+      position: sticky;
+      top: 104px;
+    }
+  }
+  .sv-offer-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+  .sv-offer-path {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--color-muted);
+  }
+  .sv-offer-n {
+    color: var(--color-accent);
+  }
+  .sv-offer-h {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--text-case-h2);
+    line-height: 1.08;
+  }
+  .sv-offer-lede {
+    font-size: var(--text-cta);
+    line-height: 1.55;
+    color: var(--color-ink);
+  }
+  .sv-offer-p {
+    font-size: var(--text-body);
+    line-height: 1.65;
+    color: var(--color-ink-2);
+  }
+  .sv-get {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2xs);
+    width: 100%;
+    margin-top: var(--spacing-2xs);
+    padding-top: var(--spacing-sm);
+    border-top: 1px dashed var(--color-dashed);
+  }
+  .sv-get ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .sv-get li {
+    display: flex;
+    gap: var(--spacing-xs);
+    font-size: var(--text-body-sm);
+    line-height: 1.5;
+  }
+  .sv-get-mark {
+    flex: none;
+    font-family: var(--font-mono);
+    color: var(--color-accent);
+  }
+  .sv-proof {
+    display: flex;
+    align-items: baseline;
+    gap: var(--spacing-sm);
+    width: 100%;
+    margin-top: var(--spacing-2xs);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-surface);
+    border: 1px solid var(--color-rule);
+  }
+  .sv-proof-v {
+    flex: none;
+    font-family: var(--font-display);
+    font-size: 32px;
+    line-height: 1;
+  }
+  .sv-proof-c {
+    font-size: var(--text-label);
+    line-height: 1.45;
+    color: var(--color-ink-2);
+  }
+  .sv-proof-l {
+    color: var(--color-ink);
+    text-decoration-color: var(--color-accent);
+    text-underline-offset: 3px;
+  }
+  .sv-offer-cta {
+    margin-top: var(--spacing-2xs);
+  }
+  .sv-offer-media {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+  /* a tall clip and a wide photo sit side by side */
+  @media (min-width: 640px) {
+    .sv-offer--tall .sv-offer-media {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+      align-items: start;
+    }
+  }
+
+  /* ---------- numbers ---------- */
+  .sv-nums {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    margin: 0;
+  }
+  @media (min-width: 640px) {
+    .sv-nums {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 1024px) {
+    .sv-nums {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  .sv-num {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-lg);
+  }
+  .sv-num-v {
+    font-family: var(--font-display);
+    font-size: var(--text-case-figure);
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .sv-num-l {
+    font-size: var(--text-label);
+    line-height: 1.45;
+    color: var(--color-ink-2);
+  }
+  .sv-more {
+    align-self: flex-start;
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+    color: var(--color-ink);
+    text-decoration-color: var(--color-accent);
+    text-underline-offset: 4px;
+  }
+
+  /* ---------- steps ---------- */
+  .sv-steps {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  @media (min-width: 768px) {
+    .sv-steps {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
+  .sv-step {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2xs);
+    padding: var(--spacing-md);
+  }
+  .sv-step-n {
+    font-family: var(--font-display);
+    font-size: 40px;
+    line-height: 1;
+    color: var(--color-accent);
+  }
+  .sv-step-name {
+    margin-top: var(--spacing-xs);
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .sv-step-t {
+    font-size: var(--text-body-sm);
+    line-height: 1.5;
+    color: var(--color-ink-2);
+  }
+
+  /* ---------- work ---------- */
+  .sv-work {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--spacing-md);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 768px) {
+    .sv-work {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .sv-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border: 1px solid var(--color-rule);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    text-decoration: none;
+    transition: background-color 120ms var(--ease-out);
+  }
+  .sv-card-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    object-position: top left;
+    border-bottom: 1px solid var(--color-rule);
+  }
+  .sv-card-text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--spacing-2xs);
+    padding: var(--spacing-md);
+  }
+  .sv-card-name {
+    font-family: var(--font-display);
+    font-size: var(--text-h3-card);
+    line-height: 1.2;
+  }
+  .sv-card-st {
+    flex: 1;
+    font-size: var(--text-body-sm);
+    line-height: 1.5;
+    color: var(--color-ink-2);
+  }
+  .sv-card-go {
+    margin-top: var(--spacing-xs);
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+    color: var(--color-accent);
+  }
+  .sv-card--other {
+    justify-content: flex-end;
+    background: transparent;
+    border-style: dashed;
+    border-color: var(--color-dashed);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .sv-card:hover {
+      background: var(--color-surface-hover);
+    }
+  }
+</style>

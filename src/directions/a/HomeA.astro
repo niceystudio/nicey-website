@@ -22,14 +22,20 @@ import AsciiBand from './AsciiBand.astro';
 import HowA from './HowA.astro';
 import SelectedA from './SelectedA.astro';
 import BookCallA from './BookCallA.astro';
+// 26 Nov (Goran): a long-form article after the call band, for AI search and for readers who want depth
+import ArticleA from './ArticleA.astro';
+import { homeArticle } from '../../data/articles/home';
+import { articleLd } from '../../data/article-types';
 
-
+const pageUrl = new URL('/', Astro.site ?? 'https://nicey-website.vercel.app').href;
+const jsonLd = { '@context': 'https://schema.org', '@graph': [articleLd(homeArticle, pageUrl)] };
 ---
 
 <Base
   title="Nicey · Design systems people and agents read the same way"
   description="We turn years of drifted UI into one system: tokens, components and documentation that a designer, an engineer and a coding agent understand the same way. Product design when you need the screens too."
   markdownHref="/index.md"
+  jsonLd={jsonLd}
 >
   <div class="dir-a">
     <Header />
@@ -43,6 +49,7 @@ import BookCallA from './BookCallA.astro';
       <ProcessA />
       <Faq />
       <BookCallA />
+      <ArticleA article={homeArticle} />
     </main>
     <SiteFooter mdHref="/index.md" directionA />
   </div>
