@@ -38,7 +38,8 @@ import Base from '../../layouts/Base.astro';
           <label>Preset
             <select name="preset">
               <option value="">—</option>
-              <optgroup label="Brand" id="preset-builtins"></optgroup>
+              <optgroup label="Nicey site" id="preset-site"></optgroup>
+              <optgroup label="Cover set" id="preset-builtins"></optgroup>
               <optgroup label="Saved" id="preset-saved"></optgroup>
             </select>
           </label>
@@ -54,11 +55,17 @@ import Base from '../../layouts/Base.astro';
 
         <fieldset>
           <legend class="mono">PATTERN</legend>
+          <label>Style
+            <select name="style">
+              <option value="cover" selected>Cover (babarogic set)</option>
+              <option value="site">Nicey site (PixelFieldA)</option>
+            </select>
+          </label>
           <label>Mode
             <select name="mode">
               <option value="drift" selected>Drift field</option>
               <option value="rings">Ripple rings</option>
-              <option value="drops">Filled drops</option>
+              <option value="drops">Filled drops (site: one drop)</option>
             </select>
           </label>
           <label>Theme
@@ -90,19 +97,40 @@ import Base from '../../layouts/Base.astro';
             </span>
           </label>
           <label>Cell size <output>32</output>
-            <input type="range" name="cell" min="14" max="56" value="32" />
+            <input type="range" name="cell" min="8" max="56" value="32" />
           </label>
           <label>Cell gap <output>1</output>
             <input type="range" name="gap" min="0" max="10" value="1" />
           </label>
-          <label>Wash <output>0.18</output>
+          <label data-style="cover">Wash <output>0.18</output>
             <input type="range" name="shift" min="0.02" max="0.40" step="0.01" value="0.18" />
           </label>
-          <label class="check"><input type="checkbox" name="featherOn" checked /> Fade edges</label>
-          <label class="check" data-only="drift"><input type="checkbox" name="animate" checked /> Animate (drift + waves)</label>
+          <label class="check" data-style="cover"><input type="checkbox" name="featherOn" checked /> Fade edges</label>
+          <label class="check" id="anim-row"><input type="checkbox" name="animate" checked /> Animate</label>
         </fieldset>
 
-        <fieldset data-only="rings">
+        <fieldset data-style="site">
+          <legend class="mono">NICEY SITE</legend>
+          <label>Fade
+            <select name="fade">
+              <option value="left">Left (hero, fades towards the copy)</option>
+              <option value="edges" selected>All edges</option>
+              <option value="none">None</option>
+            </select>
+          </label>
+          <label>Fill
+            <select name="fill">
+              <option value="hero" selected>Hero (more cream between islands)</option>
+              <option value="panel">Panel (fuller, thin rim)</option>
+            </select>
+          </label>
+          <p class="hint">
+            Same math as PixelFieldA on the site. Cells above the island level fuse; the gap is the seam
+            between the rest. Click sets the centre in rings and drop, sends a wave in drift.
+          </p>
+        </fieldset>
+
+        <fieldset data-only="rings" data-style="cover">
           <legend class="mono">RINGS</legend>
           <label>Ring spacing <output>95</output>
             <input type="range" name="wavelength" min="50" max="220" value="95" />
@@ -112,7 +140,7 @@ import Base from '../../layouts/Base.astro';
           </label>
         </fieldset>
 
-        <fieldset data-only="drops">
+        <fieldset data-only="drops" data-style="cover">
           <legend class="mono">DROPS</legend>
           <label>Circles <output>6</output>
             <input type="range" name="dropCount" min="1" max="12" value="6" />
@@ -214,6 +242,7 @@ import Base from '../../layouts/Base.astro';
   .hint { font-size: 12px; color: var(--color-muted); margin: 0; line-height: 1.4; }
   .row > * { flex: 1; }
   .row > #dice { flex: 0 0 auto; }
+  [hidden] { display: none !important; }
   [data-only] { display: none; }
   [data-only].on { display: grid; }
   label[data-only].on { display: grid; }
@@ -241,6 +270,12 @@ import Base from '../../layouts/Base.astro';
     mulberry32,
     COVER_FEATHER,
     HERO_RIPPLE,
+    SITE_ISLAND,
+    SITE_RIPPLE_GAIN,
+    siteEdge,
+    siteValue,
+    type SiteFade,
+    type SiteFrame,
     LIGHT_PALETTE,
     DARK_PALETTE,
     GLOW_DARK_PALETTE,
@@ -269,7 +304,13 @@ import Base from '../../layouts/Base.astro';
   };
 
   type Params = {
+    /** 'cover': the babarogic cover set. 'site': the Nicey site field (PixelFieldA), via siteValue/siteEdge. */
+    style: 'cover' | 'site';
     mode: 'drift' | 'rings' | 'drops';
+    /** site style: which edges dissolve */
+    fade: SiteFade;
+    /** site style: fuller panel field instead of the hero's */
+    panel: boolean;
     theme: 'light' | 'dark' | 'glow';
     /** Frame background — defaults to the theme's ground, freely overridable. */
     bg: string;
@@ -304,7 +345,10 @@ import Base from '../../layouts/Base.astro';
     const note = document.getElementById('stage-note')!;
 
     const p: Params = {
+      style: 'cover',
       mode: 'drift',
+      fade: 'edges',
+      panel: false,
       theme: 'light',
       bg: LIGHT_PALETTE.bg,
       w: 1600,
@@ -344,21 +388,33 @@ import Base from '../../layouts/Base.astro';
     // Validated brand recipes from the cover set. Applied over current state,
     // so text and anything a patch doesn't mention carries through.
     const BUILTINS: { id: string; name: string; patch: Partial<Params> }[] = [
-      { id: 'cover-drift-light', name: 'Cover · drift light', patch: { mode: 'drift', theme: 'light', bg: '#f3f0e9', w: 1600, h: 1200, seed: 101, cell: 36, gap: 1, shift: 0.18, featherOn: true } },
-      { id: 'cover-drift-dark', name: 'Cover · drift dark', patch: { mode: 'drift', theme: 'glow', bg: '#1e1d18', w: 1600, h: 1200, seed: 467, cell: 36, gap: 1, shift: 0.18, featherOn: true } },
-      { id: 'cover-rings-light', name: 'Cover · rings light', patch: { mode: 'rings', theme: 'light', bg: '#f3f0e9', w: 1600, h: 1200, seed: 701, cell: 36, gap: 1, shift: 0.18, epicenter: { x: 0.62, y: 0.42 }, wavelength: 95, decay: 950 } },
-      { id: 'cover-rings-dark', name: 'Cover · rings dark', patch: { mode: 'rings', theme: 'glow', bg: '#1e1d18', w: 1600, h: 1200, seed: 733, cell: 36, gap: 1, shift: 0.18, epicenter: { x: 0.4, y: 0.55 }, wavelength: 95, decay: 780 } },
-      { id: 'cover-drops-light', name: 'Cover · drops light', patch: { mode: 'drops', theme: 'light', bg: '#f3f0e9', w: 1600, h: 1200, seed: 811, cell: 36, gap: 1, shift: 0.18, dropCount: 6, dropMax: 0.27, extraDrops: [] } },
-      { id: 'cover-drops-dark', name: 'Cover · drops dark', patch: { mode: 'drops', theme: 'glow', bg: '#1e1d18', w: 1600, h: 1200, seed: 853, cell: 36, gap: 1, shift: 0.18, dropCount: 6, dropMax: 0.27, extraDrops: [] } },
-      { id: 'linkedin-cover', name: 'LinkedIn cover', patch: { mode: 'drift', theme: 'light', bg: '#f3f0e9', w: 1584, h: 396, seed: 211, cell: 22, gap: 1, shift: 0.18 } },
-      { id: 'linkedin-post', name: 'LinkedIn post', patch: { mode: 'drift', theme: 'light', bg: '#f3f0e9', w: 1200, h: 1200, seed: 229, cell: 28, gap: 1, shift: 0.18 } },
-      { id: 'site-dark', name: 'Site dark drift', patch: { mode: 'drift', theme: 'dark', bg: '#141410', w: 1600, h: 1200, seed: 101, cell: 36, gap: 1, shift: 0.18 } },
+      { id: 'cover-drift-light', name: 'Cover · drift light', patch: { style: 'cover', mode: 'drift', theme: 'light', bg: '#f3f0e9', w: 1600, h: 1200, seed: 101, cell: 36, gap: 1, shift: 0.18, featherOn: true } },
+      { id: 'cover-drift-dark', name: 'Cover · drift dark', patch: { style: 'cover', mode: 'drift', theme: 'glow', bg: '#1e1d18', w: 1600, h: 1200, seed: 467, cell: 36, gap: 1, shift: 0.18, featherOn: true } },
+      { id: 'cover-rings-light', name: 'Cover · rings light', patch: { style: 'cover', mode: 'rings', theme: 'light', bg: '#f3f0e9', w: 1600, h: 1200, seed: 701, cell: 36, gap: 1, shift: 0.18, epicenter: { x: 0.62, y: 0.42 }, wavelength: 95, decay: 950 } },
+      { id: 'cover-rings-dark', name: 'Cover · rings dark', patch: { style: 'cover', mode: 'rings', theme: 'glow', bg: '#1e1d18', w: 1600, h: 1200, seed: 733, cell: 36, gap: 1, shift: 0.18, epicenter: { x: 0.4, y: 0.55 }, wavelength: 95, decay: 780 } },
+      { id: 'cover-drops-light', name: 'Cover · drops light', patch: { style: 'cover', mode: 'drops', theme: 'light', bg: '#f3f0e9', w: 1600, h: 1200, seed: 811, cell: 36, gap: 1, shift: 0.18, dropCount: 6, dropMax: 0.27, extraDrops: [] } },
+      { id: 'cover-drops-dark', name: 'Cover · drops dark', patch: { style: 'cover', mode: 'drops', theme: 'glow', bg: '#1e1d18', w: 1600, h: 1200, seed: 853, cell: 36, gap: 1, shift: 0.18, dropCount: 6, dropMax: 0.27, extraDrops: [] } },
+      { id: 'linkedin-cover', name: 'LinkedIn cover', patch: { style: 'cover', mode: 'drift', theme: 'light', bg: '#f3f0e9', w: 1584, h: 396, seed: 211, cell: 22, gap: 1, shift: 0.18 } },
+      { id: 'linkedin-post', name: 'LinkedIn post', patch: { style: 'cover', mode: 'drift', theme: 'light', bg: '#f3f0e9', w: 1200, h: 1200, seed: 229, cell: 28, gap: 1, shift: 0.18 } },
+      { id: 'site-dark', name: 'Cover · drift, site dark palette', patch: { style: 'cover', mode: 'drift', theme: 'dark', bg: '#141410', w: 1600, h: 1200, seed: 101, cell: 36, gap: 1, shift: 0.18 } },
+    ];
+
+    // The fields as the Nicey site draws them (props from HeroA, ReportA, ServicesA, brand.astro).
+    // No size in the patch: pick the format, the look carries.
+    const SITE_BUILTINS: { id: string; name: string; patch: Partial<Params> }[] = [
+      { id: 'site-hero', name: 'Site · hero', patch: { style: 'site', mode: 'drift', fade: 'left', panel: false, theme: 'light', bg: '#f3f0e9', seed: 7, cell: 14, gap: 1 } },
+      { id: 'site-hero-dark', name: 'Site · hero dark', patch: { style: 'site', mode: 'drift', fade: 'left', panel: false, theme: 'dark', bg: '#141410', seed: 7, cell: 14, gap: 1 } },
+      { id: 'site-panel', name: 'Site · panel drift', patch: { style: 'site', mode: 'drift', fade: 'edges', panel: true, theme: 'light', bg: '#f3f0e9', seed: 11, cell: 14, gap: 1 } },
+      { id: 'site-services-rings', name: 'Site · services rings', patch: { style: 'site', mode: 'rings', fade: 'edges', panel: true, theme: 'light', bg: '#f3f0e9', seed: 5, cell: 14, gap: 1, epicenter: { x: 0.72, y: 0.5 } } },
+      { id: 'site-services-drop', name: 'Site · services drop', patch: { style: 'site', mode: 'drops', fade: 'edges', panel: true, theme: 'light', bg: '#f3f0e9', seed: 9, cell: 14, gap: 1, epicenter: { x: 0.72, y: 0.5 } } },
+      { id: 'site-brand-rings', name: 'Site · brand rings', patch: { style: 'site', mode: 'rings', fade: 'edges', panel: false, theme: 'light', bg: '#f3f0e9', seed: 3, cell: 14, gap: 1, epicenter: { x: 0.8, y: 0.4 } } },
     ];
 
     let field: DriftField;
     const ripples: Ripple[] = [];
     const rebuildField = () => {
-      const rows = Math.min(14, Math.max(4, Math.round(10 * (p.h / p.w))));
+      // the site always uses a 10×5 lattice, whatever the box's shape
+      const rows = p.style === 'site' ? 5 : Math.min(14, Math.max(4, Math.round(10 * (p.h / p.w))));
       field = createDrift({ cols: 10, rows, seed: p.seed });
     };
     rebuildField();
@@ -393,6 +449,34 @@ import Base from '../../layouts/Base.astro';
       const CELL = p.cell;
       const cols = Math.ceil(W / CELL);
       const rows = Math.ceil(H / CELL);
+
+      if (p.style === 'site') {
+        // PixelFieldA's loop, cell for cell (t = 0 is the site's still frame)
+        const f: SiteFrame = {
+          W,
+          H,
+          mode: p.mode === 'drops' ? 'drop' : p.mode,
+          fade: p.fade,
+          cx: p.epicenter.x,
+          cy: p.epicenter.y,
+          panel: p.panel,
+        };
+        const half = CELL / 2;
+        for (let y = 0; y < rows; y++)
+          for (let x = 0; x < cols; x++) {
+            const px = x * CELL + half, py = y * CELL + half;
+            const edge = siteEdge(f, px, py);
+            if (edge <= 0.01) continue;
+            let v = siteValue(f, field, px, py, t);
+            if (ripples.length) v += waveAt(ripples, px, py, t) * SITE_RIPPLE_GAIN;
+            const c = colorAt(pal.stops, v);
+            const a = c[3] * edge;
+            if (a < 0.005) continue;
+            emit(x * CELL, y * CELL, v > SITE_ISLAND ? CELL : Math.max(2, CELL - p.gap), c, a);
+          }
+        return;
+      }
+
       const drops = p.mode === 'drops' ? seededDrops() : [];
       const live = p.mode === 'drift' && p.animate && ripples.length > 0;
       const size = Math.max(2, CELL - p.gap);
@@ -516,7 +600,7 @@ import Base from '../../layouts/Base.astro';
     const applySize = () => {
       canvas.width = p.w;
       canvas.height = p.h;
-      note.textContent = `${p.w}×${p.h} · seed ${p.seed} · ${p.mode} / ${p.theme}`;
+      note.textContent = `${p.w}×${p.h} · seed ${p.seed} · ${p.style} · ${p.mode} / ${p.theme}`;
     };
 
     // ---- animation (drift mode) ----
@@ -537,8 +621,12 @@ import Base from '../../layouts/Base.astro';
       if (on === running) return;
       running = on;
       if (on) {
-        emitWave(0.62, 0.42); // something moves the moment animation starts
-        autoWave = window.setInterval(emitWave, 7000);
+        // cover drift: something moves the moment animation starts, then a wave every 7s.
+        // The site field has no automatic waves (only clicks), so neither does its style here.
+        if (p.style === 'cover') emitWave(0.62, 0.42);
+        autoWave = window.setInterval(() => {
+          if (p.style === 'cover' && p.mode === 'drift') emitWave();
+        }, 7000);
         requestAnimationFrame(loop);
       } else {
         clearInterval(autoWave);
@@ -553,7 +641,13 @@ import Base from '../../layouts/Base.astro';
       form.querySelectorAll<HTMLElement>('[data-only]').forEach((el) => {
         el.classList.toggle('on', el.dataset.only === p.mode);
       });
-      setRunning(p.mode === 'drift' && p.animate);
+      form.querySelectorAll<HTMLElement>('[data-style]').forEach((el) => {
+        el.hidden = el.dataset.style !== p.style;
+      });
+      // the cover set only animates drift; on the site every mode moves
+      const animatable = p.mode === 'drift' || p.style === 'site';
+      document.getElementById('anim-row')!.hidden = !animatable;
+      setRunning(animatable && p.animate);
       if (!running) draw(0);
       saveLast();
     };
@@ -563,7 +657,10 @@ import Base from '../../layouts/Base.astro';
 
     // Push params → form (presets, JSON load, first paint after restore).
     const syncForm = () => {
+      f.style.value = p.style;
       f.mode.value = p.mode;
+      f.fade.value = p.fade;
+      f.fill.value = p.panel ? 'panel' : 'hero';
       f.theme.value = p.theme;
       f.bg.value = p.bg ?? PALETTES[p.theme].bg;
       f.format.value = `${p.w}x${p.h}`;
@@ -587,7 +684,11 @@ import Base from '../../layouts/Base.astro';
     };
 
     form.addEventListener('input', () => {
+      const styleChanged = f.style.value !== p.style;
+      p.style = f.style.value;
       p.mode = f.mode.value;
+      p.fade = f.fade.value;
+      p.panel = f.fill.value === 'panel';
       if (f.theme.value !== p.theme) {
         // switching theme resets the ground to that theme's own
         p.theme = f.theme.value;
@@ -619,7 +720,7 @@ import Base from '../../layouts/Base.astro';
         const out = r.closest('label')?.querySelector('output');
         if (out) out.textContent = (r as HTMLInputElement).value;
       });
-      update(seedChanged || sizeChanged);
+      update(seedChanged || sizeChanged || styleChanged);
     });
 
     document.getElementById('dice')!.addEventListener('click', () => {
@@ -635,8 +736,10 @@ import Base from '../../layouts/Base.astro';
     // ---- presets ----
     const builtinGroup = document.getElementById('preset-builtins')!;
     const savedGroup = document.getElementById('preset-saved')!;
+    const siteGroup = document.getElementById('preset-site')!;
     const refreshPresetOptions = () => {
       builtinGroup.innerHTML = BUILTINS.map((b) => `<option value="b:${b.id}">${b.name}</option>`).join('');
+      siteGroup.innerHTML = SITE_BUILTINS.map((b) => `<option value="b:${b.id}">${b.name}</option>`).join('');
       savedGroup.innerHTML = Object.keys(loadSaved())
         .map((n) => `<option value="s:${encodeURIComponent(n)}">${n}</option>`)
         .join('');
@@ -652,7 +755,7 @@ import Base from '../../layouts/Base.astro';
       const v = f.preset.value as string;
       if (!v) return;
       if (v.startsWith('b:')) {
-        const b = BUILTINS.find((x) => 'b:' + x.id === v);
+        const b = [...SITE_BUILTINS, ...BUILTINS].find((x) => 'b:' + x.id === v);
         if (b) applyPatch(b.patch);
       } else {
         const s = loadSaved()[decodeURIComponent(v.slice(2))];
@@ -700,7 +803,8 @@ import Base from '../../layouts/Base.astro';
       if (p.mode === 'drift' && p.animate) {
         ripples.push({ x, y, t0: performance.now() / 1000 });
         if (ripples.length > 6) ripples.shift();
-      } else if (p.mode === 'rings') {
+      } else if (p.mode === 'rings' || p.style === 'site') {
+        // rings in either style, and the site's single drop: the click is the new centre
         p.epicenter = { x: x / p.w, y: y / p.h };
         draw(0);
         saveLast();

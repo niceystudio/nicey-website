@@ -58,7 +58,24 @@ const { mode = 'drift', fade = 'edges', still = false, seed = 7, cx = 0.8, cy = 
 </style>
 
 <script>
-  import { LIGHT_PALETTE, DARK_PALETTE, createDrift, colorAt, cssColor, ringCrest, discFill, smooth, waveAt, HERO_RIPPLE, type Ripple } from '../../lib/pixel-field';
+  import {
+    LIGHT_PALETTE,
+    DARK_PALETTE,
+    createDrift,
+    colorAt,
+    cssColor,
+    waveAt,
+    HERO_RIPPLE,
+    SITE_ISLAND,
+    SITE_RIPPLE_GAIN,
+    isSitePanel,
+    siteEdge,
+    siteValue,
+    type Ripple,
+    type SiteFade,
+    type SiteFrame,
+    type SiteMode,
+  } from '../../lib/pixel-field';
 
   const isDark = () => {
     const t = document.documentElement.dataset.theme;
@@ -71,8 +88,8 @@ const { mode = 'drift', fade = 'edges', still = false, seed = 7, cx = 0.8, cy = 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     const d = canvas.dataset;
-    const mode = d.mode ?? 'drift';
-    const fade = d.fade ?? 'edges';
+    const mode = (d.mode ?? 'drift') as SiteMode;
+    const fade = (d.fade ?? 'edges') as SiteFade;
     const seed = Number(d.seed) || 7;
     const CELL = Number(d.cell) || 14;
     const epiX = Number(d.cx ?? 0.8);
@@ -85,46 +102,9 @@ const { mode = 'drift', fade = 'edges', still = false, seed = 7, cx = 0.8, cy = 
     // click ripples, in canvas px, timed on the performance clock in seconds
     const ripples: Ripple[] = [];
     const MAX_RIPPLES = 6;
-    const RIPPLE_GAIN = 0.5; // how much a passing wave lifts a cell's value
     const field = createDrift({ cols: 10, rows: 5, seed });
-
-    // alpha multiplier toward the faded edges (px distances, so it reads the same at any size)
-    const edge = (px: number, py: number) => {
-      if (fade === 'none') return 1;
-      if (fade === 'left') {
-        // the hero: solid on the right, gone by ~55% of the width, plus a soft top and bottom
-        const fx = smooth(Math.min(1, Math.max(0, (px / W - 0.12) / 0.5)));
-        const fy = Math.min(1, py / 60, (H - py) / 90);
-        return fx * smooth(Math.max(0, fy));
-      }
-      // a panel-sized field only softens its rim; it has little room around the window it sits behind
-      const e = isPanel() ? 24 : 70;
-      const f = Math.min(px / e, (W - px) / e, py / e, (H - py) / e, 1);
-      return smooth(Math.max(0, f));
-    };
-
-    // a field behind a window (not the hero): fuller, so it reads around the window's edges
-    const isPanel = () => Math.min(W, H) < 640;
-
-    const value = (px: number, py: number, t: number) => {
-      const nx = px / W, ny = py / H;
-      // the noise under every mode drifts slowly; at t = 0 it is the seeded still frame
-      const n = field.sample(nx, ny, t * 0.35);
-      if (mode === 'rings') {
-        const dist = Math.hypot(px - epiX * W, py - epiY * H);
-        const warp = (n - 0.5) * 0.8;
-        // rings ripple outward: one wavelength every ~8s
-        return ringCrest(dist, 64, warp - t * 0.12) * Math.exp(-dist / (Math.max(W, H) * 0.7)) + 0.12;
-      }
-      if (mode === 'drop') {
-        // the drop breathes: ±6% of its radius over ~9s
-        const r = Math.min(W, H) * 0.55 * (1 + 0.06 * Math.sin(t * 0.7));
-        const dist = Math.hypot(px - epiX * W, py - epiY * H) * (1 + (n - 0.5) * 0.3);
-        return discFill(dist, r) * 0.95 + n * 0.15;
-      }
-      // the hero sits a little lower (more cream between islands); a panel field is fuller
-      return field.sample(nx, ny, t) - (isPanel() ? 0.02 : 0.18);
-    };
+    // the per-cell look (edges, modes, panel vs hero) lives in the shared engine, so /studio/field draws the same
+    const frame = (): SiteFrame => ({ W, H, mode, fade, cx: epiX, cy: epiY, panel: isSitePanel(W, H) });
 
     const t0 = performance.now() / 1000;
     const draw = (now: number) => {
@@ -134,17 +114,18 @@ const { mode = 'drift', fade = 'edges', still = false, seed = 7, cx = 0.8, cy = 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, W, H);
       const half = CELL / 2;
+      const f = frame();
       for (let y = 0; y < rows; y++)
         for (let x = 0; x < cols; x++) {
           const px = x * CELL + half, py = y * CELL + half;
-          const a = edge(px, py);
+          const a = siteEdge(f, px, py);
           if (a <= 0.01) continue;
-          let v = value(px, py, t);
-          if (ripples.length) v += waveAt(ripples, px, py, now, HERO_RIPPLE) * RIPPLE_GAIN;
+          let v = siteValue(f, field, px, py, t);
+          if (ripples.length) v += waveAt(ripples, px, py, now, HERO_RIPPLE) * SITE_RIPPLE_GAIN;
           ctx.globalAlpha = a;
           ctx.fillStyle = cssColor(colorAt(stops, v));
           // cells above the island level fuse (full size), the rest keep a 1px seam
-          const size = v > 0.32 ? CELL : CELL - 1;
+          const size = v > SITE_ISLAND ? CELL : CELL - 1;
           ctx.fillRect(x * CELL, y * CELL, size, size);
         }
       ctx.globalAlpha = 1;
