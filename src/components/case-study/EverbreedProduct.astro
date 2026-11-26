@@ -91,8 +91,6 @@ const clip = (id: string) => ({ src: `${base}/mobile-${id}.webm`, poster: `${bas
     </div>
   </div>
 
-  <button type="button" class="ep-pause" data-ep-pause aria-pressed="false">Pause motion</button>
-
   <figure class="ep-desk m-0">
     <div class="ep-desk-copy">
       <span class="ep-mono">Desktop · Project Book</span>
@@ -200,26 +198,6 @@ const clip = (id: string) => ({ src: `${base}/mobile-${id}.webm`, poster: `${bas
     display: none;
   }
 
-  .ep-pause {
-    position: sticky;
-    bottom: 20px;
-    align-self: flex-end;
-    margin-top: -64px;
-    min-height: 40px;
-    padding: 0 16px;
-    border: 1px solid var(--color-line-strong);
-    border-radius: var(--radius-pill);
-    background: var(--color-surface);
-    color: var(--color-ink);
-    font: inherit;
-    font-size: var(--text-body-sm);
-    cursor: pointer;
-    transition: transform 160ms var(--ease-out);
-  }
-  .ep-pause:active {
-    transform: scale(var(--scale-press));
-  }
-
   /* desktop screens, layered */
   .ep-desk {
     display: grid;
@@ -313,9 +291,6 @@ const clip = (id: string) => ({ src: `${base}/mobile-${id}.webm`, poster: `${bas
       align-self: center;
       margin-top: 12px;
     }
-    .ep-pause {
-      margin-top: -32px;
-    }
     .ep-desk {
       grid-template-columns: 1fr;
     }
@@ -333,18 +308,10 @@ const clip = (id: string) => ({ src: `${base}/mobile-${id}.webm`, poster: `${bas
     const steps = Array.from(root.querySelectorAll<HTMLElement>('[data-ep-step]'));
     const clips = Array.from(root.querySelectorAll<HTMLVideoElement>('[data-ep-clip]'));
     const inline = Array.from(root.querySelectorAll<HTMLVideoElement>('[data-ep-inline]'));
-    const pauseBtn = root.querySelector<HTMLButtonElement>('[data-ep-pause]');
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const wide = matchMedia('(min-width: 861px)');
-    // reduced motion: posters only, until someone presses play
-    let paused = reduced;
-    let current = 0;
-    const setBtn = () => {
-      if (!pauseBtn) return;
-      pauseBtn.textContent = paused ? 'Play motion' : 'Pause motion';
-      pauseBtn.setAttribute('aria-pressed', String(paused));
-    };
-    setBtn();
+    // reduced motion: posters only (the Pause motion button was removed 26 Nov — it overlapped "Change the style")
+    const paused = reduced;
 
     const playFromStart = (v: HTMLVideoElement) => {
       if (paused) return;
@@ -359,7 +326,6 @@ const clip = (id: string) => ({ src: `${base}/mobile-${id}.webm`, poster: `${bas
 
     // pinned phone (wide screens): the clip of the step being read plays once, then holds its last frame
     const show = (i: number) => {
-      current = i;
       steps.forEach((s, k) => s.classList.toggle('is-on', k === i));
       clips.forEach((v, k) => {
         v.toggleAttribute('data-on', k === i);
@@ -376,7 +342,6 @@ const clip = (id: string) => ({ src: `${base}/mobile-${id}.webm`, poster: `${bas
     steps.forEach((s) => spy.observe(s));
 
     // phone width: each inline phone loops while it is on screen
-    const onScreen = new Set<HTMLVideoElement>();
     const playInline = (v: HTMLVideoElement) => {
       v.preload = 'auto';
       v.loop = true;
@@ -386,8 +351,6 @@ const clip = (id: string) => ({ src: `${base}/mobile-${id}.webm`, poster: `${bas
       (es) =>
         es.forEach((e) => {
           const v = e.target as HTMLVideoElement;
-          if (e.isIntersecting) onScreen.add(v);
-          else onScreen.delete(v);
           if (wide.matches) return;
           if (e.isIntersecting && !paused) playInline(v);
           else v.pause();
@@ -396,14 +359,6 @@ const clip = (id: string) => ({ src: `${base}/mobile-${id}.webm`, poster: `${bas
     );
     inline.forEach((v) => seen.observe(v));
 
-    pauseBtn?.addEventListener('click', () => {
-      paused = !paused;
-      setBtn();
-      if (paused) [...clips, ...inline].forEach((v) => v.pause());
-      else if (wide.matches) clips[current] && playFromStart(clips[current]);
-      // phone width: Play starts the phone(s) on screen (it did nothing here before — 20 Nov motion review)
-      else onScreen.forEach(playInline);
-    });
     show(0);
   });
 </script>
