@@ -239,3 +239,74 @@ export function discFill(d: number, radius: number): number {
   const t = Math.min(1, Math.max(0, (d - 0.5 * radius) / (0.5 * radius)));
   return 1 - smooth(t);
 }
+
+/* ------------------------------------------------------------------ *
+ * The Nicey site field: the look PixelFieldA.astro draws on the site
+ * (hero, panels, services, brand page). Lives here so the component
+ * and the /studio/field playground render the same picture.
+ * Distances are px in the frame's own units, so a field reads the same
+ * at any size.
+ * ------------------------------------------------------------------ */
+
+export type SiteMode = 'drift' | 'rings' | 'drop';
+/** Which edges dissolve: 'left' (hero: fades out towards the copy), 'edges' (all four), 'none'. */
+export type SiteFade = 'left' | 'edges' | 'none';
+
+export interface SiteFrame {
+  /** Frame size in px. */
+  W: number;
+  H: number;
+  mode: SiteMode;
+  fade: SiteFade;
+  /** Epicentre for rings/drop, 0..1 of the frame. */
+  cx: number;
+  cy: number;
+  /** A field behind a window rather than the hero: fuller, with a thinner rim. */
+  panel: boolean;
+}
+
+/** Cells above this value fuse into islands (full size); the rest keep a seam. */
+export const SITE_ISLAND = 0.32;
+/** How much a passing click ripple lifts a cell's value. */
+export const SITE_RIPPLE_GAIN = 0.5;
+
+/** The site's own rule for telling a panel field from the hero. */
+export const isSitePanel = (W: number, H: number): boolean => Math.min(W, H) < 640;
+
+/** Alpha multiplier toward the faded edges. */
+export function siteEdge(f: SiteFrame, px: number, py: number): number {
+  const { W, H } = f;
+  if (f.fade === 'none') return 1;
+  if (f.fade === 'left') {
+    // the hero: solid on the right, gone by ~55% of the width, plus a soft top and bottom
+    const fx = smooth(Math.min(1, Math.max(0, (px / W - 0.12) / 0.5)));
+    const fy = Math.min(1, py / 60, (H - py) / 90);
+    return fx * smooth(Math.max(0, fy));
+  }
+  // a panel-sized field only softens its rim; it has little room around the window it sits behind
+  const e = f.panel ? 24 : 70;
+  const m = Math.min(px / e, (W - px) / e, py / e, (H - py) / e, 1);
+  return smooth(Math.max(0, m));
+}
+
+/** Field value at px (px, py) and t seconds since the field started; feed to colorAt as is. */
+export function siteValue(f: SiteFrame, field: DriftField, px: number, py: number, t: number): number {
+  const { W, H } = f;
+  const nx = px / W, ny = py / H;
+  // the noise under every mode drifts slowly; at t = 0 it is the seeded still frame
+  const n = field.sample(nx, ny, t * 0.35);
+  if (f.mode === 'rings') {
+    const dist = Math.hypot(px - f.cx * W, py - f.cy * H);
+    const warp = (n - 0.5) * 0.8;
+    // rings ripple outward: one wavelength every ~8s
+    return ringCrest(dist, 64, warp - t * 0.12) * Math.exp(-dist / (Math.max(W, H) * 0.7)) + 0.12;
+  }
+  if (f.mode === 'drop') {
+    // the drop breathes: ±6% of its radius over ~9s
+    const r = Math.min(W, H) * 0.55 * (1 + 0.06 * Math.sin(t * 0.7));
+    const dist = Math.hypot(px - f.cx * W, py - f.cy * H) * (1 + (n - 0.5) * 0.3);
+    return discFill(dist, r) * 0.95 + n * 0.15;
+  }
+  // the hero sits a little lower (more cream between islands); a panel field is fuller
+  return field.sample(nx, ny, t) - (f.panel ? 0.02 : 0.18);
+}
