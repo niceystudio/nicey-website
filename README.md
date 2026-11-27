@@ -28,8 +28,8 @@ npm run build    # type check + production build
 - **Homepage sections:** `src/directions/a/` (one file per section, e.g. `HeroA`, `ServicesA`, `ProcessA`)
 - **Service pages:** `src/data/service-pages.ts` (hero, one section per included/ line, steps, FAQ). Photo and video spots are `MediaSlot` placeholders that name the suggested asset; swap each for the real file when it exists.
 - **Articles at the bottom of a page** (after Book a call): `src/data/articles/` (`home.ts`, `design-systems.ts`, `product-design.ts`), rendered by `src/directions/a/ArticleA.astro`. Each H2 opens with a one- or two-sentence answer that stands on its own, for AI search.
-- **Hill reveal into How we work:** `src/directions/a/RevealHillA.astro` (canvas, no library). Colours come from the page, lavender, accent and band tokens. The How we work section is the one dark section; it re-points the page tokens in `HowA.astro`.
-- **Theme:** light only (27 Nov). Dark moments are sections: the band, terminal windows, How we work.
+- **Dark stretch and hill reveals:** How we work and Free audit are dark (`.a-dark` in `src/directions/a/a.css` re-points the page tokens). A hill reveal leads in and one leads out: `src/directions/a/RevealHillA.astro` (canvas, no library; `exit` for the way out). Colours come from the page, lavender, accent and band tokens.
+- **Theme:** light only (27 Nov). Dark moments are sections: the band, terminal windows, the dark stretch.
 - **Styles and tokens:** `src/styles/global.css`, direction A in `src/directions/a/a.css` and `a-case.css`
 
 ## Case-study films

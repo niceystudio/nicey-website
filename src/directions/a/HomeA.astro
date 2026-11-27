@@ -21,7 +21,7 @@ import SiteFooter from '../../components/SiteFooter.astro';
 import HeroA from './HeroA.astro';
 import AsciiBand from './AsciiBand.astro';
 import HowA from './HowA.astro';
-// 27 Nov (Goran): the hill reveal into How we work, the one dark section
+// 27 Nov (Goran): hill reveals into and out of the dark stretch (How we work + Free audit)
 import RevealHillA from './RevealHillA.astro';
 import SelectedA from './SelectedA.astro';
 import BookCallA from './BookCallA.astro';
@@ -51,6 +51,7 @@ const jsonLd = { '@context': 'https://schema.org', '@graph': [articleLd(homeArti
       <RevealHillA />
       <HowA />
       <ProcessA />
+      <RevealHillA exit />
       <Faq />
       <BookCallA />
       <ArticleA article={homeArticle} />

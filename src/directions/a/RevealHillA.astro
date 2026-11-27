@@ -1,8 +1,12 @@
 ---
 /**
- * Direction A · the hill reveal into How we work (Goran, 27 Nov). A soft hill in the brand ramp rises from the light
- * page as you scroll, swells until its dark core fills the screen, and hands straight over to the dark How we work
- * section below it. It stays dark (no hand-back).
+ * Direction A · the hill reveal around the dark stretch (Goran, 27 Nov). Way in (above How we work): a soft hill in the
+ * brand ramp rises from the light page as you scroll and swells until its dark core fills the screen, handing straight
+ * over to the dark section. Way out (`exit`, below Free audit): the same hill played backwards and hung from the top,
+ * so the dark sinks back up and the light page returns.
+ *
+ * The runway overlaps the light section next to it by one screen (the one before on the way in, the one after on the
+ * way out), so the hill moves over real content and there is no empty screen. It never takes clicks.
  *
  * How it's drawn: a plain 2D canvas, pinned (sticky) inside a tall runway. Every band is the same hill, drawn a little
  * smaller each time, so the bands are thick at the peak and squeezed at the feet. As the hill grows its shoulders
@@ -16,9 +20,14 @@
  * Only shown with scripting on and motion allowed (CSS below). Otherwise the page cuts straight to the dark section,
  * which is the final state. Decorative: aria-hidden, nothing to read or focus.
  */
+interface Props {
+  /** the way out: dark → light, hung from the top */
+  exit?: boolean;
+}
+const { exit = false } = Astro.props;
 ---
 
-<div class="rh" data-rh aria-hidden="true">
+<div class:list={['rh', exit ? 'rh--out' : 'rh--in']} data-rh data-exit={exit ? '1' : undefined} aria-hidden="true">
   <div class="rh-pin">
     <canvas class="rh-canvas"></canvas>
   </div>
@@ -34,8 +43,20 @@
       /* the runway: one screen pinned while the hill grows (the scroll distance), plus the pinned screen itself */
       height: 220vh;
       height: 220svh;
-      /* the hill's last frame is the next section, so no gap between them */
+      position: relative;
+      z-index: 1;
+      pointer-events: none;
+    }
+    /* overlap the light neighbour by one screen; -1px so the dark frame and the dark section meet with no seam */
+    .rh--in {
+      margin-top: -100vh;
+      margin-top: -100svh;
       margin-bottom: -1px;
+    }
+    .rh--out {
+      margin-top: -1px;
+      margin-bottom: -100vh;
+      margin-bottom: -100svh;
     }
   }
   .rh-pin {
@@ -71,6 +92,7 @@
     if (root.dataset.ready) return;
     root.dataset.ready = '1';
     if (getComputedStyle(root).display === 'none') return; // reduced motion: the section below is the final state
+    const exit = root.dataset.exit === '1';
     const canvas = root.querySelector('canvas')!;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -146,8 +168,10 @@
 
     const draw = () => {
       if (!W) return;
-      const p = progress();
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      // the way out is the way in played backwards, upside down
+      const p = exit ? 1 - progress() : progress();
+      if (exit) ctx.setTransform(dpr, 0, 0, -dpr, 0, H * dpr);
+      else ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, W, H);
       if (p <= 0.001) {
         canvas.style.filter = '';

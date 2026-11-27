@@ -5,14 +5,14 @@
  * the per-step windows (seeing / we do / proof figures) are gone; the full text stays in the Markdown twin for agents.
  * 23 Nov (Emir): the rail above the cards (HowDiagramB) — tangled lines straighten from Drift to Proof.
  * 23 Nov (Goran): no "You get" line and no rules between the steps — one container, spacing separates them.
- * 27 Nov (Goran): a dark section, reached through the hill reveal (RevealHillA) right above it. The section re-points
- * the page tokens to their dark-band values, so the cards, the diagram and the printed heading follow without edits.
+ * 27 Nov (Goran): dark (.a-dark), with Free audit below it: one dark stretch between two hill reveals (RevealHillA).
+ * .a-dark re-points the page tokens, so the cards, the diagram and the printed heading follow without edits.
  */
 import { steps } from '../../data/zero-drift';
 import HowDiagramB from './HowDiagramB.astro';
 ---
 
-<section id="how" aria-labelledby="how-head" class="ho">
+<section id="how" aria-labelledby="how-head" class="ho a-dark">
   <div class="container-page">
     <div class="ho-intro">
       <span class="caption a-path text-ink-2">How we work</span>
@@ -35,24 +35,7 @@ import HowDiagramB from './HowDiagramB.astro';
 
 <style>
   .ho {
-    /* the dark band: page tokens re-pointed for everything inside (cards, diagram, printed heading) */
-    --color-page: var(--color-band);
-    --color-surface: color-mix(in srgb, var(--color-on-band) 5%, var(--color-band));
-    --color-ink: var(--color-on-band);
-    --color-ink-2: var(--color-on-band-2);
-    --color-muted: var(--color-on-band-2);
-    --color-line: var(--color-term-rule);
-    --color-rule: var(--color-term-rule);
-    --color-accent: var(--color-on-band-accent);
-    --color-hot: var(--color-term-fail);
-    --color-on-accent: var(--color-band);
-    /* the A aliases resolve on .dir-a, so they are set again here */
-    --a-rule: var(--color-term-rule);
-    --a-block: var(--color-on-band-accent);
-    --a-on-block: var(--color-band);
-    padding-block: var(--spacing-section);
-    background: var(--color-band);
-    color: var(--color-ink);
+    padding-top: var(--spacing-section);
   }
   .ho-intro {
     display: flex;

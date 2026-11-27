@@ -132,3 +132,31 @@
   position: relative;
   z-index: 1;
 }
+
+/* ---------- the dark stretch (27 Nov, Goran): How we work + Free audit, between two hill reveals ----------
+   The page tokens re-pointed to their dark-band values, so everything inside follows without its own dark rules.
+   The site is light only; this is a section, not a theme. */
+.dir-a .a-dark {
+  --color-page: var(--color-band);
+  --color-surface: color-mix(in srgb, var(--color-on-band) 5%, var(--color-band));
+  --color-surface-hover: color-mix(in srgb, var(--color-on-band) 9%, var(--color-band));
+  --color-ink: var(--color-on-band);
+  --color-ink-2: var(--color-on-band-2);
+  --color-muted: var(--color-on-band-2);
+  --color-line: var(--color-term-rule);
+  --color-line-strong: rgb(243 240 233 / 0.26);
+  --color-rule: var(--color-term-rule);
+  /* violet is too dark to read on the band: the lavender is the accent here */
+  --color-accent: var(--color-on-band-accent);
+  --color-focus: var(--color-on-band-accent);
+  --color-hot: var(--color-term-fail);
+  --color-on-accent: var(--color-band);
+  /* terminal windows: a step darker than the band, so they still read as windows */
+  --color-term: color-mix(in srgb, #000 30%, var(--color-band));
+  /* the A aliases resolve on .dir-a, so they are set again here */
+  --a-rule: var(--color-term-rule);
+  --a-block: var(--color-on-band-accent);
+  --a-on-block: var(--color-band);
+  background: var(--color-band);
+  color: var(--color-ink);
+}

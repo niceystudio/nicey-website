@@ -60,6 +60,7 @@ const { mode = 'drift', fade = 'edges', still = false, seed = 7, cx = 0.8, cy = 
 <script>
   import {
     LIGHT_PALETTE,
+    DARK_PALETTE,
     createDrift,
     colorAt,
     cssColor,
@@ -89,6 +90,8 @@ const { mode = 'drift', fade = 'edges', still = false, seed = 7, cx = 0.8, cy = 
     const epiX = Number(d.cx ?? 0.8);
     const epiY = Number(d.cy ?? 0.5);
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // the site is light only; a field inside a dark section (.a-dark, 27 Nov) takes the dark palette
+    const stops = (canvas.closest('.a-dark') ? DARK_PALETTE : LIGHT_PALETTE).stops;
     // every mode moves (24 Nov: the panel fields behind the terminals were still); `still` or reduced motion stop it
     const animated = !d.still && !reduced;
 
@@ -104,7 +107,6 @@ const { mode = 'drift', fade = 'edges', still = false, seed = 7, cx = 0.8, cy = 
     const draw = (now: number) => {
       // time since this field started, so the still frame and the first animated frame are the same picture
       const t = animated ? now - t0 : 0;
-      const stops = LIGHT_PALETTE.stops;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, W, H);
       const half = CELL / 2;
