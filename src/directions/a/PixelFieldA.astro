@@ -133,6 +133,8 @@ const { mode = 'drift', fade = 'edges', still = false, seed = 7, cx = 0.8, cy = 
 
     const resize = () => {
       const r = canvas.getBoundingClientRect();
+      // hidden (display: none, a closed tab): nothing to draw; the ResizeObserver calls again once it has a size
+      if (r.width < 1 || r.height < 1) return;
       W = Math.max(1, Math.round(r.width));
       H = Math.max(1, Math.round(r.height));
       // draw at the screen's density so the cells stay crisp squares

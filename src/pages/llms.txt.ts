@@ -3,6 +3,6 @@ import type { APIRoute } from 'astro';
 import { siteMarkdown } from '../lib/site-markdown';
 
 export const GET: APIRoute = ({ site }) => {
-  const body = siteMarkdown(site ?? new URL('https://nicey-website.vercel.app'));
+  const body = siteMarkdown(site!);
   return new Response(body, { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
 };

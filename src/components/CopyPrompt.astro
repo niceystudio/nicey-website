@@ -6,12 +6,13 @@
  */
 import { aiReadyPrompt } from '../lib/ai-ready';
 
+import { SITE } from '../lib/site';
 interface Props {
   /** Show the /ai-ready.md link next to the button (Direction A hides it — Emir, 20 Nov). */
   showFile?: boolean;
 }
 const { showFile = true } = Astro.props;
-const prompt = aiReadyPrompt(Astro.site ?? new URL('https://nicey-website.vercel.app'));
+const prompt = aiReadyPrompt((Astro.site ?? SITE));
 ---
 
 <div class="cp">

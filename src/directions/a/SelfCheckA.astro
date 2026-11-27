@@ -11,11 +11,12 @@
  * on an animated pixel field like the other two windows.
  */
 import CopyPrompt from '../../components/CopyPrompt.astro';
+import { SITE } from '../../lib/site';
 import PixelFieldA from './PixelFieldA.astro';
 import { aiReadyPrompt, PILLARS } from '../../lib/ai-ready';
 import { links } from '../../data/links';
 
-const prompt = aiReadyPrompt(Astro.site ?? new URL('https://nicey-website.vercel.app'));
+const prompt = aiReadyPrompt((Astro.site ?? SITE));
 const sample: Record<string, 'pass' | 'partial' | 'fail' | 'skipped'> = {
   'Token metadata': 'partial',
   'Token binding': 'pass',

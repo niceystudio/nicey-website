@@ -137,9 +137,9 @@ export function createDrift(opts: DriftOptions = {}): DriftField {
   };
 }
 
-/** Interpolate palette stops at value v (clamped 0..1). */
+/** Interpolate palette stops at value v (clamped 0..1; NaN, e.g. from a 0px canvas, reads as 0). */
 export function colorAt(stops: Stop[], v: number): Stop {
-  const pos = Math.min(0.9999, Math.max(0, v)) * (stops.length - 1);
+  const pos = Math.min(0.9999, Math.max(0, Number.isFinite(v) ? v : 0)) * (stops.length - 1);
   const i = Math.floor(pos);
   const t = pos - i;
   const a = stops[i];

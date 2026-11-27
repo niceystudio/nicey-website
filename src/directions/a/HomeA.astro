@@ -10,6 +10,7 @@
  * ("Before you book a call"); every CTA was on the page twice.
  */
 import './a.css';
+import { SITE } from '../../lib/site';
 import Base from '../../layouts/Base.astro';
 import Header from '../../components/Header.astro';
 import ServicesA from './ServicesA.astro';
@@ -27,7 +28,7 @@ import ArticleA from './ArticleA.astro';
 import { homeArticle } from '../../data/articles/home';
 import { articleLd } from '../../data/article-types';
 
-const pageUrl = new URL('/', Astro.site ?? 'https://nicey-website.vercel.app').href;
+const pageUrl = new URL('/', (Astro.site ?? SITE)).href;
 const jsonLd = { '@context': 'https://schema.org', '@graph': [articleLd(homeArticle, pageUrl)] };
 ---
 

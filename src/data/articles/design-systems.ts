@@ -3,6 +3,7 @@
  * Facts and figures come from the QBench case study (src/data/case-studies.ts); nothing here is invented.
  */
 import type { Article } from '../article-types';
+import { founder } from '../people';
 
 export const designSystemsArticle: Article = {
   id: 'guide',
@@ -10,7 +11,7 @@ export const designSystemsArticle: Article = {
   title: 'Design systems for people and agents: a field guide',
   lede: 'What a design system is, why it drifts, and what it takes for designers, engineers and coding agents to read it the same way. Written from the audits and builds we run every week.',
   updated: '2026-11-26',
-  author: 'Nicey Studio',
+  author: founder.name,
   about: ['Design systems', 'Design tokens', 'Figma variables', 'Component libraries', 'AI-ready design systems', 'Design system audit'],
   sections: [
     {

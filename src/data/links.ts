@@ -11,8 +11,8 @@ export const links = {
   bookCall: 'https://cal.com/nicey/intro',
   /** the self-check (/ai-ready.md) ends with this: the same booking page as bookCall */
   meeting: 'https://cal.com/nicey/intro',
-  /** "Get a free audit" in the "It starts with a free audit" section */
-  startAudit: '#',
+  /** "Get a free audit" in the "It starts with a free audit" section: the audit starts with an intro call */
+  startAudit: 'https://cal.com/nicey/intro',
   /** the service pages (src/pages/design-systems.astro, product-design.astro) */
   exploreDesignSystems: '/design-systems',
   exploreProductDesign: '/product-design',

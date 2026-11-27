@@ -46,9 +46,10 @@ export interface ServicePage {
 
 export const designSystemsPage: ServicePage = {
   slug: 'design-systems',
-  metaTitle: 'Design systems agency · Audit, tokens, components, AI-ready docs · Nicey',
+  // ~60 characters with the query first, so Google shows it whole (SEO plan, Phase 1)
+  metaTitle: 'Design system agency: audit, tokens, AI-ready docs · Nicey',
   metaDescription:
-    'Nicey builds design systems people and coding agents read the same way: audit and consolidation, token architecture and theming, component libraries from Figma to code, AI-ready documentation, and a monthly systems partnership. Start with a free audit.',
+    'Design systems people and coding agents read the same way: audit, tokens, components from Figma to code and AI-ready docs. Start with a free audit.',
   caption: 'Design systems',
   h1: ['Design systems', 'people and agents', 'read the same way.'],
   lede: 'For products with years of drift, and teams that want their coding agents to build on-system. We audit, consolidate and rebuild your system in Figma and in code, then write it down so nobody has to guess.',
@@ -259,9 +260,9 @@ export const designSystemsPage: ServicePage = {
 
 export const productDesignPage: ServicePage = {
   slug: 'product-design',
-  metaTitle: 'Product design agency · UX, design engineering, AI workflows · Nicey',
+  metaTitle: 'Product design agency: UX, design engineering, AI · Nicey',
   metaDescription:
-    'Nicey designs complex product workflows on the design system we build, with AI in the loop: product and UX design, design engineering in your stack, and coding-agent workflows that ship on-system screens from day one.',
+    'Product and UX design for complex workflows, built on your design system with AI in the loop: design engineering in your stack and on-system screens from day one.',
   caption: 'Product design',
   h1: ['Product design', 'on the system,', 'with AI in the loop.'],
   lede: 'Complex workflows designed on the system we build, so new screens ship consistent from day one. We prototype in real code, design AI features people trust, and set up your coding agents to build what we design.',
