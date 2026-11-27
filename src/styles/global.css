@@ -40,6 +40,9 @@
   /* FLYR's case study band */
   --color-stone: #ece7db;
 
+  /* the agent world's page (two worlds, 27 Nov): .world-dark sections and the seams that lead into them */
+  --color-agent: #232320;
+
   /* closing band */
   --color-band: #26251f;
   --color-on-band: #f3f0e9;
@@ -72,8 +75,14 @@
   /* type */
   --font-sans: 'Geist Variable', 'Geist Fallback', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'Geist Mono Variable', 'Geist Mono Fallback', ui-monospace, monospace;
-  /* display face: headlines, names, figures. Named for its role: "Change the style" swaps it for a sans or a serif */
-  --font-display: 'Geist Pixel', 'Geist Mono Variable', ui-monospace, monospace;
+  /* display face: headlines, names, figures. Named for its role: "Change the style" swaps it for a pixel or a serif.
+     27 Nov (two worlds): the people side speaks sans, sentence case; the machine side speaks mono. The face carries its
+     own weight, tracking and case, so a swap to Geist Pixel brings back its capitals without touching a component. */
+  --font-display: 'Geist Variable', 'Geist Fallback', ui-sans-serif, system-ui, sans-serif;
+  --display-weight: 500;
+  /* calm, not shouting (ref contentarchitecture.dev: Geist 500, normal tracking, ~46px section heads) */
+  --display-tracking: -0.015em;
+  --display-case: none;
 
   --text-display-figure: clamp(104px, 13vw, 196px);
   --text-display-figure--line-height: 0.84;
@@ -85,8 +94,8 @@
   --text-h1--letter-spacing: -0.05em;
   --text-h1--font-weight: 500;
 
-  --text-h2: clamp(36px, 4.2vw, 60px);
-  --text-h2--line-height: 1.02;
+  --text-h2: clamp(32px, 3.3vw, 48px);
+  --text-h2--line-height: 1.1;
   --text-h2--letter-spacing: -0.04em;
   --text-h2--font-weight: 500;
 
@@ -183,19 +192,20 @@
   --text-label--line-height: 1.45;
   --text-code: 13px;
   --text-code--line-height: 1.6;
-  --text-caption: 12px;
+  /* mono labels read at a real size, normal tracking (27 Nov: were 12/11px with wide tracking) */
+  --text-caption: 14px;
   --text-caption--line-height: 1.4;
-  --text-caption-sm: 11px;
+  --text-caption-sm: 12px;
   --text-caption-sm--line-height: 1.4;
   --text-arrow: 24px;
   --text-arrow--line-height: 1;
 
-  /* shape: square everywhere (Direction A) */
-  --radius-panel: 0px;
-  --radius-code: 0px;
-  --radius-chip: 0px;
-  --radius-swatch: 0px;
-  --radius-pill: 0px;
+  /* shape: small, even corners (27 Nov: square before) */
+  --radius-panel: 8px;
+  --radius-code: 8px;
+  --radius-chip: 4px;
+  --radius-swatch: 2px;
+  --radius-pill: 4px;
 
   /* interaction (make-interfaces-feel-better): every control is at least this tall to hit, presses scale to this,
      images get this hairline so they keep their edge on any surface */
@@ -235,6 +245,8 @@
 @layer base {
   :root {
     color-scheme: light;
+    /* the floating header's height (Header.astro); the homepage hero tucks under it */
+    --head-h: 76px;
   }
   :root[data-theme='dark'] {
     color-scheme: dark;
@@ -259,9 +271,50 @@
     --color-stone: #33312a;
     /* a step darker than the page, so the closing band still reads */
     --color-band: #0c0c09;
+    --color-agent: #0b0b09;
     --color-image-outline: oklch(1 0 0 / 0.1);
     --color-on-band: #ece7db;
     --color-on-band-2: #b6b1a3;
+  }
+
+  /* ---------- Two worlds (27 Nov, after contentarchitecture.dev) ----------
+     The page alternates full-width worlds: cream for people, charcoal for agents, joined by seams (SeamA).
+     .world-dark remaps every colour token inside it, so any component dropped in restyles itself. */
+  .world-dark {
+    --color-page: var(--color-agent);
+    --color-surface: #2b2a26;
+    --color-surface-hover: #33322d;
+    --color-ink: #f3f0e9;
+    --color-ink-2: #cbc6b8;
+    --color-muted: #a29e92;
+    --color-on-ink: #232320;
+    --color-line: rgba(243, 240, 233, 0.12);
+    --color-line-strong: rgba(243, 240, 233, 0.24);
+    --color-dashed: rgba(243, 240, 233, 0.3);
+    --color-cell-quiet: rgba(243, 240, 233, 0.16);
+    --color-rule: var(--color-line);
+    --color-accent: #a79bea;
+    --color-on-accent: #232320;
+    --color-hot: #ff8a66;
+    --color-sage: #3a4634;
+    --color-lavender: #3a3556;
+    --color-peach: #4a3a2c;
+    --color-butter: #4a4229;
+    --color-mauve: #463a4c;
+    --color-stone: #33312a;
+    --color-term: #181815;
+    --color-image-outline: oklch(1 0 0 / 0.1);
+    color-scheme: dark;
+    background: var(--color-page);
+    color: var(--color-ink);
+  }
+  /* after dark the cream world is the dark page, so the agent world goes a step deeper */
+  :root[data-theme='dark'] .world-dark {
+    --color-surface: #151511;
+    --color-surface-hover: #1b1b16;
+    --color-on-ink: #0b0b09;
+    --color-on-accent: #0b0b09;
+    --color-term: #1d1c16;
   }
 
   /* metric-matched fallbacks so the swap to Geist doesn't shift layout */
@@ -441,16 +494,16 @@
     font-family: var(--font-mono);
     font-size: var(--text-caption);
     line-height: var(--text-caption--line-height);
-    font-weight: 500;
-    letter-spacing: 0.08em;
+    font-weight: 400;
+    letter-spacing: 0;
     text-transform: uppercase;
   }
   .caption-sm {
     font-family: var(--font-mono);
     font-size: var(--text-caption-sm);
     line-height: var(--text-caption-sm--line-height);
-    font-weight: 500;
-    letter-spacing: 0.08em;
+    font-weight: 400;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
   }
 
@@ -463,9 +516,14 @@
     color: var(--color-muted);
   }
   /* a section caption reads like a path: // prefix in the accent (Label variant="section", SectionHead) */
+  /* 27 Nov: numbered like a path, "01 / Work", counted down the page (main resets the count) */
+  main {
+    counter-reset: a-path;
+  }
   .a-path::before {
-    content: '//\00a0';
-    color: var(--color-accent);
+    counter-increment: a-path;
+    content: '0' counter(a-path, decimal-leading-zero) '\00a0/\00a0';
+    color: var(--color-muted);
   }
 
   /* ---------- File tabs ----------
@@ -675,9 +733,9 @@
     min-height: 44px;
     border-radius: var(--radius-pill);
     font-family: var(--font-mono);
-    font-size: var(--text-code);
-    font-weight: 500;
-    letter-spacing: 0.1em;
+    font-size: 15px;
+    font-weight: 400;
+    letter-spacing: 0.01em;
     text-transform: uppercase;
     text-decoration: none;
     white-space: nowrap;
@@ -719,12 +777,14 @@
   a:focus-visible .arr {
     transform: translateX(4px);
   }
+  /* 27 Nov: primary is an ink chip (cream on the dark world), secondary a quiet grey chip; violet stays for dots */
   .pill-ink {
-    background: var(--color-accent);
-    color: var(--color-on-accent);
+    background: var(--color-ink);
+    color: var(--color-page);
   }
   .pill-outline {
-    border: 1px solid var(--color-line-strong);
+    border: 1px solid transparent;
+    background: color-mix(in srgb, var(--color-ink) 9%, transparent);
     color: var(--color-ink);
   }
   .pill-lg {
@@ -740,21 +800,20 @@
      Hover only where a pointer can hover; pressed goes one step further than hover, plus the scale above. */
   @media (hover: hover) and (pointer: fine) {
     .pill-ink:hover {
-      background: color-mix(in srgb, var(--color-accent) 86%, var(--color-ink));
+      background: color-mix(in srgb, var(--color-ink) 84%, var(--color-page));
     }
     .pill-outline:hover {
-      border-color: var(--color-ink);
-      background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+      background: color-mix(in srgb, var(--color-ink) 15%, transparent);
     }
     .pill.border-on-band:hover {
       background: color-mix(in srgb, var(--color-on-band) 10%, transparent);
     }
   }
   .pill-ink:active {
-    background: color-mix(in srgb, var(--color-accent) 74%, var(--color-ink));
+    background: color-mix(in srgb, var(--color-ink) 72%, var(--color-page));
   }
   .pill-outline:active {
-    background: color-mix(in srgb, var(--color-ink) 12%, transparent);
+    background: color-mix(in srgb, var(--color-ink) 20%, transparent);
   }
   .pill.border-on-band:active {
     background: color-mix(in srgb, var(--color-on-band) 18%, transparent);
@@ -804,11 +863,8 @@
 
   /* A heading printed on blocks, line by line, like the hero headline: wrap the heading's text in
      <span class="h-print"> (SectionHead does it). The block takes the window radius, so "Change the style" rounds it. */
+  /* 27 Nov (two worlds): headings are plain sans now, the blocks are gone; the hook stays so a style can bring them back */
   .h-print {
-    padding: 0.04em 0.16em;
-    border-radius: var(--radius-code);
-    background: var(--color-ink);
-    color: var(--color-page);
     box-decoration-break: clone;
     -webkit-box-decoration-break: clone;
   }

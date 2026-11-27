@@ -8,15 +8,15 @@
   font-family: var(--font-display);
   font-size: clamp(96px, 15vw, 220px);
   line-height: 1;
-  letter-spacing: 0;
+  letter-spacing: var(--display-tracking);
   font-variant-numeric: tabular-nums;
   background: var(--a-block);
   color: var(--a-on-block);
 }
 .dir-a .nf-h {
   font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: 0;
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-tracking);
 }
 .dir-a .nf-copy > .caption::before {
   content: '//\00a0';

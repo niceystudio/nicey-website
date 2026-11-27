@@ -270,7 +270,7 @@ const num = (i: number) => String(i + 1).padStart(2, '0');
   }
   .ar-title {
     font-family: var(--font-display);
-    font-weight: 400;
+    font-weight: var(--display-weight);
     font-size: clamp(32px, 3.6vw, 52px);
     line-height: 1.06;
     letter-spacing: -0.01em;
@@ -297,10 +297,10 @@ const num = (i: number) => String(i + 1).padStart(2, '0');
   }
   .ar-h {
     font-family: var(--font-display);
-    font-weight: 400;
+    font-weight: var(--display-weight);
     font-size: var(--text-title);
     line-height: var(--text-title--line-height);
-    letter-spacing: 0;
+    letter-spacing: var(--display-tracking);
   }
   .ar-answer {
     padding-left: var(--spacing-sm);
