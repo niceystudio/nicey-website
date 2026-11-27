@@ -44,9 +44,6 @@
   line-height: 1.04;
 }
 /* 27 Nov (two worlds): section headings are plain sans in sentence case, no ink blocks (.h-print is a no-op hook) */
-.dir-a .caption {
-  letter-spacing: 0.12em;
-}
 .dir-a .text-work {
   font-family: var(--font-display);
   font-weight: var(--display-weight);
@@ -54,55 +51,7 @@
 }
 
 /* ---------- header ----------
- * 27 Nov (two worlds): the wordmark and the action sit on the page; the links sit in a dark capsule, the machine side's
- * colour, the same in both themes (after the Content Architecture nav). Mono capitals, a lit segment on hover and for
- * the page you're on. */
-.dir-a .site-head {
-  background: color-mix(in srgb, var(--color-page) 88%, transparent);
-  backdrop-filter: blur(8px);
-}
-.dir-a .site-head .head-nav > a:first-child {
-  font-family: var(--font-sans) !important;
-  font-weight: 600 !important;
-  font-size: 24px;
-  letter-spacing: -0.045em !important;
-}
-.dir-a .site-head .head-links {
-  gap: 2px;
-  padding: 4px;
-  background: var(--color-term);
-  border: 1px solid var(--color-term-rule);
-  border-radius: var(--radius-code);
-  box-shadow: var(--shadow-sm);
-}
-.dir-a .site-head .head-link {
-  gap: 0 !important;
-  min-height: 36px;
-  padding: 0 var(--spacing-xs);
-  border-radius: calc(var(--radius-code) - 2px);
-  color: var(--color-term-muted);
-  font-size: var(--text-caption-sm);
-  letter-spacing: 0.1em;
-  text-transform: uppercase !important;
-  transition:
-    background-color 120ms var(--ease-out),
-    color 120ms var(--ease-out),
-    transform 160ms var(--ease-out);
-}
-.dir-a .site-head .head-link[aria-current='page'] {
-  background: var(--color-term-rule);
-  color: var(--color-term-ink);
-}
-@media (hover: hover) and (pointer: fine) {
-  .dir-a .site-head .head-link:hover {
-    background: var(--color-term-rule);
-    color: var(--color-term-ink) !important;
-  }
-}
-.dir-a .site-head .head-link:focus-visible {
-  outline: 2px solid var(--color-term-accent);
-  outline-offset: -2px;
-}
+ * 27 Nov: a floating capsule; Header.astro holds its look, --head-h (global.css) its height. */
 
 /* footer wordmark: the same sans mark as the header */
 .dir-a footer a[href='/']:not(.pill) {
@@ -125,4 +74,10 @@
 .dir-a .sa-stage > :not(.pf) {
   position: relative;
   z-index: 1;
+}
+
+/* ---------- worlds (27 Nov) ----------
+ * Each world opens with room under the seam; sections keep their own bottom padding. */
+.dir-a .world {
+  padding-top: var(--spacing-2xl);
 }

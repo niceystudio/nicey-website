@@ -1,0 +1,199 @@
+---
+/**
+ * The seam (27 Nov, after contentarchitecture.dev): where the people world (cream) and the agent world (charcoal) meet.
+ * Not a straight edge: a skyline of mono words from our own vocabulary (drifted values, tokens, the files agents read),
+ * with inverted letter blocks along the edge, so one world dissolves into the other. Scroll moves the edge: it glitches
+ * while it passes through the viewport and settles when it leaves.
+ *
+ *   <SeamA to="dark" />    cream above, charcoal below
+ *   <SeamA to="light" />   charcoal above, cream below
+ *
+ * Decorative (aria-hidden). The two colours are read from the live tokens (a hidden probe of each world), so it follows
+ * the theme. Canvas, DPR capped at 2, redrawn only on scroll while on screen. Reduced motion: one still frame.
+ */
+interface Props {
+  to: 'dark' | 'light';
+}
+const { to } = Astro.props;
+---
+
+<div class="seam" data-seam={to} aria-hidden="true">
+  <span class="seam-probe" data-probe-light></span>
+  <span class="seam-probe world-dark" data-probe-dark></span>
+  <canvas class="seam-c"></canvas>
+</div>
+
+<style>
+  .seam {
+    position: relative;
+    height: clamp(160px, 22vw, 300px);
+    overflow: hidden;
+  }
+  /* until the canvas draws: the top half one world, the bottom the other */
+  .seam[data-seam='dark'] {
+    background: linear-gradient(var(--color-page) 50%, var(--color-agent) 50%);
+  }
+  .seam[data-seam='light'] {
+    background: linear-gradient(var(--color-agent) 50%, var(--color-page) 50%);
+  }
+  .seam-probe {
+    position: absolute;
+    width: 0;
+    height: 0;
+    visibility: hidden;
+  }
+  .seam-c {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+</style>
+
+<script>
+  import { createDrift, mulberry32 } from '../../lib/pixel-field';
+
+  const WORDS = [
+    '#6b5fbe', 'purple-2', 'col-7', 'btn-new-final', 'color.accent', 'text/default', 'AGENTS.md', 'tokens.json',
+    'space.4', 'radius.panel', 'Button', 'Input', 'llms.txt', 'button.md', 'z-index:9999', 'surface/hover',
+    'violet-final', 'DRIFT:', 'SYNCED', 'border/default', 'theme.css', 'field.md', '!important', 'opacity/disabled',
+  ];
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // a stable pseudo-random value per cell and time step
+  const hash = (a: number, b: number, c: number) => {
+    let h = (a * 374761393 + b * 668265263 + c * 2246822519) | 0;
+    h = Math.imul(h ^ (h >>> 13), 1274126177);
+    return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+  };
+
+  document.querySelectorAll<HTMLElement>('[data-seam]').forEach((root, n) => {
+    const canvas = root.querySelector('canvas')!;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const toDark = root.dataset.seam === 'dark';
+    const field = createDrift({ cols: 12, rows: 2, driftSpeed: 1, seed: 31 + n });
+    let light = '#f3f0e9', lightInk = '#26251f', dark = '#232320', darkInk = '#f3f0e9';
+    const readColours = () => {
+      const l = getComputedStyle(root.querySelector('[data-probe-light]')!);
+      const d = getComputedStyle(root.querySelector('[data-probe-dark]')!);
+      const v = (cs: CSSStyleDeclaration, name: string, f: string) => cs.getPropertyValue(name).trim() || f;
+      light = v(l, '--color-page', light);
+      lightInk = v(l, '--color-ink', lightInk);
+      dark = v(d, '--color-page', dark);
+      darkInk = v(d, '--color-ink', darkInk);
+    };
+
+    let W = 0, H = 0, cw = 8, ch = 14, cols = 0, rows = 0, size = 12;
+    let lines: string[] = [];
+    let visible = false, raf = 0;
+
+    const resize = () => {
+      const r = root.getBoundingClientRect();
+      W = Math.max(1, Math.round(r.width));
+      H = Math.max(1, Math.round(r.height));
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      canvas.width = W * dpr;
+      canvas.height = H * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      size = W < 600 ? 10 : 12;
+      cw = size * 0.6;
+      ch = size * 1.17;
+      cols = Math.ceil(W / cw);
+      rows = Math.ceil(H / ch);
+      lines = Array.from({ length: rows }, (_, i) => {
+        const rnd = mulberry32(i * 97 + n * 13 + 5);
+        let s = '';
+        while (s.length < cols + 2) s += WORDS[Math.floor(rnd() * WORDS.length)].toUpperCase() + (rnd() < 0.3 ? ' · ' : ' ');
+        return s;
+      });
+      draw();
+    };
+
+    // 0 while the seam enters the bottom of the screen, 1 when it leaves the top
+    const progress = () => {
+      if (reduced) return 0.5;
+      const r = root.getBoundingClientRect();
+      const vh = window.innerHeight;
+      return Math.min(1, Math.max(0, (vh - r.top) / (vh + r.height)));
+    };
+
+    const draw = () => {
+      const p = progress();
+      const t = p * 6;
+      const step = reduced ? 0 : Math.floor(p * 40); // the glitch changes in steps, like a terminal redraw
+      const top = toDark ? light : dark;
+      const bot = toDark ? dark : light;
+      const topInk = toDark ? lightInk : darkInk;
+      const botInk = toDark ? darkInk : lightInk;
+      ctx.fillStyle = top;
+      ctx.fillRect(0, 0, W, H);
+      ctx.font = `400 ${size}px 'Geist Mono Variable', ui-monospace, monospace`;
+      ctx.textBaseline = 'top';
+      // the edge: a skyline per column, around the middle, drifting with scroll
+      const edge = new Float32Array(cols);
+      for (let c = 0; c < cols; c++) {
+        const v = field.sample(c / cols, 0.5, t);
+        const jag = (hash(c >> 2, 0, step) - 0.5) * 0.18;
+        edge[c] = H * (0.52 + (v - 0.5) * 0.9 + jag);
+      }
+      // the lower world fills up to its edge
+      ctx.fillStyle = bot;
+      for (let c = 0; c < cols; c++) {
+        const e = Math.round(edge[c] / ch) * ch;
+        ctx.fillRect(c * cw, e, cw + 0.5, H - e);
+      }
+      // words: dense near the edge, thinning out into each world
+      for (let r = 0; r < rows; r++) {
+        const y = r * ch;
+        const line = lines[r];
+        for (let c = 0; c < cols; c++) {
+          const g = line[c];
+          if (!g || g === ' ') continue;
+          const d = (y - edge[c]) / H; // < 0 above the edge, > 0 below
+          const near = Math.exp(-Math.abs(d) * 7);
+          const h = hash(c, r, step);
+          if (h > near * 0.95) continue;
+          const x = c * cw;
+          if (d < 0) {
+            // above: the upper world's ink; right at the edge, inverted blocks bite into it
+            if (near > 0.72 && h < near * 0.3) {
+              ctx.fillStyle = bot;
+              ctx.fillRect(x, y, cw + 0.5, ch);
+              ctx.fillStyle = botInk;
+            } else {
+              ctx.fillStyle = topInk;
+            }
+          } else {
+            ctx.fillStyle = botInk;
+          }
+          ctx.globalAlpha = 0.35 + 0.65 * near;
+          ctx.fillText(g, x, y + 1);
+          ctx.globalAlpha = 1;
+        }
+      }
+    };
+
+    const onScroll = () => {
+      if (!visible || raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        draw();
+      });
+    };
+
+    readColours();
+    new ResizeObserver(resize).observe(root);
+    new IntersectionObserver((es) => {
+      visible = es[0].isIntersecting;
+      if (visible) draw();
+    }).observe(root);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    // theme toggle: the worlds change colour
+    new MutationObserver(() => {
+      readColours();
+      draw();
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    document.fonts?.ready.then(resize);
+  });
+</script>

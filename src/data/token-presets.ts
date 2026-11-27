@@ -25,10 +25,10 @@ export const styles: Style[] = [
   {
     id: 'studio',
     label: 'Studio',
-    note: 'Sans, violet, square',
-    font: { name: 'Geist Sans', stack: "'Geist Variable', 'Geist Fallback', ui-sans-serif, system-ui, sans-serif", weight: 500, tracking: '-0.035em', case: 'none' },
+    note: 'Sans, mono, two worlds',
+    font: { name: 'Geist Sans', stack: "'Geist Variable', 'Geist Fallback', ui-sans-serif, system-ui, sans-serif", weight: 500, tracking: '-0.015em', case: 'none' },
     accent: { light: '#6b5fbe', dark: '#a79bea' },
-    radius: { panel: '0px', code: '0px', chip: '0px', pill: '0px', swatch: '0px' },
+    radius: { panel: '8px', code: '8px', chip: '4px', pill: '4px', swatch: '2px' },
   },
   {
     id: 'terminal',

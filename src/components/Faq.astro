@@ -54,13 +54,11 @@ const faqs = items;
       faqs.map((f, i) => (
         <details class="faq">
           <summary>
-            <span class="font-mono text-caption font-medium text-muted">
-              {String(i + 1).padStart(2, '0')}
-            </span>
-            <span class="flex-1">{f.q}</span>
+            <span class="faq-n">Q.{String(i + 1).padStart(3, '0')}&nbsp;/</span>
+            <span class="faq-q flex-1">{f.q}</span>
             <span class="faq-ind" aria-hidden="true" />
           </summary>
-          <p class="m-0 max-w-[60ch] pb-7 pl-9 text-body leading-[1.6] text-pretty text-ink-2"><Gaps text={f.a} /></p>
+          <p class="m-0 max-w-[60ch] pb-7 pl-[78px] text-body leading-[1.6] text-pretty text-ink-2"><Gaps text={f.a} /></p>
         </details>
       ))
     }
@@ -71,16 +69,24 @@ const faqs = items;
   .faq {
     padding: 0 var(--spacing-lg);
   }
+  /* 27 Nov (after contentarchitecture.dev): questions read like a numbered log, "Q.001 / WHAT …", mono capitals */
   .faq summary {
     display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    min-height: 76px;
-    padding-block: var(--spacing-xs);
-    font-size: var(--text-faq);
-    line-height: var(--text-faq--line-height);
-    letter-spacing: var(--text-faq--letter-spacing);
-    font-weight: 500;
+    align-items: baseline;
+    gap: var(--spacing-xs);
+    min-height: 64px;
+    padding-block: var(--spacing-sm);
+    font-family: var(--font-mono);
+    font-size: 15px;
+    line-height: 1.45;
+    text-transform: uppercase;
+  }
+  .faq-n {
+    flex: none;
+    color: var(--color-muted);
+  }
+  .faq-q {
+    color: var(--color-ink);
   }
   /* the row is the target: let the ring wrap the whole summary */
   .faq summary:focus-visible {
@@ -88,10 +94,18 @@ const faqs = items;
     padding-inline: var(--spacing-md);
   }
   .faq-ind {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 22px;
+    height: 22px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-chip);
     font-family: var(--font-mono);
-    font-size: var(--text-lede);
+    font-size: 14px;
     line-height: 1;
     color: var(--color-ink-2);
+    align-self: center;
   }
   .faq-ind::before {
     content: '+';

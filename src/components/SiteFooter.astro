@@ -5,7 +5,6 @@
  */
 import { links } from '../data/links';
 import { publishedCaseStudies, caseHref } from '../data/case-studies';
-import WordFieldA from '../directions/a/WordFieldA.astro';
 
 /* 24 Nov: the footer is Direction A's only. The Human | Machine switch, the animated wordmark and the extra audit
    button were rendered and then hidden with CSS; they are gone (the Machine view still opens with the m key). */
@@ -40,17 +39,15 @@ const contact = [
 ];
 ---
 
-<footer class="site-foot">
-  <!-- 27 Nov ("two worlds"): the page closes on the machine side, a dark band with the word field as texture -->
-  <WordFieldA quiet class="site-foot-field" />
+<footer class="site-foot border-t border-line">
   <div class="container-page site-foot-grid">
     <div class="flex max-w-[36ch] flex-col gap-4">
       <a
         href={links.home}
-        class="hit self-start text-[22px] leading-none font-semibold tracking-[-0.04em] text-on-band no-underline"
-        >nicey<span class="text-term-accent">.</span></a
+        class="hit self-start text-[22px] leading-none font-semibold tracking-[-0.04em] text-ink no-underline"
+        >nicey<span class="text-accent">.</span></a
       >
-      <p class="m-0 text-body-sm text-pretty text-on-band-2">
+      <p class="m-0 text-body-sm text-pretty text-ink-2">
         Nicey Studio is a design systems studio for legacy products and teams scaling with agents. We turn drifted UI
         into one system of tokens, components and documentation that designers, engineers and coding agents read the
         same way.
@@ -60,11 +57,11 @@ const contact = [
       {
         cols.map((c) => (
           <div class="flex flex-col gap-3">
-            <h2 class="caption-sm m-0 text-on-band-2">{c.head}</h2>
+            <h2 class="caption-sm m-0 text-ink-2">{c.head}</h2>
             <ul class="m-0 flex list-none flex-col p-0">
               {c.items.map((it) => (
                 <li>
-                  <a href={it.href} class="foot-link text-on-band no-underline hover:underline">
+                  <a href={it.href} class="foot-link text-body-sm text-ink no-underline hover:underline">
                     {it.label}
                   </a>
                 </li>
@@ -76,11 +73,11 @@ const contact = [
       <div class="flex flex-col gap-6">
         {contact.map((c) => (
           <div class="flex flex-col gap-3">
-            <h2 class="caption-sm m-0 text-on-band-2">{c.head}</h2>
+            <h2 class="caption-sm m-0 text-ink-2">{c.head}</h2>
             <ul class="m-0 flex list-none flex-col p-0">
               {c.items.map((it) => (
                 <li>
-                  <a href={it.href} class="foot-link text-on-band no-underline hover:underline">
+                  <a href={it.href} class="foot-link text-body-sm text-ink no-underline hover:underline">
                     {it.label}
                   </a>
                 </li>
@@ -92,41 +89,16 @@ const contact = [
     </nav>
   </div>
   <div class="container-page site-foot-base">
-    <p class="caption-sm m-0 text-on-band-2">© {year} Nicey Studio · Design systems people and agents read the same way</p>
+    <p class="caption-sm m-0 text-ink-2">© {year} Nicey Studio · Design systems people and agents read the same way</p>
     <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
-      <a href="#main" class="foot-link caption-sm text-on-band-2 no-underline hover:underline">Back to top <span class="arr-up" aria-hidden="true">↑</span></a>
+      <a href="#main" class="foot-link caption-sm text-ink-2 no-underline hover:underline">Back to top <span class="arr-up" aria-hidden="true">↑</span></a>
     </div>
   </div>
 </footer>
 
 <style>
   .site-foot {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
     padding-block: var(--spacing-2xl) var(--spacing-lg);
-    background: var(--color-band);
-    color: var(--color-on-band);
-  }
-  .site-foot > :global(.container-page) {
-    position: relative;
-    z-index: 1;
-  }
-  /* the field fades in towards the bottom, so the text above stays clean */
-  .site-foot :global(.site-foot-field) {
-    z-index: 0;
-    mask-image: linear-gradient(to bottom, transparent 10%, #000 85%);
-  }
-  /* on the dark band the focus ring takes the band's lavender, so it still reads */
-  .site-foot a:focus-visible {
-    outline-color: var(--color-term-accent);
-  }
-  /* links read like the nav capsule: mono capitals */
-  .foot-link {
-    font-family: var(--font-mono);
-    font-size: var(--text-caption);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
   }
   .site-foot-grid {
     display: flex;
@@ -164,6 +136,6 @@ const contact = [
     gap: var(--spacing-xs);
     margin-top: var(--spacing-md);
     padding-top: var(--spacing-md);
-    border-top: 1px solid var(--color-term-rule);
+    border-top: 1px solid var(--color-line);
   }
 </style>
