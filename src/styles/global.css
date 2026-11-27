@@ -2,8 +2,8 @@
 
 /* ------------------------------------------------------------------ *
  * Tokens. Every value lives here once; components use only these.
- * Day values come from the v3 canvas. Night values are overridden
- * below under [data-theme='dark'].
+ * Values come from the v3 canvas. Light only (27 Nov, Goran): the dark
+ * theme is gone; dark moments are sections (the band, terminals, How we work).
  *
  * This file is the single source of truth for the design system. The /brand page renders every token and
  * component straight from it, /brand.md and /tokens.json serve it to agents, so a change here (or in a
@@ -229,39 +229,9 @@
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-/* ------------------------------------------------------------------ *
- * Night. Every colour token has a value here.
- * ------------------------------------------------------------------ */
 @layer base {
   :root {
     color-scheme: light;
-  }
-  :root[data-theme='dark'] {
-    color-scheme: dark;
-    --color-page: #141410;
-    --color-surface: #1d1c16;
-    --color-surface-hover: #24231c;
-    --color-ink: #ece7db;
-    --color-ink-2: #b6b1a3;
-    --color-muted: #8f8c81;
-    --color-on-ink: #141410;
-    --color-line: rgba(236, 231, 219, 0.13);
-    --color-line-strong: rgba(236, 231, 219, 0.26);
-    --color-dashed: rgba(236, 231, 219, 0.34);
-    --color-cell-quiet: rgba(236, 231, 219, 0.16);
-    --color-accent: #a79bea;
-    --color-hot: #ff8a66;
-    --color-sage: #3a4634;
-    --color-lavender: #3a3556;
-    --color-peach: #4a3a2c;
-    --color-butter: #4a4229;
-    --color-mauve: #463a4c;
-    --color-stone: #33312a;
-    /* a step darker than the page, so the closing band still reads */
-    --color-band: #0c0c09;
-    --color-image-outline: oklch(1 0 0 / 0.1);
-    --color-on-band: #ece7db;
-    --color-on-band-2: #b6b1a3;
   }
 
   /* metric-matched fallbacks so the swap to Geist doesn't shift layout */
@@ -344,13 +314,6 @@
     outline: none;
   }
 
-  /* one frame with no transitions while the theme swaps */
-  .theme-switching,
-  .theme-switching *,
-  .theme-switching *::before,
-  .theme-switching *::after {
-    transition: none !important;
-  }
 
   @media (max-width: 767px) {
     :root {

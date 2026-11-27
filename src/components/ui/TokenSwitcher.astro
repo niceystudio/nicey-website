@@ -30,7 +30,7 @@ import { styles } from '../../data/token-presets';
           <button
             type="button"
             class="ts-card"
-            style={`--f:${s.font.stack};--sw-l:${s.accent.light};--sw-d:${s.accent.dark};--r:${s.radius.pill};--rc:${s.radius.code}`}
+            style={`--f:${s.font.stack};--sw-l:${s.accent.light};--r:${s.radius.pill};--rc:${s.radius.code}`}
             aria-pressed={i === 0 ? 'true' : 'false'}
             data-style={s.id}
           >
@@ -222,9 +222,6 @@ import { styles } from '../../data/token-presets';
       border-color 160ms var(--ease-out),
       transform 160ms var(--ease-out);
   }
-  :global(:root[data-theme='dark']) .ts-card {
-    --sw: var(--sw-d);
-  }
   .ts-card:active {
     transform: scale(var(--scale-press));
   }
@@ -377,7 +374,6 @@ import { styles } from '../../data/token-presets';
       return el;
     };
     const paint = () => cards.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.style === state)));
-    const isDark = () => document.documentElement.dataset.theme === 'dark';
 
     // ---------- the log: what an agent would report ----------
     // a line is plain text, or mark + token + value in three columns
@@ -411,14 +407,14 @@ import { styles } from '../../data/token-presets';
         { text: '$ nicey status' },
         { mark: ' ', key: 'style', value: s.id + (s.id === styles[0].id ? ' (shipped)' : '') },
         { mark: ' ', key: 'font.display', value: s.font.name },
-        { mark: ' ', key: 'color.accent', value: isDark() ? s.accent.dark : s.accent.light },
+        { mark: ' ', key: 'color.accent', value: s.accent.light },
         { mark: ' ', key: 'radius.*', value: list(Object.values(s.radius)) },
         { text: 'pick a style to see the edit', tone: 'dim' },
       ]);
     };
     const report = (fromId: string, toId: string) => {
       const to = styleById(toId);
-      const all = edits(styleById(fromId), to, isDark());
+      const all = edits(styleById(fromId), to);
       const radius = all.filter((e) => e.token.startsWith('radius.'));
       const rows: Line[] = all
         .filter((e) => !e.token.startsWith('radius.'))

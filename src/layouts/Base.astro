@@ -74,23 +74,10 @@ const org = {
     {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
     <script type="application/ld+json" set:html={JSON.stringify(org)} />
     {noindex && <meta name="robots" content="noindex" />}
-    <meta name="color-scheme" content="light dark" />
+    <meta name="color-scheme" content="light" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preload" href={geistLatin} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={geistMonoLatin} as="font" type="font/woff2" crossorigin />
-    <!-- Theme before first paint: stored choice, else the system preference. -->
-    <script is:inline>
-      (function () {
-        var t = null;
-        try {
-          t = localStorage.getItem('nicey-theme');
-        } catch (e) {}
-        if (t !== 'light' && t !== 'dark') {
-          t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        }
-        document.documentElement.setAttribute('data-theme', t);
-      })();
-    </script>
     <!-- "Change the style" before first paint: a remembered style (src/data/token-presets.ts). -->
     <script is:inline define:vars={{ tokenCss }}>
       (function () {

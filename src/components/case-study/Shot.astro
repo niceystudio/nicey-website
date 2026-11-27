@@ -1,7 +1,6 @@
 ---
 /**
- * A case-study image. If there is a night version, the day and night images
- * swap with the site theme (data-theme on <html>, or the system setting).
+ * A case-study image. The site is light only (27 Nov), so a night version, if any, is never shown.
  */
 import type { Shot } from '../../data/case-studies';
 
@@ -55,19 +54,5 @@ const loading = eager ? 'eager' : 'lazy';
   }
   .shot--themed .shot-dark {
     display: none;
-  }
-  :global([data-theme='dark']) .shot--themed .shot-light {
-    display: none;
-  }
-  :global([data-theme='dark']) .shot--themed .shot-dark {
-    display: block;
-  }
-  @media (prefers-color-scheme: dark) {
-    :global(:root:not([data-theme='light'])) .shot--themed .shot-light {
-      display: none;
-    }
-    :global(:root:not([data-theme='light'])) .shot--themed .shot-dark {
-      display: block;
-    }
   }
 </style>

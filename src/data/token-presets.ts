@@ -49,12 +49,11 @@ export const styles: Style[] = [
 
 export const styleById = (id?: string | null): Style => styles.find((s) => s.id === id) ?? styles[0];
 
-/** the CSS that applies one style: on :root, and the lighter accent after dark */
+/** the CSS that applies one style, on :root */
 export const styleCss = (s: Style) =>
   `:root{--font-display:${s.font.stack};--color-accent:${s.accent.light};--color-accent-solid:${s.accent.light};` +
   `--radius-panel:${s.radius.panel};--radius-code:${s.radius.code};--radius-chip:${s.radius.chip};` +
-  `--radius-pill:${s.radius.pill};--radius-swatch:${s.radius.swatch}}` +
-  `:root[data-theme='dark']{--color-accent:${s.accent.dark}}`;
+  `--radius-pill:${s.radius.pill};--radius-swatch:${s.radius.swatch}}`;
 
 /** what goes in <style id="token-override">; empty for the shipped style */
 export const overrideCss = (id?: string | null): string => {
@@ -71,12 +70,11 @@ export interface Edit {
 
 /**
  * What an agent would edit to go from one style to another: one row per token that really differs.
- * `dark` picks which accent value to show (the one on screen).
  */
-export function edits(from: Style, to: Style, dark = false): Edit[] {
+export function edits(from: Style, to: Style): Edit[] {
   const out: Edit[] = [];
   if (from.font.name !== to.font.name) out.push({ token: 'font.display', from: from.font.name, to: to.font.name });
-  const a = (s: Style) => (dark ? s.accent.dark : s.accent.light);
+  const a = (s: Style) => s.accent.light;
   if (a(from) !== a(to)) out.push({ token: 'color.accent', from: a(from), to: a(to) });
   (Object.keys(to.radius) as (keyof Style['radius'])[]).forEach((k) => {
     if (from.radius[k] !== to.radius[k]) out.push({ token: `radius.${k}`, from: from.radius[k], to: to.radius[k] });

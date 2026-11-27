@@ -1,0 +1,217 @@
+---
+/**
+ * Direction A · the hill reveal into How we work (Goran, 27 Nov). A soft hill in the brand ramp rises from the light
+ * page as you scroll, swells until its dark core fills the screen, and hands straight over to the dark How we work
+ * section below it. It stays dark (no hand-back).
+ *
+ * How it's drawn: a plain 2D canvas, pinned (sticky) inside a tall runway. Every band is the same hill, drawn a little
+ * smaller each time, so the bands are thick at the peak and squeezed at the feet. As the hill grows its shoulders
+ * flatten, and its final size is worked out from the screen so the core reaches both edges at the end of the runway.
+ * A CSS blur that grows with the hill keeps the bands melted together. The peak leans a little toward the cursor and
+ * lets go as it fills the screen.
+ *
+ * Colours are read from tokens: page → lavender → accent → band. So "Change the style" recolours it too.
+ * No library: scroll progress comes from the runway's position, eased with one curve.
+ *
+ * Only shown with scripting on and motion allowed (CSS below). Otherwise the page cuts straight to the dark section,
+ * which is the final state. Decorative: aria-hidden, nothing to read or focus.
+ */
+---
+
+<div class="rh" data-rh aria-hidden="true">
+  <div class="rh-pin">
+    <canvas class="rh-canvas"></canvas>
+  </div>
+</div>
+
+<style>
+  .rh {
+    display: none;
+  }
+  @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+    .rh {
+      display: block;
+      /* the runway: one screen pinned while the hill grows (the scroll distance), plus the pinned screen itself */
+      height: 220vh;
+      height: 220svh;
+      /* the hill's last frame is the next section, so no gap between them */
+      margin-bottom: -1px;
+    }
+  }
+  .rh-pin {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100svh;
+    overflow: hidden;
+  }
+  .rh-canvas {
+    position: absolute;
+    /* bigger than the screen by the max blur, so the blur never softens the screen edges */
+    inset: -48px;
+    width: calc(100% + 96px);
+    height: calc(100% + 96px);
+    will-change: filter;
+  }
+</style>
+
+<script>
+  type RGB = [number, number, number];
+
+  const BANDS = 8;
+  /* each band is the hill one step bigger than the one inside it */
+  const STEP = 0.075;
+  const MAX_BLUR = 16;
+  const PAD = 48; // matches .rh-canvas inset
+
+  const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+  const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+  document.querySelectorAll<HTMLElement>('[data-rh]').forEach((root) => {
+    if (root.dataset.ready) return;
+    root.dataset.ready = '1';
+    if (getComputedStyle(root).display === 'none') return; // reduced motion: the section below is the final state
+    const canvas = root.querySelector('canvas')!;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // ---------- colours from tokens (re-read on every draw, so a style switch shows up at once) ----------
+    const probe = document.createElement('canvas').getContext('2d')!;
+    const rgb = (v: string): RGB => {
+      probe.fillStyle = '#000';
+      probe.fillStyle = v.trim() || '#000';
+      const s = probe.fillStyle as string;
+      if (s.startsWith('#')) return [1, 3, 5].map((i) => parseInt(s.slice(i, i + 2), 16)) as RGB;
+      const m = s.match(/[\d.]+/g) ?? ['0', '0', '0'];
+      return [+m[0], +m[1], +m[2]];
+    };
+    const ramp = () => {
+      const cs = getComputedStyle(root);
+      const stops = ['--color-page', '--color-lavender', '--color-accent', '--color-band'].map((n) => rgb(cs.getPropertyValue(n)));
+      // band i = 0 is the outermost; the last band is the core and is exactly the next section's colour
+      return Array.from({ length: BANDS }, (_, i) => {
+        const t = (i + 1) / BANDS; // never the page colour itself: the outer band is already a tint of it
+        const seg = Math.min(stops.length - 2, Math.floor(t * (stops.length - 1)));
+        const local = t * (stops.length - 1) - seg;
+        const a = stops[seg], b = stops[seg + 1];
+        return `rgb(${a.map((c, k) => Math.round(lerp(c, b[k], local))).join(',')})`;
+      });
+    };
+
+    // ---------- size ----------
+    let W = 0, H = 0, dpr = 1;
+    const resize = () => {
+      const r = canvas.getBoundingClientRect();
+      if (r.width < 1 || r.height < 1) return;
+      W = r.width;
+      H = r.height;
+      dpr = Math.min(2, devicePixelRatio || 1);
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+      draw();
+    };
+
+    // ---------- the cursor lean ----------
+    const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+    let lean = 0, leanTarget = 0;
+
+    // ---------- progress through the runway ----------
+    const progress = () => {
+      const r = root.getBoundingClientRect();
+      const run = r.height - innerHeight;
+      return run > 0 ? clamp(-r.top / run) : 0;
+    };
+
+    /*
+     * One hill: height h, half-width w, peak at px, shoulders set by e (2 = round, bigger = flatter).
+     * Profile y = h * (1 - |u|^e) for |u| < 1, where u = (x - px) / w. Sampled every 8px, closed along the bottom.
+     */
+    const hill = (px: number, w: number, h: number, e: number) => {
+      const base = H;
+      ctx.beginPath();
+      ctx.moveTo(0, base);
+      const x0 = Math.max(0, px - w), x1 = Math.min(W, px + w);
+      ctx.lineTo(x0, base);
+      for (let x = x0; x <= x1; x += 8) {
+        const u = Math.min(1, Math.abs((x - px) / w));
+        ctx.lineTo(x, base - h * (1 - Math.pow(u, e)));
+      }
+      const u1 = Math.min(1, Math.abs((x1 - px) / w));
+      ctx.lineTo(x1, base - h * (1 - Math.pow(u1, e)));
+      ctx.lineTo(x1, base);
+      ctx.lineTo(W, base);
+      ctx.closePath();
+      ctx.fill();
+    };
+
+    const draw = () => {
+      if (!W) return;
+      const p = progress();
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+      if (p <= 0.001) {
+        canvas.style.filter = '';
+        return;
+      }
+      const colours = ramp();
+      const vw = W - PAD * 2, vh = H - PAD * 2; // the visible screen
+
+      // the core at the end: shoulders flat (e = 8) and wide enough that the screen edges sit at u = 0.8,
+      // tall enough that the curve is still above the top there. Worked out per screen, so it lands on every size.
+      const eEnd = 8;
+      const wEnd = vw / 2 / 0.8;
+      const hEnd = (vh + PAD * 2) / (1 - Math.pow(0.8, eEnd));
+      // the core at the start: a narrow round hill. It widens steadily and grows taller slowly at first, then
+      // faster (the swell), so the screen is only fully dark on the last frame of the runway
+      const wStart = vw * 0.18;
+      const e = lerp(2.2, eEnd, p * p);
+      const wCore = lerp(wStart, wEnd, Math.pow(p, 1.2));
+      const hCore = hEnd * Math.pow(p, 1.6);
+      // the peak leans toward the cursor, and lets go as the hill fills the screen
+      lean += (leanTarget - lean) * 0.12;
+      const px = W / 2 + lean * vw * 0.12 * (1 - p);
+
+      for (let i = 0; i < BANDS; i++) {
+        const k = 1 + (BANDS - 1 - i) * STEP; // outer bands are the core scaled up
+        ctx.fillStyle = colours[i];
+        hill(px, wCore * k, hCore * k, e);
+      }
+      // blur grows with the hill and eases off at the very end, so the core lands crisp on the section's colour
+      canvas.style.filter = `blur(${(MAX_BLUR * Math.sin(Math.PI * Math.pow(p, 0.8))).toFixed(1)}px)`;
+    };
+
+    // ---------- loop: only while on screen, and only while something changes ----------
+    let visible = false, raf = 0, lastP = -1;
+    const tick = () => {
+      raf = 0;
+      const p = progress();
+      const leaning = Math.abs(leanTarget - lean) > 0.002;
+      if (p !== lastP || leaning) {
+        lastP = p;
+        draw();
+      }
+      if (visible && leaning) raf = requestAnimationFrame(tick);
+    };
+    const kick = () => {
+      if (visible && !raf) raf = requestAnimationFrame(tick);
+    };
+    new IntersectionObserver((e) => {
+      visible = e[0].isIntersecting;
+      kick();
+    }).observe(root);
+    addEventListener('scroll', kick, { passive: true });
+    if (fine)
+      addEventListener(
+        'pointermove',
+        (e) => {
+          if (!visible) return;
+          leanTarget = clamp((e.clientX / innerWidth) * 2 - 1, -1, 1);
+          kick();
+        },
+        { passive: true },
+      );
+    new ResizeObserver(resize).observe(canvas);
+    addEventListener('nicey:tokens', () => draw());
+    resize();
+  });
+</script>

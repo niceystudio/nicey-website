@@ -1,6 +1,5 @@
 ---
 import { links } from '../data/links';
-import ThemeToggle from './ThemeToggle.astro';
 import Button from './ui/Button.astro';
 
 interface Props {
@@ -33,7 +32,7 @@ const audit = variant === 'case' ? `${home}#audit` : '#audit';
       >nicey<span class="text-accent">.</span></a
     >
     <!-- desktop: everything on one row -->
-    <!-- desktop: links in the middle, Free audit + theme on the right (Emir, 12 Nov) -->
+    <!-- desktop: links in the middle, Free audit on the right (Emir, 12 Nov). 27 Nov (Goran): light only, no theme toggle -->
     <div class="head-row head-links text-body-sm">
       {
         nav.map((item) => (
@@ -45,7 +44,6 @@ const audit = variant === 'case' ? `${home}#audit` : '#audit';
     </div>
     <div class="head-row head-end items-center gap-2 text-body-sm">
       <Button href={audit} size="sm">Free audit</Button>
-      <ThemeToggle />
     </div>
     <!-- phone: Free audit stays visible, the rest sits behind the menu button (Emir, 12 Nov) -->
     <div class="head-compact items-center justify-end gap-2">
@@ -75,10 +73,6 @@ const audit = variant === 'case' ? `${home}#audit` : '#audit';
           ))
         }
       </ul>
-    </div>
-    <div class="container-page flex items-center justify-between py-4">
-      <span class="font-mono text-caption text-ink-2">Theme</span>
-      <ThemeToggle />
     </div>
   </div>
 </header>
