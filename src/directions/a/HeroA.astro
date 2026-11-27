@@ -39,13 +39,9 @@ import PixelFieldA from './PixelFieldA.astro';
     padding-top: var(--spacing-3xl);
     padding-bottom: var(--spacing-2xl);
   }
-  /* the pixel field sits on the right half and fades out towards the headline */
-  .ha :global(.ha-field) {
-    left: 38%;
-  }
+  /* the pixel field runs the full width of the hero (Goran 27 Nov), fading out towards the headline */
   @media (max-width: 767px) {
     .ha :global(.ha-field) {
-      left: 0;
       opacity: 0.6;
     }
   }
