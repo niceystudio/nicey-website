@@ -10,9 +10,10 @@ export const links = {
   /** the booking page the live site (nicey.studio) uses; opens in a new tab */
   bookCall: 'https://cal.com/nicey/intro',
   /** the self-check (/ai-ready.md) ends with this: the same booking page as bookCall */
-  meeting: 'https://cal.com/nicey/intro',
+  // `source` rides through the booking: cal.com forwards it to /booked, which reports it with the conversion event
+  meeting: 'https://cal.com/nicey/intro?source=ai-ready',
   /** "Get a free audit" in the "It starts with a free audit" section: the audit starts with an intro call */
-  startAudit: 'https://cal.com/nicey/intro',
+  startAudit: 'https://cal.com/nicey/intro?source=audit',
   /** the service pages (src/pages/design-systems.astro, product-design.astro) */
   exploreDesignSystems: '/design-systems',
   exploreProductDesign: '/product-design',
