@@ -8,6 +8,7 @@
 import Base from '../../layouts/Base.astro';
 import { SITE } from '../../lib/site';
 import Header from '../Header.astro';
+import PixelFieldA from '../../directions/a/PixelFieldA.astro';
 import Gaps from './Gaps.astro';
 import Shot from './Shot.astro';
 import NamesField from './NamesField.astro';
@@ -115,7 +116,9 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), (Astro.site ?? SITE))
   <div class:list={[direction && `dir-${direction}`]} data-rail-a={railA ? '' : undefined}>
   <Header variant="case" home={home} />
   <main id="main" tabindex="-1" class="cs" data-human>
-    <section aria-labelledby="cs-title" class={band}>
+    <section aria-labelledby="cs-title" class:list={[band, 'cs-hero-band']}>
+      {/* the full-width pixel field, as on the homepage and service heroes (Goran 27 Nov) */}
+      <PixelFieldA mode="drift" fade="left" seed={13} class="cs-field" />
       <div class="container-page cs-hero">
         <div class:list={['cs-hero-top', s.heroVisual && 'cs-hero-top--visual']}>
           <div class="cs-hero-copy">
@@ -372,7 +375,18 @@ const markdown = caseMarkdown(s, new URL(caseHref(s.slug), (Astro.site ?? SITE))
     --cs-head: 48px;
   }
 
+  .cs-hero-band {
+    position: relative;
+    overflow: hidden;
+  }
+  @media (max-width: 767px) {
+    .cs-hero-band :global(.cs-field) {
+      opacity: 0.5;
+    }
+  }
   .cs-hero {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md);

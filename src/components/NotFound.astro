@@ -5,6 +5,7 @@
  */
 import Base from '../layouts/Base.astro';
 import Header from './Header.astro';
+import PixelFieldA from '../directions/a/PixelFieldA.astro';
 import Button from './ui/Button.astro';
 
 interface Props {
@@ -28,6 +29,9 @@ const cells: { x: number; y: number }[] = [];
 <Base title="Page not found · Nicey" description="This page does not exist." noindex>
   <div class:list={[direction && `dir-${direction}`]}>
   <Header variant="case" home={home} />
+  <div class="nf-wrap">
+  {/* the full-width pixel field, as on the other heroes (Goran 27 Nov) */}
+  <PixelFieldA mode="drift" fade="left" seed={21} class="nf-field" />
   <main id="main" tabindex="-1" class="nf container-page">
         <section class="nf-a" aria-labelledby="nf-h">
           {direction ? (
@@ -56,10 +60,22 @@ const cells: { x: number; y: number }[] = [];
         </section>
   </main>
   </div>
+  </div>
 </Base>
 
 <style>
+  .nf-wrap {
+    position: relative;
+    overflow: hidden;
+  }
+  @media (max-width: 767px) {
+    .nf-wrap :global(.nf-field) {
+      opacity: 0.5;
+    }
+  }
   .nf {
+    position: relative;
+    z-index: 1;
     min-height: calc(100svh - 80px);
     display: flex;
     align-items: center;

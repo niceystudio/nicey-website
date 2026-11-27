@@ -40,6 +40,9 @@ const px = (v: string) => (/^\d+px$/.test(v) ? Number(v.replace('px', '')) : 0);
   <div class="dir-a">
     <Header variant="case" />
     <main id="main" tabindex="-1" class="br">
+      <div class="br-hero">
+      {/* the full-width pixel field, as on the other heroes (Goran 27 Nov) */}
+      <PixelFieldA mode="drift" fade="left" seed={19} class="br-hero-field" />
       <section class="container-page br-intro">
         <Label variant="section">Brand</Label>
         <h1 class="m-0 br-h1">The system, all of it.</h1>
@@ -54,6 +57,7 @@ const px = (v: string) => (/^\d+px$/.test(v) ? Number(v.replace('px', '')) : 0);
           <span class="label-mono">{tokens.length} tokens · {components.length} components</span>
         </div>
       </section>
+      </div>
 
       {/* ---------- colour ---------- */}
       <section class="container-page br-sec" aria-labelledby="br-color">
@@ -297,7 +301,18 @@ const px = (v: string) => (/^\d+px$/.test(v) ? Number(v.replace('px', '')) : 0);
   .br {
     padding-bottom: var(--spacing-section);
   }
+  .br-hero {
+    position: relative;
+    overflow: hidden;
+  }
+  @media (max-width: 767px) {
+    .br-hero :global(.br-hero-field) {
+      opacity: 0.5;
+    }
+  }
   .br-intro {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
