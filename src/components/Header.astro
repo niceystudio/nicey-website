@@ -19,7 +19,6 @@ const nav = [
   { label: 'Design systems', href: links.exploreDesignSystems },
   { label: 'Product design', href: links.exploreProductDesign },
   ...[
-    { id: 'services', label: 'Services' },
     { id: 'work', label: 'Work' },
     { id: 'how', label: 'How we work' },
     { id: 'faq', label: 'FAQ' },
@@ -158,7 +157,7 @@ const audit = variant === 'case' ? `${home}#audit` : '#audit';
   .head-compact {
     display: flex;
   }
-  @media (min-width: 1100px) {
+  @media (min-width: 900px) {
     .head-row {
       display: flex;
     }
@@ -274,7 +273,7 @@ const audit = variant === 'case' ? `${home}#audit` : '#audit';
     document.addEventListener('click', (e) => {
       if (!panel.hidden && !head.contains(e.target as Node)) set(false);
     });
-    matchMedia('(min-width: 1100px)').addEventListener('change', (m) => m.matches && set(false));
+    matchMedia('(min-width: 900px)').addEventListener('change', (m) => m.matches && set(false));
   });
 
 </script>
