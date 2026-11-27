@@ -133,6 +133,13 @@ const { exit = false } = Astro.props;
       draw();
     };
 
+    // ---------- does the dark core sit under the header? (read by Header.astro) ----------
+    const setCover = (on: boolean) => {
+      if ((root.dataset.cover === '1') === on) return;
+      root.dataset.cover = on ? '1' : '';
+      dispatchEvent(new Event('nicey:cover'));
+    };
+
     // ---------- the cursor lean ----------
     const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
     let lean = 0, leanTarget = 0;
@@ -175,6 +182,7 @@ const { exit = false } = Astro.props;
       ctx.clearRect(0, 0, W, H);
       if (p <= 0.001) {
         canvas.style.filter = '';
+        setCover(false);
         return;
       }
       const colours = ramp();
@@ -200,6 +208,13 @@ const { exit = false } = Astro.props;
         ctx.fillStyle = colours[i];
         hill(px, wCore * k, hCore * k, e);
       }
+      // does the dark core cover the header strip across the middle 80% of the screen? (the header turns dark over
+      // it, see Header.astro; edge to edge looked late, a light bar over a dark screen)
+      const head = document.querySelector('[data-site-head]')?.getBoundingClientRect().bottom ?? 0;
+      const uEdge = Math.min(1, (Math.abs(px - W / 2) + vw * 0.4) / wCore);
+      const hEdge = hCore * (1 - Math.pow(uEdge, e));
+      // canvas y runs from the hill's base: bottom of the screen on the way in, top on the way out
+      setCover(exit ? hEdge >= PAD + head : hEdge >= H - PAD - head);
       // blur grows with the hill and eases off at the very end, so the core lands crisp on the section's colour
       canvas.style.filter = `blur(${(MAX_BLUR * Math.sin(Math.PI * Math.pow(p, 0.8))).toFixed(1)}px)`;
     };
