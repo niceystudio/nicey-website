@@ -13,6 +13,8 @@ import Button from '../../components/ui/Button.astro';
 import Label from '../../components/ui/Label.astro';
 
 import SelfCheckA from './SelfCheckA.astro';
+// 27 Nov (after craft.wild.as): the score per pillar in cells, under the steps
+import PixelAuditA from './PixelAuditA.astro';
 
 
 
@@ -48,6 +50,7 @@ const steps = [
             ))
           }
         </ol>
+        <PixelAuditA />
         <Button href={links.startAudit} class="pa-cta">Get a free audit</Button>
       </div>
       <div class="pa-right">
@@ -107,7 +110,7 @@ const steps = [
     flex-direction: column;
     gap: var(--spacing-md);
     margin: 0;
-    padding: var(--spacing-2xs) 0 0;
+    padding: var(--spacing-2xs) 0 var(--spacing-lg);
     list-style: none;
   }
   .pa-steps li {

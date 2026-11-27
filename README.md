@@ -28,6 +28,7 @@ npm run build    # type check + production build
 - **Homepage sections:** `src/directions/a/` (one file per section, e.g. `HeroA`, `ServicesA`, `ProcessA`)
 - **Service pages:** `src/data/service-pages.ts` (hero, one section per included/ line, steps, FAQ). Photo and video spots are `MediaSlot` placeholders that name the suggested asset; swap each for the real file when it exists.
 - **Articles at the bottom of a page** (after Book a call): `src/data/articles/` (`home.ts`, `design-systems.ts`, `product-design.ts`), rendered by `src/directions/a/ArticleA.astro`. Each H2 opens with a one- or two-sentence answer that stands on its own, for AI search.
+- **Pixel scenes** (the brand grid as illustration: hero trail, How we work flow, service icons, audit bars, Book a call marquee): `src/directions/a/Pixel*A.astro` on one engine, `src/lib/pixel-scenes.ts`. The soft background field elsewhere is still `PixelFieldA`.
 - **Styles and tokens:** `src/styles/global.css`, direction A in `src/directions/a/a.css` and `a-case.css`
 
 ## Case-study films

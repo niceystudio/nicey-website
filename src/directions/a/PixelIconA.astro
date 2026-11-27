@@ -1,0 +1,103 @@
+---
+/**
+ * Direction A: a small pixel icon that acts out a service (27 Nov, after craft.wild.as's pixel faces).
+ *   system  eleven near-purples, scattered, collapse into one token: a swatch, its name and its description
+ *   screen  loose parts assemble into a phone screen: header, card, list rows, one button
+ * It assembles once when it comes on screen; while the pointer is over its card it keeps taking itself apart and
+ * putting itself back together. Decorative (the card says it in words). Reduced motion: the assembled icon, still.
+ * Engine: src/lib/pixel-scenes.ts.
+ */
+interface Props {
+  kind: 'system' | 'screen';
+  class?: string;
+}
+const { kind, class: cls } = Astro.props;
+---
+
+<canvas class:list={['pic', cls]} data-pic={kind} aria-hidden="true"></canvas>
+
+<style>
+  .pic {
+    display: block;
+    width: 96px;
+    height: 96px;
+    flex: none;
+  }
+</style>
+
+<script>
+  import { mountScene, mulberry32, easeOut, cell as drawCell, type Colors, type Scene } from '../../lib/pixel-scenes';
+
+  type Tone = 'accent' | 'ink' | 'muted' | 'lavender' | 'sage';
+  interface Part {
+    gx: number;
+    gy: number;
+    to: Tone;
+    from: number;
+    sx: number;
+    sy: number;
+    d: number;
+  }
+  interface Icon extends Scene {
+    kind: string;
+    parts: Part[];
+    phase: number;
+    size: number;
+  }
+
+  const GRID = 12;
+
+  function build(kind: string): Part[] {
+    const r = mulberry32(kind === 'system' ? 3 : 5);
+    const P: Part[] = [];
+    const add = (gx: number, gy: number, to: Tone) =>
+      P.push({ gx, gy, to, from: Math.floor(r() * 7), sx: r() * (GRID - 1), sy: r() * (GRID - 1), d: r() * 0.25 });
+    if (kind === 'system') {
+      for (let y = 2; y < 6; y++) for (let x = 4; x < 8; x++) add(x, y, 'accent'); // one swatch
+      for (let x = 3; x < 9; x++) add(x, 8, 'ink'); // its name
+      for (let x = 4; x < 8; x++) add(x, 9, 'muted'); // its description
+    } else {
+      for (let y = 1; y < 12; y++) (add(3, y, 'ink'), add(8, y, 'ink')); // the phone
+      for (let x = 4; x < 8; x++) (add(x, 1, 'ink'), add(x, 11, 'ink'));
+      for (let x = 4; x < 8; x++) add(x, 3, 'lavender'); // header
+      for (let y = 4; y < 6; y++) for (let x = 4; x < 8; x++) add(x, y, 'sage'); // card
+      for (let x = 4; x < 7; x++) (add(x, 7, 'muted'), add(x, 8, 'muted')); // rows
+      for (let x = 4; x < 8; x++) add(x, 10, 'accent'); // the button
+    }
+    return P;
+  }
+
+  document.querySelectorAll<HTMLCanvasElement>('[data-pic]').forEach((canvas) => {
+    const kind = canvas.dataset.pic ?? 'system';
+    mountScene<Icon>(
+      canvas,
+      {
+        host: canvas.closest('article') ?? canvas.parentElement,
+        threshold: 0.6,
+        layout(s) {
+          s.size = Math.floor(Math.min(s.W, s.H) / GRID);
+        },
+        draw(s, c: Colors, t) {
+          const { ctx, size: z } = s;
+          // the near-colours a drifted product carries
+          const near = kind === 'system'
+            ? [c.lavenderDeep, c.mauveDeep, c.accent, c.lavender, c.hot, c.mauve, c.peachDeep]
+            : [c.sageDeep, c.peachDeep, c.butterDeep, c.lavenderDeep, c.mauveDeep, c.sage, c.peach];
+          // 0 = scattered, 1 = assembled. First view: assemble once. Under the pointer: take apart, put back, repeat.
+          const want = s.reduced ? 1 : !s.started ? 0 : s.inside ? (Math.sin(t * 1.8) > -0.2 ? 1 : 0) : 1;
+          const before = s.phase;
+          s.phase = s.reduced ? 1 : s.phase + (want - s.phase) * 0.08;
+          ctx.clearRect(0, 0, s.W, s.H);
+          const ox = (s.W - z * GRID) / 2, oy = (s.H - z * GRID) / 2;
+          for (const p of s.parts) {
+            const k = easeOut(s.phase * 1.3 - p.d);
+            ctx.fillStyle = k > 0.95 ? c[p.to] : near[p.from];
+            drawCell(ctx, ox + (p.sx + (p.gx - p.sx) * k) * z, oy + (p.sy + (p.gy - p.sy) * k) * z, z);
+          }
+          return s.inside || Math.abs(s.phase - before) > 0.001 || Math.abs(want - s.phase) > 0.002;
+        },
+      },
+      { kind, parts: build(kind), phase: 0, size: 8 },
+    );
+  });
+</script>
