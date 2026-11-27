@@ -222,10 +222,11 @@ const other = p.slug === 'design-systems'
     align-items: flex-start;
     gap: 4px;
     font-family: var(--font-display);
-    font-weight: 400;
+    font-weight: var(--display-weight);
     font-size: clamp(28px, 6.2vw, 92px);
     line-height: 1;
-    text-transform: uppercase;
+    letter-spacing: calc(var(--display-tracking) - 0.01em);
+    text-transform: var(--display-case);
   }
   .sv-line {
     padding: 0.06em 0.14em 0.02em;
@@ -371,7 +372,7 @@ const other = p.slug === 'design-systems'
   }
   .sv-offer-h {
     font-family: var(--font-display);
-    font-weight: 400;
+    font-weight: var(--display-weight);
     font-size: var(--text-case-h2);
     line-height: 1.08;
   }

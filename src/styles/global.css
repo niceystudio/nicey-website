@@ -72,8 +72,13 @@
   /* type */
   --font-sans: 'Geist Variable', 'Geist Fallback', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'Geist Mono Variable', 'Geist Mono Fallback', ui-monospace, monospace;
-  /* display face: headlines, names, figures. Named for its role: "Change the style" swaps it for a sans or a serif */
-  --font-display: 'Geist Pixel', 'Geist Mono Variable', ui-monospace, monospace;
+  /* display face: headlines, names, figures. Named for its role: "Change the style" swaps it for a pixel or a serif.
+     27 Nov (two worlds): the people side speaks sans, sentence case; the machine side speaks mono. The face carries its
+     own weight, tracking and case, so a swap to Geist Pixel brings back its capitals without touching a component. */
+  --font-display: 'Geist Variable', 'Geist Fallback', ui-sans-serif, system-ui, sans-serif;
+  --display-weight: 500;
+  --display-tracking: -0.035em;
+  --display-case: none;
 
   --text-display-figure: clamp(104px, 13vw, 196px);
   --text-display-figure--line-height: 0.84;
@@ -463,8 +468,13 @@
     color: var(--color-muted);
   }
   /* a section caption reads like a path: // prefix in the accent (Label variant="section", SectionHead) */
+  /* 27 Nov: numbered like a path, "01 / Work", counted down the page (main resets the count) */
+  main {
+    counter-reset: a-path;
+  }
   .a-path::before {
-    content: '//\00a0';
+    counter-increment: a-path;
+    content: counter(a-path, decimal-leading-zero) '\00a0/\00a0';
     color: var(--color-accent);
   }
 
@@ -804,11 +814,8 @@
 
   /* A heading printed on blocks, line by line, like the hero headline: wrap the heading's text in
      <span class="h-print"> (SectionHead does it). The block takes the window radius, so "Change the style" rounds it. */
+  /* 27 Nov (two worlds): headings are plain sans now, the blocks are gone; the hook stays so a style can bring them back */
   .h-print {
-    padding: 0.04em 0.16em;
-    border-radius: var(--radius-code);
-    background: var(--color-ink);
-    color: var(--color-page);
     box-decoration-break: clone;
     -webkit-box-decoration-break: clone;
   }

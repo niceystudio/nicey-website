@@ -1,97 +1,123 @@
 ---
 /**
- * Direction A hero (Select layout). The headline loads like the Supabase Select logotype: pixel capitals printed on
- * blocks, the last line on the accent — then the blocks fade and it rests as plain pixel text (Goran, 25 Nov; the
- * section headings below keep the printed blocks, .h-print). Reduced motion: plain text from the start. Below it one ruled row: the lede on the headline's left edge, the two keys
- * flush with the container's right edge, both sitting on the same bottom line (Emir 19 Nov: text and buttons were
- * not aligned). The "Selected work" strip moved out of the hero into its own band (SelectedA) after the ASCII band.
+ * Direction A hero, 27 Nov: "two worlds". The studio's line is that people and agents read the same system, so the
+ * hero shows both readers side by side (after contentarchitecture.dev: sans headline, mono labels, a field of words).
+ *
+ *   people  the cream page: the headline in sans, the lede, the one action (Goran 24 Nov: Get a free audit is in the nav)
+ *   agents  the dark band, bleeding to the right edge: the word field (WordFieldA), legacy values on the left turning
+ *           into tokens and the files an agent reads, and a prompt at the bottom
+ *
+ * The two meet on a hard seam: two tones, no gradient. On phones the agent side stacks under the copy.
+ * Before 27 Nov: pixel capitals printed on blocks over a pastel pixel field.
  */
 import { links } from '../../data/links';
 import Button from '../../components/ui/Button.astro';
-import PixelFieldA from './PixelFieldA.astro';
+import WordFieldA from './WordFieldA.astro';
 ---
 
-<section class="ha">
-  <PixelFieldA mode="drift" fade="left" class="ha-field" />
-  <div class="container-page ha-in">
-    <h1 class="ha-h m-0">
-      <span class="ha-line">Designing</span>
-      <span class="ha-line">systems that</span>
-      <span class="ha-line ha-line--accent">scale products.</span>
+<section class="ha" aria-labelledby="ha-head">
+  <div class="ha-people">
+    <p class="ha-side caption m-0"><span class="ha-dot" aria-hidden="true"></span>Read by people</p>
+    <h1 id="ha-head" class="ha-h m-0">
+      Design systems people and <span class="ha-em">agents</span> read the same&nbsp;way.
     </h1>
     <div class="ha-aside">
       <p class="ha-lede m-0">
-        Send us your Figma file. You get a score per pillar, the top findings and what to fix first. Free, and we never
-        edit your file.
+        We bridge design and engineering. Legacy UI in, one system out: tokens, components and docs that your
+        designers, engineers and coding agents all build on.
       </p>
       <div class="ha-ctas">
-        {/* Goran 24 Nov: one action here — Get a free audit is already in the nav */}
         <Button href={links.bookCall} target="_blank" rel="noopener">Book a call</Button>
+        <a href="#work" class="ha-link hit">See the work <span class="arr" aria-hidden="true">→</span></a>
       </div>
+    </div>
+  </div>
+  <div class="ha-machine">
+    <WordFieldA />
+    <p class="ha-side ha-side--machine caption m-0"><span class="ha-dot" aria-hidden="true"></span>Read by agents</p>
+    <div class="ha-prompt" aria-hidden="true">
+      <span class="ha-ps">~/your-product</span><span class="ha-gt">&gt;</span> nicey audit --from legacy --to agentic<span
+        class="term-cursor"></span>
     </div>
   </div>
 </section>
 
 <style>
+  /* the people side lines up with the container's left edge; the machine side runs to the window's right edge */
   .ha {
-    position: relative;
-    overflow: hidden;
-    padding-top: var(--spacing-3xl);
-    padding-bottom: var(--spacing-2xl);
+    --ha-edge: max(var(--spacing-gutter), calc((100vw - var(--container-page)) / 2 + var(--spacing-gutter)));
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    border-bottom: 1px solid var(--color-line);
   }
-  /* the pixel field runs the full width of the hero (Goran 27 Nov), fading out towards the headline */
-  @media (max-width: 767px) {
-    .ha :global(.ha-field) {
-      opacity: 0.6;
+  @media (min-width: 1024px) {
+    .ha {
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+      min-height: min(760px, calc(100svh - 77px));
     }
   }
-  .ha-in {
-    position: relative;
-    z-index: 1;
+  .ha-people {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-2xl);
+    justify-content: center;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-3xl) var(--spacing-2xl) var(--spacing-3xl) var(--ha-edge);
   }
-  /* under the headline: the lede, then the one action right below it on the same left edge
-     (Emir 24 Nov: the button sat too far from the text at the right edge) */
+  @media (max-width: 1023px) {
+    .ha-people {
+      padding: var(--spacing-2xl) var(--spacing-gutter) var(--spacing-xl);
+    }
+  }
+
+  /* "Read by people" / "Read by agents": a square marker and a mono caption, one per side */
+  .ha-side {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-2xs);
+    color: var(--color-ink-2);
+  }
+  .ha-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--color-accent);
+  }
+  .ha-h {
+    max-width: 16ch;
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-size: clamp(40px, 5.6vw, 80px);
+    line-height: 1;
+    letter-spacing: calc(var(--display-tracking) - 0.01em);
+    text-transform: var(--display-case);
+    color: var(--color-ink);
+  }
+  /* the word that crosses over: the agent's world, set in mono on the band colour */
+  .ha-em {
+    display: inline-block;
+    padding: 0.08em 0.14em 0.1em;
+    line-height: 0.9;
+    vertical-align: 0.04em;
+    background: var(--color-band);
+    color: var(--color-on-band);
+    font-family: var(--font-mono);
+    font-weight: 400;
+    font-size: 0.82em;
+    letter-spacing: -0.05em;
+    white-space: nowrap;
+  }
+  :global([data-theme='dark']) .ha-em {
+    box-shadow: inset 0 0 0 1px var(--color-term-light);
+  }
   .ha-aside {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: var(--spacing-lg);
   }
-  @media (max-width: 1023px) {
-    .ha {
-      padding-top: var(--spacing-2xl);
-    }
-    .ha-in {
-      gap: var(--spacing-xl);
-    }
-  }
-  .ha-h {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-    font-family: var(--font-display);
-    font-weight: 400;
-    font-size: clamp(28px, 7.6vw, 112px); /* 28px floor: "SCALE PRODUCTS." fits a 320px screen */
-    line-height: 1;
-    letter-spacing: 0;
-    text-transform: uppercase;
-  }
-  /* at rest: plain pixel text (the padding stays, so the letters don't shift when the blocks go) */
-  .ha-line {
-    display: inline-block;
-    white-space: nowrap;
-    padding: 0.06em 0.14em 0.02em;
-    border-radius: var(--radius-code);
-    color: var(--color-ink);
-  }
   .ha-lede {
-    max-width: 44ch;
+    max-width: 46ch;
     font-size: var(--text-cta);
-    line-height: 1.45;
+    line-height: 1.5;
     color: var(--color-ink-2);
     text-wrap: pretty;
   }
@@ -99,55 +125,85 @@ import PixelFieldA from './PixelFieldA.astro';
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--spacing-xs);
+    gap: var(--spacing-xs) var(--spacing-md);
   }
-  /* on load: each line prints in on its block, holds, then the block fades and the text stays */
-  @media (prefers-reduced-motion: no-preference) {
-    .ha-line {
-      animation:
-        ha-print 520ms steps(6, end) both,
-        ha-block 1900ms var(--ease-out) both;
-    }
-    .ha-line--accent {
-      animation:
-        ha-print 520ms steps(6, end) both,
-        ha-block-accent 1900ms var(--ease-out) both;
-    }
-    .ha-line:nth-child(2) {
-      animation-delay: 140ms;
-    }
-    .ha-line:nth-child(3) {
-      animation-delay: 280ms;
+  .ha-link {
+    gap: var(--spacing-2xs);
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--color-ink);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .ha-link:hover {
+      text-decoration: underline;
+      text-underline-offset: 4px;
     }
   }
-  @keyframes ha-block {
-    0%,
-    65% {
-      background-color: var(--color-ink);
-      color: var(--color-page);
-    }
-    100% {
-      background-color: transparent;
-      color: var(--color-ink);
-    }
+
+  /* ---------- the machine side ---------- */
+  .ha-machine {
+    position: relative;
+    isolation: isolate;
+    min-height: 320px;
+    overflow: hidden;
+    background: var(--color-band);
+    color: var(--color-on-band);
   }
-  @keyframes ha-block-accent {
-    0%,
-    65% {
-      background-color: var(--color-accent);
-      color: var(--color-on-accent);
-    }
-    100% {
-      background-color: transparent;
-      color: var(--color-ink);
-    }
+  /* after dark the band is a step darker than the page; a hairline keeps the seam */
+  :global([data-theme='dark']) .ha-machine {
+    box-shadow: inset 1px 0 0 var(--color-term-rule);
   }
-  @keyframes ha-print {
-    from {
-      clip-path: inset(0 100% 0 0);
+  .ha-side--machine {
+    position: absolute;
+    top: var(--spacing-lg);
+    left: var(--spacing-lg);
+    z-index: 1;
+    padding: 4px 8px 4px 6px;
+    background: var(--color-band);
+    color: var(--color-on-band-2);
+  }
+  .ha-side--machine .ha-dot {
+    background: var(--color-term-ok);
+  }
+  .ha-prompt {
+    position: absolute;
+    left: var(--spacing-lg);
+    right: var(--spacing-lg);
+    bottom: var(--spacing-lg);
+    z-index: 1;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    overflow: hidden;
+    background: var(--color-term);
+    border: 1px solid var(--color-term-light);
+    border-radius: var(--radius-code);
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+    line-height: 1.5;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--color-term-ink);
+    box-shadow: var(--shadow-window);
+  }
+  .ha-ps {
+    color: var(--color-term-accent);
+  }
+  .ha-gt {
+    margin: 0 0.6ch;
+    color: var(--color-term-muted);
+  }
+  @media (max-width: 1023px) {
+    .ha-side--machine {
+      top: var(--spacing-sm);
+      left: var(--spacing-gutter);
     }
-    to {
-      clip-path: inset(0 0 0 0);
+    .ha-prompt {
+      left: var(--spacing-gutter);
+      right: var(--spacing-gutter);
+      bottom: var(--spacing-sm);
+      font-size: var(--text-caption);
     }
   }
 </style>

@@ -10,10 +10,10 @@
   align-self: flex-start;
   padding: 0.06em 0.14em 0.02em;
   font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: 0;
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-tracking);
   line-height: 1;
-  text-transform: uppercase;
+  text-transform: var(--display-case);
   background: var(--color-ink);
   color: var(--color-page);
 }
@@ -36,8 +36,8 @@
 .dir-a .text-case-h2,
 .dir-a .cs-num-fig {
   font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: 0;
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-tracking);
 }
 
 /* captions read as paths, like the homepage */
@@ -97,8 +97,8 @@
 /* figures in the pixel face */
 .dir-a [data-chapters] .ch-fig {
   font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: 0;
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-tracking);
 }
 /* meters: a segmented track like pixels, a solid accent fill */
 .dir-a [data-chapters] .ch-meter {
@@ -121,8 +121,8 @@
 }
 .dir-a [data-chapters] .ch-fig-sm {
   font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: 0;
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-tracking);
 }
 
 /* ---------- The agentic layer: folded into AgenticCompare.astro (24 Nov) ---------- */
@@ -144,8 +144,8 @@
  * Now A's language: square chips and model box, square end markers, the figure in the pixel face. */
 .dir-a [data-sf] .sf-figure {
   font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: 0;
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-tracking);
 }
 .dir-a [data-sf] .sf-of {
   margin-left: 0.15em;
@@ -164,8 +164,8 @@
  * 13. Status See it work: the new screen fades in over the old one (no see-through mid-swap). */
 .dir-a .cs-next-name {
   font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: 0;
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-tracking);
 }
 .dir-a .cs-next-arrow,
 .dir-a .ch.is-seen .ch-run > li,

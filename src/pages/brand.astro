@@ -321,7 +321,7 @@ const px = (v: string) => (/^\d+px$/.test(v) ? Number(v.replace('px', '')) : 0);
   }
   .br-h1 {
     font-family: var(--font-display);
-    font-weight: 400;
+    font-weight: var(--display-weight);
     font-size: var(--text-h1);
     line-height: 1;
   }
@@ -350,7 +350,7 @@ const px = (v: string) => (/^\d+px$/.test(v) ? Number(v.replace('px', '')) : 0);
   }
   .br-h3 {
     font-family: var(--font-display);
-    font-weight: 400;
+    font-weight: var(--display-weight);
     font-size: var(--text-h3-card);
     line-height: 1.1;
   }
