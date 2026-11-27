@@ -50,6 +50,8 @@ const prompt = aiReadyPrompt((Astro.site ?? SITE));
 </style>
 
 <script>
+  import { track } from '../lib/track';
+
   document.querySelectorAll<HTMLButtonElement>('[data-copy-prompt]').forEach((btn) => {
     const label = btn.querySelector<HTMLElement>('[data-copy-label]')!;
     const live = btn.parentElement?.querySelector<HTMLElement>('[data-copy-live]');
@@ -70,6 +72,7 @@ const prompt = aiReadyPrompt((Astro.site ?? SITE));
         btn.parentElement?.querySelector<HTMLElement>('[data-copy-file]')?.removeAttribute('hidden');
         return;
       }
+      track('prompt_copied');
       t = window.setTimeout(() => {
         label.textContent = 'Copy prompt for your agent';
         btn.classList.remove('is-done');

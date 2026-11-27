@@ -1,0 +1,121 @@
+---
+/**
+ * Cookie consent for Google Analytics, kept quiet on purpose: a small hairline pill bottom left (the style switcher
+ * owns bottom right), no shadow, no overlay, nothing blocked. Rendered only when GA is on (Base.astro).
+ * GA starts with consent denied (Google consent mode, set in Base.astro before gtag config); Allow updates it to
+ * granted. The answer is remembered in this browser (localStorage 'nicey-consent'), and the bar only shows until then.
+ * Fixed position, so it never shifts the layout.
+ */
+---
+
+<div class="cb" role="region" aria-label="Cookie consent" hidden data-cb>
+  <p class="cb-text m-0">
+    <span class="cb-long">We'd like to use analytics cookies.</span><span class="cb-short" aria-hidden="true"
+      >Analytics cookies?</span
+    >
+  </p>
+  <button type="button" class="cb-btn" data-cb-choice="granted">Allow</button>
+  <button type="button" class="cb-btn" data-cb-choice="denied">Decline</button>
+</div>
+
+<style>
+  .cb {
+    position: fixed;
+    left: var(--spacing-md);
+    bottom: var(--spacing-md);
+    z-index: 59;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    max-width: calc(100vw - 2 * var(--spacing-md));
+    padding: 0 4px 0 14px;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-pill);
+    background: var(--color-surface);
+    color: var(--color-ink-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    letter-spacing: 0.02em;
+  }
+  .cb[hidden] {
+    display: none;
+  }
+  .cb-text {
+    flex: none;
+    margin-right: var(--spacing-2xs);
+    white-space: nowrap;
+  }
+  .cb-btn {
+    min-height: 32px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--color-ink);
+    font: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--color-line-strong);
+    cursor: pointer;
+  }
+  .cb-btn:focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 1px;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .cb-btn:hover {
+      text-decoration-color: currentColor;
+    }
+  }
+  .cb-short {
+    display: none;
+  }
+  /* phone: one line beside the style switcher's 48px button, same height, shorter text */
+  @media (max-width: 639px) {
+    .cb {
+      left: var(--spacing-sm);
+      bottom: var(--spacing-sm);
+      max-width: calc(100vw - 2 * var(--spacing-sm) - 48px - var(--spacing-xs));
+      min-height: 48px;
+      padding-left: 12px;
+      white-space: nowrap;
+    }
+    .cb-long {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+    }
+    .cb-short {
+      display: inline;
+    }
+    .cb-btn {
+      min-height: 40px;
+      padding: 0 8px;
+    }
+  }
+</style>
+
+<script>
+  const KEY = 'nicey-consent';
+  const bar = document.querySelector<HTMLElement>('[data-cb]');
+  if (bar) {
+    let stored: string | null = null;
+    try {
+      stored = localStorage.getItem(KEY);
+    } catch {}
+    if (stored !== 'granted' && stored !== 'denied') bar.hidden = false;
+    bar.querySelectorAll<HTMLButtonElement>('[data-cb-choice]').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        const choice = btn.dataset.cbChoice as 'granted' | 'denied';
+        try {
+          localStorage.setItem(KEY, choice);
+        } catch {}
+        const gtag = (window as unknown as { gtag?: (...a: unknown[]) => void }).gtag;
+        gtag?.('consent', 'update', { analytics_storage: choice });
+        bar.hidden = true;
+      }),
+    );
+  }
+</script>

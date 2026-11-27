@@ -1,0 +1,71 @@
+---
+/**
+ * Where cal.com sends people after they book (event type → Advanced → "Redirect on booking", with "Forward
+ * parameters" on). It is the only place we know a booking really happened, so the conversion event fires here:
+ * audit_requested when the booking started from "Get a free audit" (?source=audit), call_booked otherwise.
+ * noindex, and kept out of the sitemap and llms.txt: it is a confirmation, not a page to land on.
+ */
+import '../directions/a/a.css';
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Button from '../components/ui/Button.astro';
+---
+
+<Base title="You're booked · Nicey" description="Your call with Nicey Studio is booked." noindex>
+  <div class="dir-a">
+    <Header variant="case" home="/" />
+    <main id="main" tabindex="-1" class="bk container-page">
+      <section class="bk-copy" aria-labelledby="bk-h">
+        <span class="caption text-ink-2">Booking confirmed</span>
+        <h1 id="bk-h" class="bk-h">You're booked.</h1>
+        <p class="m-0 max-w-[44ch] text-body-lg text-pretty text-ink-2">
+          The invite is on its way to your inbox. If you have a Figma file you'd like us to look at, bring the link to
+          the call.
+        </p>
+        <div class="flex flex-wrap gap-2.5">
+          <Button href="/">Back to the homepage</Button>
+          <Button href="/#work" variant="secondary">See our work</Button>
+        </div>
+      </section>
+    </main>
+  </div>
+</Base>
+
+<style>
+  .bk {
+    display: grid;
+    min-height: 70vh;
+    align-content: center;
+    padding-block: var(--spacing-3xl, 96px);
+  }
+  .bk-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-md, 20px);
+  }
+  .bk-h {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-h1);
+    line-height: 1.05;
+  }
+</style>
+
+<script>
+  import { track } from '../lib/track';
+
+  // once per booking: a reload or a second visit in the same tab doesn't count again
+  const KEY = 'nicey-booked';
+  let seen = false;
+  try {
+    const last = sessionStorage.getItem(KEY);
+    // the address is cleaned below, so a reload arrives with no query: that is the same booking
+    seen = last !== null && (location.search === '' || last === location.search);
+    if (!seen) sessionStorage.setItem(KEY, location.search);
+  } catch {}
+  const source = new URLSearchParams(location.search).get('source') ?? 'site';
+  if (!seen) track(source === 'audit' ? 'audit_requested' : 'call_booked', { source });
+  // cal.com forwards the attendee's name and email in the URL: drop them from the address bar and history
+  if (location.search) history.replaceState(null, '', location.pathname);
+</script>
