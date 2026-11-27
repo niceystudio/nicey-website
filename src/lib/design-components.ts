@@ -58,12 +58,6 @@ export const components: Component[] = [
     classes: ['tabs', 'tabs--fill', 'tab', 'tab-k'],
   },
   {
-    name: 'TokenSwitcher',
-    file: 'src/components/ui/TokenSwitcher.astro',
-    what: 'The floating "Change the style" button, bottom right on every page. Pick one of three styles (Terminal, Product, Editorial) and the whole site follows: each overrides --font-display, --color-accent and the --radius-* tokens on :root, and the panel logs the token edits like an agent would. Styles live in src/data/token-presets.ts; the pick is remembered in the browser and applied before first paint.',
-    api: ['no props: Base.astro renders it once per page', "fires 'nicey:tokens' on window after a change ({ style })"],
-  },
-  {
     name: 'PixelFieldA',
     file: 'src/directions/a/PixelFieldA.astro',
     what: 'The brand pattern: soft pastel cells that move slowly (drift, rippling rings, a breathing drop); a click sends a ripple through it. Still, with no ripples, under reduced motion.',

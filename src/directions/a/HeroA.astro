@@ -78,19 +78,20 @@ import PixelFieldA from './PixelFieldA.astro';
     align-items: flex-start;
     gap: 6px;
     font-family: var(--font-display);
-    font-weight: 400;
-    font-size: clamp(28px, 7.6vw, 112px); /* 28px floor: "SCALE PRODUCTS." fits a 320px screen */
+    font-weight: 500;
+    font-size: clamp(36px, 8.4vw, 116px);
     line-height: 1;
-    letter-spacing: 0;
-    text-transform: uppercase;
+    letter-spacing: -0.05em;
   }
-  /* at rest: plain pixel text (the padding stays, so the letters don't shift when the blocks go) */
+  /* premium (27 Nov): sans, sentence case, the last line in the accent */
   .ha-line {
     display: inline-block;
     white-space: nowrap;
-    padding: 0.06em 0.14em 0.02em;
-    border-radius: var(--radius-code);
+    padding-bottom: 0.04em;
     color: var(--color-ink);
+  }
+  .ha-line--accent {
+    color: var(--color-accent);
   }
   .ha-lede {
     max-width: 44ch;
@@ -105,53 +106,22 @@ import PixelFieldA from './PixelFieldA.astro';
     align-items: center;
     gap: var(--spacing-xs);
   }
-  /* on load: each line prints in on its block, holds, then the block fades and the text stays */
+  /* on load: each line rises in softly, one after the other (the printed blocks belong to the terminal look) */
   @media (prefers-reduced-motion: no-preference) {
     .ha-line {
-      animation:
-        ha-print 520ms steps(6, end) both,
-        ha-block 1900ms var(--ease-out) both;
-    }
-    .ha-line--accent {
-      animation:
-        ha-print 520ms steps(6, end) both,
-        ha-block-accent 1900ms var(--ease-out) both;
+      animation: ha-rise 900ms var(--ease-out) both;
     }
     .ha-line:nth-child(2) {
-      animation-delay: 140ms;
+      animation-delay: 90ms;
     }
     .ha-line:nth-child(3) {
-      animation-delay: 280ms;
+      animation-delay: 180ms;
     }
   }
-  @keyframes ha-block {
-    0%,
-    65% {
-      background-color: var(--color-ink);
-      color: var(--color-page);
-    }
-    100% {
-      background-color: transparent;
-      color: var(--color-ink);
-    }
-  }
-  @keyframes ha-block-accent {
-    0%,
-    65% {
-      background-color: var(--color-accent);
-      color: var(--color-on-accent);
-    }
-    100% {
-      background-color: transparent;
-      color: var(--color-ink);
-    }
-  }
-  @keyframes ha-print {
+  @keyframes ha-rise {
     from {
-      clip-path: inset(0 100% 0 0);
-    }
-    to {
-      clip-path: inset(0 0 0 0);
+      opacity: 0;
+      transform: translateY(0.18em);
     }
   }
 </style>

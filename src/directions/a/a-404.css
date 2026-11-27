@@ -18,7 +18,7 @@
   font-weight: 400;
   letter-spacing: 0;
 }
-.dir-a .nf-copy > .caption::before {
+.dir-a .a-term .nf-copy > .caption::before {
   content: '//\00a0';
   color: var(--color-accent);
 }

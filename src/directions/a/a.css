@@ -33,30 +33,38 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* ---------- type ---------- */
+/* ---------- type ----------
+   Premium by default (27 Nov): sans, tight tracking, sentence case. The terminal look (.a-term) puts back the pixel
+   face, printed capitals and // paths. */
 .dir-a .text-h2,
 .dir-a h2.text-h2 {
   font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 1.06;
+}
+.dir-a .a-term .text-h2,
+.dir-a .a-term h2.text-h2 {
   font-weight: 400;
   letter-spacing: -0.01em;
   line-height: 1.04;
 }
-/* section headings read like the hero (25 Nov): pixel capitals printed on ink blocks, line by line (.h-print) */
-.dir-a h2.text-h2:has(.h-print) {
+/* section headings in the terminal look (25 Nov): pixel capitals printed on ink blocks, line by line (.h-print) */
+.dir-a .a-term h2.text-h2:has(.h-print) {
   letter-spacing: 0;
   line-height: 1.32;
   text-transform: uppercase;
 }
-.dir-a .caption {
+.dir-a .a-term .caption {
   letter-spacing: 0.12em;
 }
 .dir-a .text-work {
   font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: 0;
+  font-weight: 500;
+  letter-spacing: -0.03em;
 }
-/* every section label reads like a path */
-.dir-a .a-path::before {
+/* every section label in the terminal look reads like a path */
+.dir-a .a-term .a-path::before {
   content: '//\00a0';
   color: var(--color-accent);
 }
@@ -77,6 +85,10 @@
 .dir-a .text-title,
 .dir-a .text-faq {
   font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+.dir-a .a-term :is(.text-h3-card, .text-title, .text-faq, .text-work) {
   font-weight: 400;
   letter-spacing: 0;
 }
@@ -89,11 +101,12 @@
 
 /* nav: plain links, no prompt / cursor / ./ prefixes (Emir 18 Nov: less "code") */
 .dir-a .site-head .head-link {
+  border-radius: var(--radius-pill);
   min-height: var(--hit-min);
   padding: 0 var(--spacing-2xs);
   text-transform: none;
-  letter-spacing: 0.02em;
-  font-size: var(--text-code);
+  letter-spacing: 0;
+  font-size: 14px;
   /* background and white text ease together (20 Nov review: Header's own rule won, the purple came in alone) */
   transition:
     background-color 120ms var(--ease-out),
@@ -103,8 +116,8 @@
 @media (hover: hover) and (pointer: fine) {
   /* white text on a purple that holds it in both themes (Emir 19 Nov: the text must be white) */
   .dir-a .head-link:hover {
-    background: var(--color-accent-solid);
-    color: var(--color-on-accent-solid) !important;
+    background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+    color: var(--color-ink) !important;
   }
 }
 
@@ -115,8 +128,8 @@
 }
 .dir-a .site-head .head-nav > a:first-child {
   font-family: var(--font-display) !important;
-  font-weight: 400 !important;
-  letter-spacing: 0 !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.04em !important;
 }
 
 /* ---------- The nav in A (Emir, 20 Nov) ----------
@@ -159,4 +172,12 @@
   --a-on-block: var(--color-band);
   background: var(--color-band);
   color: var(--color-ink);
+}
+
+/* the pixel field is part of the terminal look: it only draws inside .a-term (27 Nov) */
+.dir-a .pf {
+  display: none;
+}
+.dir-a .a-term .pf {
+  display: block;
 }

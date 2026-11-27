@@ -248,11 +248,11 @@ const audit = variant === 'case' ? `${home}#audit` : '#audit';
   /*
    * Dark header over the dark stretch (Goran, 27 Nov): the header takes .a-dark while dark content sits right under
    * its bottom edge, i.e. a dark section (.a-dark), or a hill reveal whose dark core covers the header strip
-   * (data-cover, set by RevealHillA). Pages without either never change.
+   * (data-cover, set by PixelWipeA). Pages without either never change.
    */
   document.querySelectorAll<HTMLElement>('[data-site-head]').forEach((head) => {
     const sections = [...document.querySelectorAll<HTMLElement>('main .a-dark')];
-    const hills = [...document.querySelectorAll<HTMLElement>('[data-rh]')];
+    const hills = [...document.querySelectorAll<HTMLElement>('[data-reveal]')];
     if (!sections.length) return;
     const spans = (el: HTMLElement, y: number) => {
       const r = el.getBoundingClientRect();

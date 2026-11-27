@@ -190,7 +190,7 @@
   --text-arrow: 24px;
   --text-arrow--line-height: 1;
 
-  /* shape: square everywhere (Direction A) */
+  /* shape: square (the terminal look, .a-term). Outside it, :root below rounds them (premium by default, 27 Nov) */
   --radius-panel: 0px;
   --radius-code: 0px;
   --radius-chip: 0px;
@@ -230,8 +230,29 @@
 }
 
 @layer base {
+  /*
+   * Two looks, one token set (Goran, 27 Nov). Premium by default: sans everywhere (no mono, no pixel face), soft
+   * corners, sentence case. The terminal look (pixel face, mono, square, uppercase labels, // paths, printed headings)
+   * only inside .a-term: the dark stretch on the homepage, between the two pixel wipes.
+   */
   :root {
     color-scheme: light;
+    --font-display: var(--font-sans);
+    --font-mono: var(--font-sans);
+    --radius-panel: 16px;
+    --radius-code: 12px;
+    --radius-chip: 8px;
+    --radius-swatch: 4px;
+    --radius-pill: 999px;
+  }
+  .a-term {
+    --font-display: 'Geist Pixel', 'Geist Mono Variable', ui-monospace, monospace;
+    --font-mono: 'Geist Mono Variable', 'Geist Mono Fallback', ui-monospace, monospace;
+    --radius-panel: 0px;
+    --radius-code: 0px;
+    --radius-chip: 0px;
+    --radius-swatch: 0px;
+    --radius-pill: 0px;
   }
 
   /* metric-matched fallbacks so the swap to Geist doesn't shift layout */
@@ -401,20 +422,26 @@
   }
 
   .caption {
-    font-family: var(--font-mono);
-    font-size: var(--text-caption);
+    font-family: var(--font-sans);
+    font-size: 13px;
     line-height: var(--text-caption--line-height);
     font-weight: 500;
+  }
+  .caption-sm {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    line-height: var(--text-caption-sm--line-height);
+    font-weight: 500;
+  }
+  /* terminal: mono capitals */
+  .a-term :is(.caption, .caption-sm) {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
-  .caption-sm {
-    font-family: var(--font-mono);
+  .a-term .caption-sm {
     font-size: var(--text-caption-sm);
-    line-height: var(--text-caption-sm--line-height);
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
   }
 
   /* Sentence-case mono label: column heads, control names, small "what this is" notes.
@@ -425,8 +452,8 @@
     line-height: var(--text-code--line-height);
     color: var(--color-muted);
   }
-  /* a section caption reads like a path: // prefix in the accent (Label variant="section", SectionHead) */
-  .a-path::before {
+  /* in the terminal look a section caption reads like a path: // prefix in the accent (Label variant="section", SectionHead) */
+  .a-term .a-path::before {
     content: '//\00a0';
     color: var(--color-accent);
   }
@@ -629,7 +656,7 @@
   }
 
   /* The button. Rendered by src/components/ui/Button.astro — use that, not these classes, in new markup.
-     Square, mono, uppercase (Direction A). Primary = accent, secondary = outline. */
+     Round and sans by default; square, mono, uppercase in the terminal look (.a-term). Primary = accent, secondary = outline. */
   .pill {
     display: inline-flex;
     align-items: center;
@@ -637,18 +664,23 @@
     gap: var(--spacing-2xs);
     min-height: 44px;
     border-radius: var(--radius-pill);
-    font-family: var(--font-mono);
-    font-size: var(--text-code);
+    font-family: var(--font-sans);
+    font-size: 14px;
     font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    letter-spacing: -0.005em;
     text-decoration: none;
     white-space: nowrap;
     transition:
       transform 160ms var(--ease-out),
       background-color 160ms var(--ease-out),
       border-color 160ms var(--ease-out);
+  }  .a-term .pill {
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
   }
+
   .pill-sm {
     padding: var(--spacing-xs) 18px;
   }
@@ -767,7 +799,8 @@
 
   /* A heading printed on blocks, line by line, like the hero headline: wrap the heading's text in
      <span class="h-print"> (SectionHead does it). The block takes the window radius, so "Change the style" rounds it. */
-  .h-print {
+  /* premium: the heading is plain text; the blocks only print in the terminal look */
+  .a-term .h-print {
     padding: 0.04em 0.16em;
     border-radius: var(--radius-code);
     background: var(--color-ink);

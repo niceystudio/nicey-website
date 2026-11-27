@@ -7,8 +7,6 @@ import '@fontsource/geist-pixel/400.css';
 import '@fontsource/instrument-serif/latin-400.css';
 import '../styles/global.css';
 import geistLatin from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url';
-import TokenSwitcher from '../components/ui/TokenSwitcher.astro';
-import { styles, styleCss, STORAGE_KEY } from '../data/token-presets';
 import { links } from '../data/links';
 import { founder } from '../data/people';
 import geistMonoLatin from '@fontsource-variable/geist-mono/files/geist-mono-latin-wght-normal.woff2?url';
@@ -31,11 +29,6 @@ const { title, description, noindex = false, markdownHref, jsonLd, ogImage, ogTy
 // one canonical per page, on the production domain, without a trailing slash (the sitemap spells URLs the same way)
 const canonical = new URL(Astro.url.pathname.replace(/\.html$/, '').replace(/(.)\/$/, '$1'), (Astro.site ?? SITE)).href;
 const ogImageUrl = ogImage && new URL(ogImage, (Astro.site ?? SITE)).href;
-// "Change the style": the CSS for every style, so the head script can apply a remembered one before first paint
-const tokenCss = {
-  key: STORAGE_KEY,
-  style: Object.fromEntries(styles.slice(1).map((s) => [s.id, styleCss(s)])),
-};
 const siteUrl = (Astro.site ?? SITE).href;
 // who we are, said the same way as the footer and the home page; sameAs = the profiles in links.ts
 const org = {
@@ -78,23 +71,8 @@ const org = {
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preload" href={geistLatin} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={geistMonoLatin} as="font" type="font/woff2" crossorigin />
-    <!-- "Change the style" before first paint: a remembered style (src/data/token-presets.ts). -->
-    <script is:inline define:vars={{ tokenCss }}>
-      (function () {
-        var v = null;
-        try {
-          v = JSON.parse(localStorage.getItem(tokenCss.key) || 'null');
-        } catch (e) {}
-        var css = (v && tokenCss.style[v.style]) || '';
-        var el = document.createElement('style');
-        el.id = 'token-override';
-        el.textContent = css;
-        document.head.appendChild(el);
-      })();
-    </script>
   </head>
   <body>
     <slot />
-    <TokenSwitcher />
   </body>
 </html>

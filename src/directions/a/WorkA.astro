@@ -78,7 +78,7 @@ const rows: Row[] = [
   <!-- one container for the column heads and the rows: it owns the rule and the corner radius, so a rounder radius
        (Change the style) wraps the whole list (24 Nov) -->
   <div class="wka-box">
-  <div class="wka-head" aria-hidden="true"><span>client</span><span>what we did</span><span></span></div>
+  <div class="wka-head" aria-hidden="true"><span>Client</span><span>What we did</span><span></span></div>
   <ul class="panel flex flex-col wka-list">
     {
       rows.map((r) => (
@@ -382,12 +382,11 @@ const rows: Row[] = [
     border: 1px solid var(--a-rule);
     border-radius: var(--radius-panel);
   }
+  /* premium (27 Nov): sentence case, no wide tracking */
   .wka-head {
     padding: var(--spacing-xs) var(--spacing-lg);
-    font-family: var(--font-mono);
-    font-size: var(--text-caption-sm);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    font-size: 13px;
+    font-weight: 500;
     color: var(--color-muted);
   }
   .wka-list {
@@ -423,10 +422,7 @@ const rows: Row[] = [
   }
   /* work in progress: not a link, so no hover, and a quiet label under the meta line */
   .wka-wip {
-    font-family: var(--font-mono);
-    font-size: var(--text-caption-sm);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    font-size: 13px;
     color: var(--color-muted);
   }
   .wka :global(.work-row.is-wip) .text-work {

@@ -57,11 +57,10 @@ const services = [
             <h3 id={`sc2-${s.id}`} class="sc2-h m-0">{s.label}</h3>
             <p class="m-0 sc2-lede">{s.lede}</p>
             <div class="sc2-tree" aria-label="What's included">
-              <span class="sc2-tree-root">included/</span>
+              <span class="sc2-tree-root">What's included</span>
               <ul>
-                {s.items.map((item, k) => (
+                {s.items.map((item) => (
                   <li>
-                    <span class="sc2-branch" aria-hidden="true">{k === s.items.length - 1 ? '└──' : '├──'}</span>
                     <a href={`${s.href}#${item.id}`} class="sc2-item">{item.name}</a>
                   </li>
                 ))}
@@ -72,7 +71,7 @@ const services = [
           <figure class="sc2-stage m-0">
             <PixelFieldA mode={s.field} seed={s.seed} cx={0.72} cy={0.5} />
             {s.visual === 'qbench' ? (
-              <QBenchWork terminal bare />
+              <QBenchWork bare />
             ) : (
               <div class="sc2-phone">
                 <video muted loop playsinline preload="none" poster="/work/everbreed/mobile-care.webp" aria-label="Everbreed student app: the weekly care summary, seven days cared for, added to the Project Book" data-sc2-video>
@@ -139,15 +138,19 @@ const services = [
     color: var(--color-ink-2);
     text-wrap: pretty;
   }
+  /* premium (27 Nov): a plain checklist under a small label, no ASCII tree */
   .sc2-tree {
     width: 100%;
     margin-top: 4px;
-    font-family: var(--font-mono);
-    font-size: var(--text-label);
-    line-height: 2;
+    font-size: var(--text-body-sm);
+    line-height: 1.5;
   }
   .sc2-tree-root {
-    color: var(--color-accent);
+    display: block;
+    margin-bottom: var(--spacing-2xs);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-muted);
   }
   .sc2-tree ul {
     margin: 0;
@@ -156,10 +159,19 @@ const services = [
   }
   .sc2-tree li {
     display: flex;
-    gap: var(--spacing-xs);
+    align-items: baseline;
+    gap: 10px;
+    padding: 6px 0;
+    border-top: 1px solid var(--color-line);
   }
-  .sc2-branch {
-    color: var(--a-dim);
+  .sc2-tree li::before {
+    content: '';
+    flex: none;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    transform: translateY(-2px);
   }
   .sc2-item {
     color: inherit;
