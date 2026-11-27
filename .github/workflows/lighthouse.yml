@@ -1,0 +1,27 @@
+# Lighthouse CI (SEO plan, Phase 1): builds the site and audits the main pages on every PR to master.
+# Budgets live in lighthouserc.cjs. Reports are attached to the run as an artifact, not uploaded anywhere.
+name: Lighthouse
+
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the sitemap reads each page's last-changed date from git
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npx --yes @lhci/cli@0.15.1 autorun --config=lighthouserc.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci/reports
