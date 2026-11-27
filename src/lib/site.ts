@@ -4,3 +4,6 @@
  */
 export const SITE_URL = 'https://nicey.studio';
 export const SITE = new URL(SITE_URL);
+
+/** Google Analytics 4 measurement ID (G-…). Empty = no analytics on the site. */
+export const GA_ID = '';

@@ -1,6 +1,6 @@
 ---
 import '@fontsource-variable/geist';
-import { SITE } from '../lib/site';
+import { SITE, GA_ID } from '../lib/site';
 import '@fontsource-variable/geist-mono';
 import '@fontsource/geist-pixel/400.css';
 // the Editorial style's display face; the file is only fetched once that style is picked
@@ -43,6 +43,9 @@ const tokenCss = {
   font: { editorial: instrumentSerifLatin } as Record<string, string>,
 };
 const siteUrl = (Astro.site ?? SITE).href;
+// Google Analytics (src/lib/track.ts): only on the production deployment and only once GA_ID is set, so previews,
+// local builds and Lighthouse CI don't count
+const gaId = process.env.VERCEL_ENV === 'production' ? GA_ID : '';
 // who we are, said the same way as the footer and the home page; sameAs = the profiles in links.ts
 const org = {
   '@context': 'https://schema.org',
@@ -85,6 +88,29 @@ const org = {
     <link rel="preload" href={geistLatin} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={geistMonoLatin} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={geistPixelLatin} as="font" type="font/woff2" crossorigin />
+    {
+      gaId && (
+        <>
+          <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} />
+          <script is:inline define:vars={{ gaId }}>
+            // page_location without the query string (keeping utm_*): cal.com forwards the attendee's name and email
+            // to /booked in the URL, and personal data must never reach Google Analytics
+            window.dataLayer = window.dataLayer || [];
+            window.gtag = function () {
+              dataLayer.push(arguments);
+            };
+            var q = new URLSearchParams(location.search);
+            var keep = new URLSearchParams();
+            q.forEach(function (v, k) {
+              if (k.indexOf('utm_') === 0) keep.set(k, v);
+            });
+            var s = keep.toString();
+            gtag('js', new Date());
+            gtag('config', gaId, { page_location: location.origin + location.pathname + (s ? '?' + s : '') });
+          </script>
+        </>
+      )
+    }
     <!-- Theme before first paint: stored choice, else the system preference. -->
     <script is:inline>
       (function () {
