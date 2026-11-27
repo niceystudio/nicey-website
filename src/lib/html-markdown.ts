@@ -36,6 +36,16 @@ export function htmlToMarkdown(html: string, base: URL): string {
     if (t) out.push(t);
     buf = '';
   };
+  // tables come out as one Markdown table (the articles use them for comparisons)
+  let table: { rows: string[][]; row: string[]; head: number; inHead: boolean } | null = null;
+  const cell = (s: string) => s.replace(/[ \t\n]+/g, ' ').trim().replace(/\|/g, '\\|');
+  const TABLE_PART = new Set(['caption', 'thead', 'tbody', 'tfoot', 'tr', 'td', 'th']);
+  const renderTable = (t: NonNullable<typeof table>) => {
+    const width = Math.max(...t.rows.map((r) => r.length));
+    const line = (r: string[]) => `| ${Array.from({ length: width }, (_, k) => r[k] ?? '').join(' | ')} |`;
+    const [head = [], ...body] = t.rows;
+    return [line(head), `|${' --- |'.repeat(width)}`, ...body.map(line)].join('\n');
+  };
   const re = /<!--[\s\S]*?-->|<(\/?)([a-zA-Z][\w-]*)([^>]*?)(\/?)>|([^<]+)/g;
   let m: RegExpExecArray | null;
   while ((m = re.exec(html))) {
@@ -60,6 +70,18 @@ export function htmlToMarkdown(html: string, base: URL): string {
         out.push(`*${decode(figLabel)}*`);
       }
       const skip = SKIP.has(tag) || hidden || !!figLabel;
+      if (!skip && !skipping() && (tag === 'table' || (table && TABLE_PART.has(tag)))) {
+        if (tag === 'table') {
+          flush();
+          table = { rows: [], row: [], head: 0, inHead: false };
+        } else if (table) {
+          if (tag === 'thead') table.inHead = true;
+          if (tag === 'tr') table.row = [];
+          buf = '';
+        }
+        stack.push({ tag, skip: false, start: 0 });
+        continue;
+      }
       if (VOID.has(tag) || m[4] === '/') {
         if (tag === 'br' && !skipping()) buf += ' ';
         continue;
@@ -88,6 +110,20 @@ export function htmlToMarkdown(html: string, base: URL): string {
       stack.length = i;
       if (wasSkipping && (frame.skip || skipping())) {
         if (frame.skip && BLOCK.has(tag)) flush();
+        continue;
+      }
+      if (table && (tag === 'table' || TABLE_PART.has(tag))) {
+        if (tag === 'td' || tag === 'th') table.row.push(cell(buf));
+        else if (tag === 'tr') {
+          table.rows.push(table.row);
+          if (table.inHead) table.head = table.rows.length;
+        } else if (tag === 'thead') table.inHead = false;
+        else if (tag === 'caption' && cell(buf)) out.push(`*${cell(buf)}*`);
+        else if (tag === 'table') {
+          if (table.rows.length) out.push(renderTable(table));
+          table = null;
+        }
+        buf = '';
         continue;
       }
       if (tag === 'dt' || tag === 'strong' || tag === 'b') buf = buf.replace(/\s+$/, '') + '**';

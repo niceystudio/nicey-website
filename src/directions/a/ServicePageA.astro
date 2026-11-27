@@ -1,0 +1,66 @@
+---
+/**
+ * Direction A: the shell of a service page (Base, header, footer, JSON-LD). The content is ServiceBodyA.
+ * JSON-LD: the Service, the FAQ, the article and a breadcrumb, so AI search can quote each part on its own.
+ */
+import './a.css';
+import Base from '../../layouts/Base.astro';
+import Header from '../../components/Header.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import ServiceBodyA from './ServiceBodyA.astro';
+import type { ServicePage } from '../../data/service-pages';
+import { articleLd } from '../../data/article-types';
+
+interface Props {
+  page: ServicePage;
+}
+const { page: p } = Astro.props;
+const site = Astro.site ?? new URL('https://nicey-website.vercel.app');
+const pageUrl = new URL(`/${p.slug}`, site).href;
+const home = new URL('/', site).href;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Service',
+      name: p.caption,
+      serviceType: p.caption,
+      description: p.metaDescription,
+      url: pageUrl,
+      provider: { '@type': 'Organization', name: 'Nicey Studio', url: home },
+      areaServed: 'Worldwide',
+      hasOfferCatalog: {
+        '@type': 'OfferCatalog',
+        name: `${p.caption}: what's included`,
+        itemListElement: p.offers.map((o) => ({
+          '@type': 'Offer',
+          itemOffered: { '@type': 'Service', name: o.name, description: o.lede, url: `${pageUrl}#${o.id}` },
+        })),
+      },
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: p.faq.items.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+    },
+    articleLd(p.article, pageUrl),
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Nicey', item: home },
+        { '@type': 'ListItem', position: 2, name: p.caption, item: pageUrl },
+      ],
+    },
+  ],
+};
+const mdHref = `/${p.slug}.md`;
+---
+
+<Base title={p.metaTitle} description={p.metaDescription} markdownHref={mdHref} jsonLd={jsonLd}>
+  <div class="dir-a">
+    <Header variant="case" />
+    <main id="main" tabindex="-1" data-human>
+      <ServiceBodyA page={p} />
+    </main>
+    <SiteFooter mdHref={mdHref} directionA />
+  </div>
+</Base>

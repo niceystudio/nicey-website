@@ -12,21 +12,19 @@ import QBenchWork from '../../components/case-study/QBenchWork.astro';
 import SectionHead from '../../components/SectionHead.astro';
 import PixelFieldA from './PixelFieldA.astro';
 import Label from '../../components/ui/Label.astro';
+import { links } from '../../data/links';
+import { designSystemsPage, productDesignPage } from '../../data/service-pages';
 
+// 26 Nov: each card leads to its service page; every included/ line links to its section there
+// (the lines come from src/data/service-pages.ts, so the card and the page never disagree)
 const services = [
   {
     id: 'design-systems',
     label: 'Design systems',
     kicker: 'Primary practice',
     lede: 'For products with years of drift, and teams that want their coding agents to build on-system.',
-    items: [
-      'Audit and consolidation',
-      'Token architecture and theming',
-      'Component library, Figma to code',
-      'AI-ready documentation',
-      'Systems partner, monthly',
-      'Free audit to start',
-    ],
+    href: links.exploreDesignSystems,
+    items: designSystemsPage.offers.map((o) => ({ name: o.name, id: o.id })),
     visual: 'qbench',
     field: 'rings' as const,
     seed: 5,
@@ -36,7 +34,8 @@ const services = [
     label: 'Product design',
     kicker: 'Alongside',
     lede: 'Complex workflows designed on the system we build, so new screens ship consistent from day one.',
-    items: ['Product and UX design', 'Design engineering', 'AI workflows in delivery'],
+    href: links.exploreProductDesign,
+    items: productDesignPage.offers.map((o) => ({ name: o.name, id: o.id })),
     visual: 'phone',
     field: 'drop' as const,
     seed: 9,
@@ -63,11 +62,12 @@ const services = [
                 {s.items.map((item, k) => (
                   <li>
                     <span class="sc2-branch" aria-hidden="true">{k === s.items.length - 1 ? '└──' : '├──'}</span>
-                    {item}
+                    <a href={`${s.href}#${item.id}`} class="sc2-item">{item.name}</a>
                   </li>
                 ))}
               </ul>
             </div>
+            <a href={s.href} class="sc2-more">Explore {s.label.toLowerCase()} →</a>
           </div>
           <figure class="sc2-stage m-0">
             <PixelFieldA mode={s.field} seed={s.seed} cx={0.72} cy={0.5} />
@@ -160,6 +160,26 @@ const services = [
   }
   .sc2-branch {
     color: var(--a-dim);
+  }
+  .sc2-item {
+    color: inherit;
+    text-decoration: none;
+  }
+  .sc2-more {
+    margin-top: var(--spacing-xs);
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+    color: var(--color-ink);
+    text-decoration-line: underline;
+    text-decoration-color: var(--color-accent);
+    text-underline-offset: 4px;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .sc2-item:hover {
+      color: var(--color-accent);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
   }
   /* both stages the same height so the two cards end on one line */
   .sc2-stage {

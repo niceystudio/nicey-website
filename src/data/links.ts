@@ -13,8 +13,9 @@ export const links = {
   meeting: 'https://cal.com/nicey/intro',
   /** "Get a free audit" in the "It starts with a free audit" section */
   startAudit: '#',
-  exploreDesignSystems: '#',
-  exploreProductDesign: '#',
+  /** the service pages (src/pages/design-systems.astro, product-design.astro) */
+  exploreDesignSystems: '/design-systems',
+  exploreProductDesign: '/product-design',
   /** site footer: contact and profiles (placeholders until we have them) */
   email: '#',
   linkedin: 'https://www.linkedin.com/company/nicey-studio',

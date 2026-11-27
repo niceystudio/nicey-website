@@ -1,0 +1,71 @@
+---
+/**
+ * A placeholder for a photo, video, screen recording or diagram that is not made yet.
+ * It shows the asset we suggest for the spot, so the brief travels with the layout. Swap it for the real <img>/<video>
+ * when the asset exists. `data-md-skip` keeps it out of the Markdown twins: agents read the text, not our to-do list.
+ */
+import type { MediaSpec } from '../data/article-types';
+interface Props extends MediaSpec {
+  class?: string;
+}
+const { kind, ratio = '16 / 9', note, caption, class: cls } = Astro.props;
+const kindLabel = { photo: 'Photo', video: 'Video', screen: 'Screen recording', diagram: 'Diagram' }[kind];
+---
+
+<figure class:list={['ms m-0', cls]} data-md-skip data-media-slot={kind}>
+  <div class="ms-box" style={`aspect-ratio: ${ratio}`}>
+    <span class="ms-kind caption-sm">
+      <span class="ms-dot" aria-hidden="true"></span>{kindLabel} · {ratio.replace(/\s/g, '')}
+    </span>
+    <p class="ms-note m-0"><span class="ms-tag">Suggested asset:</span> {note}</p>
+  </div>
+  {caption && <figcaption class="ms-cap">{caption}</figcaption>}
+</figure>
+
+<style>
+  .ms {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2xs);
+    width: 100%;
+  }
+  .ms-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    width: 100%;
+    min-height: 160px;
+    padding: var(--spacing-md);
+    border: 1px dashed var(--color-dashed);
+    background:
+      repeating-linear-gradient(135deg, transparent 0 10px, color-mix(in srgb, var(--color-ink) 3%, transparent) 10px 11px),
+      var(--color-surface);
+  }
+  .ms-kind {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-2xs);
+    color: var(--color-ink-2);
+  }
+  .ms-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--color-accent);
+  }
+  .ms-note {
+    max-width: 52ch;
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+    line-height: 1.6;
+    color: var(--color-ink-2);
+  }
+  .ms-tag {
+    color: var(--color-ink);
+  }
+  .ms-cap {
+    font-size: var(--text-label);
+    line-height: 1.45;
+    color: var(--color-muted);
+  }
+</style>

@@ -1,0 +1,459 @@
+---
+/**
+ * Direction A: the long-form article at the bottom of a page, after the call band (Goran, 26 Nov). Reads like a blog
+ * post: the contents on the left (every H2, sticky, the one you are reading marked), the text on the right at a
+ * reading width. Below 1024px the contents fold into a "Contents" disclosure above the text.
+ *
+ * Written for AI search as much as for people: each H2 opens with an answer that stands on its own, the H2s carry
+ * ids for deep links, and the page passes the article to JSON-LD (articleLd in src/data/article-types.ts).
+ * The contents lists and media placeholders stay out of the Markdown twins (data-md-skip); the text goes in.
+ */
+import type { Article } from '../../data/article-types';
+import { readingMinutes } from '../../data/article-types';
+import Label from '../../components/ui/Label.astro';
+import MediaSlot from '../../components/MediaSlot.astro';
+
+interface Props {
+  article: Article;
+}
+const { article: a } = Astro.props;
+const minutes = readingMinutes(a);
+const updated = new Date(a.updated).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+const num = (i: number) => String(i + 1).padStart(2, '0');
+---
+
+<section id={a.id} aria-labelledby={`${a.id}-title`} class="container-page pb-section ar" data-ar>
+  <div class="ar-grid">
+    <aside class="ar-side" data-md-skip>
+      <nav class="ar-toc" aria-label={`Contents: ${a.title}`}>
+        <p class="caption-sm ar-toc-h m-0">On this page</p>
+        <ol class="ar-toc-list">
+          {
+            a.sections.map((s, i) => (
+              <li>
+                <a href={`#${s.id}`} class="ar-toc-link" data-ar-link={s.id}>
+                  <span class="ar-toc-n" aria-hidden="true">{num(i)}</span>
+                  <span>{s.title}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </nav>
+    </aside>
+
+    <article class="ar-body">
+      <header class="ar-head">
+        <Label variant="section">{a.caption}</Label>
+        <h2 id={`${a.id}-title`} class="ar-title m-0">{a.title}</h2>
+        <p class="ar-lede m-0">{a.lede}</p>
+        <p class="ar-meta m-0">
+          <span>By {a.author}</span>
+          <span aria-hidden="true">·</span>
+          <span>Updated <time datetime={a.updated}>{updated}</time></span>
+          <span aria-hidden="true">·</span>
+          <span>{minutes} min read</span>
+        </p>
+      </header>
+
+      <details class="ar-toc-m" data-md-skip>
+        <summary>
+          <span class="caption-sm">Contents</span>
+          <span class="ar-toc-m-count">{a.sections.length} sections</span>
+          <span class="ar-toc-m-ind" aria-hidden="true"></span>
+        </summary>
+        <ol class="ar-toc-list">
+          {
+            a.sections.map((s, i) => (
+              <li>
+                <a href={`#${s.id}`} class="ar-toc-link" data-ar-link={s.id}>
+                  <span class="ar-toc-n" aria-hidden="true">{num(i)}</span>
+                  <span>{s.title}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </details>
+
+      {
+        a.sections.map((s) => (
+          <section id={s.id} aria-labelledby={`${s.id}-h`} class="ar-sec" data-ar-sec>
+            <h2 id={`${s.id}-h`} class="ar-h m-0">
+              {s.title}
+            </h2>
+            <p class="ar-answer m-0" set:html={s.answer} />
+            {s.blocks.map((b) =>
+              'p' in b ? (
+                <p class="ar-p m-0" set:html={b.p} />
+              ) : 'h3' in b ? (
+                <h3 class="ar-h3 m-0" set:html={b.h3} />
+              ) : 'list' in b ? (
+                b.ordered ? (
+                  <ol class="ar-list ar-list--ol">
+                    {b.list.map((li) => (
+                      <li set:html={li} />
+                    ))}
+                  </ol>
+                ) : (
+                  <ul class="ar-list">
+                    {b.list.map((li) => (
+                      <li set:html={li} />
+                    ))}
+                  </ul>
+                )
+              ) : 'table' in b ? (
+                <div class="ar-table-wrap">
+                  <table class="ar-table">
+                    {b.table.caption && <caption class="caption-sm">{b.table.caption}</caption>}
+                    <thead>
+                      <tr>
+                        {b.table.head.map((h) => (
+                          <th scope="col">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {b.table.rows.map((r) => (
+                        <tr>
+                          {r.map((c, k) => (k === 0 ? <th scope="row" set:html={c} /> : <td set:html={c} />))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : 'callout' in b ? (
+                <aside class="ar-callout">
+                  <span class="caption-sm ar-callout-k">In short</span>
+                  <p class="m-0" set:html={b.callout} />
+                </aside>
+              ) : 'media' in b ? (
+                <MediaSlot {...b.media} class="ar-media" />
+              ) : null,
+            )}
+          </section>
+        ))
+      }
+    </article>
+  </div>
+</section>
+
+<style>
+  .ar {
+    border-top: 1px solid var(--color-rule);
+    padding-top: var(--spacing-section);
+  }
+  .ar-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--spacing-xl);
+  }
+  @media (min-width: 1024px) {
+    .ar-grid {
+      grid-template-columns: 248px minmax(0, 1fr);
+      gap: var(--spacing-2xl);
+    }
+  }
+
+  /* ---------- contents, left ---------- */
+  .ar-side {
+    display: none;
+  }
+  @media (min-width: 1024px) {
+    .ar-side {
+      display: block;
+    }
+    .ar-toc-m {
+      display: none;
+    }
+  }
+  .ar-toc {
+    position: sticky;
+    top: 104px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    max-height: calc(100vh - 128px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .ar-toc-h {
+    color: var(--color-muted);
+  }
+  .ar-toc-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-left: 1px solid var(--color-rule);
+  }
+  .ar-toc-link {
+    display: flex;
+    gap: var(--spacing-xs);
+    margin-left: -1px;
+    padding: 7px 0 7px var(--spacing-sm);
+    border-left: 2px solid transparent;
+    font-size: var(--text-label);
+    line-height: 1.4;
+    color: var(--color-ink-2);
+    text-decoration: none;
+    transition:
+      color 120ms var(--ease-out),
+      border-color 120ms var(--ease-out);
+  }
+  .ar-toc-n {
+    flex: none;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    line-height: 1.7;
+    color: var(--color-muted);
+  }
+  .ar-toc-link[aria-current='true'] {
+    border-left-color: var(--color-accent);
+    color: var(--color-ink);
+  }
+  .ar-toc-link[aria-current='true'] .ar-toc-n {
+    color: var(--color-accent);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .ar-toc-link:hover {
+      color: var(--color-ink);
+    }
+  }
+
+  /* contents, folded (tablet and phone) */
+  .ar-toc-m {
+    border: 1px solid var(--color-rule);
+    background: var(--color-surface);
+  }
+  .ar-toc-m summary {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    min-height: 52px;
+    padding: 0 var(--spacing-md);
+    list-style: none;
+  }
+  .ar-toc-m summary::-webkit-details-marker {
+    display: none;
+  }
+  .ar-toc-m-count {
+    flex: 1;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--color-muted);
+  }
+  .ar-toc-m-ind::before {
+    content: '+';
+    font-family: var(--font-mono);
+    font-size: var(--text-lede);
+    color: var(--color-ink-2);
+  }
+  .ar-toc-m[open] .ar-toc-m-ind::before {
+    content: '\2212';
+  }
+  .ar-toc-m .ar-toc-list {
+    margin: 0 var(--spacing-md) var(--spacing-md);
+  }
+
+  /* ---------- the text, right ---------- */
+  .ar-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+    min-width: 0;
+    max-width: 720px;
+  }
+  .ar-head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  .ar-title {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(32px, 3.6vw, 52px);
+    line-height: 1.06;
+    letter-spacing: -0.01em;
+  }
+  .ar-lede {
+    font-size: var(--text-body-lg);
+    line-height: 1.55;
+    color: var(--color-ink-2);
+  }
+  .ar-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-2xs);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    color: var(--color-muted);
+  }
+  .ar-sec {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--color-rule);
+  }
+  .ar-h {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--text-title);
+    line-height: var(--text-title--line-height);
+    letter-spacing: 0;
+  }
+  .ar-answer {
+    padding-left: var(--spacing-sm);
+    border-left: 2px solid var(--color-accent);
+    font-size: var(--text-lede);
+    line-height: 1.55;
+    color: var(--color-ink);
+  }
+  .ar-h3 {
+    margin-top: var(--spacing-2xs);
+    font-size: var(--text-cta);
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  .ar-p,
+  .ar-list {
+    font-size: var(--text-body);
+    line-height: 1.7;
+    color: var(--color-ink-2);
+  }
+  .ar-list {
+    margin: 0;
+    padding-left: 1.25em;
+    list-style: square;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3xs);
+  }
+  .ar-list li::marker {
+    color: var(--color-accent);
+  }
+  .ar-list--ol {
+    list-style: decimal-leading-zero;
+    padding-left: 2em;
+  }
+  .ar-list--ol li::marker {
+    font-family: var(--font-mono);
+    font-size: var(--text-code);
+  }
+  .ar-body :global(a) {
+    color: var(--color-ink);
+    text-decoration-line: underline;
+    text-decoration-color: var(--color-accent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+  .ar-body :global(strong) {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+  .ar-body :global(code) {
+    padding: 1px 5px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-rule);
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    color: var(--color-ink);
+    overflow-wrap: anywhere;
+  }
+  .ar-table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--color-rule);
+  }
+  .ar-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-label);
+    line-height: 1.5;
+  }
+  .ar-table caption {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    text-align: left;
+    color: var(--color-muted);
+    border-bottom: 1px solid var(--color-rule);
+  }
+  .ar-table th,
+  .ar-table td {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--color-rule);
+    color: var(--color-ink-2);
+  }
+  .ar-table thead th {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    background: var(--color-surface);
+  }
+  .ar-table tbody th {
+    font-weight: 500;
+    color: var(--color-ink);
+  }
+  .ar-table tbody tr:last-child > * {
+    border-bottom: 0;
+  }
+  .ar-callout {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2xs);
+    padding: var(--spacing-md);
+    background: var(--color-surface);
+    border: 1px solid var(--color-rule);
+    font-size: var(--text-body);
+    line-height: 1.6;
+  }
+  .ar-callout-k {
+    color: var(--color-accent);
+  }
+  .ar-body :global(.ar-media) {
+    margin-block: var(--spacing-2xs);
+  }
+</style>
+
+<script>
+  // mark the section being read in the contents: the last one whose top has passed the header line
+  document.querySelectorAll<HTMLElement>('[data-ar]').forEach((root) => {
+    const secs = [...root.querySelectorAll<HTMLElement>('[data-ar-sec]')];
+    const links = [...root.querySelectorAll<HTMLAnchorElement>('[data-ar-link]')];
+    if (!secs.length) return;
+    let current = '';
+    let queued = false;
+    const update = () => {
+      queued = false;
+      const line = 140;
+      let id = '';
+      for (const s of secs) if (s.getBoundingClientRect().top <= line) id = s.id;
+      // past the article: nothing is current
+      if (root.getBoundingClientRect().bottom < line) id = '';
+      if (id === current) return;
+      current = id;
+      for (const l of links) {
+        if (l.dataset.arLink === id) l.setAttribute('aria-current', 'true');
+        else l.removeAttribute('aria-current');
+      }
+    };
+    const onScroll = () => {
+      if (!queued) {
+        queued = true;
+        requestAnimationFrame(update);
+      }
+    };
+    addEventListener('scroll', onScroll, { passive: true });
+    addEventListener('resize', onScroll);
+    update();
+    // the folded contents close after a pick, so the text is in view
+    root.querySelectorAll<HTMLDetailsElement>('.ar-toc-m').forEach((d) =>
+      d.addEventListener('click', (e) => {
+        if ((e.target as HTMLElement).closest('a')) d.open = false;
+      }),
+    );
+  });
+</script>
