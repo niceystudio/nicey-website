@@ -4,6 +4,7 @@
  * still makes sense when it is quoted alone, then goes into detail. Inline HTML is allowed in strings
  * (<a>, <strong>, <em>, <code>); it is our own copy, never user input.
  */
+import { founder } from './people';
 
 /** a photo, video, screen recording or diagram still to make (MediaSlot.astro) */
 export interface MediaSpec {
@@ -71,7 +72,7 @@ export function articleLd(a: Article, pageUrl: string) {
     datePublished: a.updated,
     wordCount: wordCount(a),
     about: a.about,
-    author: { '@type': 'Organization', name: a.author, url: new URL('/', pageUrl).href },
+    author: founder,
     publisher: { '@type': 'Organization', name: 'Nicey Studio', url: new URL('/', pageUrl).href },
     articleSection: a.sections.map((s) => s.title),
   };

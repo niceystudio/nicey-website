@@ -8,7 +8,7 @@ export const getStaticPaths = (() =>
 
 export const GET: APIRoute = ({ props, site }) => {
   const study = props.study as CaseStudy;
-  const url = new URL(caseHref(study.slug), site ?? 'https://nicey-website.vercel.app').href;
+  const url = new URL(caseHref(study.slug), site!).href;
   return new Response(caseMarkdown(study, url), {
     headers: { 'Content-Type': 'text/markdown; charset=utf-8' },
   });

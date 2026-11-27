@@ -4,6 +4,7 @@
  * (src/data/articles/design-systems.ts, product-design.ts); this one links to them.
  */
 import type { Article } from '../article-types';
+import { founder } from '../people';
 
 export const homeArticle: Article = {
   id: 'guide',
@@ -11,7 +12,7 @@ export const homeArticle: Article = {
   title: 'What a design systems agency does, and when you need one',
   lede: 'A plain guide to hiring outside help for your design system and product design: what the work includes, the signs it is time, how coding agents change the brief, and how to pick a partner.',
   updated: '2026-11-26',
-  author: 'Nicey Studio',
+  author: founder.name,
   about: ['Design systems agency', 'Design systems', 'Product design', 'AI-ready design systems', 'Design tokens'],
   sections: [
     {

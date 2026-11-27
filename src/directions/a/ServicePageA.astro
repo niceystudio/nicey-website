@@ -4,6 +4,7 @@
  * JSON-LD: the Service, the FAQ, the article and a breadcrumb, so AI search can quote each part on its own.
  */
 import './a.css';
+import { SITE } from '../../lib/site';
 import Base from '../../layouts/Base.astro';
 import Header from '../../components/Header.astro';
 import SiteFooter from '../../components/SiteFooter.astro';
@@ -15,7 +16,7 @@ interface Props {
   page: ServicePage;
 }
 const { page: p } = Astro.props;
-const site = Astro.site ?? new URL('https://nicey-website.vercel.app');
+const site = (Astro.site ?? SITE);
 const pageUrl = new URL(`/${p.slug}`, site).href;
 const home = new URL('/', site).href;
 const jsonLd = {

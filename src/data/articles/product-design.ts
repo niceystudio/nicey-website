@@ -3,6 +3,7 @@
  * Practice, not prophecy: what changes in the work when agents can build, and what stays a design decision.
  */
 import type { Article } from '../article-types';
+import { founder } from '../people';
 
 export const productDesignArticle: Article = {
   id: 'guide',
@@ -10,7 +11,7 @@ export const productDesignArticle: Article = {
   title: 'Product design with AI in the loop: a practical guide',
   lede: 'How product design works now that prototypes cost minutes and coding agents can build what you draw: what changes in the process, how to design AI features people trust, and where design engineering fits.',
   updated: '2026-11-26',
-  author: 'Nicey Studio',
+  author: founder.name,
   about: ['Product design', 'UX design', 'Design engineering', 'AI product design', 'AI-assisted prototyping', 'Design systems'],
   sections: [
     {

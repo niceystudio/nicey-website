@@ -6,6 +6,7 @@
  * → CTA card and the next case study.
  */
 import Base from '../../layouts/Base.astro';
+import { SITE } from '../../lib/site';
 import Header from '../Header.astro';
 import Gaps from './Gaps.astro';
 import Shot from './Shot.astro';
@@ -37,6 +38,7 @@ import SiteFooter from '../SiteFooter.astro';
 import { links } from '../../data/links';
 import { caseHref, nextPublished, publishedCaseStudies, type Band, type CaseStudy } from '../../data/case-studies';
 import { qbenchChaptersA, everbreedAliasesDiff } from '../../data/case-studies-a';
+import { founder } from '../../data/people';
 
 interface Props {
   study: CaseStudy;
@@ -89,14 +91,14 @@ const bandBg: Record<Band, string> = {
 };
 const band = bandBg[s.band];
 const mdHref = `${caseHref(s.slug)}.md`;
-const pageUrl = new URL(caseHref(s.slug), Astro.site ?? 'https://nicey-website.vercel.app').href;
+const pageUrl = new URL(caseHref(s.slug), (Astro.site ?? SITE)).href;
 const article = {
   '@type': 'Article',
   headline: `${s.name}: ${s.statement}`,
   description: s.lede,
   url: pageUrl,
   about: s.kicker.replace('Case study · ', '').split(' · '),
-  author: { '@type': 'Organization', name: 'Nicey Studio', url: new URL('/', pageUrl).href },
+  author: founder,
   mainEntityOfPage: pageUrl,
 };
 // only answered questions go into structured data; [placeholders] stay out
@@ -106,10 +108,10 @@ const faqLd = answered.length > 0 && {
   mainEntity: answered.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
 };
 const jsonLd = { '@context': 'https://schema.org', '@graph': faqLd ? [article, faqLd] : [article] };
-const markdown = caseMarkdown(s, new URL(caseHref(s.slug), Astro.site ?? 'https://nicey-website.vercel.app').href);
+const markdown = caseMarkdown(s, new URL(caseHref(s.slug), (Astro.site ?? SITE)).href);
 ---
 
-<Base title={`${s.linkName} case study · Nicey`} description={s.lede} markdownHref={mdHref} jsonLd={jsonLd} noindex={noindex} >
+<Base title={`${s.linkName} case study · Nicey`} description={s.lede} markdownHref={mdHref} jsonLd={jsonLd} noindex={noindex} ogType="article">
   <div class:list={[direction && `dir-${direction}`]} data-rail-a={railA ? '' : undefined}>
   <Header variant="case" home={home} />
   <main id="main" tabindex="-1" class="cs" data-human>
