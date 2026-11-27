@@ -3,13 +3,17 @@
  * Direction A: "Book a call" with Goran, right after the free audit (Emir 23 Nov). Our own design, no embedded
  * scheduler: the button opens the booking page (links.bookCall, the cal.com intro the live site uses) in a new tab.
  * Copy is rough (Goran + Predrag polish).
+ * 27 Nov (after craft.wild.as): the band opens on pixel type (PixelMarqueeA, the Zero Drift story in two words), and
+ * the button gets stepped pixel corners while the style is square (Terminal).
  */
 import { links } from '../../data/links';
 import Button from '../../components/ui/Button.astro';
+import PixelMarqueeA from './PixelMarqueeA.astro';
 ---
 
 <section aria-labelledby="call-head" class="container-page pb-section">
   <div class="panel bc">
+    <PixelMarqueeA text="DRIFT → SYSTEM → " class="bc-mq" />
     <div class="bc-in">
       <img class="bc-photo" src="/team/goran.jpg" alt="Goran, founder of Nicey" width="400" height="400" loading="lazy" decoding="async" />
       <div class="bc-text">
@@ -45,6 +49,22 @@ import Button from '../../components/ui/Button.astro';
     display: inline-flex;
     align-items: center;
     gap: var(--spacing-xs);
+  }
+  .bc :global(.bc-mq) {
+    border-bottom: 1px solid var(--color-line);
+    background: var(--color-page);
+  }
+  /* stepped pixel corners, only while the corners are square (the Terminal style); the other styles keep their radius */
+  @container style(--radius-pill: 0px) {
+    .bc-btn {
+      --step: 4px;
+      clip-path: polygon(
+        0 var(--step), var(--step) var(--step), var(--step) 0, calc(100% - var(--step)) 0,
+        calc(100% - var(--step)) var(--step), 100% var(--step), 100% calc(100% - var(--step)),
+        calc(100% - var(--step)) calc(100% - var(--step)), calc(100% - var(--step)) 100%, var(--step) 100%,
+        var(--step) calc(100% - var(--step)), 0 calc(100% - var(--step))
+      );
+    }
   }
   .bc-ext {
     flex: none;

@@ -7,10 +7,12 @@
  * Product design shows Everbreed's weekly care summary (one clear Continue button) instead of the weight log.
  * 25 Nov (design system merge): the opener is SectionHead, and each visual sits on an animated pixel field (rings
  * behind design systems, a drop behind product design) instead of a flat pastel stage.
+ * 27 Nov (after craft.wild.as): the fields behind the stages are gone; each card opens with a pixel icon that acts
+ * the service out (PixelIconA). The stage is a plain page-coloured ground.
  */
 import QBenchWork from '../../components/case-study/QBenchWork.astro';
 import SectionHead from '../../components/SectionHead.astro';
-import PixelFieldA from './PixelFieldA.astro';
+import PixelIconA from './PixelIconA.astro';
 import Label from '../../components/ui/Label.astro';
 import { links } from '../../data/links';
 import { designSystemsPage, productDesignPage } from '../../data/service-pages';
@@ -26,8 +28,7 @@ const services = [
     href: links.exploreDesignSystems,
     items: designSystemsPage.offers.map((o) => ({ name: o.name, id: o.id })),
     visual: 'qbench',
-    field: 'rings' as const,
-    seed: 5,
+    icon: 'system' as const,
   },
   {
     id: 'product-design',
@@ -37,8 +38,7 @@ const services = [
     href: links.exploreProductDesign,
     items: productDesignPage.offers.map((o) => ({ name: o.name, id: o.id })),
     visual: 'phone',
-    field: 'drop' as const,
-    seed: 9,
+    icon: 'screen' as const,
   },
 ];
 ---
@@ -53,6 +53,7 @@ const services = [
       services.map((s) => (
         <article class:list={['sc2-card', `sc2-card--${s.id}`]} aria-labelledby={`sc2-${s.id}`}>
           <div class="sc2-text">
+            <PixelIconA kind={s.icon} class="sc2-icon" />
             <Label variant="caption">{s.kicker}</Label>
             <h3 id={`sc2-${s.id}`} class="sc2-h m-0">{s.label}</h3>
             <p class="m-0 sc2-lede">{s.lede}</p>
@@ -70,7 +71,6 @@ const services = [
             <a href={s.href} class="sc2-more">Explore {s.label.toLowerCase()} →</a>
           </div>
           <figure class="sc2-stage m-0">
-            <PixelFieldA mode={s.field} seed={s.seed} cx={0.72} cy={0.5} />
             {s.visual === 'qbench' ? (
               <QBenchWork terminal bare />
             ) : (
@@ -192,6 +192,11 @@ const services = [
     position: relative;
     isolation: isolate;
     overflow: hidden;
+    background: var(--color-page);
+  }
+  /* the icon sits on the card's left edge, a step above the kicker */
+  .sc2-text > :global(.sc2-icon) {
+    margin: calc(-1 * var(--spacing-2xs)) 0 var(--spacing-2xs) -4px;
   }
   @media (max-width: 639px) {
     .sc2-stage {

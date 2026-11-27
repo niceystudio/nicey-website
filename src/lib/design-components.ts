@@ -70,6 +70,36 @@ export const components: Component[] = [
     api: ["mode: 'drift' | 'rings' | 'drop'", "fade: 'left' | 'edges' | 'none'", 'still: one frame, no motion', 'seed, cx, cy, cell'],
   },
   {
+    name: 'PixelTrailA',
+    file: 'src/directions/a/PixelTrailA.astro',
+    what: 'The homepage hero field: crisp pastel cells in slow bands; the pointer leaves an accent and hot trail through them. Fades out towards the headline. Still, with no trail, under reduced motion.',
+    api: ['seed, cell', 'fills its positioned parent; listens for the pointer on the closest <section>'],
+  },
+  {
+    name: 'PixelFlowA',
+    file: 'src/directions/a/PixelFlowA.astro',
+    what: 'How we work drawn in cells: scattered near-colours at Drift become one solid, bordered block at Proof. Hovering or focusing a step card (#step-<id>) lights its column.',
+    api: ['no props: sits above the five step cards in HowA'],
+  },
+  {
+    name: 'PixelIconA',
+    file: 'src/directions/a/PixelIconA.astro',
+    what: 'A small pixel icon that acts out a service: near-purples collapse into one token (system), parts assemble into a screen (screen). Assembles once on screen, loops while its card is hovered.',
+    api: ["kind: 'system' | 'screen'", 'class'],
+  },
+  {
+    name: 'PixelAuditA',
+    file: 'src/directions/a/PixelAuditA.astro',
+    what: 'The example audit score per pillar in cells: they pour into each track and the ones past the score fall out hot. Names and scores are real text; data from src/data/audit-sample.ts.',
+    api: ['no props'],
+  },
+  {
+    name: 'PixelMarqueeA',
+    file: 'src/directions/a/PixelMarqueeA.astro',
+    what: 'Words drawn in cells from the display face, on a slow loop; they scatter away from the pointer.',
+    api: ['text', 'class'],
+  },
+  {
     name: 'Faq',
     file: 'src/components/Faq.astro',
     what: 'Questions as an accordion, with a section opener.',

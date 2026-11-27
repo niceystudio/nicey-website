@@ -12,7 +12,6 @@
  */
 import CopyPrompt from '../../components/CopyPrompt.astro';
 import { SITE } from '../../lib/site';
-import PixelFieldA from './PixelFieldA.astro';
 import { aiReadyPrompt, PILLARS } from '../../lib/ai-ready';
 import { links } from '../../data/links';
 
@@ -58,7 +57,6 @@ const gets = [
     </div>
 
     <div class="sc-stage">
-      <PixelFieldA mode="drift" seed={17} />
       <div class="scr term" data-scr={JSON.stringify(script)} data-md-skip>
         <div class="scr-bar term-bar">
           <span>your agent · example run</span>
@@ -154,7 +152,9 @@ const gets = [
     align-items: flex-start;
     gap: var(--spacing-xs);
   }
+  /* 27 Nov: plain page ground, like the report stage above (the pixel field behind it is gone) */
   .sc-stage {
+    background: var(--color-page);
     min-width: 0;
     display: flex;
     align-items: center;

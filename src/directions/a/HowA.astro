@@ -5,9 +5,10 @@
  * the per-step windows (seeing / we do / proof figures) are gone; the full text stays in the Markdown twin for agents.
  * 23 Nov (Emir): the rail above the cards (HowDiagramB) — tangled lines straighten from Drift to Proof.
  * 23 Nov (Goran): no "You get" line and no rules between the steps — one container, spacing separates them.
+ * 27 Nov (after craft.wild.as): the rail is drawn in cells (PixelFlowA) instead of lines; HowDiagramB stays in the repo.
  */
 import { steps } from '../../data/zero-drift';
-import HowDiagramB from './HowDiagramB.astro';
+import PixelFlowA from './PixelFlowA.astro';
 ---
 
 <section id="how" aria-labelledby="how-head" class="ho">
@@ -16,7 +17,7 @@ import HowDiagramB from './HowDiagramB.astro';
       <span class="caption a-path text-ink-2">How we work</span>
       <h2 id="how-head" class="m-0 text-h2"><span class="h-print">From drift to a system that holds.</span></h2>
     </div>
-    <HowDiagramB />
+    <PixelFlowA />
     <ol class="ho-steps">
       {
         steps.map((s) => (

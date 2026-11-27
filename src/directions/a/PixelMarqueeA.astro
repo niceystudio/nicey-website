@@ -1,0 +1,96 @@
+---
+/**
+ * Direction A: pixel type on a slow loop (27 Nov, after craft.wild.as's "the answer is yes" band). The words are drawn
+ * in cells from the display face, each cell in one of the brand colours, and they scatter away from the pointer.
+ * Used as the closing strip of the Book a call band. Decorative (aria-hidden): the band says it in words.
+ * Reduced motion: still, no scatter. Engine: src/lib/pixel-scenes.ts.
+ */
+interface Props {
+  text: string;
+  class?: string;
+}
+const { text, class: cls } = Astro.props;
+---
+
+<div class:list={['pmq', cls]} aria-hidden="true">
+  <canvas data-pmq={text}></canvas>
+</div>
+
+<style>
+  .pmq {
+    height: 120px;
+    overflow: hidden;
+  }
+  .pmq canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  @media (max-width: 767px) {
+    .pmq {
+      height: 88px;
+    }
+  }
+</style>
+
+<script>
+  import { mountScene, repel, cell as drawCell, type Colors, type Scene } from '../../lib/pixel-scenes';
+
+  interface Marquee extends Scene {
+    text: string;
+    mask: [number, number][];
+    span: number;
+    rows: number;
+    z: number;
+  }
+  const GLYPH = 10; // text is rasterised at this px height, one cell per pixel
+
+  document.querySelectorAll<HTMLCanvasElement>('[data-pmq]').forEach((canvas) => {
+    mountScene<Marquee>(
+      canvas,
+      {
+        host: canvas.parentElement,
+        threshold: 0.2,
+        layout(s) {
+          // rasterise the words in the site's display face, then keep the solid pixels as cells
+          const face = getComputedStyle(document.documentElement).getPropertyValue('--font-display').trim() || 'monospace';
+          const o = document.createElement('canvas');
+          const g = o.getContext('2d');
+          if (!g) return;
+          const font = `400 ${GLYPH}px ${face}`;
+          g.font = font;
+          s.span = Math.ceil(g.measureText(s.text).width);
+          o.width = Math.max(1, s.span);
+          o.height = GLYPH + 4;
+          g.font = font;
+          g.textBaseline = 'top';
+          g.fillStyle = '#000';
+          g.fillText(s.text, 0, 1);
+          const d = g.getImageData(0, 0, o.width, o.height).data;
+          s.mask = [];
+          for (let y = 0; y < o.height; y++)
+            for (let x = 0; x < o.width; x++) if (d[(y * o.width + x) * 4 + 3] > 120) s.mask.push([x, y]);
+          s.rows = o.height;
+          s.z = Math.max(5, Math.floor((s.H * 0.8) / s.rows));
+        },
+        draw(s, c: Colors, t) {
+          const { ctx, z } = s;
+          ctx.clearRect(0, 0, s.W, s.H);
+          if (!s.mask.length) return false;
+          const pal = [c.accent, c.hot, c.butterDeep, c.lavenderDeep, c.sageDeep, c.ink];
+          const loop = s.span * z, off = s.reduced ? 0 : (t * 24) % loop, top = Math.round((s.H - s.rows * z) / 2);
+          for (let rep = -1; rep * loop - off < s.W; rep++)
+            for (const [mx, my] of s.mask) {
+              let x = rep * loop + mx * z - off, y = top + my * z;
+              if (x < -z || x > s.W) continue;
+              if (s.inside) [x, y] = repel(s, x, y, 64, 30);
+              ctx.fillStyle = pal[(mx * 7 + my * 3) % pal.length];
+              drawCell(ctx, x, y, z);
+            }
+          return !s.reduced;
+        },
+      },
+      { text: canvas.dataset.pmq ?? '', mask: [], span: 0, rows: 0, z: 6 },
+    );
+  });
+</script>

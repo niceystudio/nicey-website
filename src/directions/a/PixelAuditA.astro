@@ -1,0 +1,155 @@
+---
+/**
+ * Direction A · Free audit: the score per pillar, drawn in cells (27 Nov, after craft.wild.as's Brand Check, where
+ * rejected outputs fall out of the diagram in red). Cells pour in from above and fill each pillar's track; the ones
+ * past the score turn hot and fall away. Plays once on screen; hovering it plays it again.
+ * The names and scores are real text in the list; the canvas only draws the bars (aria-hidden).
+ * Sample values from src/data/audit-sample.ts, the same ones the report terminal shows.
+ * Reduced motion: the settled bars, still. Engine: src/lib/pixel-scenes.ts.
+ */
+import { auditSample, auditGrade } from '../../data/audit-sample';
+---
+
+<div class="pau">
+  <ul class="pau-list" aria-label={`Example score: grade ${auditGrade}`}>
+    {
+      auditSample.map((a) => (
+        <li class="pau-row">
+          <span>{a.pillar}</span>
+          <span class="pau-score">{a.score}/100</span>
+        </li>
+      ))
+    }
+  </ul>
+  <canvas data-pau data-scores={auditSample.map((a) => a.score).join(',')} aria-hidden="true"></canvas>
+  <p class="pau-foot m-0"><span>Example score</span><span>Grade {auditGrade}</span></p>
+</div>
+
+<style>
+  /* each row: the label on top, its bar (drawn on the canvas) in the 14px below it; rows are fixed so the two line up */
+  .pau {
+    --pau-row: 40px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2xs);
+  }
+  .pau-list {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pau-row {
+    display: flex;
+    justify-content: space-between;
+    height: var(--pau-row);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    line-height: 1.4;
+    color: var(--color-ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+  .pau-score {
+    color: var(--color-ink);
+  }
+  .pau canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: calc(var(--pau-row) * 5 + 40px);
+    pointer-events: none;
+  }
+  .pau-foot {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: var(--text-caption-sm);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+</style>
+
+<script>
+  import { mountScene, mulberry32, easeOut, cell as drawCell, type Colors, type Scene } from '../../lib/pixel-scenes';
+
+  interface Part {
+    keep: boolean;
+    tx: number;
+    ty: number;
+    sx: number;
+    sy: number;
+    d: number;
+    fx: number;
+  }
+  interface Audit extends Scene {
+    scores: number[];
+    parts: Part[];
+    tracks: number;
+  }
+  const ROW = 40, BAR_Y = 20, Z = 6;
+
+  document.querySelectorAll<HTMLCanvasElement>('[data-pau]').forEach((canvas) => {
+    const scores = (canvas.dataset.scores ?? '').split(',').map(Number);
+    mountScene<Audit>(
+      canvas,
+      {
+        host: canvas.parentElement,
+        threshold: 0.5,
+        layout(s) {
+          const r = mulberry32(9), per = Math.floor(s.W / Z);
+          s.tracks = per * Z;
+          s.parts = [];
+          s.scores.forEach((v, row) => {
+            const kept = Math.round((v / 100) * per);
+            for (let i = 0; i < per; i++)
+              for (let k = 0; k < 2; k++)
+                s.parts.push({
+                  keep: i < kept,
+                  tx: i * Z,
+                  ty: row * ROW + BAR_Y + k * Z,
+                  sx: r() * s.W,
+                  sy: -20 - r() * 160,
+                  d: r() * 0.5 + row * 0.12,
+                  fx: (r() - 0.5) * 120,
+                });
+          });
+        },
+        // the pointer replays it once it has settled
+        onMove(s) {
+          if (s.started && performance.now() - s.started > 3600) s.started = performance.now();
+        },
+        draw(s, c: Colors, t) {
+          const { ctx } = s;
+          ctx.clearRect(0, 0, s.W, s.H);
+          ctx.fillStyle = c.faint;
+          s.scores.forEach((_, row) => ctx.fillRect(0, row * ROW + BAR_Y, s.tracks - 1, Z * 2 - 1));
+          let live = false;
+          for (const p of s.parts) {
+            const k = s.started || s.reduced ? easeOut((t - p.d) / 0.9) : 0;
+            if (!p.keep && s.reduced) continue;
+            let x = p.sx + (p.tx - p.sx) * k, y = p.sy + (p.ty - p.sy) * k, fill = c.accent;
+            if (!p.keep) {
+              const f = Math.max(0, t - p.d - 1.3);
+              fill = f > 0 ? c.hot : c.lavenderDeep;
+              if (f > 0) {
+                y = p.ty + f * f * 380;
+                x = p.tx + p.fx * f;
+              }
+              if (y > s.H) continue;
+            }
+            if (k < 1 || !p.keep) live = true;
+            if (y < -Z) continue;
+            ctx.fillStyle = fill;
+            drawCell(ctx, x, y, Z);
+          }
+          return live || !s.started;
+        },
+      },
+      { scores, parts: [], tracks: 0 },
+    );
+  });
+</script>
