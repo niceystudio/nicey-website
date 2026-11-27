@@ -43,8 +43,6 @@ const tokenCss = {
   font: { editorial: instrumentSerifLatin } as Record<string, string>,
 };
 const siteUrl = (Astro.site ?? SITE).href;
-// Plausible (cookieless, no consent banner) only on the production deployment, so previews and local builds don't count
-const analytics = process.env.VERCEL_ENV === 'production';
 // who we are, said the same way as the footer and the home page; sameAs = the profiles in links.ts
 const org = {
   '@context': 'https://schema.org',
@@ -87,15 +85,6 @@ const org = {
     <link rel="preload" href={geistLatin} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={geistMonoLatin} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={geistPixelLatin} as="font" type="font/woff2" crossorigin />
-    <!-- Analytics: a stub that queues events (src/lib/track.ts) until the script loads; the script only on production. -->
-    <script is:inline>
-      window.plausible =
-        window.plausible ||
-        function () {
-          (window.plausible.q = window.plausible.q || []).push(arguments);
-        };
-    </script>
-    {analytics && <script defer data-domain={SITE.hostname} src="https://plausible.io/js/script.outbound-links.js" />}
     <!-- Theme before first paint: stored choice, else the system preference. -->
     <script is:inline>
       (function () {
