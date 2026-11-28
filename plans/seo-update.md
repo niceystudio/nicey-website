@@ -18,12 +18,19 @@ Compared on 28 Nov 2026: the SEO checklist (`personal-context/playbooks/seo-chec
 | # | Priority | Item | Detail |
 |---|---|---|---|
 | 1 | 🔴 | Share image | No page has an `og:image`, so links shared on LinkedIn or Slack show no picture. Add one per page (homepage, the two service pages, three case studies). |
-| 2 | 🔴 | Lorem ipsum on case studies | "About this project" on QBench, status workflows and Everbreed shows placeholder text (Headquarters, Founded, Company size, Result) in the HTML Google reads. Fill in real facts, or hide the block until they exist. Facts come from Emir. |
+| 2 | 🔴 | Placeholders on case studies | Google reads placeholder text in the HTML: Lorem ipsum in "About this project" on QBench, status workflows and Everbreed (Headquarters, Founded, Company size, Result), plus the dashed placeholders: team size, client quotes, "Work by" dates, QBench's two screenshots ("token layers", "library by function"). Fill in real facts, or hide each block until it exists. Facts come from Emir. |
 | 3 | 🔴 | Meta descriptions too long | Homepage 200 characters, Everbreed 214, QBench 168. Trim to about 150–160. |
 | 4 | 🟡 | Case study titles | Titles like "Everbreed case study · Nicey" (29 characters) don't say what the work was. Put the search target first, e.g. "Everbreed: Figma-to-code design system and student app · Nicey" (aim for 50–60). |
 | 5 | 🟡 | Case study structured data | Add BreadcrumbList and `dateModified` (the service pages already have them). |
 | 6 | 🟡 | Contact in the HTML | No contact email on any page. Add a real address to the footer (address from Emir). |
 | 7 | ⚪ | Name AI search crawlers | `robots.txt` already allows everyone; optionally list `OAI-SearchBot`, `PerplexityBot`, `Claude-SearchBot` by name. |
+| 8 | 🔴 | Redirects from the old site | Old URLs that now return 404 lose their ranking. Emir exports the old URLs from Search Console; each one gets a 301 to its closest new page (404 when there is none). |
+| 9 | 🟡 | Speed (Core Web Vitals on mobile) | Performance scores are 0.74–0.8. Everbreed's two big JPGs (`desktop-care.jpg` ~490 KB, `desktop-photos.jpg`) to WebP or AVIF; trim script work. |
+| 10 | 🟡 | Homepage title | Put the main search phrase first; waits for the keyword choice (Phase 2). |
+| 11 | 🟡 | "design system agency" on /design-systems | Use the phrase in an H2. FAQ schema and links to the three case studies are already live. |
+
+## Already done
+- Lighthouse CI on PRs (#12) is merged.
 
 ## Outside the code (Emir)
 - Google Search Console and Bing Webmaster Tools: verify the site and submit the sitemap (status unknown).
