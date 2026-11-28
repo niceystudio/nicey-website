@@ -27,6 +27,8 @@ Found on 28 Nov 2026 from phone screenshots (iPhone, nicey.studio) and a check o
 ## Checks before the PR
 - Each fix compared at 375px and 390px, light and dark, and on desktop (desktop must not change).
 - `astro build` and Lighthouse CI pass.
+- When assets go into the hidden media slots (/design-systems, /product-design, the long-form articles), re-check each slot at 390px.
+- Page speed on mobile is tracked in the SEO plan (#20, item 9).
 
 ## Not mobile, but found on the way
 - The three case study pages show **Lorem ipsum** in "About this project" (Headquarters, Founded, Company size, Result). Needs real facts; tracked in `plans/seo-update.md`.
